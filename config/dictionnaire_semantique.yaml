@@ -1,0 +1,20 @@
+# Dictionnaire sémantique — v0.1 (libellés -> champs canoniques)
+# Enrichi à chaque session d'arbitrage. Libellé absent = QUARANTAINE.
+version: "0.1"
+
+champs_canoniques:
+  resultat_net:
+    syscohada: ["Résultat net", "Résultat net de l'exercice", "Bénéfice net"]
+    bancaire_umoa: ["Résultat net", "Résultat de l'exercice"]
+  total_actif:
+    syscohada: ["TOTAL ACTIF", "Total général actif"]
+    bancaire_umoa: ["TOTAL ACTIF", "Total de l'actif"]
+  total_passif:
+    syscohada: ["TOTAL PASSIF", "Total général passif"]
+    bancaire_umoa: ["TOTAL PASSIF", "Total du passif"]
+  capitaux_propres:
+    syscohada: ["Capitaux propres", "Total capitaux propres et ressources assimilées"]
+    bancaire_umoa: ["Capitaux propres", "Fonds propres"]
+  chiffre_affaires:
+    syscohada: ["Chiffre d'affaires", "Chiffre d'affaires net"]
+    bancaire_umoa: ["Produit net bancaire", "PNB"]

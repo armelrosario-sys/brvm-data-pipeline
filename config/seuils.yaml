@@ -1,0 +1,31 @@
+# Registre des seuils — v0.1 (statut : PROVISOIRES, à valider au backtest P7)
+# Toute modification : tracer ancienne valeur, nouvelle valeur, raison, date.
+version: "0.1"
+date: "2026-07-07"
+
+filtres_exclusion:
+  retards_publication: { defauts_max: 2, fenetre_echeances: 4 }
+  silence_informationnel_mois: 18
+  resultat_net_negatif_exercices: 2
+  payout_max: 1.00
+  payout_max_exercices: 2
+  de_ratio_multiple_median_sectoriel: 2.0   # hors banques
+  solvabilite_bancaire_min: 0.115           # BCEAO — vérifier taux en vigueur
+  suspension_lookback_mois: 12
+  sanction_lookback_mois: 24
+
+score:
+  poids: { rentabilite: 0.35, solidite: 0.30, valorisation: 0.35 }
+  payout_sain: { min: 0.30, max: 0.70 }
+  dividende_regulier_annees: 5
+  recul_max: { malus_des: 0.10, vigilance: 0.25 }
+  peg_attractif_max: 1.0
+  croissance_lookback_annees: 3
+
+extraction:
+  plafond_plausibilite_fcfa: 1000000000000  # 1 000 Mds FCFA
+  statut_ocr_max_sans_2e_source: "PROBABLE"
+
+collecte:
+  requetes_par_seconde_max: 2
+  cibles: ["boc_fin_de_mois", "avis", "rapports_financiers"]

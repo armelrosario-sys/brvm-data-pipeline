@@ -1,0 +1,75 @@
+# Donnees de marche de reference — v0.1
+# Distinct de seuils.yaml : ceci est de la DONNEE (a actualiser chaque revue),
+# pas un SEUIL comportemental. Source : BOC BRVM du 30/04/2026 sauf mention contraire.
+version: "0.1"
+date_reference: "2026-04-30"
+
+indicateurs_marche:
+  per_moyen: 13.04
+  rendement_moyen: 0.0654
+  rentabilite_moyenne: 0.0650
+  liquidite_moyenne: 27.53
+  taux_rotation_moyen: 0.04
+  prime_risque_marche: 1.93
+
+per_sectoriel:
+  TELECOMMUNICATIONS: 10.03
+  CONSOMMATION_DE_BASE: 12.31
+  INDUSTRIELS: 15.66
+  SERVICES_PUBLICS: 16.71
+  ENERGIE: 17.10
+  SERVICES_FINANCIERS: 23.80
+  CONSOMMATION_DISCRETIONNAIRE: 45.84
+
+de_mediane_sectorielle:               # hors banques (banques -> solvabilite reglementaire)
+  INDUSTRIELS: 1.0
+  CONSOMMATION_DE_BASE: 0.8
+  ENERGIE: 0.9
+  SERVICES_PUBLICS: 1.1
+  CONSOMMATION_DISCRETIONNAIRE: 0.9
+  TELECOMMUNICATIONS: 1.0
+
+per_individuels:                       # source BOC 30/04/2026, a actualiser chaque revue
+  SNTS: 6.94
+  STBC: 9.78
+  NSBC: 9.02
+  SMBC: 6.98
+  SAFC: 41.81                          # ANTERIEUR au redressement 2025 — a rafraichir en priorite
+  ORGT: 10.42
+  BOABF: 12.91
+  CBIBF: 7.87
+  SICC: 133.75
+
+liquidite_individuelle:                # ratio/qualification connue, source et date precisees
+  CBIBF:
+    ratio_flottant: 0.20
+    source: "capitalisation flottante/totale, 05/2026"
+  SNTS:
+    liquidite_execution: "ELEVEE"
+    note: "Sonatel capte jusqu'a 90% du volume quotidien du marche (dominance historique) — flottant reduit par le controle Orange MEA, mais execution aisee du fait du volume absolu"
+    source: "observation de marche, 07/2026"
+  # Ratios mesures directement (volume moyen/jour, 101 bulletins 2018-2026,
+  # rapporte au volume moyen de Sonatel = reference marche la plus liquide) :
+  UNLC:
+    volume_relatif_marche: 0.002
+    note: "29 titres/jour en moyenne, donnee absente 68% des mois (non cote) — quasi intradable"
+    source: "mesure directe BOC, 07/2026 (101 bulletins)"
+  SIVC:
+    volume_relatif_marche: 0.162
+    source: "mesure directe BOC, 07/2026 (101 bulletins)"
+  STBC:
+    volume_relatif_marche: 0.208
+    source: "mesure directe BOC, 07/2026 (101 bulletins)"
+  BICC:
+    volume_relatif_marche: 0.103
+    source: "mesure directe BOC, 07/2026 (101 bulletins)"
+  BOAM:
+    volume_relatif_marche: 0.220
+    source: "mesure directe BOC, 07/2026 (101 bulletins)"
+  CFAC:
+    volume_relatif_marche: 0.337
+    source: "mesure directe BOC, 07/2026 (101 bulletins)"
+  # Les autres titres n'ont pas encore de donnee individuelle fiable collectee —
+  # absence assumee plutot que valeur inventee (cf. principe integrite > couverture).
+  # Defaut applique : PRUDENCE, justifie par le taux de rotation moyen du marche
+  # (indicateurs_marche.taux_rotation_moyen = 0.04, extremement bas).

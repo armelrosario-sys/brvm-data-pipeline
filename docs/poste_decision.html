@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Poste de décision BRVM — v1</title><style>
+body{background:#0f172a;color:#e2e8f0;font:15px/1.5 system-ui,sans-serif;margin:0;padding:18px}
+.w{max-width:1000px;margin:auto} h1{font-size:1.3em} h2{font-size:1.05em;margin:0 0 10px}
+.carte{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px 16px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.9em} th{text-align:left;color:#94a3b8;font-weight:500;padding:6px 8px;border-bottom:1px solid #334155}
+td{padding:7px 8px;border-bottom:1px solid rgba(148,163,184,.15);vertical-align:top}
+.chip{display:inline-block;padding:1px 8px;border-radius:99px;font-size:.8em;font-weight:600}
+.c-value{background:#173f2e;color:#34d399}.c-growth{background:#1e3a5f;color:#60a5fa}.c-garp{background:#3f2e17;color:#fbbf24}.c-na{background:#334155;color:#94a3b8}
+.c-ok{color:#34d399}.c-mid{color:#fbbf24}.c-bad{color:#f87171}
+.al{margin:2px 0}.al.bad{color:#f87171}.al.ok{color:#34d399}.al.ras{color:#94a3b8}
+.esc{color:#fb923c} .note{color:#94a3b8;font-size:.82em;margin-top:8px}
+.deg{background:#3f2e17;color:#fbbf24;border:1px solid #fbbf24;border-radius:8px;padding:8px 12px;font-size:.85em;margin-bottom:10px}
+.onglets{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap}
+.o{background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:6px 12px;border-radius:8px;cursor:pointer}
+.o.a{background:#2563eb;color:#fff} .p{display:none}.p.a{display:block}
+</style></head><body><div class="w">
+<h1>Poste de décision BRVM <small style="color:#94a3b8">v1 — données du bulletin 2026-07 · généré le 2026-07-13</small></h1>
+<div class="onglets">
+<div class="o a" onclick="go(0)">1 · Allocation</div><div class="o" onclick="go(1)">2 · Mes titres</div>
+<div class="o" onclick="go(2)">3 · Opportunités</div><div class="o" onclick="go(3)">4 · Journal</div></div>
+
+<div class="p a"><div class="carte"><h2>Mon allocation tient-elle ?</h2>
+<div class="deg">MODE DÉGRADÉ — aucune donnée personnelle renseignée. Vue marché uniquement.
+Renseigner (en privé) : patrimoine financier, poche actions, positions.</div>
+<table><tr><th>Référence</th><th>Valeur</th></tr>
+<tr><td>Taux obligataire UEMOA (config, à actualiser trimestriellement — UMOA-Titres)</td><td><b>6.5 %</b></td></tr>
+<tr><td>Rendement dividende net d'IRVM moyen des titres éligibles</td><td>6.5 %</td></tr>
+<tr><td>Titres éligibles battant le taux sans risque (net)</td><td><b>4</b> / 39</td></tr></table>
+<div class="note">Règles hors système (à décider et écrire une fois) : plafond poche actions / patrimoine ·
+plafond satellite ≤ 25 % de la poche · ≤ 2 positions satellite par secteur.</div></div></div>
+
+<div class="p"><div class="carte"><h2>Mes titres vont-ils bien ? <small style="color:#94a3b8">(6 suivis — codes seuls)</small></h2>
+<table><tr><th>Titre</th><th>Profil</th><th>État (alarmes prioritaires)</th></tr><tr><td><b>BICB</b><br><small>BIIC Benin</small></td><td><span class='chip c-value'>VALUE</span></td><td><div class='al ok'>B1_RECORD — PLUS-HAUT HISTORIQUE a 6275 FCFA (bulletin 2026-07)</div></td></tr><tr><td><b>BOABF</b><br><small>BOA Burkina Faso</small></td><td><span class='chip c-value'>VALUE</span></td><td><div class='al bad'>⚠ D2_CHUTE_RESULTAT — RN en recul de 33.8% : 29063 (2023) -> 19252 M FCFA (2025) <i>(2026-07-13)</i></div></td></tr><tr><td><b>NEIC</b><br><small>NEI-CEDA CI</small></td><td><span class='chip c-value'>VALUE</span></td><td><div class='al ras'>RAS</div></td></tr><tr><td><b>SDSC</b><br><small>Africa Global Logistics CI</small></td><td><span class='chip c-na'>profil n/d</span></td><td><div class='al bad'>⚠ D4_RETARD_PUBLICATION — Retard de publication constate le 2025-04-30, aucune publication enregistree depuis <i>(2026-07-13)</i></div></td></tr><tr><td><b>SNTS</b><br><small>Sonatel</small></td><td><span class='chip c-value'>VALUE (mixte)</span></td><td><div class='al ok'>A_QUALITE_DECOTEE — PER 7.23 < 70% de la mediane sectorielle 13.23 (mediane sur 3 titres (reproductible)) ; RN 393662 -> 413588 M FCFA ; gate ELIGIBLE</div><div class='al ok'>B1_RECORD — PLUS-HAUT HISTORIQUE a 29900 FCFA (bulletin 2026-07)</div></td></tr><tr><td><b>TTLC</b><br><small>TotalEnergies Marketing CI</small></td><td><span class='chip c-value'>VALUE</span></td><td><div class='al ok'>B1_RECORD — Plus-haut 12 mois a 2940 FCFA (bulletin 2026-07)</div></td></tr></table></div></div>
+
+<div class="p"><div class="carte"><h2>Cœur rendement-qualité — DY net &gt; 6.5 %, gate OK, aucune alarme</h2>
+<table><tr><th>Titre</th><th>Profil</th><th>DY brut</th><th>DY net IRVM</th><th>PER</th><th>Capacité (20 % val. mens. 12m)</th><th>Confiance données</th></tr>
+<tr><td><b>SIVC</b></td><td><span class='chip c-value'>VALUE</span></td><td>23.8 %</td><td><b>21.4 %</b></td><td>105.22</td><td class='c-mid'>2.7 M/mois — etroit</td><td>FAIBLE</td></tr><tr><td><b>STBC</b></td><td><span class='chip c-growth'>GROWTH (mixte)</span></td><td>8.5 %</td><td><b>7.7 %</b></td><td>12.09</td><td class='c-ok'>12 M/mois — absorbable</td><td>HAUTE</td></tr><tr><td><b>BNBC</b></td><td><span class='chip c-value'>VALUE</span></td><td>7.6 %</td><td><b>6.9 %</b></td><td>581.73</td><td class='c-bad'>0.6 M/mois — impraticable</td><td>FAIBLE</td></tr></table><div class="note">Le DY net est indicatif (résidence fiscale non prise en compte). La décision reste humaine.</div></div>
+<div class="carte"><h2>Satellite re-rating — signaux actifs (table signaux, cycle de vie daté)</h2>
+<table><tr><th>Titre</th><th>Profil</th><th>Signal</th><th>Capacité</th><th>Confiance</th></tr><tr><td><b>SNTS</b></td><td><span class='chip c-value'>VALUE (mixte)</span></td><td><b>⚡ CONJONCTION A+B1 — le profil CBI</b><br><small>A_QUALITE_DECOTEE · B1_RECORD</small></td><td class='c-ok'>29 M/mois — absorbable</td><td>MOYENNE</td></tr><tr><td><b>CABC</b></td><td><span class='chip c-garp'>GARP (mixte)</span></td><td><b>Décote qualifiée (A)</b><br><small>A_QUALITE_DECOTEE</small></td><td class='c-bad'>1.3 M/mois — impraticable</td><td>HAUTE</td></tr><tr><td><b>SMBC</b></td><td><span class='chip c-garp'>GARP (mixte)</span></td><td><b>Décote qualifiée (A)</b><br><small>A_QUALITE_DECOTEE</small></td><td class='c-bad'>1.5 M/mois — impraticable</td><td>HAUTE</td></tr><tr><td><b>SPHC</b></td><td><span class='chip c-garp'>GARP (mixte)</span></td><td><b>Décote qualifiée (A)</b><br><small>A_QUALITE_DECOTEE</small></td><td class='c-mid'>8.1 M/mois — etroit</td><td>HAUTE</td></tr></table>
+<div class='note'>+ 14 records isolés non affichés (marché haussier généralisé — sélectivité faible sans décote) : BICB, BOAB, CBIBF, CIEC, ETIT, NSBC, NTLC, SDCC, SGBC, SHEC, SIBC, SICC, TTLC, TTLS</div>
+<div class="note">Anti-poursuite : première entrée refusée au-delà de +25 % du cours au premier signal. Sizing petit par construction.</div></div></div></div>
+
+<div class="p"><div class="carte"><h2>Qu'ai-je décidé et pourquoi ?</h2>
+<div class="note">Journal pré-rempli par le système (titre, signaux actifs du jour, cours de référence) — tu n'écris que la décision et sa raison.
+Table <code>journal_decisions</code> déjà en base. Aucune entrée pour l'instant.</div></div></div>
+<script>function go(i){document.querySelectorAll('.o').forEach((e,j)=>e.classList.toggle('a',i==j));
+document.querySelectorAll('.p').forEach((e,j)=>e.classList.toggle('a',i==j))}</script>
+</div></body></html>
