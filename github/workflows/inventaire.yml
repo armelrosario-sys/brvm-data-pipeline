@@ -1,0 +1,24 @@
+name: P2a - Inventaire brvm.org
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  inventaire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests==2.32.3 beautifulsoup4==4.12.3
+      - run: python collecte/inventaire.py
+      - name: Commit des resultats
+        run: |
+          git config user.name "robot-inventaire"
+          git config user.email "robot@users.noreply.github.com"
+          git add collecte/inventaire.json collecte/rapport_inventaire.md
+          git commit -m "Inventaire brvm.org $(date -u +%F)" || echo "rien a committer"
+          git push
