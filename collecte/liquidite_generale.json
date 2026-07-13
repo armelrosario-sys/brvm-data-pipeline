@@ -1,0 +1,237 @@
+{
+ "BOAB": {
+  "valeur_moyenne_12m": 20105489.583333332,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SIVC": {
+  "valeur_moyenne_12m": 13356623.333333334,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "CABC": {
+  "valeur_moyenne_12m": 6495290.416666667,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "ORGT": {
+  "valeur_moyenne_12m": 16667462.083333334,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SIBC": {
+  "valeur_moyenne_12m": 48706659.583333336,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SMBC": {
+  "valeur_moyenne_12m": 7665881.25,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "FTSC": {
+  "valeur_moyenne_12m": 18405867.083333332,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BOABF": {
+  "valeur_moyenne_12m": 19984621.666666668,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "ORAC": {
+  "valeur_moyenne_12m": 43727667.916666664,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BOAS": {
+  "valeur_moyenne_12m": 29675723.75,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SDCC": {
+  "valeur_moyenne_12m": 9851656.25,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SOGC": {
+  "valeur_moyenne_12m": 49788035.416666664,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "CFAC": {
+  "valeur_moyenne_12m": 9362632.5,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "ECOC": {
+  "valeur_moyenne_12m": 173815735.41666666,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BNBC": {
+  "valeur_moyenne_12m": 2817399.1666666665,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "LNBB": {
+  "valeur_moyenne_12m": 10798514.166666666,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BICC": {
+  "valeur_moyenne_12m": 17299270.0,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SEMC": {
+  "valeur_moyenne_12m": 6397752.5,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SAFC": {
+  "valeur_moyenne_12m": 19333229.583333332,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SHEC": {
+  "valeur_moyenne_12m": 11812175.833333334,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "STAC": {
+  "valeur_moyenne_12m": 8886775.833333334,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "NTLC": {
+  "valeur_moyenne_12m": 8656306.25,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "TTLC": {
+  "valeur_moyenne_12m": 11339929.583333334,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "ABJC": {
+  "valeur_moyenne_12m": 12588610.0,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SCRC": {
+  "valeur_moyenne_12m": 15474917.916666666,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "PRSC": {
+  "valeur_moyenne_12m": 7663720.416666667,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "ETIT": {
+  "valeur_moyenne_12m": 52051813.0,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BOAC": {
+  "valeur_moyenne_12m": 136987077.91666666,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BICB": {
+  "valeur_moyenne_12m": 25547720.833333332,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BOAN": {
+  "valeur_moyenne_12m": 42755148.75,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "NEIC": {
+  "valeur_moyenne_12m": 4385692.916666667,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SGBC": {
+  "valeur_moyenne_12m": 89755917.5,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SPHC": {
+  "valeur_moyenne_12m": 40743645.833333336,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "ONTBF": {
+  "valeur_moyenne_12m": 9709408.75,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SICC": {
+  "valeur_moyenne_12m": 153675.83333333334,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SNTS": {
+  "valeur_moyenne_12m": 144847674.16666666,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "TTLS": {
+  "valeur_moyenne_12m": 7751977.916666667,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "BOAM": {
+  "valeur_moyenne_12m": 41299417.083333336,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "UNLC": {
+  "valeur_moyenne_12m": 1698850.4166666667,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SLBC": {
+  "valeur_moyenne_12m": 57864307.5,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "CBIBF": {
+  "valeur_moyenne_12m": 14009502.916666666,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "CIEC": {
+  "valeur_moyenne_12m": 17456175.833333332,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "PALC": {
+  "valeur_moyenne_12m": 31848955.0,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "STBC": {
+  "valeur_moyenne_12m": 62230083.75,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "NSBC": {
+  "valeur_moyenne_12m": 23670511.666666668,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "UNXC": {
+  "valeur_moyenne_12m": 33435001.25,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ },
+ "SDSC": {
+  "valeur_moyenne_12m": 21714413.75,
+  "n_mois": 12,
+  "dernier_mois": "2026-07"
+ }
+}
