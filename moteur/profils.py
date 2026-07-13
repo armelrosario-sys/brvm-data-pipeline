@@ -24,7 +24,8 @@ def calculer():
     seuils, marche = charger_seuils(), charger_marche()
     sect = dict(c.execute("SELECT ticker, secteur FROM societes"))
     ing = {}
-    for (t,) in c.execute("SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%'"):
+    tickers = [r[0] for r in c.execute("SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%'").fetchall()]
+    for t in tickers:
         per = c.execute("SELECT per FROM cours_mensuels WHERE ticker=? AND per IS NOT NULL ORDER BY fin_mois DESC LIMIT 1",(t,)).fetchone()
         rdt = c.execute("SELECT rendement FROM cours_mensuels WHERE ticker=? AND rendement IS NOT NULL ORDER BY fin_mois DESC LIMIT 1",(t,)).fetchone()
         ex = c.execute("SELECT exercice,resultat_net,capitaux_propres FROM etats_financiers WHERE ticker=? AND resultat_net IS NOT NULL ORDER BY exercice DESC",(t,)).fetchall()
