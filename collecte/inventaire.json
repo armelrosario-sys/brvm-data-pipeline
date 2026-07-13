@@ -1,0 +1,166 @@
+{
+  "date_utc": "2026-07-08T10:11:29.283872+00:00",
+  "base": "https://www.brvm.org",
+  "pages": {
+    "https://www.brvm.org/fr/newsletter/brvm-bourse-regionale-des-valeurs-mobilieres-newsletter": {
+      "texte_lien": "publications précédentes",
+      "status": 200,
+      "nb_pdf": 0,
+      "echantillon_pdf": [],
+      "nb_liens_sections": 5,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/comment-etre-cote-la-brvm",
+        "https://www.brvm.org/fr/emetteurs/societes-cotees",
+        "https://www.brvm.org/fr/societes-de-gestion-d-opcvm"
+      ],
+      "pagination": false
+    },
+    "https://www.brvm.org/fr/rapports-societes-cotees": {
+      "texte_lien": "rapports sociétés cotées",
+      "status": 200,
+      "nb_pdf": 0,
+      "echantillon_pdf": [],
+      "nb_liens_sections": 47,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/en/rapports-societes-cotees",
+        "https://www.brvm.org/pt/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/rapports-societes-cotees?field_secteur_emeteur_tid=All",
+        "https://www.brvm.org/fr/rapports-societes-cotees?field_secteur_emeteur_tid=194",
+        "https://www.brvm.org/fr/rapports-societes-cotees?field_secteur_emeteur_tid=195",
+        "https://www.brvm.org/fr/rapports-societes-cotees?field_secteur_emeteur_tid=196",
+        "https://www.brvm.org/fr/rapports-societes-cotees?field_secteur_emeteur_tid=197",
+        "https://www.brvm.org/fr/rapports-societes-cotees?field_secteur_emeteur_tid=198"
+      ],
+      "pagination": true
+    },
+    "https://www.brvm.org/fr/bulletins-officiels-de-la-cote": {
+      "texte_lien": "publications",
+      "status": 200,
+      "nb_pdf": 11,
+      "echantillon_pdf": [
+        "https://www.brvm.org/sites/default/files/boc_20260707_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260706_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260703_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260702_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260701_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260630_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260629_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260626_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260625_2.pdf",
+        "https://www.brvm.org/sites/default/files/boc_20260624_2.pdf"
+      ],
+      "nb_liens_sections": 11,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/en/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/pt/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-mensuels",
+        "https://www.brvm.org/fr/marche/avis-et-publications/avis",
+        "https://www.brvm.org/fr/publications/donnees-economiques",
+        "https://www.brvm.org/fr/publications/valeurs-liquidatives",
+        "https://www.brvm.org/fr/comment-etre-cote-la-brvm",
+        "https://www.brvm.org/fr/emetteurs/societes-cotees"
+      ],
+      "pagination": false
+    },
+    "https://www.brvm.org/fr/mediacentre/actualites/le-bulletin-officiel-de-la-cote-de-la-brvm-des-evolutions-majeures-pour-une-0": {
+      "texte_lien": "le bulletin officiel de la cote de la brvm : des evolutions majeures pour une me",
+      "status": 200,
+      "nb_pdf": 0,
+      "echantillon_pdf": [],
+      "nb_liens_sections": 6,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/mediacentre/actualites/le-bulletin-officiel-de-la-cote-de-la-brvm-des-evolutions-majeures-pour-une-0",
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/comment-etre-cote-la-brvm",
+        "https://www.brvm.org/fr/emetteurs/societes-cotees",
+        "https://www.brvm.org/fr/societes-de-gestion-d-opcvm"
+      ],
+      "pagination": false
+    },
+    "https://www.brvm.org/fr/comment-etre-cote-la-brvm": {
+      "texte_lien": "entrer",
+      "status": 200,
+      "nb_pdf": 0,
+      "echantillon_pdf": [],
+      "nb_liens_sections": 6,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/comment-etre-cote-la-brvm",
+        "https://www.brvm.org/pt/comment-etre-cote-la-brvm",
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/emetteurs/societes-cotees",
+        "https://www.brvm.org/fr/societes-de-gestion-d-opcvm"
+      ],
+      "pagination": false
+    },
+    "https://www.brvm.org/fr/emetteurs/societes-cotees": {
+      "texte_lien": "emetteurs",
+      "status": 200,
+      "nb_pdf": 0,
+      "echantillon_pdf": [],
+      "nb_liens_sections": 29,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/emetteurs/societes-cotees",
+        "https://www.brvm.org/en/emetteurs/societes-cotees",
+        "https://www.brvm.org/pt/emetteurs/societes-cotees",
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/pays-societes-cotees/benin",
+        "https://www.brvm.org/fr/pays-societes-cotees/burkina-faso",
+        "https://www.brvm.org/fr/pays-societes-cotees/cote-divoire",
+        "https://www.brvm.org/fr/pays-societes-cotees/guinee-bissau",
+        "https://www.brvm.org/fr/pays-societes-cotees/mali"
+      ],
+      "pagination": true
+    },
+    "https://www.brvm.org/fr/societes-de-gestion-d-opcvm": {
+      "texte_lien": "sociétés de gestion d'opcvm (sgo)",
+      "status": 200,
+      "nb_pdf": 0,
+      "echantillon_pdf": [],
+      "nb_liens_sections": 9,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/societes-de-gestion-d-opcvm",
+        "https://www.brvm.org/en/societes-de-gestion-d-opcvm",
+        "https://www.brvm.org/pt/societes-de-gestion-d-opcvm",
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/pays-sgo/cote-divoire",
+        "https://www.brvm.org/fr/societes-de-gestion-d-opcvm?page=1",
+        "https://www.brvm.org/fr/comment-etre-cote-la-brvm",
+        "https://www.brvm.org/fr/emetteurs/societes-cotees"
+      ],
+      "pagination": true
+    },
+    "https://www.brvm.org/fr/intervenants/sgp/tous": {
+      "texte_lien": "sociétés de gestion de patrimoine",
+      "status": 200,
+      "nb_pdf": 0,
+      "echantillon_pdf": [],
+      "nb_liens_sections": 6,
+      "echantillon_sections": [
+        "https://www.brvm.org/fr/rapports-societes-cotees",
+        "https://www.brvm.org/fr/bulletins-officiels-de-la-cote",
+        "https://www.brvm.org/fr/pays-sgp/cote-divoire",
+        "https://www.brvm.org/fr/comment-etre-cote-la-brvm",
+        "https://www.brvm.org/fr/emetteurs/societes-cotees",
+        "https://www.brvm.org/fr/societes-de-gestion-d-opcvm"
+      ],
+      "pagination": false
+    }
+  },
+  "erreurs": [],
+  "robots_txt": "#\n# robots.txt\n#\n# This file is to prevent the crawling and indexing of certain parts\n# of your site by web crawlers and spiders run by sites like Yahoo!\n# and Google. By telling these \"robots\" where not to go on your site,\n# you save bandwidth and server resources.\n#\n# This file will be ignored unless it is at the root of your host:\n# Used:    http://example.com/robots.txt\n# Ignored: http://example.com/site/robots.txt\n#\n# For more information about the robots.txt standard, see:\n# http://www.robotstxt.org/robotstxt.html\n\nUser-agent: *\nCrawl-delay: 10\n# CSS, JS, Images\nAllow: /misc/*.css$\nAllow: /misc/*.css?\nAllow: /misc/*.js$\nAllow: /misc/*.js?\nAllow: /misc/*.gif\nAllow: /misc/*.jpg\nAllow: /misc/*.jpeg\nAllow: /misc/*.png\nAllow: /modules/*.css$\nAllow: /modules/*.css?\nAllow: /modules/*.js$\nAllow: /modules/*.js?\nAllow: /modules/*.gif\nAllow: /modules/*.jpg\nAllow: /modules/*.jpeg\nAllow: /modules/*.png\nAllow: /profiles/*.css$\nAllow: /profiles/*.css?\nAllow: /profiles/*.js$\nAllow: /profiles/*.js?\nAllow: /profiles/*.gif\nAllow: /profiles/*.jpg\nAllow: /profiles/*.jpeg\nAllow: /profiles/*.png\nAllow: /themes/*.css$\nAllow: /themes/*.css?\nAllow: /themes/*.js$\nAllow: /themes/*.js?\nAllow: /themes/*.gif\nAllow: /themes/*.jpg\nAllow: /themes/*.jpeg\nAllow: /themes/*.png\n# Directories\nDisallow: /includes/\nDisallow: /misc/\nDisallow: /modules/\nDisallow: /profiles/\nDisallow: /scripts/\nDisallow: /themes/\n# Files\nDisallow: /CHANGELOG.txt\nDisallow: /cron.php\nDisallow: /INSTALL.mysql.txt\nDisallow: /INSTALL.pgsql.txt\nDisallow: /INSTALL.sqlite.txt\nDisallow: /install.php\nDisallow: /INSTALL.txt\nDisallow: /LICENSE.txt\nDisallow: /MAINTAINERS.txt\nDisallow: /update.php\nDisallow: /UPGRADE.txt\nDisallow: /xmlrpc.php\n# Paths (clean URLs)\nDisallow: /admin/\nDisallow: /comment/reply/\nDisallow: /filter/tips/\nDisallow: /node/add/\nDisallow: /search/\nDisallow: /user/register/\nDisallow: /user/password/\nDisallow: /user/login/\nDisallow: /user/logout/\n# Paths (no clean URLs)\nDisallow: /?q=admin/\nDisallow: /?q=comment/re",
+  "sitemap": {
+    "disponible": false,
+    "nb_urls": 0,
+    "urls_pertinentes": []
+  }
+}
