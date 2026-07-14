@@ -22,6 +22,8 @@ Usage :
   python3 signaux.py --db X.db  # run sur une autre base (tests)
 """
 import argparse
+import json
+import statistics
 import sqlite3
 from datetime import date
 from pathlib import Path
@@ -77,10 +79,61 @@ def _per_recent_et_cours(cur, ticker):
 
 
 # ------------------------------------------------------------------ candidats
-def calculer_candidats(cur, seuils, marche):
+CALENDRIER_PATH = Path(__file__).resolve().parent.parent / "collecte" / "calendrier.json"
+
+
+def _calculer_retards_calendrier(cur, seuils, aujourd_hui):
+    """D4_RETARD_CALENDRIER (14/07/2026) : retard detecte automatiquement par
+    ecart a l'intervalle historique typique entre deux depots d'une meme
+    categorie de document -- aucune hypothese sur les echeances reglementaires,
+    seulement le rythme reel observe pour CE titre. Coexiste avec le D4 manuel
+    (avis_reglementaires) : un editeur peut annoncer un retard avant que ce
+    calcul ne le detecte ; les deux mecanismes sont donc distincts et se
+    completent plutot que de se remplacer."""
+    if not CALENDRIER_PATH.exists():
+        return {}
+    cal = json.loads(CALENDRIER_PATH.read_text())
+    cfg = seuils.get("calendrier", {})
+    min_occ = cfg.get("min_occurrences", 3)
+    exclues = set(cfg.get("categories_exclues", ["autre", "rapport_cac"]))
+    interv_min = cfg.get("intervalle_min_jours", 60)
+    interv_max = cfg.get("intervalle_max_jours", 450)
+    tol_courte = cfg.get("tolerance_courte_jours", 45)
+    tol_longue = cfg.get("tolerance_longue_jours", 60)
+
+    retards = {}
+    for t, categories in cal.items():
+        for categorie, v in categories.items():
+            if categorie in exclues:
+                continue
+            hist = sorted(date(*map(int, d.split("-"))) for d in v["historique"])
+            if len(hist) < min_occ:
+                continue
+            intervalles = [(hist[i+1]-hist[i]).days for i in range(len(hist)-1)]
+            interv_median = statistics.median(intervalles)
+            if not (interv_min <= interv_median <= interv_max):
+                continue  # historique trop irregulier pour un calendrier fiable
+            tolerance = tol_courte if interv_median < 200 else tol_longue
+            jours_ecoules = (aujourd_hui - hist[-1]).days
+            if jours_ecoules > interv_median + tolerance:
+                # un seul signal par ticker (le plus en retard, en jours relatifs
+                # a sa propre tolerance) pour eviter le bruit de plusieurs
+                # categories du meme titre alertant simultanement
+                ecart_relatif = jours_ecoules - (interv_median + tolerance)
+                prec = retards.get(t)
+                if prec is None or ecart_relatif > prec[0]:
+                    retards[t] = (ecart_relatif, categorie, hist[-1], interv_median, jours_ecoules)
+    return retards
+
+
+def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
     """Retourne {(ticker,type): dict(direction, detail, valeur_reference,
-    source_donnee)} pour toutes les conditions VRAIES aujourd'hui."""
+    source_donnee)} pour toutes les conditions VRAIES a la date consideree
+    (aujourd_hui=None -> date reelle du systeme ; sinon date de test, cf.
+    l'argument --date de reconcilier(), pour rejouer un scenario passe)."""
     cand = {}
+    aujourd_hui = aujourd_hui or date.today()
+    retards_calendrier = _calculer_retards_calendrier(cur, seuils, aujourd_hui)
     tickers = [r[0] for r in cur.execute(
         "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
     secteur = {t: s for t, s in cur.execute("SELECT ticker, secteur FROM societes")}
@@ -135,6 +188,17 @@ def calculer_candidats(cur, seuils, marche):
                     valeur_reference=None,
                     source_donnee=f"avis_reglementaires {date_avis}")
 
+        # D4 automatique : ecart a l'intervalle historique typique (calendrier.py)
+        if t in retards_calendrier:
+            ecart, categorie, dernier, interv_median, jours_ecoules = retards_calendrier[t]
+            cand[(t, "D4_RETARD_CALENDRIER")] = dict(
+                direction="DEFAVORABLE",
+                detail=f"{categorie} : dernier depot le {dernier.isoformat()}, "
+                       f"{jours_ecoules} jours ecoules (intervalle historique "
+                       f"typique {interv_median:.0f} jours)",
+                valeur_reference=jours_ecoules,
+                source_donnee=f"calendrier.json ({categorie})")
+
         # ---------- FAVORABLES (bloques si un D est candidat sur ce ticker) ----------
         d_actif_candidat = any(k[0] == t and k[1].startswith("D") for k in cand)
         if d_actif_candidat:
@@ -185,15 +249,16 @@ def calculer_candidats(cur, seuils, marche):
 
 # --------------------------------------------------------------- reconciliation
 def reconcilier(db_path=DB_DEFAUT, aujourd_hui=None):
-    auj = aujourd_hui or date.today().isoformat()
+    auj_date = date.fromisoformat(aujourd_hui) if aujourd_hui else date.today()
+    auj = auj_date.isoformat()
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     seuils, marche = charger_seuils(), charger_marche()
     # scoring lit sa propre connexion sur DB par defaut ; ici tout passe par cur
-    cand = calculer_candidats(cur, seuils, marche)
+    cand = calculer_candidats(cur, seuils, marche, auj_date)
 
-    actifs = {(t, ty): (i, vref) for i, t, ty, vref in cur.execute(
-        "SELECT id, ticker, type, valeur_reference FROM signaux WHERE statut='ACTIF'")}
+    actifs = {(t, ty): (i, vref, det) for i, t, ty, vref, det in cur.execute(
+        "SELECT id, ticker, type, valeur_reference, detail FROM signaux WHERE statut='ACTIF'")}
     secteur = {t: s for t, s in cur.execute("SELECT ticker, secteur FROM societes")}
 
     nouveaux, eteints = [], []
@@ -211,7 +276,7 @@ def reconcilier(db_path=DB_DEFAUT, aujourd_hui=None):
 
     # 1) Conflit : D candidat => eteindre les favorables actifs du ticker
     tickers_d = {t for (t, ty) in cand if ty.startswith("D")}
-    for (t, ty), (sid, _) in list(actifs.items()):
+    for (t, ty), (sid, _, _det) in list(actifs.items()):
         if t in tickers_d and ty in FAVORABLES:
             eteindre(sid, "CONFLIT_ALARME")
             eteints.append((t, ty, "CONFLIT_ALARME"))
@@ -221,9 +286,26 @@ def reconcilier(db_path=DB_DEFAUT, aujourd_hui=None):
     for (t, ty), c in cand.items():
         if (t, ty) not in actifs:
             inserer(t, ty, c)
+        elif ty == "D4_RETARD_CALENDRIER":
+            # Cas particulier decouvert au test du 14/07/2026 : ce type peut
+            # rester candidat en continu tout en changeant de categorie sous-
+            # jacente (ex. le retard T1 se resorbe mais les etats financiers
+            # restent en retard) -- l'append-only figerait alors un detail
+            # perime indefiniment. Ici seulement : si la categorie source a
+            # change, on eteint proprement (le fait initial reste vrai et
+            # archive) et on recree (le nouveau fait est un nouveau cycle).
+            _, _, detail_existant = actifs[(t, ty)]
+            categorie_existante = detail_existant.split(" : ")[0]
+            categorie_candidate = c["detail"].split(" : ")[0]
+            if categorie_existante != categorie_candidate:
+                sid_ancien = actifs[(t, ty)][0]
+                eteindre(sid_ancien, "CONDITION_CESSEE")
+                eteints.append((t, ty, "CONDITION_CESSEE (categorie resorbee)"))
+                inserer(t, ty, c)
+                del actifs[(t, ty)]
 
     # 3) Extinctions et transitions
-    for (t, ty), (sid, vref) in list(actifs.items()):
+    for (t, ty), (sid, vref, _det) in list(actifs.items()):
         if (t, ty) in cand:
             continue  # condition toujours vraie -> reste actif
         if ty == "A_QUALITE_DECOTEE":
