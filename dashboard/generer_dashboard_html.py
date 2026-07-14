@@ -18,6 +18,23 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "moteur"))
 from scoring import evaluer_titre, rapport_fraicheur, charger_seuils, charger_marche, charger_liquidite_jour, charger_liquidite_generale, charger_tendance_liquidite, DB
 import sqlite3
 
+LIBELLES_SECTEURS_COURTS = {
+    "Consommation De Base": "Conso. De Base",
+    "Consommation Discretionnaire": "Conso. Discretionnaire",
+    "Services Financiers": "Services Fin.",
+    "Services Publics": "Services Publics",
+    "Telecommunications": "Telecoms",
+}
+
+
+def libelle_secteur(s):
+    """Point 5 (audit ergonomie, 14/07/2026) : libelles raccourcis pour gagner
+    de la largeur dans les tableaux, sans perdre l'info (titre complet en attribut)."""
+    titre = s.replace("_", " ").title()
+    court = LIBELLES_SECTEURS_COURTS.get(titre, titre)
+    return f'<span title="{titre}">{court}</span>' if court != titre else titre
+
+
 GLOSSAIRE = {
     "RN": "Resultat net : ce que l'entreprise a gagne au total sur l'exercice, apres impots.",
     "CP": "Capitaux propres : la valeur nette de l'entreprise si elle remboursait toutes ses dettes.",
@@ -65,7 +82,14 @@ def collecter_donnees():
         avis[t] = [dict(r) for r in rows]
 
     conn.close()
-    return resultats, series, fondamentaux, avis, source_urls
+    # Point 1 (audit ergonomie, 14/07/2026) : integrer le profilage de style
+    # (VALUE/GROWTH/GARP), calcule par moteur/profils.py, dans le dashboard
+    # principal. Auparavant consomme uniquement par le poste de decision et
+    # les 2 blocs signaux — absent de la Synthese et des Secteurs, la lacune
+    # que l'utilisateur avait signalee.
+    profils_path = Path(__file__).resolve().parent.parent / "collecte" / "profils.json"
+    profils = json.loads(profils_path.read_text()) if profils_path.exists() else {}
+    return resultats, series, fondamentaux, avis, source_urls, profils
 
 
 def calculer_roe(fonda_ticker):
@@ -171,7 +195,7 @@ def categoriser_position(valeur, moyenne, sens_favorable_bas):
     return "orange", "●"
 
 
-def calculer_secteurs(resultats, series, fondamentaux, marche, liquidite_jour, liquidite_generale):
+def calculer_secteurs(resultats, series, fondamentaux, marche, liquidite_jour, liquidite_generale, profils):
     secteurs = {}
     for r in resultats:
         s = r["secteur"]
@@ -183,8 +207,10 @@ def calculer_secteurs(resultats, series, fondamentaux, marche, liquidite_jour, l
         sr = series.get(r["ticker"], [])
         per = sr[-1]["per"] if sr and sr[-1]["per"] else None
 
+        p_style = profils.get(r["ticker"], {})
         secteurs[s]["titres"].append({
             "ticker": r["ticker"], "score": round(r["score_composite"], 1) if r.get("score_composite") else None,
+            "profil": p_style.get("dominant"), "profil_mixte": bool(p_style.get("mixte")),
             "per": per, "roe": roe_pct, "roe_interp": roe_interp,
             "liq_gen_abs": liq_gen_abs, "liq_gen_ratio": liq_gen_ratio, "liq_gen_nmois": liq_gen_nmois,
             "liq_flottant": liq_flot_pct, "liq_flottant_interp": liq_flot_interp, "statut": r["statut_gate"],
@@ -222,12 +248,12 @@ def terme_glossaire(mot):
     return (f'<span class="gloss" tabindex="0" data-def="{txt}">{mot}</span>' if txt else mot)
 
 
-def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche, liquidite_jour, liquidite_generale, tendance_liquidite):
+def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche, liquidite_jour, liquidite_generale, tendance_liquidite, profils):
     elig = [r for r in resultats if r["statut_gate"] == "ELIGIBLE" and r["score_composite"]]
     elig.sort(key=lambda r: -r["score_composite"])
     excl = [r for r in resultats if r["statut_gate"] == "EXCLU"]
     tous_tickers = sorted(r["ticker"] for r in resultats)
-    secteurs = calculer_secteurs(resultats, series, fondamentaux, marche, liquidite_jour, liquidite_generale)
+    secteurs = calculer_secteurs(resultats, series, fondamentaux, marche, liquidite_jour, liquidite_generale, profils)
 
     # Couleurs accessibles daltonisme (WCAG 1.4.1) : jamais rouge/vert pur.
     # Bleu = normal, terracotta = attention — toujours associe a un texte.
@@ -248,8 +274,10 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
         alertes_maj = [a for a in r["alertes"] if any(
             m in a for m in ("TURNAROUND", "PERIMEE", "payout", "recul", "AVIS", "ECART"))]
         attention = any("PERIMEE" in a for a in r["alertes"]) or r["sizing"]["recommandation"] in ("REDUITE", "MINIMALE", "PRUDENCE")
+        p_style = profils.get(r["ticker"], {})
         lignes_js.append({
             "ticker": r["ticker"], "secteur": r["secteur"].replace("_", " ").title(),
+            "profil": p_style.get("dominant"), "profil_mixte": bool(p_style.get("mixte")),
             "score": round(r["score_composite"], 1) if r["score_composite"] is not None else None,
             "rentabilite": round(r["score_rentabilite"], 1) if r["score_rentabilite"] is not None else None,
             "solidite": round(r["score_solidite"], 1) if r["score_solidite"] is not None else None,
@@ -265,8 +293,6 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 
     lignes_fraicheur = "".join(f'<tr><td>{t}</td><td>{fm}</td><td>{j} jours</td></tr>'
                                 for t, fm, j in fraicheur["perimes"])
-
-    options_titres = "".join(f'<option value="{t}">{t}</option>' for t in tous_tickers)
 
     def fmt_valeur(val, interp, unite="%"):
         if val is None:
@@ -291,6 +317,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
             lignes_titres += f"""
             <tr onclick="afficherFiche('{t['ticker']}')" style="cursor:pointer">
               <td><b>{t['ticker']}</b>{statut_txt}</td>
+              <td>{(f"<span class='chip chip-" + t['profil'].lower() + "'>" + t['profil'] + (" (mixte)" if t['profil_mixte'] else "") + "</span>") if t.get('profil') else "<span class='chip chip-na'>n/d</span>"}</td>
               <td>{t['score'] if t['score'] is not None else '—'}</td>
               <td>{cellule_couleur(t['per'], t['per_pos'], t['per_symb'])}</td>
               <td>{cellule_couleur(t['roe'], t['roe_pos'], t['roe_symb'], '%')}</td>
@@ -299,7 +326,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
             </tr>"""
         lignes_titres += f"""
             <tr style="background:var(--surface-3, #172033);font-weight:600">
-              <td>Mediane du secteur <span style="font-weight:400;color:var(--muted);font-size:0.75em">(titres eligibles seulement, n={d['nb_eligibles_ds_calcul']})</span></td><td>—</td>
+              <td>Mediane du secteur <span style="font-weight:400;color:var(--muted);font-size:0.75em">(titres eligibles seulement, n={d['nb_eligibles_ds_calcul']})</span></td><td>—</td><td>—</td>
               <td>{d['per_median'] if d['per_median'] else '—'}</td>
               <td>{d['roe_median'] if d['roe_median'] else '—'}%</td><td>—</td>
             </tr>"""
@@ -309,12 +336,12 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
                            if d['roe_median'] is None or d['nb_eligibles_ds_calcul'] < d['nb_titres'] // 2 else '')
         blocs_secteurs += f"""
         <div class="carte">
-          <h2>{s.replace('_',' ').title()} — {d['nb_titres']} titres
+          <h2>{libelle_secteur(s)} — {d['nb_titres']} titres
             <span style="font-weight:400;color:var(--muted);font-size:0.75em">
               (mediane PER {d['per_median'] if d['per_median'] else '—'} · score moyen {d['score_moyen'] if d['score_moyen'] else '—'})
             </span></h2>
           <table>
-            <thead><tr><th>Titre</th><th>{terme_glossaire('Score')}</th><th>{terme_glossaire('PER')}</th>
+            <thead><tr><th>Titre</th><th>Profil</th><th>{terme_glossaire('Score')}</th><th>{terme_glossaire('PER')}</th>
               <th>{terme_glossaire('ROE')}</th><th>Liquidite generale</th><th>Flottant</th></tr></thead>
             <tbody>{lignes_titres}</tbody>
           </table>
@@ -327,9 +354,9 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
         </div>"""
 
     # Classements inter-sectoriels (mediane, titres eligibles uniquement)
-    secteurs_par_per = sorted([(s, d["per_median"]) for s, d in secteurs.items() if d["per_median"]],
+    secteurs_par_per = sorted([(libelle_secteur(s), d["per_median"]) for s, d in secteurs.items() if d["per_median"]],
                               key=lambda x: x[1])
-    secteurs_par_roe = sorted([(s, d["roe_median"]) for s, d in secteurs.items() if d["roe_median"]],
+    secteurs_par_roe = sorted([(libelle_secteur(s), d["roe_median"]) for s, d in secteurs.items() if d["roe_median"]],
                               key=lambda x: -x[1])
     rang_per = "".join(f"<tr><td>{i}</td><td>{s.replace('_',' ').title()}</td><td>{v}</td></tr>"
                         for i, (s, v) in enumerate(secteurs_par_per, 1))
@@ -363,7 +390,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   * {{ box-sizing: border-box; }}
   body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           background: var(--bg); color: var(--text); margin: 0; padding: 20px; }}
-  .conteneur {{ max-width: 1100px; margin: 0 auto; }}
+  .conteneur {{ max-width: 1400px; margin: 0 auto; }}
   h1 {{ font-size: 1.6em; margin-bottom: 4px; }}
   .maj {{ color: var(--muted); font-size: 0.85em; margin-bottom: 4px; }}
   .avertissement {{ background: #7f1d1d; color: #fecaca; padding: 10px 14px; border-radius: 8px;
@@ -372,12 +399,21 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .onglet {{ background: var(--card); border: 1px solid var(--border); color: var(--muted);
              padding: 8px 16px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 0.9em; }}
   .onglet.actif {{ background: #2563eb; color: white; border-color: #2563eb; }}
+  .groupe-onglets {{ color: var(--muted); font-size: 0.72em; text-transform: uppercase;
+                      letter-spacing: 0.05em; align-self: center; margin-right: 2px; }}
+  .separateur-onglets {{ width: 1px; background: var(--border); margin: 4px 6px; }}
   .panneau {{ display: none; }}
   .panneau.actif {{ display: block; }}
   .carte {{ background: var(--card); border: 1px solid var(--border); border-radius: 12px;
             padding: 18px; margin-bottom: 20px; }}
   h2 {{ font-size: 1.1em; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; }}
   table {{ width: 100%; border-collapse: collapse; font-size: 0.88em; }}
+  .scroll {{ overflow-x: auto; }}
+  .chip {{ display:inline-block; padding:1px 8px; border-radius:99px; font-size:0.78em; font-weight:600; white-space:nowrap; }}
+  .chip-value {{ background:#173f2e; color:#34d399; }}
+  .chip-growth {{ background:#1e3a5f; color:#60a5fa; }}
+  .chip-garp {{ background:#3f2e17; color:#fbbf24; }}
+  .chip-na {{ background:#334155; color:#94a3b8; }}
   th {{ text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600;
         border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card); cursor: pointer; }}
   td {{ padding: 8px 10px; border-bottom: 1px solid #27334a; vertical-align: top; }}
@@ -430,11 +466,16 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   </div>
 
   <div class="onglets">
+    <span class="groupe-onglets">Essentiel</span>
     <div class="onglet actif" onclick="onglet('synthese')">Synthese</div>
     <div class="onglet" onclick="onglet('surveillance')">Surveillance</div>
-    <div class="onglet" onclick="onglet('fiche')">Fiche titre</div>
-    <div class="onglet" onclick="onglet('comparaison')">Comparaison</div>
+    <span class="separateur-onglets"></span>
+    <span class="groupe-onglets">Marche</span>
     <div class="onglet" onclick="onglet('secteurs')">Secteurs</div>
+    <div class="onglet" onclick="onglet('comparaison')">Comparaison</div>
+    <span class="separateur-onglets"></span>
+    <span class="groupe-onglets">Detail</span>
+    <div class="onglet" onclick="onglet('fiche')">Fiche titre</div>
   </div>
 
   <div id="p-synthese" class="panneau actif">
@@ -451,7 +492,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
         </select>
       </div>
       <div class="scroll"><table>
-        <thead><tr><th>Titre</th><th>Secteur</th><th>Rentabilite</th><th>Solidite</th><th>Valorisation</th>
+        <thead><tr><th>Titre</th><th>Secteur</th><th>Profil</th><th>Rentabilite</th><th>Solidite</th><th>Valorisation</th>
           <th>{terme_glossaire('ROE')}</th><th>Sizing</th><th>Alertes</th></tr></thead>
         <tbody id="corps-synthese"></tbody>
       </table></div>
@@ -471,7 +512,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   <div id="p-surveillance" class="panneau">
     <div class="carte">
       <h2>Surveillance court/moyen terme — 47/47 titres couverts</h2>
-      <select id="select-surveillance" onchange="tracerSurveillance()">{options_titres}</select>
+      <select id="select-surveillance" onchange="tracerSurveillance()"></select>
       <canvas id="graph-cours"></canvas>
       <div style="height:14px"></div>
       <canvas id="graph-per"></canvas>
@@ -481,7 +522,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   <div id="p-fiche" class="panneau">
     <div class="carte">
       <h2>Fiche titre detaillee</h2>
-      <select id="select-fiche" onchange="afficherFicheSelect()">{options_titres}</select>
+      <select id="select-fiche" onchange="afficherFicheSelect()"></select>
       <div id="contenu-fiche"></div>
     </div>
   </div>
@@ -490,8 +531,8 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
     <div class="carte">
       <h2>Comparaison a deux titres <span style="font-weight:400;color:var(--muted);font-size:0.8em">(table uniquement — la precision compte plus qu'un graphique ici)</span></h2>
       <div style="display:flex;gap:10px;margin-bottom:14px">
-        <select id="select-comp-a" onchange="comparer()" style="flex:1">{options_titres}</select>
-        <select id="select-comp-b" onchange="comparer()" style="flex:1">{options_titres}</select>
+        <select id="select-comp-a" onchange="comparer()" style="flex:1"></select>
+        <select id="select-comp-b" onchange="comparer()" style="flex:1"></select>
       </div>
       <div id="contenu-comparaison"></div>
     </div>
@@ -512,6 +553,13 @@ const SOURCE_URLS = {json.dumps(source_urls)};
 const RESULTATS = {json.dumps({r["ticker"]: r for r in resultats})};
 const TENDANCE_LIQUIDITE = {json.dumps(tendance_liquidite)};
 const LIGNES_SYNTHESE = {json.dumps(lignes_js)};
+const TICKERS = {json.dumps(tous_tickers)};
+// Point 4 (audit ergonomie, 14/07/2026) : une seule liste de tickers peuple
+// les 4 menus deroulants (Surveillance, Fiche, Comparaison x2), au lieu de
+// 4 copies HTML identiques generees cote serveur.
+for (const id of ['select-surveillance','select-fiche','select-comp-a','select-comp-b']) {{
+  document.getElementById(id).innerHTML = TICKERS.map(t => `<option value="${{t}}">${{t}}</option>`).join('');
+}}
 const GLOSSAIRE = {json.dumps(GLOSSAIRE)};
 
 function rendreSynthese(lignes) {{
@@ -520,6 +568,7 @@ function rendreSynthese(lignes) {{
   corps.innerHTML = lignes.map(l => `
     <tr onclick="afficherFiche('${{l.ticker}}')" style="cursor:pointer">
       <td><b>${{l.ticker}}</b></td><td>${{l.secteur}}</td>
+      <td>${{l.profil ? `<span class="chip chip-${{l.profil.toLowerCase()}}">${{l.profil}}${{l.profil_mixte ? ' (mixte)' : ''}}</span>` : '<span class="chip chip-na">n/d</span>'}}</td>
       <td>${{v(l.rentabilite)}}</td><td>${{v(l.solidite)}}</td><td>${{v(l.valorisation)}}</td>
       <td>${{l.roe !== null ? l.roe + '%' : '—'}}</td>
       <td><span class="badge badge-${{l.sizing.toLowerCase()}}">${{l.sizing}}</span></td>
@@ -712,7 +761,7 @@ function onglet(nom) {{
 
 
 def main():
-    resultats, series, fondamentaux, avis, source_urls = collecter_donnees()
+    resultats, series, fondamentaux, avis, source_urls, profils = collecter_donnees()
     seuils = charger_seuils()
     marche = charger_marche()
     liquidite_jour = charger_liquidite_jour()
@@ -720,7 +769,7 @@ def main():
     tendance_liquidite = charger_tendance_liquidite()
     fraicheur = rapport_fraicheur()
     html = generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche,
-                        liquidite_jour, liquidite_generale, tendance_liquidite)
+                        liquidite_jour, liquidite_generale, tendance_liquidite, profils)
     sortie = Path(__file__).resolve().parent.parent / "docs_site"
     sortie.mkdir(exist_ok=True)
     (sortie / "index.html").write_text(html, encoding="utf-8")
