@@ -16,6 +16,7 @@ from statistics import median, mean
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "moteur"))
 from scoring import evaluer_titre, rapport_fraicheur, charger_seuils, charger_marche, charger_liquidite_jour, charger_liquidite_generale, charger_tendance_liquidite, DB
+from glossaire_signaux import sizing_libelle, sizing_classe, sizing_description  # 14/07/2026
 import sqlite3
 
 LIBELLES_SECTEURS_COURTS = {
@@ -208,9 +209,12 @@ def calculer_secteurs(resultats, series, fondamentaux, marche, liquidite_jour, l
         per = sr[-1]["per"] if sr and sr[-1]["per"] else None
 
         p_style = profils.get(r["ticker"], {})
+        profil_detail = (f"VALUE {p_style['VALUE']} \u00b7 GROWTH {p_style['GROWTH']} \u00b7 GARP {p_style['GARP']}"
+                         if p_style.get("dominant") else "")
         secteurs[s]["titres"].append({
             "ticker": r["ticker"], "score": round(r["score_composite"], 1) if r.get("score_composite") else None,
             "profil": p_style.get("dominant"), "profil_mixte": bool(p_style.get("mixte")),
+            "profil_detail": profil_detail,
             "per": per, "roe": roe_pct, "roe_interp": roe_interp,
             "liq_gen_abs": liq_gen_abs, "liq_gen_ratio": liq_gen_ratio, "liq_gen_nmois": liq_gen_nmois,
             "liq_flottant": liq_flot_pct, "liq_flottant_interp": liq_flot_interp, "statut": r["statut_gate"],
@@ -275,16 +279,23 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
             m in a for m in ("TURNAROUND", "PERIMEE", "payout", "recul", "AVIS", "ECART"))]
         attention = any("PERIMEE" in a for a in r["alertes"]) or r["sizing"]["recommandation"] in ("REDUITE", "MINIMALE", "PRUDENCE")
         p_style = profils.get(r["ticker"], {})
+        profil_detail = (f"VALUE {p_style['VALUE']} \u00b7 GROWTH {p_style['GROWTH']} \u00b7 GARP {p_style['GARP']}"
+                         if p_style.get("dominant") else "")
         lignes_js.append({
             "ticker": r["ticker"], "secteur": r["secteur"].replace("_", " ").title(),
             "profil": p_style.get("dominant"), "profil_mixte": bool(p_style.get("mixte")),
+            "profil_detail": profil_detail,
             "score": round(r["score_composite"], 1) if r["score_composite"] is not None else None,
             "rentabilite": round(r["score_rentabilite"], 1) if r["score_rentabilite"] is not None else None,
             "solidite": round(r["score_solidite"], 1) if r["score_solidite"] is not None else None,
             "valorisation": round(r["score_valorisation"], 1) if r["score_valorisation"] is not None else None,
             "roe": round(roe * 100, 1) if roe else None,
-            "sizing": r["sizing"]["recommandation"], "attention": attention,
-            "alertes": "; ".join(alertes_maj[:2]) or "—",
+            "sizing": r["sizing"]["recommandation"],
+            "sizing_libelle": sizing_libelle(r["sizing"]["recommandation"]),
+            "sizing_classe": sizing_classe(r["sizing"]["recommandation"]),
+            "sizing_desc": sizing_description(r["sizing"]["recommandation"]),
+            "attention": attention,
+            "alertes": alertes_maj,  # liste complete (14/07/2026) ; le JS affiche 1 + "et N autres" repliable
         })
 
     lignes_exclus = "".join(f"""
@@ -317,7 +328,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
             lignes_titres += f"""
             <tr onclick="afficherFiche('{t['ticker']}')" style="cursor:pointer">
               <td><b>{t['ticker']}</b>{statut_txt}</td>
-              <td>{(f"<span class='chip chip-" + t['profil'].lower() + "'>" + t['profil'] + (" (mixte)" if t['profil_mixte'] else "") + "</span>") if t.get('profil') else "<span class='chip chip-na'>n/d</span>"}</td>
+              <td>{(f"<span class='chip chip-" + t['profil'].lower() + f"' title='{t.get('profil_detail','')}'>" + t['profil'] + (" (mixte)" if t['profil_mixte'] else "") + "</span>") if t.get('profil') else "<span class='chip chip-na'>n/d</span>"}</td>
               <td>{t['score'] if t['score'] is not None else '—'}</td>
               <td>{cellule_couleur(t['per'], t['per_pos'], t['per_symb'])}</td>
               <td>{cellule_couleur(t['roe'], t['roe_pos'], t['roe_symb'], '%')}</td>
@@ -414,6 +425,10 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .chip-growth {{ background:#1e3a5f; color:#60a5fa; }}
   .chip-garp {{ background:#3f2e17; color:#fbbf24; }}
   .chip-na {{ background:#334155; color:#94a3b8; }}
+  .alertes details {{ cursor: pointer; }}
+  .alertes summary {{ list-style: none; }}
+  .alertes summary::-webkit-details-marker {{ display: none; }}
+  .badge[title], .chip[title] {{ cursor: help; }}
   th {{ text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600;
         border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card); cursor: pointer; }}
   td {{ padding: 8px 10px; border-bottom: 1px solid #27334a; vertical-align: top; }}
@@ -568,11 +583,11 @@ function rendreSynthese(lignes) {{
   corps.innerHTML = lignes.map(l => `
     <tr onclick="afficherFiche('${{l.ticker}}')" style="cursor:pointer">
       <td><b>${{l.ticker}}</b></td><td>${{l.secteur}}</td>
-      <td>${{l.profil ? `<span class="chip chip-${{l.profil.toLowerCase()}}">${{l.profil}}${{l.profil_mixte ? ' (mixte)' : ''}}</span>` : '<span class="chip chip-na">n/d</span>'}}</td>
+      <td>${{l.profil ? `<span class="chip chip-${{l.profil.toLowerCase()}}" title="${{l.profil_detail || ''}}">${{l.profil}}${{l.profil_mixte ? ' (mixte)' : ''}}</span>` : '<span class="chip chip-na">n/d</span>'}}</td>
       <td>${{v(l.rentabilite)}}</td><td>${{v(l.solidite)}}</td><td>${{v(l.valorisation)}}</td>
       <td>${{l.roe !== null ? l.roe + '%' : '—'}}</td>
-      <td><span class="badge badge-${{l.sizing.toLowerCase()}}">${{l.sizing}}</span></td>
-      <td class="alertes">${{l.alertes}}</td>
+      <td><span class="badge badge-${{l.sizing.toLowerCase()}}" title="${{l.sizing_desc}}">${{l.sizing_libelle}}</span></td>
+      <td class="alertes">${{l.alertes.length ? `<details><summary>${{l.alertes[0]}}${{l.alertes.length>1 ? ' <span style=\'color:var(--muted)\'>(+' + (l.alertes.length-1) + ' autre' + (l.alertes.length>2?'s':'') + ')</span>' : ''}}</summary>${{l.alertes.length>1 ? '<div style=\'margin-top:4px\'>' + l.alertes.slice(1).map(a=>`&bull; ${{a}}`).join('<br>') + '</div>' : ''}}</details>` : '—'}}</td>
     </tr>`).join('');
 }}
 let ligneCourantes = [...LIGNES_SYNTHESE];
