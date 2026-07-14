@@ -4,15 +4,15 @@ version: "0.1"
 date: "2026-07-07"
 
 filtres_exclusion:
-  retards_publication: { defauts_max: 2, fenetre_echeances: 4 }
-  silence_informationnel_mois: 18
+  retards_publication: { defauts_max: 2, fenetre_echeances: 4 }  # PREVU_NON_IMPLEMENTE — meme dependance que silence_informationnel_mois
+  silence_informationnel_mois: 18  # PREVU_NON_IMPLEMENTE — necessite un historique de publication par titre (chantier calendrier, non fait)
   resultat_net_negatif_exercices: 2
   payout_max: 1.00
   payout_max_exercices: 2
   de_ratio_multiple_median_sectoriel: 2.0   # hors banques
   solvabilite_bancaire_min: 0.115           # BCEAO — vérifier taux en vigueur
-  suspension_lookback_mois: 12
-  sanction_lookback_mois: 24
+  suspension_lookback_mois: 12  # PREVU_NON_IMPLEMENTE — necessite une source structuree des suspensions (actuellement note en texte libre dans avis_reglementaires.note)
+  sanction_lookback_mois: 24  # PREVU_NON_IMPLEMENTE — aucune source de sanctions CREPMF collectee a ce jour
 
 score:
   poids: { rentabilite: 0.35, solidite: 0.30, valorisation: 0.35 }
@@ -22,9 +22,36 @@ score:
   peg_attractif_max: 1.0
   croissance_lookback_annees: 3
 
+# ------------------------------------------------------------------
+# Registre des seuils SIGNAUX (chantier 1, 13/07/2026) — rapatries ici
+# depuis moteur/signaux.py le 14/07/2026 (ils y etaient codes en dur,
+# violation de la doctrine de versionnement ; corrige).
+signaux:
+  seuil_decote: 0.70              # PER < 70% de la mediane sectorielle -> A_QUALITE_DECOTEE
+  seuil_chute_rn: 0.30            # recul du RN >= 30% (2 exercices positifs) -> D2
+  seuil_rerating_acheve: 1.30     # PER > 130% de la mediane -> sortie RERATING_EN_COURS
+  expiration_b1_bulletins: 2      # bulletins mensuels sans nouveau record -> extinction B1
+  fenetre_heritage_retroactif_seances: 15   # heritage des signaux B a la qualification A (non encore implemente)
+
+# Registre des seuils PROFILS (rapatries le 14/07/2026, memes raisons)
+profils:
+  fenetre_exercices_max: 4        # nombre max d'exercices beneficiaires consecutifs regardes
+  seuil_mixite_pts: 20            # ecart de points sous lequel un profil est dit "mixte"
+  confiance_haute_min_exercices: 4
+  confiance_moyenne_min_exercices: 2
+  alerte_peg_plausibilite_max: 0.20   # PEG sous ce seuil -> alerte de plausibilite (effet de base)
+
+# ------------------------------------------------------------------
+# Etat d'application des regles ci-dessous (audit du 14/07/2026) :
+# 4 cles etaient documentees ici sans etre lues par AUCUN script
+# (securite theatrale). Deux sont maintenant appliquees (voir moteur/tester.py,
+# fonctions verifier_plausibilite / verifier_statut_ocr). Les autres sont
+# explicitement marquees PREVU_NON_IMPLEMENTE ci-dessous : elles decrivent
+# une intention de conception, pas un comportement actif du systeme.
+
 extraction:
-  plafond_plausibilite_fcfa: 1000000000000  # 1 000 Mds FCFA
-  statut_ocr_max_sans_2e_source: "PROBABLE"
+  plafond_plausibilite_fcfa: 1000000000000  # 1 000 Mds FCFA — APPLIQUE (moteur/tester.py) AU SEUL RESULTAT_NET (pas au bilan : total_actif/capitaux_propres de groupes bancaires panafricains le depassent legitimement — decouvert au 1er run reel, 14/07/2026)
+  statut_ocr_max_sans_2e_source: "PROBABLE"  # APPLIQUE (moteur/tester.py::verifier_statut_ocr)
 
 collecte:
   requetes_par_seconde_max: 2
