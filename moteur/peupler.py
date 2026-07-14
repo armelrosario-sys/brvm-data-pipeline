@@ -96,6 +96,30 @@ SOCIETES = [
 
 # ticker, exercice, RN, RN_N1, actif, passif, CP, dettes_fin, payout, solva, source_type, statut, date_pub
 ETATS = [
+    ("SDSC", 2024, 21068.974, 17138.527, 188126.016, 188126.016, 77808.004, 8324.985, 0.2377, None,
+     "NATIF", "VALIDE", "2025-08-29"),  # AJOUT 14/07/2026 (relance SDSC) : PDF officiel certifie
+    # "Etats financiers et rapport des CAC - Exercice 2024" (ECR International, signe
+    # Abidjan 20/06/2025, depose BRVM 29/08/2025). Verification arithmetique : RN
+    # 21068.974 - dividende propose 5008.048 = report a nouveau 16060.926 (exact).
+    # Document en MILLIERS de FCFA dans l'original -> converti en millions (/1000)
+    # pour coherence avec le reste de la base. CP = Capital + Primes et Reserves +
+    # Resultat + Autres capitaux propres (10887.060+45139.150+21068.974+712.820).
+    # RAO non retranscrit (tableau compte de resultat trop degrade a l'extraction
+    # pour une lecture fiable ligne a ligne) -> laisse a None, integrite > couverture.
+    ("SDSC", 2023, 17138.527, 10044, 157733.319, 157733.319, 61747.077, 10733.982, None, None,
+     "NATIF", "VALIDE", "2025-08-29"),  # meme document (colonne comparative 2023, certifiee)
+    ("SDSC", 2022, 10044, 13942, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", None),  # AJOUT 14/07/2026 (relance SDSC) : source = fiche officielle
+    # BRVM (page profil emetteur, tableau "indicateurs sur les 3 dernieres annees"),
+    # PAS le PDF d'etats financiers complet -> bilan (actif/passif/CP) inconnu ici,
+    # d'ou PROBABLE et non VALIDE. CA 86997 M FCFA non stocke (colonne absente du schema,
+    # gap connu). date_publication=None : la page profil ne donne pas la date reelle de
+    # depot, et en fabriquer une fausserait l'anti-look-ahead documente dans le schema.
+    # URL : brvm.org/fr/emetteurs/societes-cotees/africa-global-logistics-agl-cote-divoire
+    ("SDSC", 2021, 13942, 13455, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", None),  # meme source, meme reserve bilan et date
+    ("SDSC", 2020, 13455, None, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", None),  # meme source ; pas d'annee anterieure pour RN N-1
     ("ETIT", 2025, 345523, 299708, 19243865, 19243865, 1597846, None, None, None,
      "NATIF", "VALIDE", "2026-04-13"),  # RESOLU 11/07/2026 via web_fetch direct sur brvm.org — page dediee
     # jamais collectee par le robot (gap depuis le debut du projet). Donnees consolidees groupe (part
@@ -438,6 +462,19 @@ ETATS = [
 ]
 
 DIVIDENDES = [
+    # SDSC 2020-2022 : RESOLU le 14/07/2026. La fiche profil BRVM donnait
+    # "5443/5443/5008" sous l'intitule "Dividende net/action (FCFA)" -- en realite
+    # le DIVIDENDE TOTAL en MILLIONS FCFA, mal etiquete (verifie : 92 FCFA/action brut
+    # x 54 435 300 actions = 5008,05 M FCFA, exact au centime pres vs le document de
+    # resolutions d'AG qui confirme independamment "92 FCFA brut" pour 2022).
+    # 2022 : brut confirme par document primaire (resolutions AG). 2020/2021 :
+    # brut RECONSTRUIT par le meme calcul (5443 M / 54 435 300 actions = 100,00 FCFA,
+    # chiffre rond, coherent avec un resserrement a 92 FCFA en 2022) -- non enonce
+    # explicitement par action dans un document, donc moins sur que 2022.
+    # Net = brut x (1 - IRVM_CI 10%), cf. moteur/scoring.py IRVM_PAR_PAYS.
+    ("SDSC", 82.8, None, 2022),   # 92 FCFA brut confirme (resolutions AG) -> net apres IRVM 10%
+    ("SDSC", 90.0, None, 2021),   # 100 FCFA brut reconstruit (voir note ci-dessus) -> net
+    ("SDSC", 90.0, None, 2020),   # idem
     # ticker, montant_net, date_paiement, exercice_couvert
     # REGLE D'INTEGRITE : montant renseigne UNIQUEMENT si source dans la conversation ;
     # sinon None (date seule, issue du BOC) — la saisie manuelle suit les memes
