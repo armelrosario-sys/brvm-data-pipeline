@@ -28,6 +28,23 @@ LIBELLES_SECTEURS_COURTS = {
 }
 
 
+def _rendre_profil_secteur(t):
+    """Meme logique que le rendu JS de la Synthese : scores TOUJOURS visibles,
+    pas seulement en info-bulle (correctif ergonomie du 14/07/2026)."""
+    if not t.get("profil"):
+        return "<span class='chip chip-na'>n/d</span>"
+    sc = t.get("profil_scores") or {}
+    def fmt(nom, abbr):
+        v = sc.get(nom)
+        if v is None:
+            return ""
+        cls = " score-dominant" if t["profil"] == nom else ""
+        return f"<span class='score-detail{cls}'>{abbr}{v}</span>"
+    chip = f"<span class='chip chip-{t['profil'].lower()}' title='{t.get('profil_detail','')}'>{t['profil']}</span>"
+    detail = f"<span class='profil-detail-ligne'>{fmt('VALUE','V')} {fmt('GROWTH','G')} {fmt('GARP','P')}</span>"
+    return chip + detail
+
+
 def libelle_secteur(s):
     """Point 5 (audit ergonomie, 14/07/2026) : libelles raccourcis pour gagner
     de la largeur dans les tableaux, sans perdre l'info (titre complet en attribut)."""
@@ -209,12 +226,17 @@ def calculer_secteurs(resultats, series, fondamentaux, marche, liquidite_jour, l
         per = sr[-1]["per"] if sr and sr[-1]["per"] else None
 
         p_style = profils.get(r["ticker"], {})
-        profil_detail = (f"VALUE {p_style['VALUE']} \u00b7 GROWTH {p_style['GROWTH']} \u00b7 GARP {p_style['GARP']}"
+        # Correctif ergonomie (14/07/2026) : un survol (title=) est invisible sur
+        # mobile/tactile et cache l'info au lieu de l'expliciter — corrige suite
+        # au retour explicite sur ce point. Les 3 scores sont maintenant fournis
+        # pour un affichage TOUJOURS VISIBLE (plus seulement en info-bulle).
+        profil_scores = {"VALUE": p_style.get("VALUE"), "GROWTH": p_style.get("GROWTH"), "GARP": p_style.get("GARP")}
+        profil_detail = (f"VALUE {{p_style['VALUE']}} \u00b7 GROWTH {{p_style['GROWTH']}} \u00b7 GARP {{p_style['GARP']}}"
                          if p_style.get("dominant") else "")
         secteurs[s]["titres"].append({
             "ticker": r["ticker"], "score": round(r["score_composite"], 1) if r.get("score_composite") else None,
             "profil": p_style.get("dominant"), "profil_mixte": bool(p_style.get("mixte")),
-            "profil_detail": profil_detail,
+            "profil_detail": profil_detail, "profil_scores": profil_scores,
             "per": per, "roe": roe_pct, "roe_interp": roe_interp,
             "liq_gen_abs": liq_gen_abs, "liq_gen_ratio": liq_gen_ratio, "liq_gen_nmois": liq_gen_nmois,
             "liq_flottant": liq_flot_pct, "liq_flottant_interp": liq_flot_interp, "statut": r["statut_gate"],
@@ -279,12 +301,17 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
             m in a for m in ("TURNAROUND", "PERIMEE", "payout", "recul", "AVIS", "ECART"))]
         attention = any("PERIMEE" in a for a in r["alertes"]) or r["sizing"]["recommandation"] in ("REDUITE", "MINIMALE", "PRUDENCE")
         p_style = profils.get(r["ticker"], {})
-        profil_detail = (f"VALUE {p_style['VALUE']} \u00b7 GROWTH {p_style['GROWTH']} \u00b7 GARP {p_style['GARP']}"
+        # Correctif ergonomie (14/07/2026) : un survol (title=) est invisible sur
+        # mobile/tactile et cache l'info au lieu de l'expliciter — corrige suite
+        # au retour explicite sur ce point. Les 3 scores sont maintenant fournis
+        # pour un affichage TOUJOURS VISIBLE (plus seulement en info-bulle).
+        profil_scores = {"VALUE": p_style.get("VALUE"), "GROWTH": p_style.get("GROWTH"), "GARP": p_style.get("GARP")}
+        profil_detail = (f"VALUE {{p_style['VALUE']}} \u00b7 GROWTH {{p_style['GROWTH']}} \u00b7 GARP {{p_style['GARP']}}"
                          if p_style.get("dominant") else "")
         lignes_js.append({
             "ticker": r["ticker"], "secteur": r["secteur"].replace("_", " ").title(),
             "profil": p_style.get("dominant"), "profil_mixte": bool(p_style.get("mixte")),
-            "profil_detail": profil_detail,
+            "profil_detail": profil_detail, "profil_scores": profil_scores,
             "score": round(r["score_composite"], 1) if r["score_composite"] is not None else None,
             "rentabilite": round(r["score_rentabilite"], 1) if r["score_rentabilite"] is not None else None,
             "solidite": round(r["score_solidite"], 1) if r["score_solidite"] is not None else None,
@@ -328,7 +355,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
             lignes_titres += f"""
             <tr onclick="afficherFiche('{t['ticker']}')" style="cursor:pointer">
               <td><b>{t['ticker']}</b>{statut_txt}</td>
-              <td>{(f"<span class='chip chip-" + t['profil'].lower() + f"' title='{t.get('profil_detail','')}'>" + t['profil'] + (" (mixte)" if t['profil_mixte'] else "") + "</span>") if t.get('profil') else "<span class='chip chip-na'>n/d</span>"}</td>
+              <td>{_rendre_profil_secteur(t)}</td>
               <td>{t['score'] if t['score'] is not None else '—'}</td>
               <td>{cellule_couleur(t['per'], t['per_pos'], t['per_symb'])}</td>
               <td>{cellule_couleur(t['roe'], t['roe_pos'], t['roe_symb'], '%')}</td>
@@ -351,11 +378,11 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
             <span style="font-weight:400;color:var(--muted);font-size:0.75em">
               (mediane PER {d['per_median'] if d['per_median'] else '—'} · score moyen {d['score_moyen'] if d['score_moyen'] else '—'})
             </span></h2>
-          <table>
+          <div class="scroll"><table>
             <thead><tr><th>Titre</th><th>Profil</th><th>{terme_glossaire('Score')}</th><th>{terme_glossaire('PER')}</th>
               <th>{terme_glossaire('ROE')}</th><th>Liquidite generale</th><th>Flottant</th></tr></thead>
             <tbody>{lignes_titres}</tbody>
-          </table>
+          </table></div>
           <div style="font-size:0.75em;color:var(--muted);margin-top:8px">
             ▼ vert = plus favorable que la mediane du secteur (PER bas ou ROE eleve) ·
             ● orange = proche de la mediane (±15%) · ▲ rouge = moins favorable ·
@@ -425,6 +452,16 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .chip-growth {{ background:#1e3a5f; color:#60a5fa; }}
   .chip-garp {{ background:#3f2e17; color:#fbbf24; }}
   .chip-na {{ background:#334155; color:#94a3b8; }}
+  .col-analytique {{ color: var(--muted, #94a3b8); font-size: 0.93em; }}
+  .legende-globale {{ margin: 10px 0 16px; font-size: 0.85em; color: var(--muted, #94a3b8); }}
+  .legende-globale summary {{ cursor: pointer; }}
+  .profil-detail-ligne {{ display: block; font-size: 0.72em; color: var(--muted, #94a3b8);
+                           font-family: monospace; margin-top: 1px; }}
+  .score-detail {{ margin-right: 5px; }}
+  .score-detail.score-dominant {{ color: var(--text, #e2e8f0); font-weight: 700; }}
+  .legende-corps {{ display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px;
+                     padding: 10px 14px; background: var(--card, #1e293b);
+                     border: 1px solid var(--border, #334155); border-radius: 8px; }}
   .alertes details {{ cursor: pointer; }}
   .alertes summary {{ list-style: none; }}
   .alertes summary::-webkit-details-marker {{ display: none; }}
@@ -480,6 +517,18 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
     individuellement pour toute lecture.
   </div>
 
+  <details class="legende-globale">
+    <summary>Legende des couleurs et symboles (cliquer pour deplier)</summary>
+    <div class="legende-corps">
+      <span>&#9873; rouge = defavorable / a surveiller</span>
+      <span>&#10003; vert = favorable / decote qualifiee</span>
+      <span>&#8505; bleu = information neutre (ex. nouveau record)</span>
+      <span>&#9660; vert (secteurs) = plus favorable que la mediane</span>
+      <span>&#9679; orange (secteurs) = proche de la mediane (&plusmn;15%)</span>
+      <span>&#9650; rouge (secteurs) = moins favorable que la mediane</span>
+    </div>
+  </details>
+
   <div class="onglets">
     <span class="groupe-onglets">Essentiel</span>
     <div class="onglet actif" onclick="onglet('synthese')">Synthese</div>
@@ -507,8 +556,9 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
         </select>
       </div>
       <div class="scroll"><table>
-        <thead><tr><th>Titre</th><th>Secteur</th><th>Profil</th><th>Rentabilite</th><th>Solidite</th><th>Valorisation</th>
-          <th>{terme_glossaire('ROE')}</th><th>Sizing</th><th>Alertes</th></tr></thead>
+        <thead><tr><th>Titre</th><th>Secteur</th><th>Profil</th><th>Alertes</th><th>Sizing</th>
+          <th class="col-analytique">Rentabilite</th><th class="col-analytique">Solidite</th>
+          <th class="col-analytique">Valorisation</th><th class="col-analytique">{terme_glossaire('ROE')}</th></tr></thead>
         <tbody id="corps-synthese"></tbody>
       </table></div>
     </div>
@@ -583,11 +633,17 @@ function rendreSynthese(lignes) {{
   corps.innerHTML = lignes.map(l => `
     <tr onclick="afficherFiche('${{l.ticker}}')" style="cursor:pointer">
       <td><b>${{l.ticker}}</b></td><td>${{l.secteur}}</td>
-      <td>${{l.profil ? `<span class="chip chip-${{l.profil.toLowerCase()}}" title="${{l.profil_detail || ''}}">${{l.profil}}${{l.profil_mixte ? ' (mixte)' : ''}}</span>` : '<span class="chip chip-na">n/d</span>'}}</td>
-      <td>${{v(l.rentabilite)}}</td><td>${{v(l.solidite)}}</td><td>${{v(l.valorisation)}}</td>
-      <td>${{l.roe !== null ? l.roe + '%' : '—'}}</td>
-      <td><span class="badge badge-${{l.sizing.toLowerCase()}}" title="${{l.sizing_desc}}">${{l.sizing_libelle}}</span></td>
+      <td>${{l.profil ? (() => {{
+        const sc = l.profil_scores || {{}};
+        const fmt = (nom, abbr) => sc[nom] !== null && sc[nom] !== undefined
+          ? `<span class="score-detail ${{l.profil===nom?'score-dominant':''}}">${{abbr}}${{sc[nom]}}</span>` : '';
+        return `<span class="chip chip-${{l.profil.toLowerCase()}}" title="${{l.profil_detail || ''}}">${{l.profil}}</span>`
+             + `<span class="profil-detail-ligne">${{fmt('VALUE','V')}} ${{fmt('GROWTH','G')}} ${{fmt('GARP','P')}}</span>`;
+      }})() : '<span class="chip chip-na">n/d</span>'}}</td>
       <td class="alertes">${{l.alertes.length ? `<details><summary>${{l.alertes[0]}}${{l.alertes.length>1 ? ` <span style="color:var(--muted)">(+${{l.alertes.length-1}} autre${{l.alertes.length>2?'s':''}})</span>` : ''}}</summary>${{l.alertes.length>1 ? `<div style="margin-top:4px">${{l.alertes.slice(1).map(a=>`&bull; ${{a}}`).join('<br>')}}</div>` : ''}}</details>` : '—'}}</td>
+      <td><span class="badge badge-${{l.sizing.toLowerCase()}}" title="${{l.sizing_desc}}">${{l.sizing_libelle}}</span></td>
+      <td class="col-analytique">${{v(l.rentabilite)}}</td><td class="col-analytique">${{v(l.solidite)}}</td><td class="col-analytique">${{v(l.valorisation)}}</td>
+      <td class="col-analytique">${{l.roe !== null ? l.roe + '%' : '—'}}</td>
     </tr>`).join('');
 }}
 let ligneCourantes = [...LIGNES_SYNTHESE];
