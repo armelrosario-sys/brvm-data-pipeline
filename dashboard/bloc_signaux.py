@@ -52,6 +52,7 @@ STYLE = """
 .sig-toggle { background: none; border: 1px solid var(--border, #334155); color: var(--muted, #94a3b8);
   border-radius: 6px; padding: 3px 10px; font-size: 0.78em; cursor: pointer; margin-bottom: 8px; }
 .sig-toggle:hover { color: var(--text, #e2e8f0); border-color: var(--muted, #94a3b8); }
+.sig-note-cell { color: var(--muted, #94a3b8); font-size: 0.85em; }
 </style>
 <script>
 function sigToggleColonnes(tableId, btn) {
@@ -144,7 +145,36 @@ def generer_blocs():
     <tbody>{''.join(lignes2)}</tbody>
   </table>
 </div>"""
-    return STYLE + bloc1 + bloc2
+    # ---- Bloc 3 : introductions et cotations a venir (14/07/2026) ----
+    # Principe identique a celui applique au Sizing "Prudence" : ne JAMAIS
+    # confondre "pas de donnee" avec "probleme" -- un titre nouvellement
+    # introduit (BBGCI, rejoint la BRVM en 2026) n'a ni cours ni historique,
+    # ce n'est pas une exclusion pour cause, ce n'est pas un signal --
+    # affichage separe, jamais dans "Exclus".
+    intro = cur.execute(
+        "SELECT ticker, nom, secteur, date_introduction, controle_actionnarial "
+        "FROM societes WHERE ticker NOT LIKE 'TEST_%' AND ticker NOT IN "
+        "(SELECT DISTINCT ticker FROM cours_mensuels)").fetchall()
+    bloc3 = ""
+    if intro:
+        lignes3 = []
+        for t, nom, sec, date_intro, note in intro:
+            statut = f"cotation prevue le {date_intro}" if date_intro else "date de cotation a preciser"
+            lignes3.append(f"<tr><td><b>{t}</b></td><td>{nom}</td><td>{sec.replace('_',' ').title()}</td>"
+                          f"<td>{statut}</td><td class='sig-note-cell'>{note or ''}</td></tr>")
+        bloc3 = f"""
+<div class="sig-carte">
+  <h2>Introductions et cotations a venir <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
+      ({len(intro)} titre{'s' if len(intro)>1 else ''} — pas encore de cours, distinct d'une exclusion)</span></h2>
+  <table class="sig-table">
+    <thead><tr><th>Titre</th><th>Nom</th><th>Secteur</th><th>Statut</th><th>Note</th></tr></thead>
+    <tbody>{''.join(lignes3)}</tbody>
+  </table>
+  <div class="sig-note">Absence de cours = pas encore cote, pas un probleme de donnee ni un risque --
+  ce titre rejoindra les autres tableaux des que ses premieres cotations seront collectees.</div>
+</div>"""
+
+    return STYLE + bloc1 + bloc2 + bloc3
 
 
 def injecter():
