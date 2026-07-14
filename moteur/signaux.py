@@ -31,10 +31,13 @@ from scoring import (charger_seuils, charger_marche, appliquer_gate,
 
 DB_DEFAUT = Path(__file__).resolve().parent / "brvm.db"
 
-SEUIL_DECOTE = 0.70          # PER < 70% de la mediane sectorielle
-SEUIL_CHUTE_RN = 0.30        # recul du RN >= 30% (les deux exercices positifs)
-SEUIL_RERATING_ACHEVE = 1.30 # PER > 130% de la mediane sectorielle
-EXPIRATION_B1_BULLETINS = 2  # bulletins mensuels sans nouveau record
+# Correctif 14/07/2026 : ces seuils vivaient en dur ici, violation de la
+# doctrine "parametres geles ET versionnes dans seuils.yaml". Rapatries.
+_seuils_signaux = charger_seuils().get("signaux", {})
+SEUIL_DECOTE = _seuils_signaux.get("seuil_decote", 0.70)
+SEUIL_CHUTE_RN = _seuils_signaux.get("seuil_chute_rn", 0.30)
+SEUIL_RERATING_ACHEVE = _seuils_signaux.get("seuil_rerating_acheve", 1.30)
+EXPIRATION_B1_BULLETINS = _seuils_signaux.get("expiration_b1_bulletins", 2)
 
 FAVORABLES = ("A_QUALITE_DECOTEE", "B1_RECORD", "RERATING_EN_COURS")
 
