@@ -38,7 +38,9 @@ LIQ = RACINE / "collecte" / "liquidite_generale.json"
 SORTIE = RACINE / "docs_site" / "poste_decision.html"
 
 sys.path.insert(0, str(RACINE / "moteur"))
+sys.path.insert(0, str(RACINE / "dashboard"))
 from scoring import charger_marche, rendement_net_estime  # reutilisation moteur
+from glossaire_signaux import libelle as libelle_signal  # 14/07/2026 : codes -> libelles clairs
 
 def dy_net(dy_brut_pct, pays):
     """DY net d'IRVM en %, via la table officielle du moteur (moteur/scoring.py::IRVM_PAR_PAYS).
@@ -142,7 +144,7 @@ def generer():
                     else "Décote qualifiée (A)" if "A_QUALITE_DECOTEE" in types
                     else "Re-rating en cours")
             ab, cl = absorption(liq, t)
-            det = " · ".join(s[0] for s in ss if s[1] == "FAVORABLE")
+            det = " · ".join(libelle_signal(s[0]) for s in ss if s[1] == "FAVORABLE")
             rows3b.append((2 if b1 else 1,
                 f"<tr><td><b>{t}</b></td><td>{chip(profils.get(t))}</td>"
                 f"<td><b>{conj}</b><br><small>{det}</small></td>"
