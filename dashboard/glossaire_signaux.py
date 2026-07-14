@@ -20,6 +20,8 @@ SIGNAUX = {
         "description": "Le dividende verse est inferieur a celui de l'exercice precedent."},
     "D4_RETARD_PUBLICATION": {"libelle": "Retard de publication", "classe": "def",
         "description": "Un retard de publication des comptes a ete constate et n'est pas encore resorbe."},
+    "D4_RETARD_CALENDRIER": {"libelle": "Retard (calendrier)", "classe": "def",
+        "description": "Ecart significatif au rythme historique de depot de ce titre (detecte automatiquement, sans avis officiel)."},
     "A_QUALITE_DECOTEE":  {"libelle": "Decote qualifiee",     "classe": "fav",
         "description": "PER inferieur a 70% de la mediane sectorielle, resultat en progression, titre eligible."},
     "B1_RECORD":          {"libelle": "Nouveau record",       "classe": "info",
