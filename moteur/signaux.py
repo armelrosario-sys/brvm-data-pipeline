@@ -158,7 +158,7 @@ def calculer_candidats(cur, seuils, marche):
             cand[(t, "A_QUALITE_DECOTEE")] = dict(
                 direction="FAVORABLE",
                 detail=f"PER {per:.2f} < 70% de la mediane sectorielle {med:.2f} "
-                       f"({src_med}) ; RN {rns[1][1]:.0f} -> {rns[0][1]:.0f} M FCFA{peg_txt} ; gate ELIGIBLE",
+                       f"({src_med}) ; RN {rns[1][1]:.0f} -> {rns[0][1]:.0f} M FCFA{peg_txt} ; titre eligible",
                 valeur_reference=cours_per,
                 source_donnee=f"cours_mensuels {mois_per} + etats_financiers")
 
@@ -176,7 +176,7 @@ def calculer_candidats(cur, seuils, marche):
                 historique = cours_now > max_hist
                 cand[(t, "B1_RECORD")] = dict(
                     direction="FAVORABLE",
-                    detail=("PLUS-HAUT HISTORIQUE" if historique else "Plus-haut 12 mois")
+                    detail=("Plus-haut historique" if historique else "Plus-haut 12 mois")
                            + f" a {cours_now:.0f} FCFA (bulletin {dernier_mois})",
                     valeur_reference=cours_now,
                     source_donnee=f"cours_mensuels {dernier_mois}")
