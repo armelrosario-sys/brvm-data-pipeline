@@ -36,8 +36,20 @@ jobs:
           cd moteur
           python3 peupler.py
           python3 ../collecte/charger_cours.py brvm.db
+      - name: Calculer les signaux (cycle de vie)
+        run: |
+          cd moteur
+          python3 signaux.py
+      - name: Calculer les profils de style (VALUE/GROWTH/GARP)
+        run: |
+          cd moteur
+          python3 profils.py
       - name: Generer le dashboard HTML
         run: python3 dashboard/generer_dashboard_html.py
+      - name: Injecter les blocs signaux (liste de suivi + marche)
+        run: python3 dashboard/bloc_signaux.py
+      - name: Generer le poste de decision
+        run: python3 dashboard/generer_poste_decision.py
       - name: Configurer Pages
         uses: actions/configure-pages@v5
       - name: Preparer l'artefact
