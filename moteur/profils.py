@@ -22,6 +22,13 @@ def pctl(vals, x, inverse=False):
 def calculer():
     c = sqlite3.connect(DB).cursor()
     seuils, marche = charger_seuils(), charger_marche()
+    # Correctif 14/07/2026 : ces seuils vivaient en dur, rapatries dans seuils.yaml
+    sp = seuils.get("profils", {})
+    fenetre_max = sp.get("fenetre_exercices_max", 4)
+    seuil_mixite = sp.get("seuil_mixite_pts", 20)
+    conf_haute = sp.get("confiance_haute_min_exercices", 4)
+    conf_moyenne = sp.get("confiance_moyenne_min_exercices", 2)
+    alerte_peg_max = sp.get("alerte_peg_plausibilite_max", 0.20)
     sect = dict(c.execute("SELECT ticker, secteur FROM societes"))
     ing = {}
     tickers = [r[0] for r in c.execute("SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%'").fetchall()]
@@ -31,7 +38,7 @@ def calculer():
         ex = c.execute("SELECT exercice,resultat_net,capitaux_propres FROM etats_financiers WHERE ticker=? AND resultat_net IS NOT NULL ORDER BY exercice DESC",(t,)).fetchall()
         roe = 100*ex[0][1]/ex[0][2] if ex and ex[0][2] and ex[0][2] > 0 else None
         g = None  # croissance annualisee, exercices consecutivement beneficiaires uniquement
-        serie = [e for e in ex if e[1] and e[1] > 0][:4]
+        serie = [e for e in ex if e[1] and e[1] > 0][:fenetre_max]
         if len(serie) >= 2 and serie[0][0] > serie[-1][0]:
             n = serie[0][0] - serie[-1][0]
             g = 100*((serie[0][1]/serie[-1][1])**(1/n) - 1)
@@ -53,10 +60,10 @@ def calculer():
         dispo = {k: x for k, x in s.items() if x is not None}
         tri = sorted(dispo.values(), reverse=True)
         profils[t] = dict(**s, dominant=max(dispo, key=dispo.get) if dispo else None,
-            mixte=len(tri) >= 2 and (tri[0]-tri[1]) < 20,
+            mixte=len(tri) >= 2 and (tri[0]-tri[1]) < seuil_mixite,
             peg=round(peg, 2) if peg else None,
-            alerte_peg=bool(peg is not None and peg < 0.2),  # plausibilite (cas SLBC)
-            confiance="HAUTE" if v["n_ex"] >= 4 else "MOYENNE" if v["n_ex"] >= 2 else "FAIBLE", **v)
+            alerte_peg=bool(peg is not None and peg < alerte_peg_max),  # plausibilite (cas SLBC)
+            confiance="HAUTE" if v["n_ex"] >= conf_haute else "MOYENNE" if v["n_ex"] >= conf_moyenne else "FAIBLE", **v)
     SORTIE.write_text(json.dumps(profils, ensure_ascii=False, indent=1))
     print(f"profils.json : {len(profils)} titres profiles")
     return profils
