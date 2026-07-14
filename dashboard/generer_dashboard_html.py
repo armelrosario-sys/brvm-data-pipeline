@@ -16,7 +16,26 @@ from statistics import median, mean
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "moteur"))
 from scoring import evaluer_titre, rapport_fraicheur, charger_seuils, charger_marche, charger_liquidite_jour, charger_liquidite_generale, charger_tendance_liquidite, DB
-from glossaire_signaux import sizing_libelle, sizing_classe, sizing_description  # 14/07/2026
+from glossaire_signaux import sizing_libelle, sizing_classe, sizing_description, SIZING  # 14/07/2026
+import re as _re_humanise
+
+
+def humaniser(texte):
+    """Convertit tout token EN_MAJUSCULES_AVEC_SOULIGNES (code technique libre,
+    ex. type d'avis reglementaire non couvert par un glossaire ferme) en texte
+    lisible 'En majuscules avec soulignes' -> 'En majuscules avec soulignes'.
+    Corrige le 14/07/2026 : ces codes bruts (ex. AVIS CYCLE_MATIERE_PREMIERE)
+    echappaient au glossaire_signaux (qui ne couvre que les 7 types de la
+    table `signaux`) car avis_reglementaires.type est un champ libre, pas une
+    enumeration fermee — un glossaire fige est donc impossible ici ; seule
+    une transformation de texte generique peut s'appliquer a toute valeur
+    future sans maintenance."""
+    if not texte:
+        return texte
+    def _conv(m):
+        mot = m.group(0)
+        return mot.replace("_", " ").capitalize()
+    return _re_humanise.sub(r"\b[A-Z][A-Z_]{2,}\b", _conv, texte)
 import sqlite3
 
 LIBELLES_SECTEURS_COURTS = {
@@ -29,20 +48,23 @@ LIBELLES_SECTEURS_COURTS = {
 
 
 def _rendre_profil_secteur(t):
-    """Meme logique que le rendu JS de la Synthese : scores TOUJOURS visibles,
-    pas seulement en info-bulle (correctif ergonomie du 14/07/2026)."""
+    """Identique au rendu JS de la Synthese (fonction renderProfil) : meme
+    mini-graphique en barres, memes classes CSS -> rendu visuellement
+    identique aux deux endroits (harmonisation demandee le 14/07/2026)."""
     if not t.get("profil"):
         return "<span class='chip chip-na'>n/d</span>"
     sc = t.get("profil_scores") or {}
-    def fmt(nom, abbr):
+    dominant = t["profil"]
+    titre = f"VALUE {sc.get('VALUE')} \u00b7 GROWTH {sc.get('GROWTH')} \u00b7 GARP {sc.get('GARP')}"
+    def barre(nom, cls):
         v = sc.get(nom)
         if v is None:
             return ""
-        cls = " score-dominant" if t["profil"] == nom else ""
-        return f"<span class='score-detail{cls}'>{abbr}{v}</span>"
-    chip = f"<span class='chip chip-{t['profil'].lower()}' title='{t.get('profil_detail','')}'>{t['profil']}</span>"
-    detail = f"<span class='profil-detail-ligne'>{fmt('VALUE','V')} {fmt('GROWTH','G')} {fmt('GARP','P')}</span>"
-    return chip + detail
+        dom_cls = " pm-dom" if dominant == nom else ""
+        return f"<div class='pm-bar pm-{cls}{dom_cls}' style='height:{v}%'></div>"
+    chip = f"<span class='chip chip-{dominant.lower()}'>{dominant}</span>"
+    barres = f"<div class='profil-mini' title='{titre}'>{barre('VALUE','value')}{barre('GROWTH','growth')}{barre('GARP','garp')}</div>"
+    return chip + barres
 
 
 def libelle_secteur(s):
@@ -72,6 +94,8 @@ def collecter_donnees():
     tickers = [r[0] for r in cur.execute(
         "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%'").fetchall()]
     resultats = [evaluer_titre(t) for t in tickers]
+    for r in resultats:
+        r["alertes"] = [humaniser(a) for a in r.get("alertes", [])]
 
     series = {}
     for t in tickers:
@@ -97,7 +121,7 @@ def collecter_donnees():
         rows = cur.execute(
             "SELECT type, date_avis, note FROM avis_reglementaires WHERE ticker=?",
             (t,)).fetchall()
-        avis[t] = [dict(r) for r in rows]
+        avis[t] = [dict(r, type=humaniser(r["type"]), note=humaniser(r["note"])) for r in rows]
 
     conn.close()
     # Point 1 (audit ergonomie, 14/07/2026) : integrer le profilage de style
@@ -455,10 +479,29 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .col-analytique {{ color: var(--muted, #94a3b8); font-size: 0.93em; }}
   .legende-globale {{ margin: 10px 0 16px; font-size: 0.85em; color: var(--muted, #94a3b8); }}
   .legende-globale summary {{ cursor: pointer; }}
-  .profil-detail-ligne {{ display: block; font-size: 0.72em; color: var(--muted, #94a3b8);
-                           font-family: monospace; margin-top: 1px; }}
-  .score-detail {{ margin-right: 5px; }}
-  .score-detail.score-dominant {{ color: var(--text, #e2e8f0); font-weight: 700; }}
+  /* Profil : mini-graphique en barres (14/07/2026, 2e iteration ergonomie) */
+  .profil-mini {{ display: inline-flex; align-items: flex-end; gap: 2px; height: 16px;
+                  width: 26px; vertical-align: middle; margin-left: 6px; cursor: help; }}
+  .pm-bar {{ flex: 1; min-height: 2px; border-radius: 1px; opacity: 0.5; }}
+  .pm-bar.pm-dom {{ opacity: 1; }}
+  .pm-value {{ background: #34d399; }}
+  .pm-growth {{ background: #60a5fa; }}
+  .pm-garp {{ background: #fbbf24; }}
+  /* Alertes : badge compact replie par defaut (14/07/2026) */
+  .alertes-compact summary {{ cursor: pointer; color: #fdba74; font-weight: 600; list-style: none; }}
+  .alertes-compact summary::-webkit-details-marker {{ display: none; }}
+  .alertes-compact ul {{ margin: 6px 0 0; padding-left: 18px; font-size: 0.85em; color: var(--muted, #94a3b8); }}
+  .alertes-ras {{ color: var(--muted, #94a3b8); }}
+  /* Tableau Synthese : largeurs fixes, colonnes numeriques alignees a droite,
+     jamais de retour a la ligne dans les cellules critiques (14/07/2026) */
+  #corps-synthese, .scroll table {{ table-layout: fixed; width: 100%; }}
+  #corps-synthese td, #corps-synthese th {{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+  .num {{ text-align: right; font-variant-numeric: tabular-nums; }}
+  .score-fort {{ color: #34d399; font-weight: 600; }}
+  .score-moyen {{ color: #fbbf24; }}
+  .score-faible {{ color: #f87171; }}
+  .score-na {{ color: var(--muted, #94a3b8); }}
+  .badge-na {{ background: #334155; color: #94a3b8; }}
   .legende-corps {{ display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px;
                      padding: 10px 14px; background: var(--card, #1e293b);
                      border: 1px solid var(--border, #334155); border-radius: 8px; }}
@@ -504,7 +547,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 <body>
 <div class="conteneur">
   <h1>BRVM — Watchlist GARP-Quality</h1>
-  <div class="maj">Genere automatiquement le {maj} · seuils v{seuils.get('version','?')}</div>
+  <div class="maj">Généré automatiquement le {maj} · seuils v{seuils.get('version','?')}</div>
   <div class="avertissement">
     ⚠️ Cette watchlist ne sert a AUCUNE decision d'investissement seule — seuils non valides
     empiriquement (backtest en cours), voir document de reference du projet.
@@ -518,11 +561,15 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   </div>
 
   <details class="legende-globale">
-    <summary>Legende des couleurs et symboles (cliquer pour deplier)</summary>
+    <summary>Légende des couleurs et symboles (cliquer pour déplier)</summary>
     <div class="legende-corps">
-      <span>&#9873; rouge = defavorable / a surveiller</span>
-      <span>&#10003; vert = favorable / decote qualifiee</span>
+      <span>&#9873; rouge = défavorable / à surveiller</span>
+      <span>&#10003; vert = favorable / décote qualifiée</span>
       <span>&#8505; bleu = information neutre (ex. nouveau record)</span>
+      <span>Profil : 3 barres = VALUE/GROWTH/GARP — la plus haute et vive domine (survol = chiffres exacts)</span>
+      <span>Vert/orange/rouge sur un chiffre = niveau (fort/moyen/faible) du score ou du ROE</span>
+      <span>Taille "Donnee manquante" (gris) = pas de liquidite collectee, different d'un vrai risque</span>
+      <span>Alertes : badge replie par defaut, cliquez pour lire le détail</span>
       <span>&#9660; vert (secteurs) = plus favorable que la mediane</span>
       <span>&#9679; orange (secteurs) = proche de la mediane (&plusmn;15%)</span>
       <span>&#9650; rouge (secteurs) = moins favorable que la mediane</span>
@@ -556,9 +603,16 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
         </select>
       </div>
       <div class="scroll"><table>
-        <thead><tr><th>Titre</th><th>Secteur</th><th>Profil</th><th>Alertes</th><th>Sizing</th>
-          <th class="col-analytique">Rentabilite</th><th class="col-analytique">Solidite</th>
-          <th class="col-analytique">Valorisation</th><th class="col-analytique">{terme_glossaire('ROE')}</th></tr></thead>
+        <colgroup>
+          <col style="width:9%"><col style="width:15%"><col style="width:13%">
+          <col style="width:10%">
+          <col style="width:9%"><col style="width:9%"><col style="width:10%"><col style="width:9%">
+          <col style="width:16%">
+        </colgroup>
+        <thead><tr><th>Titre</th><th>Secteur</th><th>Profil</th><th>Taille</th>
+          <th class="col-analytique num">Rentab.</th><th class="col-analytique num">Solidite</th>
+          <th class="col-analytique num">Valoris.</th><th class="col-analytique num">{terme_glossaire('ROE')}</th>
+          <th>Alertes</th></tr></thead>
         <tbody id="corps-synthese"></tbody>
       </table></div>
     </div>
@@ -594,7 +648,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 
   <div id="p-comparaison" class="panneau">
     <div class="carte">
-      <h2>Comparaison a deux titres <span style="font-weight:400;color:var(--muted);font-size:0.8em">(table uniquement — la precision compte plus qu'un graphique ici)</span></h2>
+      <h2>Comparaison à deux titres <span style="font-weight:400;color:var(--muted);font-size:0.8em">(table uniquement — la précision compte plus qu'un graphique ici)</span></h2>
       <div style="display:flex;gap:10px;margin-bottom:14px">
         <select id="select-comp-a" onchange="comparer()" style="flex:1"></select>
         <select id="select-comp-b" onchange="comparer()" style="flex:1"></select>
@@ -608,7 +662,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
     {blocs_secteurs}
   </div>
 
-  <div class="footer">Genere depuis brvm-data-pipeline — regenere a chaque mise a jour du moteur</div>
+  <div class="footer">Généré depuis brvm-data-pipeline — régénéré à chaque mise à jour du moteur</div>
 </div>
 <script>
 const SERIES = {json.dumps(series)};
@@ -617,7 +671,68 @@ const AVIS = {json.dumps(avis)};
 const SOURCE_URLS = {json.dumps(source_urls)};
 const RESULTATS = {json.dumps({r["ticker"]: r for r in resultats})};
 const TENDANCE_LIQUIDITE = {json.dumps(tendance_liquidite)};
+const PROFILS = {json.dumps(profils)};
+const LIBELLES_SECTEURS = {json.dumps(LIBELLES_SECTEURS_COURTS)};
+const LIBELLES_STATUT = {{"ELIGIBLE": "Eligible", "EXCLU": "Exclu"}};
+// Jumelle JS de humaniser() (Python) : meme transformation, pour les valeurs
+// qui arrivent brutes cote JS (Comparaison) sans etre passees par le point
+// d'humanisation Python (14/07/2026).
+function humaniserJs(txt) {{
+  if (!txt) return txt;
+  return txt.replace(/\\b[A-Z][A-Z_]{{2,}}\\b/g, m => m.replace(/_/g, ' ').toLowerCase()
+    .replace(/^./, c => c.toUpperCase()));
+}}
+function libelleSecteurJs(s) {{
+  if (!s) return '—';
+  const titre = s.replace(/_/g, ' ').toLowerCase().replace(/\\b\\w/g, c => c.toUpperCase());
+  return LIBELLES_SECTEURS[titre] || titre;
+}}
 const LIGNES_SYNTHESE = {json.dumps(lignes_js)};
+const SIZING_INFO = {json.dumps(SIZING)};
+// Composant partage (harmonisation demandee le 14/07/2026) : utilise en Synthese,
+// Fiche titre et Comparaison — un seul rendu possible pour "sizing" dans tout le site.
+function renderSizing(code) {{
+  const info = SIZING_INFO[code];
+  if (!info) return '—';
+  return `<span class="badge badge-${{info.classe}}" title="${{info.description}}">${{info.libelle}}</span>`;
+}}
+// Idem pour une alerte unique ou une liste d'alertes -> badge compact "N alerte(s)"
+// replie par defaut (demande du 14/07/2026 : attirer l'attention sans imposer
+// la lecture ; le detail reste a un clic, jamais cache totalement).
+function renderAlertes(liste) {{
+  if (!liste || !liste.length) return '<span class="alertes-ras">—</span>';
+  const items = liste.map(a => `<li>${{a}}</li>`).join('');
+  return `<details class="alertes-compact"><summary>&#9888; ${{liste.length}} alerte${{liste.length>1?'s':''}}</summary><ul>${{items}}</ul></details>`;
+}}
+// Profil de style : mini-graphique en barres TOUJOURS VISIBLE (correctif ergonomie
+// du 14/07/2026, 2e iteration : les chiffres bruts "V82 G75 P71" etaient exacts
+// mais peu lisibles d'un coup d'oeil ; la barre dominante ressort visuellement
+// sans lecture requise, les chiffres precis restent en info-bulle).
+// Rend un score 0-100 immediatement parlant par la couleur (vert = solide,
+// orange = moyen, rouge = faible) au lieu d'un chiffre neutre sans repere
+// (demande du 14/07/2026 : chiffres "pas spontanement indicatifs").
+function renderScore(v) {{
+  // Score 0-100 du moteur (Rentabilite/Solidite/Valorisation) : seuils absolus.
+  if (v === null || v === undefined) return '<span class="score-na">—</span>';
+  const cls = v >= 60 ? 'score-fort' : v >= 35 ? 'score-moyen' : 'score-faible';
+  return `<span class="${{cls}}">${{v}}</span>`;
+}}
+function renderROE(v) {{
+  // ROE en % (pas un score 0-100) : seuils propres au marche BRVM
+  // (15%+ solide, 8-15% correct, <8% faible pour ce marche).
+  if (v === null || v === undefined) return '<span class="score-na">—</span>';
+  const cls = v >= 15 ? 'score-fort' : v >= 8 ? 'score-moyen' : 'score-faible';
+  return `<span class="${{cls}}">${{v}}%</span>`;
+}}
+function renderProfil(dominant, scores) {{
+  if (!dominant) return '<span class="chip chip-na">n/d</span>';
+  const sc = scores || {{}};
+  const titre = `VALUE ${{sc.VALUE}} \u00b7 GROWTH ${{sc.GROWTH}} \u00b7 GARP ${{sc.GARP}}`;
+  const barre = (nom, cls) => sc[nom] !== null && sc[nom] !== undefined
+    ? `<div class="pm-bar pm-${{cls}}${{dominant===nom?' pm-dom':''}}" style="height:${{sc[nom]}}%"></div>` : '';
+  return `<span class="chip chip-${{dominant.toLowerCase()}}">${{dominant}}</span>`
+       + `<div class="profil-mini" title="${{titre}}">${{barre('VALUE','value')}}${{barre('GROWTH','growth')}}${{barre('GARP','garp')}}</div>`;
+}}
 const TICKERS = {json.dumps(tous_tickers)};
 // Point 4 (audit ergonomie, 14/07/2026) : une seule liste de tickers peuple
 // les 4 menus deroulants (Surveillance, Fiche, Comparaison x2), au lieu de
@@ -633,17 +748,11 @@ function rendreSynthese(lignes) {{
   corps.innerHTML = lignes.map(l => `
     <tr onclick="afficherFiche('${{l.ticker}}')" style="cursor:pointer">
       <td><b>${{l.ticker}}</b></td><td>${{l.secteur}}</td>
-      <td>${{l.profil ? (() => {{
-        const sc = l.profil_scores || {{}};
-        const fmt = (nom, abbr) => sc[nom] !== null && sc[nom] !== undefined
-          ? `<span class="score-detail ${{l.profil===nom?'score-dominant':''}}">${{abbr}}${{sc[nom]}}</span>` : '';
-        return `<span class="chip chip-${{l.profil.toLowerCase()}}" title="${{l.profil_detail || ''}}">${{l.profil}}</span>`
-             + `<span class="profil-detail-ligne">${{fmt('VALUE','V')}} ${{fmt('GROWTH','G')}} ${{fmt('GARP','P')}}</span>`;
-      }})() : '<span class="chip chip-na">n/d</span>'}}</td>
-      <td class="alertes">${{l.alertes.length ? `<details><summary>${{l.alertes[0]}}${{l.alertes.length>1 ? ` <span style="color:var(--muted)">(+${{l.alertes.length-1}} autre${{l.alertes.length>2?'s':''}})</span>` : ''}}</summary>${{l.alertes.length>1 ? `<div style="margin-top:4px">${{l.alertes.slice(1).map(a=>`&bull; ${{a}}`).join('<br>')}}</div>` : ''}}</details>` : '—'}}</td>
-      <td><span class="badge badge-${{l.sizing.toLowerCase()}}" title="${{l.sizing_desc}}">${{l.sizing_libelle}}</span></td>
-      <td class="col-analytique">${{v(l.rentabilite)}}</td><td class="col-analytique">${{v(l.solidite)}}</td><td class="col-analytique">${{v(l.valorisation)}}</td>
-      <td class="col-analytique">${{l.roe !== null ? l.roe + '%' : '—'}}</td>
+      <td>${{renderProfil(l.profil, l.profil_scores)}}</td>
+      <td>${{renderSizing(l.sizing)}}</td>
+      <td class="col-analytique num">${{renderScore(l.rentabilite)}}</td><td class="col-analytique num">${{renderScore(l.solidite)}}</td><td class="col-analytique num">${{renderScore(l.valorisation)}}</td>
+      <td class="col-analytique num">${{renderROE(l.roe)}}</td>
+      <td>${{renderAlertes(l.alertes)}}</td>
     </tr>`).join('');
 }}
 let ligneCourantes = [...LIGNES_SYNTHESE];
@@ -744,31 +853,32 @@ function construireFiche(t) {{
     const f = fonda[0];
     html += '<div class="fiche-grille">';
     html += `<div class="fiche-stat"><div class="label">Exercice</div><div class="valeur">${{f.exercice}}</div></div>`;
-    html += `<div class="fiche-stat"><div class="label">Resultat net (M FCFA)</div><div class="valeur">${{f.resultat_net ?? '—'}}</div></div>`;
-    html += `<div class="fiche-stat"><div class="label">Statut donnee</div><div class="valeur">${{f.statut_donnee ?? '—'}}</div></div>`;
+    html += `<div class="fiche-stat"><div class="label">Résultat net (M FCFA)</div><div class="valeur">${{f.resultat_net ?? '—'}}</div></div>`;
+    html += `<div class="fiche-stat"><div class="label">Statut de la donnée</div><div class="valeur">${{f.statut_donnee ?? '—'}}</div></div>`;
     html += `<div class="fiche-stat"><div class="label">Score</div><div class="valeur">${{r.score_composite ? r.score_composite.toFixed(1) : '—'}}</div></div>`;
-    html += `<div class="fiche-stat"><div class="label">Sizing</div><div class="valeur">${{r.sizing ? r.sizing.recommandation : '—'}}</div></div>`;
+    html += `<div class="fiche-stat"><div class="label">PEG</div><div class="valeur">${{PROFILS[t]?.peg ?? '—'}}</div></div>`;
+    html += `<div class="fiche-stat"><div class="label">Taille</div><div class="valeur">${{r.sizing ? renderSizing(r.sizing.recommandation) : '—'}}</div></div>`;
     html += '</div>';
     html += `<div style="margin-bottom:14px">${{ligneSource(t)}}</div>`;
   }}
-  html += '<h2 style="font-size:1em">Historique fondamental — vue transposee (' + fonda.length + ' exercice(s))</h2>';
+  html += '<h2 style="font-size:1em">Historique fondamental — vue transposée (' + fonda.length + ' exercice(s))</h2>';
   const exercicesTries = [...fonda].sort((a,b) => a.exercice - b.exercice);
   const cols = exercicesTries.map(f => f.exercice);
   html += '<div class="scroll"><table><thead><tr><th>Indicateur</th>' + cols.map(c => `<th>${{c}}</th>`).join('') + '</tr></thead><tbody>';
   const ligne = (label, fn) => '<tr><td class="alertes">' + label + '</td>' + exercicesTries.map(f => `<td>${{fn(f) ?? '—'}}</td>`).join('') + '</tr>';
   html += ligne('Chiffre d\\'affaires (M FCFA)', f => null);  // non collecte — gap assume, affiche honnetement
-  html += ligne('Resultat net (M FCFA)', f => f.resultat_net);
+  html += ligne('Résultat net (M FCFA)', f => f.resultat_net);
   html += ligne('Croissance RN', f => (f.resultat_net != null && f.resultat_net_n1 && f.resultat_net_n1 !== 0)
     ? ((f.resultat_net - f.resultat_net_n1) / Math.abs(f.resultat_net_n1) * 100).toFixed(1) + '%' : null);
   html += ligne('Resultat activites ordinaires (RAO)', f => f.resultat_activites_ordinaires);
   html += ligne('Capitaux propres (M FCFA)', f => f.capitaux_propres);
   html += ligne('ROE calcule', f => (f.resultat_net != null && f.capitaux_propres && f.capitaux_propres > 0)
     ? (f.resultat_net / f.capitaux_propres * 100).toFixed(1) + '%' : null);
-  html += ligne('Statut de la donnee', f => f.statut_donnee);
+  html += ligne('Statut de la donnée', f => f.statut_donnee);
   html += '</tbody></table></div>';
-  html += '<div style="font-size:0.75em;color:var(--muted);margin:6px 0 14px">Chiffre d\\'affaires non collecte actuellement (gap connu) — affiche pour reference de structure, pas une omission masquee.</div>';
+  html += '<div style="font-size:0.75em;color:var(--muted);margin:6px 0 14px">Chiffre d\\'affaires non collecté actuellement (lacune connue) — affiché pour référence, pas une omission masquée.</div>';
   if (av.length > 0) {{
-    html += '<h2 style="font-size:1em">Avis reglementaires</h2><table><thead><tr><th>Type</th><th>Date</th><th>Detail</th></tr></thead><tbody>';
+    html += '<h2 style="font-size:1em">Avis réglementaires</h2><table><thead><tr><th>Type</th><th>Date</th><th>Detail</th></tr></thead><tbody>';
     av.forEach(a => {{ html += `<tr><td>${{a.type}}</td><td>${{a.date_avis}}</td><td class="alertes">${{a.note}}</td></tr>`; }});
     html += '</tbody></table>';
   }}
@@ -788,12 +898,13 @@ function comparer() {{
   const fb = (FONDAMENTAUX[b] || [])[0] || {{}};
   const roeA = calculerRoeJs(FONDAMENTAUX[a]), roeB = calculerRoeJs(FONDAMENTAUX[b]);
   const lignes = [
-    ['Secteur', ra.secteur ?? '—', rb.secteur ?? '—'],
+    ['Secteur', libelleSecteurJs(ra.secteur), libelleSecteurJs(rb.secteur)],
     ['Score composite', ra.score_composite?.toFixed(1) ?? '—', rb.score_composite?.toFixed(1) ?? '—'],
-    ['Statut', ra.statut_gate ?? '—', rb.statut_gate ?? '—'],
-    ['Resultat net (M FCFA)', fa.resultat_net ?? '—', fb.resultat_net ?? '—'],
+    ['Statut', LIBELLES_STATUT[ra.statut_gate] ?? '—', LIBELLES_STATUT[rb.statut_gate] ?? '—'],
+    ['PEG', PROFILS[a]?.peg ?? '—', PROFILS[b]?.peg ?? '—'],
+    ['Résultat net (M FCFA)', fa.resultat_net ?? '—', fb.resultat_net ?? '—'],
     ['ROE', roeA !== null ? (roeA*100).toFixed(1)+'%' : '—', roeB !== null ? (roeB*100).toFixed(1)+'%' : '—'],
-    ['Sizing (liquidite)', ra.sizing?.recommandation ?? '—', rb.sizing?.recommandation ?? '—'],
+    ['Taille de position', ra.sizing ? renderSizing(ra.sizing.recommandation) : '—', rb.sizing ? renderSizing(rb.sizing.recommandation) : '—'],
     ['Exercices disponibles', (FONDAMENTAUX[a]||[]).length, (FONDAMENTAUX[b]||[]).length],
   ];
   let html = '<table><thead><tr><th>Indicateur</th><th>' + a + '</th><th>' + b + '</th></tr></thead><tbody>';
