@@ -97,15 +97,26 @@ def generer_blocs():
         depuis_txt = "; ".join(f"depuis le {dd}" for _, _, _, dd, _ in sigs)
         lignes.append(f"<tr><td><b>{t}</b></td><td>{corps_signaux}</td>"
                       f"<td class='sig-col-optionnelle sig-date'>{depuis_txt}</td></tr>")
+    if suivi:
+        corps_suivi = f"""<table class="sig-table" id="tbl-suivi">
+    <thead><tr><th>Titre</th><th>Signaux actifs</th><th class="sig-col-optionnelle">Depuis</th></tr></thead>
+    <tbody>{''.join(lignes)}</tbody>
+  </table>"""
+    else:
+        # Amelioration ergonomique (14/07/2026) : une table vide sans explication
+        # ressemble a un bug. Etat vide explicite avec la marche a suivre.
+        corps_suivi = ("""<div style="padding:16px;text-align:center;color:var(--muted,#94a3b8);"""
+                       """border:1px dashed var(--border,#334155);border-radius:8px;">"""
+                       """Aucun titre dans la liste de suivi pour l'instant.<br>"""
+                       """<span style="font-size:0.85em">Ajoute des codes (ex. SNTS, CBIBF) dans"""
+                       """ <code>config/liste_suivi.yaml</code> pour que ce tableau se peuple"""
+                       """ automatiquement au prochain calcul.</span></div>""")
     bloc1 = f"""
 <div class="sig-carte">
   <h2>Ma liste de suivi <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
       ({len(suivi)} titres — codes seuls, aucune donnee personnelle)</span></h2>
   <button class="sig-toggle" onclick="sigToggleColonnes('tbl-suivi', this)">Afficher les dates et sources</button>
-  <table class="sig-table" id="tbl-suivi">
-    <thead><tr><th>Titre</th><th>Signaux actifs</th><th class="sig-col-optionnelle">Depuis</th></tr></thead>
-    <tbody>{''.join(lignes)}</tbody>
-  </table>
+  {corps_suivi}
   <div class="sig-note">Regle d'escalade : deux signaux defavorables simultanes sur un
   titre suivi = revue obligatoire sous 10 seances, decision ecrite au journal.
   Le systeme ne decide jamais seul. Survolez un badge pour le code technique et sa definition.</div>
