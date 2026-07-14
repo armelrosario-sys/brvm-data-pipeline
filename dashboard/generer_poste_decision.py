@@ -40,19 +40,20 @@ SORTIE = RACINE / "docs_site" / "poste_decision.html"
 sys.path.insert(0, str(RACINE / "moteur"))
 from scoring import charger_marche, rendement_net_estime  # reutilisation moteur
 
-IRVM_REPLI = {"CI": 10.0, "BF": 12.5, "SN": 10.0, "TG": 13.0, "BJ": 10.0,
-              "ML": 10.0, "NE": 10.0}  # utilise seulement si le moteur echoue
-
-
 def dy_net(dy_brut_pct, pays):
-    """DY net d'IRVM en %, via le moteur ; repli sur table interne."""
-    try:
-        net = rendement_net_estime(dy_brut_pct / 100.0, pays or "CI")
-        if net is not None:
-            return 100.0 * net
-    except Exception:
-        pass
-    return dy_brut_pct * (1 - IRVM_REPLI.get(pays or "CI", 10.0) / 100.0)
+    """DY net d'IRVM en %, via la table officielle du moteur (moteur/scoring.py::IRVM_PAR_PAYS).
+
+    Correctif 14/07/2026 (bug critique trouve a l'audit) : rendement_net_estime()
+    retourne un TUPLE (rendement_net, taux), pas un flottant seul. L'ancien code
+    faisait `100.0 * net` sur ce tuple -> TypeError -> avale par un except trop
+    large -> repli SILENCIEUX sur une table IRVM dupliquee et moins a jour que
+    celle du moteur (qui documente les cas particuliers FTSC/STBC). Corrige :
+    deballage correct du tuple, plus de table dupliquee, plus de except muet.
+    """
+    net, taux = rendement_net_estime(dy_brut_pct / 100.0, pays or "CI")
+    if net is None:
+        return dy_brut_pct  # pays inconnu : aucun IRVM applique, affiche le brut tel quel
+    return 100.0 * net
 
 
 def chip(p):
