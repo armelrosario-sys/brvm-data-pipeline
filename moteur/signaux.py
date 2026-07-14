@@ -149,10 +149,16 @@ def calculer_candidats(cur, seuils, marche):
                 and len(rns) == 2 and rns[0][1] is not None and rns[1][1] is not None
                 and rns[0][1] > rns[1][1] > 0
                 and per < SEUIL_DECOTE * med):
+            peg_txt = ""
+            g_ann = None
+            if rns[1][1] and rns[1][1] > 0:
+                g_ann = 100 * (rns[0][1] / rns[1][1] - 1)
+                if g_ann > 0:
+                    peg_txt = f" ; PEG {per / g_ann:.2f}"
             cand[(t, "A_QUALITE_DECOTEE")] = dict(
                 direction="FAVORABLE",
                 detail=f"PER {per:.2f} < 70% de la mediane sectorielle {med:.2f} "
-                       f"({src_med}) ; RN {rns[1][1]:.0f} -> {rns[0][1]:.0f} M FCFA ; gate ELIGIBLE",
+                       f"({src_med}) ; RN {rns[1][1]:.0f} -> {rns[0][1]:.0f} M FCFA{peg_txt} ; gate ELIGIBLE",
                 valeur_reference=cours_per,
                 source_donnee=f"cours_mensuels {mois_per} + etats_financiers")
 
