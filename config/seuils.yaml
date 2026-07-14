@@ -49,6 +49,19 @@ profils:
 # explicitement marquees PREVU_NON_IMPLEMENTE ci-dessous : elles decrivent
 # une intention de conception, pas un comportement actif du systeme.
 
+# ------------------------------------------------------------------
+# Registre CALENDRIER (chantier D4 automatique, 14/07/2026)
+# Detection de retard par ecart a l'intervalle historique typique entre
+# deux depots (pas d'hypothese sur les echeances reglementaires, seulement
+# le rythme reel observe pour ce titre et cette categorie de document).
+calendrier:
+  min_occurrences: 3          # sous ce seuil, l'intervalle "typique" est trop instable pour etre fiable (cf. CIEC, decouvert au test)
+  categories_exclues: ["autre", "rapport_cac"]  # "autre" = fourre-tout ; rapport_cac trop irregulierement depose seul (souvent groupe avec etats_financiers)
+  intervalle_min_jours: 60    # sous ce seuil, l'historique est trop rapproche pour etre un cycle periodique reel
+  intervalle_max_jours: 450   # au-dela, ce n'est plus un cycle regulier identifiable
+  tolerance_courte_jours: 45  # categories a cycle < 200j (trimestriel, semestriel)
+  tolerance_longue_jours: 60  # categories a cycle >= 200j (annuel) : plus de variance naturelle (AG, auditeurs)
+
 extraction:
   plafond_plausibilite_fcfa: 1000000000000  # 1 000 Mds FCFA — APPLIQUE (moteur/tester.py) AU SEUL RESULTAT_NET (pas au bilan : total_actif/capitaux_propres de groupes bancaires panafricains le depassent legitimement — decouvert au 1er run reel, 14/07/2026)
   statut_ocr_max_sans_2e_source: "PROBABLE"  # APPLIQUE (moteur/tester.py::verifier_statut_ocr)
