@@ -716,6 +716,39 @@ statuts_possibles = {"STABLE", "CONFIRMEE_HAUSSE", "CONFIRMEE_BAISSE", "A_SURVEI
 verifie(all(t["statut"] in statuts_possibles for t in tendance.values()),
         "tous les statuts appartiennent a l'ensemble attendu (pas de valeur inconnue)")
 
+# ------------------------------------------------------------------
+# Verification n26+ (audit du 14/07/2026) : deux regles de seuils.yaml
+# etaient documentees sans etre appliquees ("securite theatrale"). Ici,
+# on les fait REELLEMENT respecter par la base peuplee, sinon echec.
+
+print("\n=== Verification : plafond de plausibilite des montants extraits ===")
+conn_audit = sqlite3.connect(DB)
+plafond = seuils_t["extraction"]["plafond_plausibilite_fcfa"]
+# Correctif decouvert PENDANT ce meme test (14/07/2026) : le plafond visait
+# a l'origine un resultat net annuel plausible (detecter une virgule ou une
+# unite mal saisie). Applique tel quel au bilan, il declenchait a tort sur
+# les groupes bancaires panafricains (ETIT/Ecobank Transnational, SNTS,
+# NSBC...) dont le total actif consolide atteint legitimement plusieurs
+# milliers de milliards FCFA. Restreint donc au flux (resultat_net), pas
+# au stock (total_actif/capitaux_propres) — la config seuils.yaml documente
+# cette restriction pour que la prochaine personne ne la re-decouvre pas.
+depassements = conn_audit.execute(
+    "SELECT ticker, exercice, resultat_net FROM etats_financiers WHERE "
+    "ABS(COALESCE(resultat_net,0)) > ?", (plafond / 1e6,)).fetchall()
+verifie(len(depassements) == 0,
+        f"aucun resultat net (en M FCFA) ne depasse le plafond de plausibilite "
+        f"({plafond/1e6:.0f} M) — depassements trouves : {depassements}")
+
+print("\n=== Verification : statut OCR sans 2e source jamais VALIDE ===")
+plafond_ocr = seuils_t["extraction"]["statut_ocr_max_sans_2e_source"]
+violations = conn_audit.execute(
+    "SELECT ticker, exercice FROM etats_financiers WHERE "
+    "source_type='OCR' AND statut_donnee='VALIDE'").fetchall()
+verifie(len(violations) == 0,
+        f"aucune ligne OCR (source unique) n'est marquee VALIDE — le "
+        f"statut maximal sans 2e source est {plafond_ocr} — violations : {violations}")
+conn_audit.close()
+
 print("\n" + "=" * 60)
 if ECHECS:
     print(f"RESULTAT : {len(ECHECS)} ECHEC(S) — NE PAS DEPLOYER")
