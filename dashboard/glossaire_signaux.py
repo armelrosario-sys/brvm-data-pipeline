@@ -59,14 +59,14 @@ def badge_html(code, css_prefix="sig"):
 # Le mapping ci-dessous traduit le mot-cle en phrase actionnable, sans jamais
 # inventer de pourcentage ou de montant que le moteur n'a pas calcule lui-meme.
 SIZING = {
-    "PLEINE":   {"libelle": "Ligne normale possible",  "classe": "ok",
+    "PLEINE":   {"libelle": "Normal",  "classe": "ok",
         "description": "Liquidite jugee suffisante pour une entree en une fois, sans precaution particuliere."},
-    "REDUITE":  {"libelle": "Reduire la taille",        "classe": "mid",
+    "REDUITE":  {"libelle": "Reduit",        "classe": "mid",
         "description": "Liquidite limitee : reduire la taille de la ligne et etaler les achats sur plusieurs seances."},
-    "MINIMALE": {"libelle": "Taille minimale seulement", "classe": "bad",
+    "MINIMALE": {"libelle": "Minimal", "classe": "bad",
         "description": "Marche quasi illiquide sur ce titre : n'engager qu'une position tres reduite, sortie difficile."},
-    "PRUDENCE": {"libelle": "Prudence (donnee manquante)", "classe": "bad",
-        "description": "Aucune donnee de liquidite disponible pour ce titre : traiter par defaut comme une taille minimale."},
+    "PRUDENCE": {"libelle": "Donnee manquante", "classe": "na",
+        "description": "Aucune donnee de liquidite collectee pour ce titre (chantier de collecte en cours) : a defaut, traiter comme une taille minimale par prudence."},
 }
 
 
