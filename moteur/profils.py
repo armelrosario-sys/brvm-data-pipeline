@@ -46,23 +46,44 @@ def calculer():
         ing[t] = dict(per=per[0] if per else None, dy=100*rdt[0] if rdt else None,
                       roe=roe, g=g, gate=st, n_ex=len(ex))
     E = {t: v for t, v in ing.items() if v["gate"] == "ELIGIBLE"}
-    PERs=[v["per"] for v in E.values()]; DYs=[v["dy"] for v in E.values()]
-    ROEs=[v["roe"] for v in E.values()]; Gs=[v["g"] for v in E.values()]
-    pegs=[v["per"]/v["g"] for v in E.values() if v["per"] and v["g"] and v["g"] > 0]
+
+    # Correctif 14/07/2026 (retour utilisateur, evidences chiffrees a l'appui) :
+    # les percentiles etaient calcules sur TOUT LE MARCHE, jamais par secteur --
+    # exactement l'incoherence que le gate evite deja (mediane sectorielle).
+    # Consequence mesuree : PER median Services Financiers 12.6 vs Industriels
+    # 36.0 -> toute banque, meme moyenne pour son secteur, ressortait "VALUE"
+    # par le seul effet du multiple structurellement plus bas des banques,
+    # jamais parce qu'elle etait reellement decotee PARMI SES PAIRS. Corrige :
+    # chaque titre est desormais compare a son propre secteur, comme le gate.
+    par_secteur = {}
+    for t, v in E.items():
+        sec = sect.get(t, "")
+        d = par_secteur.setdefault(sec, {"per": [], "dy": [], "roe": [], "g": [], "peg": []})
+        if v["per"] is not None: d["per"].append(v["per"])
+        if v["dy"] is not None: d["dy"].append(v["dy"])
+        if v["roe"] is not None: d["roe"].append(v["roe"])
+        if v["g"] is not None: d["g"].append(v["g"])
+        peg_v = v["per"]/v["g"] if (v["per"] and v["g"] and v["g"] > 0) else None
+        if peg_v is not None: d["peg"].append(peg_v)
+
     profils = {}
     for t, v in E.items():
-        pv_per=pctl(PERs, v["per"], True); pv_dy=pctl(DYs, v["dy"])
-        pg_g=pctl(Gs, v["g"]); pg_roe=pctl(ROEs, v["roe"])
+        sec = sect.get(t, "")
+        listes = par_secteur[sec]
+        pv_per = pctl(listes["per"], v["per"], True); pv_dy = pctl(listes["dy"], v["dy"])
+        pg_g = pctl(listes["g"], v["g"]); pg_roe = pctl(listes["roe"], v["roe"])
         peg = v["per"]/v["g"] if (v["per"] and v["g"] and v["g"] > 0) else None
-        s = {"VALUE": round(0.5*(pv_per or 0)+0.5*(pv_dy or 0)) if (pv_per or pv_dy) else None,
-             "GROWTH": round(0.6*(pg_g or 0)+0.4*(pg_roe or 0)) if v["g"] is not None else None,
-             "GARP": round(0.6*pctl(pegs, peg, True)+0.4*(pg_g or 0)) if peg is not None else None}
-        dispo = {k: x for k, x in s.items() if x is not None}
+        pg_peg = pctl(listes["peg"], peg, True) if peg is not None else None
+        sc = {"VALUE": round(0.5*(pv_per or 0)+0.5*(pv_dy or 0)) if (pv_per or pv_dy) else None,
+              "GROWTH": round(0.6*(pg_g or 0)+0.4*(pg_roe or 0)) if v["g"] is not None else None,
+              "GARP": round(0.6*(pg_peg or 0)+0.4*(pg_g or 0)) if peg is not None else None}
+        dispo = {k: x for k, x in sc.items() if x is not None}
         tri = sorted(dispo.values(), reverse=True)
-        profils[t] = dict(**s, dominant=max(dispo, key=dispo.get) if dispo else None,
+        profils[t] = dict(**sc, dominant=max(dispo, key=dispo.get) if dispo else None,
             mixte=len(tri) >= 2 and (tri[0]-tri[1]) < seuil_mixite,
             peg=round(peg, 2) if peg else None,
             alerte_peg=bool(peg is not None and peg < alerte_peg_max),  # plausibilite (cas SLBC)
+            n_secteur=len(listes["per"]),  # transparence : taille de l'echantillon sectoriel utilise
             confiance="HAUTE" if v["n_ex"] >= conf_haute else "MOYENNE" if v["n_ex"] >= conf_moyenne else "FAIBLE", **v)
     SORTIE.write_text(json.dumps(profils, ensure_ascii=False, indent=1))
     print(f"profils.json : {len(profils)} titres profiles")
