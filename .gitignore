@@ -1,0 +1,9 @@
+# La base est TOUJOURS reconstruite a neuf par peupler.py avant tout usage
+# (voir .github/workflows/pages.yml et tests.yml) : le fichier binaire ne
+# doit jamais etre la source de verite, ni gonfler l'historique Git.
+# Corrige le 14/07/2026 (audit d'architecture) : brvm.db etait committe
+# sans jamais etre lu tel quel par aucun workflow.
+moteur/brvm.db
+moteur/test.db
+__pycache__/
+*.pyc
