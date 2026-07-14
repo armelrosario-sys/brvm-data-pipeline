@@ -18,12 +18,19 @@ Aucune donnee personnelle : la liste de suivi ne contient que des codes.
 
 Usage : python3 bloc_signaux.py   (apres generer_dashboard_html.py)
 """
+import json
+import statistics
 import sqlite3
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "moteur"))
 from glossaire_signaux import badge_html
+from scoring import charger_seuils
+
+CALENDRIER_PATH = Path(__file__).resolve().parent.parent / "collecte" / "calendrier.json"
 
 DB = Path(__file__).resolve().parent.parent / "moteur" / "brvm.db"
 HTML = Path(__file__).resolve().parent.parent / "docs_site" / "index.html"
@@ -76,6 +83,44 @@ def _signaux_actifs(cur):
 def _ligne_signal(ty, de):
     """Une ligne compacte : badge (libelle clair, code en info-bulle) + detail."""
     return f'<div class="sig-ligne-signal">{badge_html(ty)}<span class="sig-detail">{de}</span></div>'
+
+
+def _prochaines_echeances(aujourd_hui):
+    """Pour chaque titre couvert par le calendrier, estime la PROCHAINE
+    publication attendue (dernier depot + intervalle historique median),
+    avec les memes garde-fous que D4_RETARD_CALENDRIER (moteur/signaux.py) :
+    categories fourre-tout exclues, minimum d'occurrences, intervalle
+    plausible -- eviter d'annoncer une echeance sur un historique trop
+    instable pour etre fiable (14/07/2026)."""
+    if not CALENDRIER_PATH.exists():
+        return []
+    cal = json.loads(CALENDRIER_PATH.read_text())
+    cfg = charger_seuils().get("calendrier", {})
+    min_occ = cfg.get("min_occurrences", 3)
+    exclues = set(cfg.get("categories_exclues", ["autre", "rapport_cac"]))
+    interv_min = cfg.get("intervalle_min_jours", 60)
+    interv_max = cfg.get("intervalle_max_jours", 450)
+
+    echeances = []
+    for t, categories in cal.items():
+        meilleure = None
+        for categorie, v in categories.items():
+            if categorie in exclues:
+                continue
+            hist = sorted(date(*map(int, d.split("-"))) for d in v["historique"])
+            if len(hist) < min_occ:
+                continue
+            intervalles = [(hist[i+1]-hist[i]).days for i in range(len(hist)-1)]
+            interv_median = statistics.median(intervalles)
+            if not (interv_min <= interv_median <= interv_max):
+                continue
+            prochaine = hist[-1] + timedelta(days=round(interv_median))
+            jours_restants = (prochaine - aujourd_hui).days
+            if meilleure is None or jours_restants < meilleure[2]:
+                meilleure = (categorie, hist[-1], jours_restants, prochaine)
+        if meilleure:
+            echeances.append((t, *meilleure))
+    return sorted(echeances, key=lambda x: x[3])  # la plus proche d'abord
 
 
 def generer_blocs():
@@ -174,7 +219,36 @@ def generer_blocs():
   ce titre rejoindra les autres tableaux des que ses premieres cotations seront collectees.</div>
 </div>"""
 
-    return STYLE + bloc1 + bloc2 + bloc3
+    # ---- Bloc 4 : calendrier des publications (14/07/2026) ----
+    # Reponse au constat : le calendrier existait en coulisses (D4 automatique)
+    # sans jamais etre visible. Ici : une vue directe, triee par echeance la
+    # plus proche, plutot qu'un fichier json invisible.
+    ech = _prochaines_echeances(date.today())
+    bloc4 = ""
+    if ech:
+        lignes4 = []
+        for t, categorie, dernier, jours_restants, prochaine in ech[:15]:
+            if jours_restants < 0:
+                statut = f"<span class='sig-def' style='padding:1px 8px;border-radius:99px'>en retard de {-jours_restants}j</span>"
+            elif jours_restants <= 14:
+                statut = f"<span class='sig-info' style='padding:1px 8px;border-radius:99px'>dans {jours_restants}j</span>"
+            else:
+                statut = f"attendue vers le {prochaine.isoformat()}"
+            lignes4.append(f"<tr><td><b>{t}</b></td><td>{categorie}</td>"
+                          f"<td>{dernier.isoformat()}</td><td>{statut}</td></tr>")
+        bloc4 = f"""
+<div class="sig-carte">
+  <h2>Calendrier des publications <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
+      (echeance estimee la plus proche par titre, {len(ech)} titres couverts)</span></h2>
+  <table class="sig-table">
+    <thead><tr><th>Titre</th><th>Categorie</th><th>Dernier depot</th><th>Echeance estimee</th></tr></thead>
+    <tbody>{''.join(lignes4)}</tbody>
+  </table>
+  <div class="sig-note">Estimation = dernier depot + intervalle historique typique de ce titre pour cette
+  categorie de document (pas une date reglementaire officielle). Les 15 echeances les plus proches sont affichees.</div>
+</div>"""
+
+    return STYLE + bloc1 + bloc2 + bloc3 + bloc4
 
 
 def injecter():
