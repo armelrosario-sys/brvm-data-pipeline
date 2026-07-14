@@ -668,7 +668,7 @@ def main():
     cur.executemany(
         "INSERT OR REPLACE INTO societes VALUES (?,?,?,?,?,?,?)", SOCIETES)
     cur.executemany(
-        "INSERT INTO etats_financiers "
+        "INSERT OR REPLACE INTO etats_financiers "
         "(ticker,exercice,resultat_net,resultat_net_n1,total_actif,total_passif,"
         "capitaux_propres,dettes_financieres,payout_ratio,solvabilite_bancaire,"
         "source_type,statut_donnee,date_publication) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
