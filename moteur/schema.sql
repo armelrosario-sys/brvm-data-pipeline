@@ -83,6 +83,12 @@ CREATE TABLE IF NOT EXISTS journal_decisions (
     score_id INTEGER REFERENCES scores(id)
 );
 
+
+-- Deduplication des lots de donnees (correctif 14/07/2026) : le lot le plus
+-- recent (corrections R6+) remplace les lignes anterieures du meme exercice.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_etats_ticker_exercice
+    ON etats_financiers(ticker, exercice);
+
 -- ============================================================
 -- CHANTIER 1 (13/07/2026) — Table des signaux avec cycle de vie
 -- La "photo" reste dans scores.alertes ; ceci est le "film" :
