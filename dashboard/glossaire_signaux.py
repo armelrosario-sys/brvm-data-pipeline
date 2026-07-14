@@ -43,10 +43,15 @@ def description(code):
     return SIGNAUX.get(code, {}).get("description", "")
 
 
+_ICONES = {"def": "\u26a0", "fav": "\u2713", "info": "\u2139"}  # !, check, i — accessibilite (pas la seule couleur)
+
+
 def badge_html(code, css_prefix="sig"):
-    """Badge HTML complet, avec le code technique en info-bulle (title)."""
+    """Badge HTML complet : icone (accessibilite, pas seulement la couleur) +
+    libelle clair + code technique et definition en info-bulle."""
     lib, cls, desc = libelle(code), classe(code), description(code)
-    return (f'<span class="{css_prefix}-{cls}" title="{code} — {desc}">{lib}</span>')
+    icone = _ICONES.get(cls, "")
+    return (f'<span class="{css_prefix}-{cls}" title="{code} — {desc}">{icone} {lib}</span>')
 
 
 # --- Sizing (moteur/scoring.py) : traduction operationnelle des recommandations ---
