@@ -587,7 +587,7 @@ function rendreSynthese(lignes) {{
       <td>${{v(l.rentabilite)}}</td><td>${{v(l.solidite)}}</td><td>${{v(l.valorisation)}}</td>
       <td>${{l.roe !== null ? l.roe + '%' : '—'}}</td>
       <td><span class="badge badge-${{l.sizing.toLowerCase()}}" title="${{l.sizing_desc}}">${{l.sizing_libelle}}</span></td>
-      <td class="alertes">${{l.alertes.length ? `<details><summary>${{l.alertes[0]}}${{l.alertes.length>1 ? ' <span style=\'color:var(--muted)\'>(+' + (l.alertes.length-1) + ' autre' + (l.alertes.length>2?'s':'') + ')</span>' : ''}}</summary>${{l.alertes.length>1 ? '<div style=\'margin-top:4px\'>' + l.alertes.slice(1).map(a=>`&bull; ${{a}}`).join('<br>') + '</div>' : ''}}</details>` : '—'}}</td>
+      <td class="alertes">${{l.alertes.length ? `<details><summary>${{l.alertes[0]}}${{l.alertes.length>1 ? ` <span style="color:var(--muted)">(+${{l.alertes.length-1}} autre${{l.alertes.length>2?'s':''}})</span>` : ''}}</summary>${{l.alertes.length>1 ? `<div style="margin-top:4px">${{l.alertes.slice(1).map(a=>`&bull; ${{a}}`).join('<br>')}}</div>` : ''}}</details>` : '—'}}</td>
     </tr>`).join('');
 }}
 let ligneCourantes = [...LIGNES_SYNTHESE];
