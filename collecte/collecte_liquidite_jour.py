@@ -47,9 +47,20 @@ def recuperer_liquidite_jour():
     date_maj = maj_texte.strip() if maj_texte else None
 
     resultats = {}
-    table = soup.find("table")
+    # Correctif 15/07/2026 (0 titre au premier run reel) : la page contient
+    # PLUSIEURS tableaux ("Top 5", "Flop 5", "Activites du marche", PUIS le
+    # tableau complet des 47 titres) -- soup.find("table") prenait le premier
+    # (Top 5, 3 colonnes), dont aucune ligne ne passait le filtre "6 colonnes
+    # minimum", d'ou "0 titres" silencieux. On cherche desormais le tableau
+    # dont l'entete contient "Cours Clôture", seul candidat a la bonne forme.
+    table = None
+    for cand in soup.find_all("table"):
+        entete = cand.find("tr")
+        if entete and "Cours Clôture" in entete.get_text():
+            table = cand
+            break
     if table is None:
-        raise RuntimeError("Table des cours introuvable sur la page — structure du site a peut-etre change")
+        raise RuntimeError("Table des cours (avec entete 'Cours Cloture') introuvable — structure du site a peut-etre change")
 
     for ligne in table.find_all("tr")[1:]:  # saute l'entete
         cellules = [c.get_text(strip=True) for c in ligne.find_all("td")]
