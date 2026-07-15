@@ -36,6 +36,10 @@ jobs:
           cd moteur
           python3 peupler.py
           python3 ../collecte/charger_cours.py brvm.db
+      - name: Calculer le calendrier des publications
+        run: |
+          cd moteur
+          python3 calendrier.py
       - name: Calculer les signaux (cycle de vie)
         run: |
           cd moteur
