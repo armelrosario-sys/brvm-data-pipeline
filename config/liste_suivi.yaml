@@ -1,0 +1,10 @@
+# Liste de suivi — CODES SEULS, jamais de quantite ni de prix (doctrine du
+# projet : aucune donnee personnelle dans le depot public). Ajouter/retirer
+# un ticker ici suffit ; il apparait automatiquement au prochain calcul
+# (moteur/peupler.py lit ce fichier et peuple la table liste_suivi).
+#
+# Exemple ci-dessous : a adapter librement a tes propres titres suivis.
+titres:
+  - SNTS
+  - CBIBF
+  - SDSC
