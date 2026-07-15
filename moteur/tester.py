@@ -5,7 +5,25 @@ du moteur ou des seuils. Echec de ces tests = ne pas deployer."""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from scoring import evaluer_titre, DB, per_le_plus_recent
+from pathlib import Path as _Path
+from scoring import evaluer_titre, DB, per_le_plus_recent, LIQUIDITE_JOUR_PATH
+LIQUIDITE_JOUR_PATH = _Path(LIQUIDITE_JOUR_PATH)  # str -> Path (scoring.py l'expose en str)
+
+# Correctif 15/07/2026 : les tests 9/10/35/36 valident le CHEMIN DE REPLI
+# (qualitatif marche.yaml / statistique) et le test 81 valide la PRIORITE
+# AU JOUR -- les deux sont legitimes, mais dependaient jusqu'ici de l'etat
+# REEL de collecte/liquidite_jour.json au moment du test, jamais controle
+# explicitement. Depuis que P9 (collecte quotidienne) alimente reellement
+# ce fichier, les tests 9/10/35/36 echouaient (le systeme priorisait a
+# raison la donnee du jour, exactement comme le test 81 l'exige) -- et le
+# nettoyage du test 81 supprimait ensuite la vraie donnee sans la restaurer.
+# Sauvegarde/restauration explicites ici : les tests de repli s'executent
+# sur un etat CONTROLE (fichier absent), le reste du depot n'est jamais
+# perdu.
+_sauvegarde_liquidite_jour = (LIQUIDITE_JOUR_PATH.read_text(encoding="utf-8")
+                               if LIQUIDITE_JOUR_PATH.exists() else None)
+if LIQUIDITE_JOUR_PATH.exists():
+    LIQUIDITE_JOUR_PATH.unlink()
 
 ECHECS = []
 
@@ -670,7 +688,7 @@ verifie(r["score_rentabilite"] is not None, "ROE desormais calculable pour STBC"
 
 print("\n=== Golden test 81 (P8, 12/07/2026) : liquidite du jour prioritaire, repli marche.yaml propre ===")
 import json as _json, os as _os
-from scoring import LIQUIDITE_JOUR_PATH, charger_marche
+from scoring import charger_marche  # LIQUIDITE_JOUR_PATH deja importee (en Path) en tete de fichier
 
 # Sans fichier du jour : repli attendu (CBIBF -> FLOTTANT_RESTREINT via marche.yaml)
 if _os.path.exists(LIQUIDITE_JOUR_PATH):
@@ -748,6 +766,16 @@ verifie(len(violations) == 0,
         f"aucune ligne OCR (source unique) n'est marquee VALIDE — le "
         f"statut maximal sans 2e source est {plafond_ocr} — violations : {violations}")
 conn_audit.close()
+
+# Restauration du vrai fichier collecte/liquidite_jour.json (production,
+# alimente par P9) apres tous les tests -- symetrique de la sauvegarde en
+# tete de fichier. Sans cette etape, chaque execution locale de tester.py
+# effacerait silencieusement la vraie donnee du jour sans la restituer.
+if _sauvegarde_liquidite_jour is not None:
+    LIQUIDITE_JOUR_PATH.write_text(_sauvegarde_liquidite_jour, encoding="utf-8")
+    print("\n[tester.py] collecte/liquidite_jour.json (production) restaure apres les tests.")
+elif LIQUIDITE_JOUR_PATH.exists():
+    LIQUIDITE_JOUR_PATH.unlink()  # aucun fichier reel avant les tests -> aucun apres
 
 print("\n" + "=" * 60)
 if ECHECS:
