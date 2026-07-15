@@ -731,6 +731,22 @@ def main():
     cur.executemany(
         "INSERT INTO avis_reglementaires (ticker,type,date_avis,note) VALUES (?,?,?,?)",
         AVIS)
+
+    # Liste de suivi (15/07/2026) : lue depuis config/liste_suivi.yaml --
+    # CODES SEULS, jamais de quantite ni de prix (doctrine du projet). Le
+    # mecanisme etait promis par le dashboard depuis le chantier 1 mais
+    # n'avait jamais ete cable ici -- corrige.
+    from datetime import date as _date
+    import yaml as _yaml
+    chemin_suivi = Path(__file__).resolve().parent.parent / "config" / "liste_suivi.yaml"
+    if chemin_suivi.exists():
+        cfg_suivi = _yaml.safe_load(chemin_suivi.read_text()) or {}
+        tickers_suivi = cfg_suivi.get("titres", [])
+        cur.execute("DELETE FROM liste_suivi")  # repart de la liste actuelle du fichier
+        cur.executemany(
+            "INSERT INTO liste_suivi (ticker, date_ajout, note) VALUES (?,?,NULL)",
+            [(t, _date.today().isoformat()) for t in tickers_suivi])
+
     conn.commit()
     n = cur.execute("SELECT COUNT(*) FROM societes").fetchone()[0]
     m = cur.execute("SELECT COUNT(*) FROM etats_financiers").fetchone()[0]
