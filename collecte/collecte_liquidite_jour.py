@@ -68,12 +68,18 @@ def recuperer_liquidite_jour():
             continue
         symbole = cellules[0]
         volume = to_nombre(cellules[2])
+        cours_veille = to_nombre(cellules[3]) if len(cellules) >= 4 else None
         cours_cloture = to_nombre(cellules[5])
+        # Variation (%) : derniere colonne de la page (15/07/2026, ajoute suite
+        # au besoin d'afficher "cours du jour + variation" dans le dashboard).
+        variation_pct = to_nombre(cellules[6]) if len(cellules) >= 7 else None
         if volume is None or cours_cloture is None:
             continue
         resultats[symbole] = {
             "volume_jour": volume,
+            "cours_veille": cours_veille,
             "cours_cloture": cours_cloture,
+            "variation_pct": variation_pct,
             "valeur_echangee_jour": round(volume * cours_cloture, 2),
             "date_maj_brvm": date_maj,
             "collecte_le": datetime.now(timezone.utc).isoformat(),
