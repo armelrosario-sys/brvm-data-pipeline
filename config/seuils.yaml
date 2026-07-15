@@ -80,6 +80,18 @@ delais_reglementaires:
   # l'AGO (15j avant / republication 45j apres), qui varie par titre et n'est
   # pas fiablement connue ici -- l'exclure plutot que de deviner une date.
 
+# ------------------------------------------------------------------
+# Fraicheur des FONDAMENTAUX (chantier "second indicateur", 15/07/2026)
+# Distinct de la fraicheur des COURS (deja existante, scoring.py::rapport_fraicheur).
+# Mesure l'age du document le PLUS RECENT, toutes categories confondues (y
+# compris celles exclues de D4/echeance reglementaire pour irregularite) --
+# jamais une echeance precise, seulement "de quand date la meilleure info
+# dont on dispose sur ce titre". Sert au signal D5_INFO_PERIMEE, INDEPENDANT
+# de D4 : les deux ne s'influencent jamais l'un l'autre (D4 reste un fait de
+# gouvernance permanent, jamais adouci par un document d'une autre categorie).
+fraicheur_fondamentaux:
+  seuil_perimee_jours: 365  # un cycle annuel complet sans AUCUN depot, toutes categories confondues
+
 extraction:
   plafond_plausibilite_fcfa: 1000000000000  # 1 000 Mds FCFA — APPLIQUE (moteur/tester.py) AU SEUL RESULTAT_NET (pas au bilan : total_actif/capitaux_propres de groupes bancaires panafricains le depassent legitimement — decouvert au 1er run reel, 14/07/2026)
   statut_ocr_max_sans_2e_source: "PROBABLE"  # APPLIQUE (moteur/tester.py::verifier_statut_ocr)
