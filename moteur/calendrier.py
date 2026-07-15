@@ -79,29 +79,60 @@ def construire_mapping(peupler_path):
     noms = {t: n for t, n in lignes if not t.startswith("TEST_")}
 
     rows = list(csv.DictReader(open(MANIFESTE, encoding="utf-8")))
-    slugs_fichiers = set()
+    slugs_fichiers = Counter()
     for r in rows:
         if r["type"] != "rapport":
             continue
         mm = PATTERN_NOM.match(r["nom_fichier"])
         if mm:
-            slugs_fichiers.add(mm.group(3))
+            slugs_fichiers[mm.group(3)] += 1
 
+    # Correctif 15/07/2026 (decouvert via le signal D5) : departager par
+    # FREQUENCE reelle plutot que par longueur du slug. "Longueur minimale"
+    # choisissait systematiquement une variante rare/ancienne (souvent sans
+    # suffixe pays -bf/-ci/-tg) plutot que le vrai slug utilise par la
+    # quasi-totalite des documents -- 7 titres etaient touches (CBIBF, NSBC,
+    # ORGT, SEMC, SHEC, SLBC, SOGC), chacun ampute de 90%+ de son historique
+    # reel sans qu'aucune erreur ne soit visible (juste tres peu de donnees).
     mapping = dict(CORRECTIFS_MANUELS)
     non_couverts = []
     for t, n in noms.items():
         if t in mapping:
             continue
         s_nom = _slugify(n)
-        candidats = [sf for sf in slugs_fichiers if s_nom in sf or sf in s_nom]
+        # Correctif 15/07/2026 : departager par FREQUENCE reelle plutot que
+        # par longueur (cf. Coris/NSIA/Oragroup/Vivo/Solibra/SOGB, chacun
+        # ampute a 1 seul document par l'ancienne regle "plus court").
+        # ATTENTION (2e decouverte, meme session) : fusionner ce candidat
+        # precis avec le repli generique "premier mot" a ete tente puis
+        # ANNULE -- ca provoquait des collisions entre entites d'une meme
+        # marque multi-pays (6 filiales BOA, TotalEnergies, Ecobank, Societe
+        # Generale toutes reduites au meme slug generique "boa_ci" etc.).
+        # Le repli generique reste donc reserve au cas ou la recherche
+        # precise (sur le nom complet) ne trouve LITTERALEMENT rien.
+        candidats = {sf for sf in slugs_fichiers if s_nom in sf or sf in s_nom}
         if not candidats:
             premier_mot = s_nom.split("_")[0]
-            candidats = [sf for sf in slugs_fichiers if sf.startswith(premier_mot + "_") or sf == premier_mot]
+            candidats = {sf for sf in slugs_fichiers if sf.startswith(premier_mot + "_") or sf == premier_mot}
         if candidats:
-            mapping[t] = sorted(candidats, key=len)[0]
+            mapping[t] = max(candidats, key=lambda sf: slugs_fichiers[sf])
         else:
             non_couverts.append(t)
-    return mapping, non_couverts
+
+    # Filet de securite (15/07/2026) : toute collision restante (deux tickers
+    # resolus au MEME slug -- cas encore ouverts : familles multi-pays comme
+    # BOA/Ecobank ou homonymes partiels non repares aujourd'hui) est EXCLUE
+    # plutot que laissee attribuer les documents d'une entite a une autre.
+    # Une donnee manquante (non couvert) est toujours preferable a une donnee
+    # fausse (mauvaise attribution silencieuse) -- integrite > couverture.
+    compte_usage = Counter(mapping.values())
+    tickers_en_collision = [t for t, sf in list(mapping.items())
+                           if compte_usage[sf] > 1 and t not in CORRECTIFS_MANUELS]
+    for t in tickers_en_collision:
+        del mapping[t]
+        non_couverts.append(t)
+
+    return mapping, sorted(non_couverts)
 
 
 def construire_calendrier(mapping):
@@ -173,6 +204,22 @@ def deja_satisfait(categorie, historique, annee_ref, delais_cfg):
         return False
     echeance_precedente = echeance_reglementaire(categorie, annee_ref - 1, delais_cfg)
     return any(d > echeance_precedente for d in historique)
+
+
+def age_meilleure_information(ticker_categories, aujourd_hui):
+    """Age (en jours) du document le plus RECENT pour un titre, toutes
+    categories confondues (y compris celles exclues du calcul d'echeance
+    D4 pour irregularite -- ici, tout document est une preuve de vie valable,
+    peu importe sa categorie). Retourne (date_derniere_info, jours) ou
+    (None, None) si aucune donnee. Sert exclusivement au signal D5, JAMAIS
+    a D4 -- les deux mesurent des choses differentes et ne se melangent pas."""
+    toutes_dates = []
+    for categorie, v in ticker_categories.items():
+        toutes_dates += [date(*map(int, d.split("-"))) for d in v["historique"]]
+    if not toutes_dates:
+        return None, None
+    derniere = max(toutes_dates)
+    return derniere, (aujourd_hui - derniere).days
 
 
 def calculer():
