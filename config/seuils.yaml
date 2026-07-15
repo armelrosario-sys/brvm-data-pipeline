@@ -62,6 +62,24 @@ calendrier:
   tolerance_courte_jours: 45  # categories a cycle < 200j (trimestriel, semestriel)
   tolerance_longue_jours: 60  # categories a cycle >= 200j (annuel) : plus de variance naturelle (AG, auditeurs)
 
+# ------------------------------------------------------------------
+# Delais reglementaires CREPMF (chantier "echeance reglementaire", 15/07/2026)
+# Source : note CREPMF reprise par Sikafinance le 09/03/2020
+# (https://www.sikafinance.com/marches/brvm-les-societes-cotees-tenues-de-respecter-les-delais-de-publication-des-resultats-sous-peine-de-sanction_21117),
+# elle-meme renvoyant au BOC officiel du 28/02/2020 (bfin.brvm.org/boc/BOC_JOUR/BOC_20200228.pdf).
+# Hypothese retenue : exercice social cale sur l'annee civile (cas de la quasi-
+# totalite des emetteurs BRVM observes) -- si un titre a un exercice decale,
+# ces dates seraient a corriger au cas par cas (non detecte automatiquement
+# aujourd'hui, limite assumee).
+delais_reglementaires:
+  etats_financiers:  {mois: 4, jour: 30, decalage_annee: 1}  # exercice N publie au plus tard le 30/04 de N+1
+  activite_T1:       {mois: 4, jour: 30, decalage_annee: 0}
+  activite_T3:       {mois: 10, jour: 31, decalage_annee: 0}
+  activite_S1:       {mois: 10, jour: 31, decalage_annee: 0}  # meme echeance que T3 -- source confirmee, pas une erreur de saisie
+  # rapport_cac deliberement absent : sa vraie echeance depend de la date de
+  # l'AGO (15j avant / republication 45j apres), qui varie par titre et n'est
+  # pas fiablement connue ici -- l'exclure plutot que de deviner une date.
+
 extraction:
   plafond_plausibilite_fcfa: 1000000000000  # 1 000 Mds FCFA — APPLIQUE (moteur/tester.py) AU SEUL RESULTAT_NET (pas au bilan : total_actif/capitaux_propres de groupes bancaires panafricains le depassent legitimement — decouvert au 1er run reel, 14/07/2026)
   statut_ocr_max_sans_2e_source: "PROBABLE"  # APPLIQUE (moteur/tester.py::verifier_statut_ocr)
