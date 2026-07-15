@@ -373,8 +373,16 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
         profil_scores = {"VALUE": p_style.get("VALUE"), "GROWTH": p_style.get("GROWTH"), "GARP": p_style.get("GARP")}
         profil_detail = (f"VALUE {{p_style['VALUE']}} \u00b7 GROWTH {{p_style['GROWTH']}} \u00b7 GARP {{p_style['GARP']}}"
                          if p_style.get("dominant") else "")
+        _dj = liquidite_jour.get(r["ticker"], {})
+        _serie_t = series.get(r["ticker"], [])
+        _cours_mensuel = _serie_t[-1]["cours"] if _serie_t else None
+        cours_jour = _dj.get("cours_cloture")
+        variation_jour = _dj.get("variation_pct")
+        cours_affiche = cours_jour if cours_jour is not None else _cours_mensuel
         lignes_js.append({
             "ticker": r["ticker"], "secteur": r["secteur"].replace("_", " ").title(),
+            "cours": cours_affiche, "variation": variation_jour if cours_jour is not None else None,
+            "cours_source": "jour" if cours_jour is not None else "mensuel",
             "profil": p_style.get("dominant"), "profil_mixte": bool(p_style.get("mixte")),
             "profil_detail": profil_detail, "profil_scores": profil_scores,
             "score": round(r["score_composite"], 1) if r["score_composite"] is not None else None,
@@ -550,6 +558,10 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   #corps-synthese, .scroll table {{ table-layout: fixed; width: 100%; }}
   #corps-synthese td, #corps-synthese th {{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
   .num {{ text-align: right; font-variant-numeric: tabular-nums; }}
+  .var-hausse {{ color: #34d399; font-weight: 600; }}
+  .var-baisse {{ color: #f87171; font-weight: 600; }}
+  .var-stable {{ color: var(--muted, #94a3b8); }}
+  .puce-jour {{ color: #60a5fa; font-size: 0.6em; margin-right: 3px; cursor: help; }}
   .score-fort {{ color: #34d399; font-weight: 600; }}
   .score-moyen {{ color: #fbbf24; }}
   .score-faible {{ color: #f87171; }}
@@ -657,12 +669,12 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
       </div>
       <div class="scroll"><table>
         <colgroup>
-          <col style="width:9%"><col style="width:15%"><col style="width:13%">
-          <col style="width:10%">
-          <col style="width:9%"><col style="width:9%"><col style="width:10%"><col style="width:9%">
+          <col style="width:8%"><col style="width:10%"><col style="width:12%"><col style="width:12%">
+          <col style="width:9%">
+          <col style="width:8%"><col style="width:8%"><col style="width:9%"><col style="width:8%">
           <col style="width:16%">
         </colgroup>
-        <thead><tr><th>Titre</th><th>Secteur</th><th>Profil</th><th>Taille</th>
+        <thead><tr><th>Titre</th><th class="num">Cours (FCFA)</th><th>Secteur</th><th>Profil</th><th>Taille</th>
           <th class="col-analytique num">Rentab.</th><th class="col-analytique num">Solidite</th>
           <th class="col-analytique num">Valoris.</th><th class="col-analytique num">{terme_glossaire('ROE')}</th>
           <th>Alertes</th></tr></thead>
@@ -779,6 +791,18 @@ function renderScore(v) {{
   const cls = v >= 60 ? 'score-fort' : v >= 35 ? 'score-moyen' : 'score-faible';
   return `<span class="${{cls}}">${{v}}</span>`;
 }}
+function renderCours(cours, variation, source) {{
+  if (cours === null || cours === undefined) return '<span class="score-na">—</span>';
+  const txt_cours = `${{cours.toLocaleString('fr-FR')}}`;
+  let badge_var = '';
+  if (variation !== null && variation !== undefined) {{
+    const cls = variation > 0 ? 'var-hausse' : variation < 0 ? 'var-baisse' : 'var-stable';
+    const signe = variation > 0 ? '+' : '';
+    badge_var = `<span class="${{cls}}">${{signe}}${{variation}}%</span>`;
+  }}
+  const puce = source === 'jour' ? '<span class="puce-jour" title="Cours du jour">&#9679;</span>' : '';
+  return `${{puce}}${{txt_cours}} ${{badge_var}}`;
+}}
 function renderROE(v) {{
   // ROE en % (pas un score 0-100) : seuils propres au marche BRVM
   // (15%+ solide, 8-15% correct, <8% faible pour ce marche).
@@ -809,7 +833,9 @@ function rendreSynthese(lignes) {{
   const v = x => x !== null ? x : '—';
   corps.innerHTML = lignes.map(l => `
     <tr onclick="afficherFiche('${{l.ticker}}')" style="cursor:pointer">
-      <td><b>${{l.ticker}}</b></td><td>${{l.secteur}}</td>
+      <td><b>${{l.ticker}}</b></td>
+      <td class="num">${{renderCours(l.cours, l.variation, l.cours_source)}}</td>
+      <td>${{l.secteur}}</td>
       <td>${{renderProfil(l.profil, l.profil_scores)}}</td>
       <td>${{renderSizing(l.sizing)}}</td>
       <td class="col-analytique num">${{renderScore(l.rentabilite)}}</td><td class="col-analytique num">${{renderScore(l.solidite)}}</td><td class="col-analytique num">${{renderScore(l.valorisation)}}</td>
