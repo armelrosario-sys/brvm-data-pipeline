@@ -81,6 +81,7 @@ def _per_recent_et_cours(cur, ticker):
 
 # ------------------------------------------------------------------ candidats
 CALENDRIER_PATH = Path(__file__).resolve().parent.parent / "collecte" / "calendrier.json"
+LIQUIDITE_JOUR_PATH = Path(__file__).resolve().parent.parent / "collecte" / "liquidite_jour.json"
 
 
 def _calculer_retards_calendrier(cur, seuils, aujourd_hui, cal):
@@ -127,6 +128,7 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
     cand = {}
     aujourd_hui = aujourd_hui or date.today()
     calendrier_cache = json.loads(CALENDRIER_PATH.read_text()) if CALENDRIER_PATH.exists() else None
+    liquidite_jour_cache = json.loads(LIQUIDITE_JOUR_PATH.read_text()) if LIQUIDITE_JOUR_PATH.exists() else None
     retards_calendrier = _calculer_retards_calendrier(cur, seuils, aujourd_hui, calendrier_cache)
     tickers = [r[0] for r in cur.execute(
         "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
@@ -242,6 +244,7 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
         # titre exclu (pertes chroniques, capitaux propres negatifs...) est du
         # bruit speculatif, pas un reveil (cas decouvert : SCRC).
         serie = _serie_cours(cur, t)
+        detecte_ce_run = False
         if (dernier_mois and len(serie) >= 13 and serie[-1][0] == dernier_mois
                 and statut_gate == "ELIGIBLE"):
             cours_now = serie[-1][1]
@@ -255,6 +258,32 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
                            + f" a {cours_now:.0f} FCFA (bulletin {dernier_mois})",
                     valeur_reference=cours_now,
                     source_donnee=f"cours_mensuels {dernier_mois}")
+                detecte_ce_run = True
+
+        # B1_RECORD (complement quotidien, 15/07/2026) : le bulletin mensuel
+        # peut laisser un record reel invisible jusqu'a un mois entier --
+        # constat direct de l'utilisateur, cours en direct tres au-dessus du
+        # dernier bulletin traite. Si liquidite_jour.json existe (collecte
+        # quotidienne, cf. collecte/collecte_liquidite_jour.py) et est plus
+        # recent que le dernier bulletin mensuel connu, on compare AUSSI le
+        # cours de cloture DU JOUR a l'historique -- sans jamais remplacer la
+        # detection mensuelle (les deux coexistent, la plus recente l'emporte
+        # naturellement car un seul candidat est retenu par ticker).
+        if not detecte_ce_run and statut_gate == "ELIGIBLE" and liquidite_jour_cache:
+            entree_jour = liquidite_jour_cache.get(t)
+            if entree_jour and entree_jour.get("cours_cloture") and len(serie) >= 12:
+                cours_jour = entree_jour["cours_cloture"]
+                max12_incl = max(x for _, x in serie[-12:])  # 12 derniers bulletins connus
+                if cours_jour > max12_incl:
+                    max_hist_incl = max(x for _, x in serie)
+                    historique = cours_jour > max_hist_incl
+                    cand[(t, "B1_RECORD")] = dict(
+                        direction="FAVORABLE",
+                        detail=("Plus-haut historique" if historique else "Plus-haut 12 mois")
+                               + f" a {cours_jour:.0f} FCFA (cours du jour, "
+                               + f"{entree_jour.get('date_maj_brvm', 'date inconnue')})",
+                        valeur_reference=cours_jour,
+                        source_donnee="liquidite_jour.json (cours quotidien)")
     return cand
 
 
