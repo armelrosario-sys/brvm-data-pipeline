@@ -22,6 +22,8 @@ SIGNAUX = {
         "description": "Un retard de publication des comptes a ete constate et n'est pas encore resorbe."},
     "D4_RETARD_CALENDRIER": {"libelle": "Retard reglementaire", "classe": "def",
         "description": "Echeance reglementaire CREPMF depassee sans nouveau depot (detecte automatiquement, sans avis officiel)."},
+    "D5_INFO_PERIMEE": {"libelle": "Information perimee", "classe": "def",
+        "description": "Aucun document recu depuis plus d'un an, toutes categories confondues -- axe independant de D4, ne l'attenue jamais."},
     "A_QUALITE_DECOTEE":  {"libelle": "Decote qualifiee",     "classe": "fav",
         "description": "PER inferieur a 70% de la mediane sectorielle, resultat en progression, titre eligible."},
     "B1_RECORD":          {"libelle": "Nouveau record",       "classe": "info",
