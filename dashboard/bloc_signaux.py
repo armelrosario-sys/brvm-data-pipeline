@@ -2,18 +2,26 @@
 # -*- coding: utf-8 -*-
 """CHANTIER 1 — Blocs d'affichage des signaux (le "film") dans le dashboard.
 
-v2 (14/07/2026) — corrections suite au retour utilisateur sur la v1 :
-  - regroupement par titre (une entreprise = une ligne, plusieurs signaux
-    empiles dans la cellule) au lieu d'une ligne par signal (SNTS apparaissait
-    deux fois, source de confusion) ;
-  - colonnes "Detecte le" / "Depuis" / "Source" repliables (toggle), pas
-    supprimees : disponibles en un clic, pas genantes par defaut ;
-  - libelles clairs via glossaire_signaux (fini les codes SCREAMING_SNAKE_CASE
-    bruts melanges a du texte en minuscules).
+v3 (15/07/2026) — colonnes distinctes, resume capital toujours visible :
+  - retour utilisateur : le texte de detail (blanc, non structure, en ligne
+    avec le badge) etait difficile a lire, sans intitule de colonne, sans
+    mise en evidence de l'information essentielle.
+  - refonte : une ligne PAR SIGNAL (pas par titre), le ticker fusionne sur
+    plusieurs lignes (rowspan) quand un titre porte plusieurs signaux --
+    conserve l'objectif du v2 (ne pas repeter le ticker inutilement) tout en
+    donnant a chaque signal sa propre ligne, plus lisible qu'un empilement
+    de divs dans une seule cellule.
+  - 3 colonnes distinctes : Signal (badge) | Essentiel (gras, centre, TOUJOURS
+    visible -- cf. glossaire_signaux.resume_capital) | Detail (texte justifie,
+    attenue, la phrase complete).
+  - nettoyage : la fonction _prochaines_echeances (calendrier) etait devenue
+    du code mort ici depuis son deplacement vers generer_dashboard_html.py
+    (le calendrier s'affiche desormais en bas de la Synthese) -- retiree.
 
-Genere deux cartes injectees EN TETE du dashboard (avant les onglets) :
+Genere trois cartes injectees EN TETE du dashboard (avant les onglets) :
   1. "Ma liste de suivi" : les tickers de liste_suivi avec leurs signaux ACTIFS.
   2. "Signaux actifs — marche" : tous les signaux ACTIFS, groupes par titre.
+  3. "Introductions et cotations a venir".
 Aucune donnee personnelle : la liste de suivi ne contient que des codes.
 
 Usage : python3 bloc_signaux.py   (apres generer_dashboard_html.py)
@@ -23,7 +31,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from glossaire_signaux import badge_html
+from glossaire_signaux import badge_html, resume_capital
 
 DB = Path(__file__).resolve().parent.parent / "moteur" / "brvm.db"
 HTML = Path(__file__).resolve().parent.parent / "docs_site" / "index.html"
@@ -36,15 +44,17 @@ STYLE = """
 .sig-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
 .sig-table th { text-align: left; color: var(--muted, #94a3b8); font-weight: 500;
   padding: 6px 8px; border-bottom: 1px solid var(--border, #334155); }
-.sig-table td { padding: 7px 8px; border-bottom: 1px solid rgba(148,163,184,.15); vertical-align: top; }
-.sig-ligne-signal { margin: 2px 0; }
+.sig-table td { padding: 7px 8px; border-bottom: 1px solid rgba(148,163,184,.15); vertical-align: middle; }
+.sig-table td.sig-ticker-cell { vertical-align: top; border-right: 1px solid rgba(148,163,184,.15); }
 .sig-def { display:inline-block; background:#3f1d1d; color:#f87171; font-weight:600;
-  padding:1px 8px; border-radius:99px; font-size:0.85em; }
+  padding:1px 8px; border-radius:99px; font-size:0.85em; white-space:nowrap; }
 .sig-fav { display:inline-block; background:#173f2e; color:#34d399; font-weight:600;
-  padding:1px 8px; border-radius:99px; font-size:0.85em; }
+  padding:1px 8px; border-radius:99px; font-size:0.85em; white-space:nowrap; }
 .sig-info { display:inline-block; background:#1e3a5f; color:#60a5fa; font-weight:600;
-  padding:1px 8px; border-radius:99px; font-size:0.85em; }
-.sig-detail { color: var(--text, #e2e8f0); font-size: 0.92em; margin-left: 6px; }
+  padding:1px 8px; border-radius:99px; font-size:0.85em; white-space:nowrap; }
+.sig-essentiel { text-align: center; font-weight: 700; color: var(--text, #e2e8f0);
+  font-size: 0.95em; white-space: nowrap; }
+.sig-detail { color: var(--muted, #94a3b8); font-size: 0.87em; text-align: justify; line-height: 1.4; }
 .sig-ras { color: var(--muted, #94a3b8); }
 .sig-note { color: var(--muted, #94a3b8); font-size: 0.82em; margin-top: 8px; }
 .sig-col-optionnelle { display: none; }
@@ -73,48 +83,23 @@ def _signaux_actifs(cur):
     ).fetchall()
 
 
-def _ligne_signal(ty, de):
-    """Une ligne compacte : badge (libelle clair, code en info-bulle) + detail."""
-    return f'<div class="sig-ligne-signal">{badge_html(ty)}<span class="sig-detail">{de}</span></div>'
-
-
-def _prochaines_echeances(aujourd_hui):
-    """Pour chaque titre couvert par le calendrier, l'echeance REGLEMENTAIRE
-    CREPMF (config: delais_reglementaires) du cycle en cours -- revise le
-    15/07/2026 : n'utilise plus l'intervalle historique pour PROJETER une
-    date, seulement pour (1) confirmer que le titre publie reellement cette
-    categorie, (2) verifier si le cycle en cours est deja satisfait.
-    N'affiche QUE les echeances dont le cycle concerne l'ANNEE EN COURS
-    (demande explicite du 15/07/2026) -- le passe sert a calibrer/confirmer,
-    jamais a s'afficher pour lui-meme."""
-    if not CALENDRIER_PATH.exists():
-        return []
-    cal = json.loads(CALENDRIER_PATH.read_text())
-    cfg = charger_seuils().get("calendrier", {})
-    delais_cfg = charger_seuils().get("delais_reglementaires", {})
-    min_occ = cfg.get("min_occurrences", 3)
-    exclues = set(cfg.get("categories_exclues", ["autre", "rapport_cac"]))
-
-    echeances = []
-    for t, categories in cal.items():
-        meilleure = None
-        for categorie, v in categories.items():
-            if categorie in exclues or categorie not in delais_cfg:
-                continue
-            hist = sorted(date(*map(int, d.split("-"))) for d in v["historique"])
-            if len(hist) < min_occ:
-                continue
-            annee_ref, echeance = cycle_le_plus_recent(categorie, aujourd_hui, delais_cfg)
-            if echeance.year != aujourd_hui.year:
-                continue  # hors annee en cours -- filtre demande le 15/07/2026
-            if deja_satisfait(categorie, hist, annee_ref, delais_cfg):
-                continue  # obligation deja remplie pour ce cycle
-            jours_restants = (echeance - aujourd_hui).days
-            if meilleure is None or jours_restants < meilleure[2]:
-                meilleure = (categorie, hist[-1], jours_restants, echeance)
-        if meilleure:
-            echeances.append((t, *meilleure))
-    return sorted(echeances, key=lambda x: x[3])  # la plus proche d'abord
+def _lignes_ticker(t, sigs, avec_source):
+    """Une ligne PAR SIGNAL pour ce ticker ; le ticker n'apparait qu'une
+    fois, fusionne (rowspan) sur toutes ses lignes."""
+    n = len(sigs)
+    lignes = []
+    for i, (ty, di, de, dd, so) in enumerate(sigs):
+        essentiel = resume_capital(ty, de) or ""
+        col_date_source = f"{dd} — {so or ''}" if avec_source else f"depuis le {dd}"
+        cell_ticker = f"<td class='sig-ticker-cell' rowspan='{n}'><b>{t}</b></td>" if i == 0 else ""
+        lignes.append(
+            f"<tr>{cell_ticker}"
+            f"<td>{badge_html(ty)}</td>"
+            f"<td class='sig-essentiel'>{essentiel}</td>"
+            f"<td class='sig-detail'>{de}</td>"
+            f"<td class='sig-col-optionnelle sig-date'>{col_date_source}</td></tr>"
+        )
+    return lignes
 
 
 def generer_blocs():
@@ -125,26 +110,27 @@ def generer_blocs():
     for t, ty, di, de, dd, so in actifs:
         par_ticker.setdefault(t, []).append((ty, di, de, dd, so))
 
-    # ---- Bloc 1 : liste de suivi — UNE LIGNE PAR TITRE ----
+    en_tete_signaux = ("<thead><tr><th>Titre</th><th>Signal</th><th>Essentiel</th>"
+                       "<th>Detail</th><th class=\"sig-col-optionnelle\">Depuis</th></tr></thead>")
+    en_tete_marche = ("<thead><tr><th>Titre</th><th>Signal</th><th>Essentiel</th>"
+                      "<th>Detail</th><th class=\"sig-col-optionnelle\">Detecte le — Source</th></tr></thead>")
+
+    # ---- Bloc 1 : liste de suivi ----
     lignes = []
     for t in suivi:
         sigs = par_ticker.get(t, [])
         if not sigs:
-            lignes.append(f"<tr><td><b>{t}</b></td><td class='sig-ras'>RAS</td>"
+            lignes.append(f"<tr><td class='sig-ticker-cell'><b>{t}</b></td>"
+                          f"<td colspan='3' class='sig-ras'>RAS</td>"
                           f"<td class='sig-col-optionnelle'></td></tr>")
             continue
-        corps_signaux = "".join(_ligne_signal(ty, de) for ty, di, de, dd, so in sigs)
-        depuis_txt = "; ".join(f"depuis le {dd}" for _, _, _, dd, _ in sigs)
-        lignes.append(f"<tr><td><b>{t}</b></td><td>{corps_signaux}</td>"
-                      f"<td class='sig-col-optionnelle sig-date'>{depuis_txt}</td></tr>")
+        lignes.extend(_lignes_ticker(t, sigs, avec_source=False))
     if suivi:
         corps_suivi = f"""<table class="sig-table" id="tbl-suivi">
-    <thead><tr><th>Titre</th><th>Signaux actifs</th><th class="sig-col-optionnelle">Depuis</th></tr></thead>
+    {en_tete_signaux}
     <tbody>{''.join(lignes)}</tbody>
   </table>"""
     else:
-        # Amelioration ergonomique (14/07/2026) : une table vide sans explication
-        # ressemble a un bug. Etat vide explicite avec la marche a suivre.
         corps_suivi = ("""<div style="padding:16px;text-align:center;color:var(--muted,#94a3b8);"""
                        """border:1px dashed var(--border,#334155);border-radius:8px;">"""
                        """Aucun titre dans la liste de suivi pour l'instant.<br>"""
@@ -162,15 +148,11 @@ def generer_blocs():
   Le systeme ne decide jamais seul. Survolez un badge pour le code technique et sa definition.</div>
 </div>"""
 
-    # ---- Bloc 2 : tous les signaux actifs du marche — UNE LIGNE PAR TITRE ----
+    # ---- Bloc 2 : tous les signaux actifs du marche ----
     lignes2 = []
     for t in sorted(par_ticker, key=lambda tk: (
             0 if any(s[1] == "DEFAVORABLE" for s in par_ticker[tk]) else 1, tk)):
-        sigs = par_ticker[t]
-        corps_signaux = "".join(_ligne_signal(ty, de) for ty, di, de, dd, so in sigs)
-        dates_sources = "<br>".join(f"{dd} — {so or ''}" for _, _, _, dd, so in sigs)
-        lignes2.append(f"<tr><td><b>{t}</b></td><td>{corps_signaux}</td>"
-                       f"<td class='sig-col-optionnelle sig-date'>{dates_sources}</td></tr>")
+        lignes2.extend(_lignes_ticker(t, par_ticker[t], avec_source=True))
     nb_def = sum(1 for a in actifs if a[2] == "DEFAVORABLE")
     nb_titres_actifs = len(par_ticker)
     bloc2 = f"""
@@ -180,16 +162,12 @@ def generer_blocs():
       — cycle de vie date, distinct des scores)</span></h2>
   <button class="sig-toggle" onclick="sigToggleColonnes('tbl-marche', this)">Afficher les dates et sources</button>
   <table class="sig-table" id="tbl-marche">
-    <thead><tr><th>Titre</th><th>Signaux actifs</th><th class="sig-col-optionnelle">Detecte le — Source</th></tr></thead>
+    {en_tete_marche}
     <tbody>{''.join(lignes2)}</tbody>
   </table>
 </div>"""
-    # ---- Bloc 3 : introductions et cotations a venir (14/07/2026) ----
-    # Principe identique a celui applique au Sizing "Prudence" : ne JAMAIS
-    # confondre "pas de donnee" avec "probleme" -- un titre nouvellement
-    # introduit (BBGCI, rejoint la BRVM en 2026) n'a ni cours ni historique,
-    # ce n'est pas une exclusion pour cause, ce n'est pas un signal --
-    # affichage separe, jamais dans "Exclus".
+
+    # ---- Bloc 3 : introductions et cotations a venir ----
     intro = cur.execute(
         "SELECT ticker, nom, secteur, date_introduction, controle_actionnarial "
         "FROM societes WHERE ticker NOT LIKE 'TEST_%' AND ticker NOT IN "
@@ -229,7 +207,7 @@ def injecter():
     blocs = marque_deb + generer_blocs() + marque_fin + "\n  "
     html = html.replace(ancre, blocs + ancre, 1)
     HTML.write_text(html, encoding="utf-8")
-    print(f"Blocs signaux injectes dans {HTML.name} (groupes par titre, colonnes repliables).")
+    print(f"Blocs signaux injectes dans {HTML.name} (colonnes distinctes, essentiel toujours visible).")
 
 
 if __name__ == "__main__":
