@@ -18,20 +18,12 @@ Aucune donnee personnelle : la liste de suivi ne contient que des codes.
 
 Usage : python3 bloc_signaux.py   (apres generer_dashboard_html.py)
 """
-import json
-import statistics
 import sqlite3
 import sys
-from datetime import date, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "moteur"))
 from glossaire_signaux import badge_html
-from scoring import charger_seuils
-from calendrier import cycle_le_plus_recent, deja_satisfait
-
-CALENDRIER_PATH = Path(__file__).resolve().parent.parent / "collecte" / "calendrier.json"
 
 DB = Path(__file__).resolve().parent.parent / "moteur" / "brvm.db"
 HTML = Path(__file__).resolve().parent.parent / "docs_site" / "index.html"
@@ -221,36 +213,7 @@ def generer_blocs():
   ce titre rejoindra les autres tableaux des que ses premieres cotations seront collectees.</div>
 </div>"""
 
-    # ---- Bloc 4 : calendrier des publications (14/07/2026) ----
-    # Reponse au constat : le calendrier existait en coulisses (D4 automatique)
-    # sans jamais etre visible. Ici : une vue directe, triee par echeance la
-    # plus proche, plutot qu'un fichier json invisible.
-    ech = _prochaines_echeances(date.today())
-    bloc4 = ""
-    if ech:
-        lignes4 = []
-        for t, categorie, dernier, jours_restants, prochaine in ech[:15]:
-            if jours_restants < 0:
-                statut = f"<span class='sig-def' style='padding:1px 8px;border-radius:99px'>en retard de {-jours_restants}j</span>"
-            elif jours_restants <= 14:
-                statut = f"<span class='sig-info' style='padding:1px 8px;border-radius:99px'>dans {jours_restants}j</span>"
-            else:
-                statut = f"attendue vers le {prochaine.isoformat()}"
-            lignes4.append(f"<tr><td><b>{t}</b></td><td>{categorie}</td>"
-                          f"<td>{dernier.isoformat()}</td><td>{statut}</td></tr>")
-        bloc4 = f"""
-<div class="sig-carte">
-  <h2>Calendrier des publications <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
-      (echeance estimee la plus proche par titre, {len(ech)} titres couverts)</span></h2>
-  <table class="sig-table">
-    <thead><tr><th>Titre</th><th>Categorie</th><th>Dernier depot</th><th>Echeance estimee</th></tr></thead>
-    <tbody>{''.join(lignes4)}</tbody>
-  </table>
-  <div class="sig-note">Estimation = dernier depot + intervalle historique typique de ce titre pour cette
-  categorie de document (pas une date reglementaire officielle). Les 15 echeances les plus proches sont affichees.</div>
-</div>"""
-
-    return STYLE + bloc1 + bloc2 + bloc3 + bloc4
+    return STYLE + bloc1 + bloc2 + bloc3
 
 
 def injecter():
