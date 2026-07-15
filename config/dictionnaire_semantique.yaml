@@ -4,7 +4,8 @@ version: "0.1"
 
 champs_canoniques:
   resultat_net:
-    syscohada: ["Résultat net", "Résultat net de l'exercice", "Bénéfice net"]
+    syscohada: ["Résultat net", "Résultat net de l'exercice", "Bénéfice net",
+                "RESULTAT DE L'EXERCICE", "Resultat net de l'exercice"]  # variantes reelles observees (OCR SDSC 2024)
     bancaire_umoa: ["Résultat net", "Résultat de l'exercice"]
   total_actif:
     syscohada: ["TOTAL ACTIF", "Total général actif"]
@@ -13,8 +14,17 @@ champs_canoniques:
     syscohada: ["TOTAL PASSIF", "Total général passif"]
     bancaire_umoa: ["TOTAL PASSIF", "Total du passif"]
   capitaux_propres:
-    syscohada: ["Capitaux propres", "Total capitaux propres et ressources assimilées"]
+    syscohada: ["Capitaux propres", "Total capitaux propres et ressources assimilées",
+                "Situation nette"]  # variante reelle (OCR SDSC 2024) -- NB : Situation nette
+                                     # exclut parfois "Autres capitaux propres", a additionner
+                                     # separement si cette ligne existe aussi (cf. extracteur)
     bancaire_umoa: ["Capitaux propres", "Fonds propres"]
+  dettes_financieres:
+    syscohada: ["Dettes financières", "Emprunts et dettes financières diverses"]
+    bancaire_umoa: ["Dettes financières"]
+  autres_capitaux_propres:
+    syscohada: ["Autres capitaux propres"]
+    bancaire_umoa: []
   chiffre_affaires:
     syscohada: ["Chiffre d'affaires", "Chiffre d'affaires net"]
     bancaire_umoa: ["Produit net bancaire", "PNB"]
