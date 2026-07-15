@@ -31,6 +31,7 @@ import re
 import sys
 import unicodedata
 from collections import Counter
+from datetime import date
 from pathlib import Path
 
 RACINE = Path(__file__).resolve().parent.parent
@@ -135,6 +136,43 @@ def construire_calendrier(mapping):
                 historique=dates_triees,
             )
     return calendrier
+
+
+def echeance_reglementaire(categorie, annee_reference, delais_cfg):
+    """Date limite reglementaire CREPMF pour une categorie et une annee de
+    reference donnees (l'annee du CYCLE, pas forcement l'annee de depot :
+    pour etats_financiers, annee_reference = l'exercice concerne, l'echeance
+    tombe l'annee suivante). Retourne None si la categorie n'a pas de regle
+    reglementaire fiable (ex. rapport_cac)."""
+    r = delais_cfg.get(categorie)
+    if not r:
+        return None
+    annee_echeance = annee_reference + r.get("decalage_annee", 0)
+    return date(annee_echeance, r["mois"], r["jour"])
+
+
+def cycle_le_plus_recent(categorie, aujourd_hui, delais_cfg):
+    """Retourne (annee_reference, echeance) du cycle EN COURS pour cette
+    categorie a la date consideree -- c'est-a-dire le cycle dont l'echeance
+    tombe dans l'annee civile courante. Utilise pour limiter l'affichage aux
+    seules obligations de l'annee en cours, comme demande le 15/07/2026."""
+    r = delais_cfg.get(categorie)
+    if not r:
+        return None, None
+    annee_ref = aujourd_hui.year - r.get("decalage_annee", 0)
+    echeance = echeance_reglementaire(categorie, annee_ref, delais_cfg)
+    return annee_ref, echeance
+
+
+def deja_satisfait(categorie, historique, annee_ref, delais_cfg):
+    """Un depot couvre-t-il DEJA le cycle de annee_ref ? Approximation : tout
+    depot posterieur a l'echeance du cycle PRECEDENT est considere comme
+    couvrant le cycle courant (les rapports sont sequentiels par nature)."""
+    r = delais_cfg.get(categorie)
+    if not r or not historique:
+        return False
+    echeance_precedente = echeance_reglementaire(categorie, annee_ref - 1, delais_cfg)
+    return any(d > echeance_precedente for d in historique)
 
 
 def calculer():
