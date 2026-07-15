@@ -37,8 +37,16 @@ SOCIETES = [
     ("SAFC", "Safca (Alios Finance CI)", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "CI", None, None),
     ("ORGT", "Oragroup Togo", "SERVICES_FINANCIERS", "IFRS", "TG", None, "ECP Financial Holdings (50,01%)"),
     ("BOABF", "BOA Burkina Faso", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "BF", None, "Groupe BOA/BMCE"),
-    ("BBGCI", "Bridge Bank Group CI", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "CI", None,
-     "Bridge Group West Africa / Groupe Teyliom (57% post-IPO)"),
+    ("BBGCI", "Bridge Bank Group CI", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "CI", "2026-08-21",
+     "Bridge Group West Africa (BGWA) 57% post-IPO, CNPS 20%, flottant BRVM 20%, "
+     "divers personnes physiques 3% -- source : Note d'Information IPO visee AMF-UMOA "
+     "AO/26-03 du 26/06/2026. CORRECTIF 15/07/2026 : la mention anterieure 'Groupe Teyliom' "
+     "etait une erreur (aucune trace de Teyliom dans le document officiel ; confusion "
+     "probable avec un autre dossier). date_introduction = 21/08/2026 : ESTIMATION, pas une "
+     "date de cotation confirmee -- la note precise seulement la periode de placement "
+     "(20/07-06/08/2026) et une date de 'transmission du calendrier indicatif de premiere "
+     "cotation' (21/08/2026, dans un tableau partiellement degrade a l'extraction). "
+     "A RECONFIRMER des qu'un avis BRVM officiel de premiere cotation sera publie."),
     # PAS ENCORE COTE au 10/07/2026 — IPO en cours (periode de placement 20/07-06/08/2026,
     # premiere cotation attendue ~1 mois apres). Ticker "BBGCI" provisoire (non confirme par
     # mnemonique officiel BRVM, ISIN CI0000010609 connu). Ajoute en preparation, etape E du
