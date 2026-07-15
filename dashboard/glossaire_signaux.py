@@ -33,6 +33,42 @@ SIGNAUX = {
 }
 
 
+import re as _re_resume
+
+
+def resume_capital(code, detail):
+    """Extrait l'information LA PLUS IMPORTANTE d'un detail de signal, de
+    facon TOUJOURS VISIBLE et concise (15/07/2026, retour utilisateur : les
+    phrases completes en texte simple, sans hierarchie, rendaient la lecture
+    difficile). Le detail complet reste affiche a cote, ce resume n'efface
+    rien -- il met juste le chiffre qui compte en evidence immediate."""
+    if code in ("D1_PREMIERE_PERTE",):
+        m = _re_resume.search(r"negatif \(([\d.\-]+) M FCFA\)", detail)
+        return f"{float(m.group(1)):,.0f} M FCFA".replace(",", " ") if m else None
+    if code == "D2_CHUTE_RESULTAT":
+        m = _re_resume.search(r"recul de ([\d.]+)%", detail)
+        return f"-{m.group(1)}% RN" if m else None
+    if code == "D3_COUPE_DIVIDENDE":
+        m = _re_resume.search(r"\(([\d.]+) FCFA\) < dividende \d+ \(([\d.]+) FCFA\)", detail)
+        return f"{m.group(1)} < {m.group(2)} FCFA" if m else None
+    if code in ("D4_RETARD_PUBLICATION", "D4_RETARD_CALENDRIER"):
+        m = _re_resume.search(r"depassee de (\d+)j", detail)
+        return f"{m.group(1)}j de retard" if m else None
+    if code == "D5_INFO_PERIMEE":
+        m = _re_resume.search(r"depuis (\d+)j", detail)
+        return f"{m.group(1)}j sans info" if m else None
+    if code == "A_QUALITE_DECOTEE":
+        m = _re_resume.search(r"PER ([\d.]+) < 70% de la mediane sectorielle ([\d.]+)", detail)
+        return f"PER {m.group(1)} (m\u00e9d. {m.group(2)})" if m else None
+    if code == "B1_RECORD":
+        m = _re_resume.search(r"a ([\d\s]+) FCFA", detail)
+        return f"{m.group(1).strip()} FCFA" if m else None
+    if code == "RERATING_EN_COURS":
+        m = _re_resume.search(r"\(([\d\s]+) -> ([\d\s]+) FCFA\)", detail)
+        return f"{m.group(1).strip()} \u2192 {m.group(2).strip()} FCFA" if m else None
+    return None
+
+
 def libelle(code):
     """Libelle court, lisible, casse normale."""
     return SIGNAUX.get(code, {}).get("libelle", code)
