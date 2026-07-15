@@ -10,12 +10,13 @@ seul, toujours un texte redondant).
 """
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 from statistics import median, mean
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "moteur"))
 from scoring import evaluer_titre, rapport_fraicheur, charger_seuils, charger_marche, charger_liquidite_jour, charger_liquidite_generale, charger_tendance_liquidite, DB
+from calendrier import cycle_le_plus_recent, deja_satisfait
 from glossaire_signaux import sizing_libelle, sizing_classe, sizing_description, SIZING  # 14/07/2026
 import re as _re_humanise
 
@@ -298,6 +299,46 @@ def terme_glossaire(mot):
     return (f'<span class="gloss" tabindex="0" data-def="{txt}">{mot}</span>' if txt else mot)
 
 
+def _prochaines_echeances_annee_en_cours(aujourd_hui):
+    """Echeance REGLEMENTAIRE CREPMF (config: delais_reglementaires) du cycle
+    en cours, par titre -- deplace de dashboard/bloc_signaux.py vers ici le
+    15/07/2026 (demande : afficher ce bloc en bas de la Synthese, sous
+    'Donnees perimees', plutot qu'en tete de page). Logique inchangee :
+    l'historique confirme seulement que le titre publie la categorie et si
+    le cycle est deja satisfait ; la date elle-meme vient du texte
+    reglementaire. Seules les echeances de l'ANNEE EN COURS sont retenues."""
+    chemin = Path(__file__).resolve().parent.parent / "collecte" / "calendrier.json"
+    if not chemin.exists():
+        return []
+    cal = json.loads(chemin.read_text())
+    seuils_locaux = charger_seuils()
+    cfg = seuils_locaux.get("calendrier", {})
+    delais_cfg = seuils_locaux.get("delais_reglementaires", {})
+    min_occ = cfg.get("min_occurrences", 3)
+    exclues = set(cfg.get("categories_exclues", ["autre", "rapport_cac"]))
+
+    echeances = []
+    for t, categories in cal.items():
+        meilleure = None
+        for categorie, v in categories.items():
+            if categorie in exclues or categorie not in delais_cfg:
+                continue
+            hist = sorted(date(*map(int, d.split("-"))) for d in v["historique"])
+            if len(hist) < min_occ:
+                continue
+            annee_ref, echeance = cycle_le_plus_recent(categorie, aujourd_hui, delais_cfg)
+            if echeance.year != aujourd_hui.year:
+                continue
+            if deja_satisfait(categorie, hist, annee_ref, delais_cfg):
+                continue
+            jours_restants = (echeance - aujourd_hui).days
+            if meilleure is None or jours_restants < meilleure[2]:
+                meilleure = (categorie, hist[-1], jours_restants, echeance)
+        if meilleure:
+            echeances.append((t, *meilleure))
+    return sorted(echeances, key=lambda x: x[3])
+
+
 def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche, liquidite_jour, liquidite_generale, tendance_liquidite, profils):
     elig = [r for r in resultats if r["statut_gate"] == "ELIGIBLE" and r["score_composite"]]
     elig.sort(key=lambda r: -r["score_composite"])
@@ -355,6 +396,18 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 
     lignes_fraicheur = "".join(f'<tr><td>{t}</td><td>{fm}</td><td>{j} jours</td></tr>'
                                 for t, fm, j in fraicheur["perimes"])
+
+    echeances_calendrier = _prochaines_echeances_annee_en_cours(date.today())
+    def _statut_echeance(jours_restants, prochaine):
+        if jours_restants < 0:
+            return f"<span style='color:#f87171;font-weight:600'>en retard de {-jours_restants}j</span>"
+        if jours_restants <= 14:
+            return f"<span style='color:#60a5fa;font-weight:600'>dans {jours_restants}j</span>"
+        return f"attendue vers le {prochaine.isoformat()}"
+    lignes_calendrier = "".join(
+        f"<tr><td><b>{t}</b></td><td>{cat}</td><td>{dernier.isoformat()}</td>"
+        f"<td>{_statut_echeance(jr, prochaine)}</td></tr>"
+        for t, cat, dernier, jr, prochaine in echeances_calendrier)
 
     def fmt_valeur(val, interp, unite="%"):
         if val is None:
@@ -625,6 +678,15 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
       <h2>Donnees perimees (seuil {fraicheur['seuil_jours']}j)</h2>
       <table><thead><tr><th>Titre</th><th>Dernier mois</th><th>Anciennete</th></tr></thead>
       <tbody>{lignes_fraicheur or '<tr><td colspan="3">Aucune donnee perimee</td></tr>'}</tbody></table>
+    </div>
+    <div class="carte">
+      <h2>Calendrier des publications <span style="font-weight:400;color:var(--muted);font-size:0.75em">
+          (echeance reglementaire la plus proche par titre, annee en cours uniquement)</span></h2>
+      <table><thead><tr><th>Titre</th><th>Categorie</th><th>Dernier depot</th><th>Echeance</th></tr></thead>
+      <tbody>{lignes_calendrier or '<tr><td colspan="4">Aucune echeance en attente pour l\'annee en cours</td></tr>'}</tbody></table>
+      <div style="font-size:0.75em;color:var(--muted);margin-top:8px">Echeance = delai reglementaire CREPMF
+      (etats financiers et T1 : 30 avril ; T3 et semestriel : 31 octobre) applique au cycle en cours.
+      L'historique confirme seulement que le titre publie cette categorie et si le cycle est deja satisfait.</div>
     </div>
   </div>
 
