@@ -27,7 +27,7 @@ import sqlite3
 from datetime import date
 from pathlib import Path
 
-from calendrier import echeance_reglementaire, cycle_le_plus_recent, deja_satisfait
+from calendrier import echeance_reglementaire, cycle_le_plus_recent, deja_satisfait, age_meilleure_information
 
 from scoring import (charger_seuils, charger_marche, appliquer_gate,
                      per_secteur_reproductible)
@@ -83,7 +83,7 @@ def _per_recent_et_cours(cur, ticker):
 CALENDRIER_PATH = Path(__file__).resolve().parent.parent / "collecte" / "calendrier.json"
 
 
-def _calculer_retards_calendrier(cur, seuils, aujourd_hui):
+def _calculer_retards_calendrier(cur, seuils, aujourd_hui, cal):
     """D4_RETARD_CALENDRIER (revise le 15/07/2026) : retard mesure contre
     l'ECHEANCE REGLEMENTAIRE CREPMF (config: delais_reglementaires), plus
     l'intervalle historique typique observe -- pas l'inverse. L'historique
@@ -93,9 +93,8 @@ def _calculer_retards_calendrier(cur, seuils, aujourd_hui):
     deja satisfait par un depot recent. La date limite elle-meme est fixe,
     fondee sur le texte reglementaire, jamais sur la moyenne des annees
     passees. Coexiste avec le D4 manuel (avis_reglementaires)."""
-    if not CALENDRIER_PATH.exists():
+    if cal is None:
         return {}
-    cal = json.loads(CALENDRIER_PATH.read_text())
     cfg = seuils.get("calendrier", {})
     delais_cfg = seuils.get("delais_reglementaires", {})
     min_occ = cfg.get("min_occurrences", 3)
@@ -127,7 +126,8 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
     l'argument --date de reconcilier(), pour rejouer un scenario passe)."""
     cand = {}
     aujourd_hui = aujourd_hui or date.today()
-    retards_calendrier = _calculer_retards_calendrier(cur, seuils, aujourd_hui)
+    calendrier_cache = json.loads(CALENDRIER_PATH.read_text()) if CALENDRIER_PATH.exists() else None
+    retards_calendrier = _calculer_retards_calendrier(cur, seuils, aujourd_hui, calendrier_cache)
     tickers = [r[0] for r in cur.execute(
         "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
     secteur = {t: s for t, s in cur.execute("SELECT ticker, secteur FROM societes")}
@@ -192,6 +192,23 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
                        f"(dernier depot connu : {dernier.isoformat()})",
                 valeur_reference=jours_ecart,
                 source_donnee=f"calendrier.json + delais_reglementaires ({categorie})")
+
+        # D5 automatique (15/07/2026) : information globalement perimee --
+        # AXE INDEPENDANT de D4. Ne regarde PAS une categorie precise ni une
+        # echeance reglementaire : uniquement "depuis quand n'a-t-on RIEN
+        # reçu de ce titre, toutes categories confondues ?". Ne peut ni
+        # attenuer ni remplacer D4 -- les deux coexistent sans se toucher.
+        if calendrier_cache and t in calendrier_cache:
+            derniere_info, jours_info = age_meilleure_information(calendrier_cache[t], aujourd_hui)
+            seuil_perime = seuils.get("fraicheur_fondamentaux", {}).get("seuil_perimee_jours", 365)
+            if derniere_info is not None and jours_info > seuil_perime:
+                cand[(t, "D5_INFO_PERIMEE")] = dict(
+                    direction="DEFAVORABLE",
+                    detail=f"Aucun document recu (toutes categories confondues) depuis "
+                           f"{jours_info}j (dernier : {derniere_info.isoformat()}) -- "
+                           f"seuil de {seuil_perime}j depasse",
+                    valeur_reference=jours_info,
+                    source_donnee="calendrier.json (toutes categories)")
 
         # ---------- FAVORABLES (bloques si un D est candidat sur ce ticker) ----------
         d_actif_candidat = any(k[0] == t and k[1].startswith("D") for k in cand)
