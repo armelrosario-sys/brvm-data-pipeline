@@ -23,10 +23,11 @@ Usage :
 """
 import argparse
 import json
-import statistics
 import sqlite3
 from datetime import date
 from pathlib import Path
+
+from calendrier import echeance_reglementaire, cycle_le_plus_recent, deja_satisfait
 
 from scoring import (charger_seuils, charger_marche, appliquer_gate,
                      per_secteur_reproductible)
@@ -83,46 +84,39 @@ CALENDRIER_PATH = Path(__file__).resolve().parent.parent / "collecte" / "calendr
 
 
 def _calculer_retards_calendrier(cur, seuils, aujourd_hui):
-    """D4_RETARD_CALENDRIER (14/07/2026) : retard detecte automatiquement par
-    ecart a l'intervalle historique typique entre deux depots d'une meme
-    categorie de document -- aucune hypothese sur les echeances reglementaires,
-    seulement le rythme reel observe pour CE titre. Coexiste avec le D4 manuel
-    (avis_reglementaires) : un editeur peut annoncer un retard avant que ce
-    calcul ne le detecte ; les deux mecanismes sont donc distincts et se
-    completent plutot que de se remplacer."""
+    """D4_RETARD_CALENDRIER (revise le 15/07/2026) : retard mesure contre
+    l'ECHEANCE REGLEMENTAIRE CREPMF (config: delais_reglementaires), plus
+    l'intervalle historique typique observe -- pas l'inverse. L'historique
+    (moteur/calendrier.py) sert desormais a DEUX choses seulement : (1)
+    confirmer que le titre publie reellement cette categorie de facon
+    recurrente (min_occurrences), (2) determiner si le cycle en cours est
+    deja satisfait par un depot recent. La date limite elle-meme est fixe,
+    fondee sur le texte reglementaire, jamais sur la moyenne des annees
+    passees. Coexiste avec le D4 manuel (avis_reglementaires)."""
     if not CALENDRIER_PATH.exists():
         return {}
     cal = json.loads(CALENDRIER_PATH.read_text())
     cfg = seuils.get("calendrier", {})
+    delais_cfg = seuils.get("delais_reglementaires", {})
     min_occ = cfg.get("min_occurrences", 3)
     exclues = set(cfg.get("categories_exclues", ["autre", "rapport_cac"]))
-    interv_min = cfg.get("intervalle_min_jours", 60)
-    interv_max = cfg.get("intervalle_max_jours", 450)
-    tol_courte = cfg.get("tolerance_courte_jours", 45)
-    tol_longue = cfg.get("tolerance_longue_jours", 60)
 
     retards = {}
     for t, categories in cal.items():
         for categorie, v in categories.items():
-            if categorie in exclues:
+            if categorie in exclues or categorie not in delais_cfg:
                 continue
             hist = sorted(date(*map(int, d.split("-"))) for d in v["historique"])
             if len(hist) < min_occ:
-                continue
-            intervalles = [(hist[i+1]-hist[i]).days for i in range(len(hist)-1)]
-            interv_median = statistics.median(intervalles)
-            if not (interv_min <= interv_median <= interv_max):
-                continue  # historique trop irregulier pour un calendrier fiable
-            tolerance = tol_courte if interv_median < 200 else tol_longue
-            jours_ecoules = (aujourd_hui - hist[-1]).days
-            if jours_ecoules > interv_median + tolerance:
-                # un seul signal par ticker (le plus en retard, en jours relatifs
-                # a sa propre tolerance) pour eviter le bruit de plusieurs
-                # categories du meme titre alertant simultanement
-                ecart_relatif = jours_ecoules - (interv_median + tolerance)
+                continue  # pas assez d'historique pour confirmer que ce titre publie bien cette categorie
+            annee_ref, echeance = cycle_le_plus_recent(categorie, aujourd_hui, delais_cfg)
+            if deja_satisfait(categorie, hist, annee_ref, delais_cfg):
+                continue  # le cycle en cours a deja son depot, rien a signaler
+            jours_ecart = (aujourd_hui - echeance).days
+            if jours_ecart > 0:  # echeance reglementaire depassee sans depot
                 prec = retards.get(t)
-                if prec is None or ecart_relatif > prec[0]:
-                    retards[t] = (ecart_relatif, categorie, hist[-1], interv_median, jours_ecoules)
+                if prec is None or jours_ecart > prec[0]:
+                    retards[t] = (jours_ecart, categorie, hist[-1], echeance, jours_ecart)
     return retards
 
 
@@ -188,16 +182,16 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
                     valeur_reference=None,
                     source_donnee=f"avis_reglementaires {date_avis}")
 
-        # D4 automatique : ecart a l'intervalle historique typique (calendrier.py)
+        # D4 automatique : echeance reglementaire CREPMF depassee (calendrier.py)
         if t in retards_calendrier:
-            ecart, categorie, dernier, interv_median, jours_ecoules = retards_calendrier[t]
+            jours_ecart, categorie, dernier, echeance, _ = retards_calendrier[t]
             cand[(t, "D4_RETARD_CALENDRIER")] = dict(
                 direction="DEFAVORABLE",
-                detail=f"{categorie} : dernier depot le {dernier.isoformat()}, "
-                       f"{jours_ecoules} jours ecoules (intervalle historique "
-                       f"typique {interv_median:.0f} jours)",
-                valeur_reference=jours_ecoules,
-                source_donnee=f"calendrier.json ({categorie})")
+                detail=f"{categorie} : echeance reglementaire CREPMF du "
+                       f"{echeance.isoformat()} depassee de {jours_ecart}j "
+                       f"(dernier depot connu : {dernier.isoformat()})",
+                valeur_reference=jours_ecart,
+                source_donnee=f"calendrier.json + delais_reglementaires ({categorie})")
 
         # ---------- FAVORABLES (bloques si un D est candidat sur ce ticker) ----------
         d_actif_candidat = any(k[0] == t and k[1].startswith("D") for k in cand)
