@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "moteur"))
 from glossaire_signaux import badge_html
 from scoring import charger_seuils
+from calendrier import cycle_le_plus_recent, deja_satisfait
 
 CALENDRIER_PATH = Path(__file__).resolve().parent.parent / "collecte" / "calendrier.json"
 
@@ -86,38 +87,39 @@ def _ligne_signal(ty, de):
 
 
 def _prochaines_echeances(aujourd_hui):
-    """Pour chaque titre couvert par le calendrier, estime la PROCHAINE
-    publication attendue (dernier depot + intervalle historique median),
-    avec les memes garde-fous que D4_RETARD_CALENDRIER (moteur/signaux.py) :
-    categories fourre-tout exclues, minimum d'occurrences, intervalle
-    plausible -- eviter d'annoncer une echeance sur un historique trop
-    instable pour etre fiable (14/07/2026)."""
+    """Pour chaque titre couvert par le calendrier, l'echeance REGLEMENTAIRE
+    CREPMF (config: delais_reglementaires) du cycle en cours -- revise le
+    15/07/2026 : n'utilise plus l'intervalle historique pour PROJETER une
+    date, seulement pour (1) confirmer que le titre publie reellement cette
+    categorie, (2) verifier si le cycle en cours est deja satisfait.
+    N'affiche QUE les echeances dont le cycle concerne l'ANNEE EN COURS
+    (demande explicite du 15/07/2026) -- le passe sert a calibrer/confirmer,
+    jamais a s'afficher pour lui-meme."""
     if not CALENDRIER_PATH.exists():
         return []
     cal = json.loads(CALENDRIER_PATH.read_text())
     cfg = charger_seuils().get("calendrier", {})
+    delais_cfg = charger_seuils().get("delais_reglementaires", {})
     min_occ = cfg.get("min_occurrences", 3)
     exclues = set(cfg.get("categories_exclues", ["autre", "rapport_cac"]))
-    interv_min = cfg.get("intervalle_min_jours", 60)
-    interv_max = cfg.get("intervalle_max_jours", 450)
 
     echeances = []
     for t, categories in cal.items():
         meilleure = None
         for categorie, v in categories.items():
-            if categorie in exclues:
+            if categorie in exclues or categorie not in delais_cfg:
                 continue
             hist = sorted(date(*map(int, d.split("-"))) for d in v["historique"])
             if len(hist) < min_occ:
                 continue
-            intervalles = [(hist[i+1]-hist[i]).days for i in range(len(hist)-1)]
-            interv_median = statistics.median(intervalles)
-            if not (interv_min <= interv_median <= interv_max):
-                continue
-            prochaine = hist[-1] + timedelta(days=round(interv_median))
-            jours_restants = (prochaine - aujourd_hui).days
+            annee_ref, echeance = cycle_le_plus_recent(categorie, aujourd_hui, delais_cfg)
+            if echeance.year != aujourd_hui.year:
+                continue  # hors annee en cours -- filtre demande le 15/07/2026
+            if deja_satisfait(categorie, hist, annee_ref, delais_cfg):
+                continue  # obligation deja remplie pour ce cycle
+            jours_restants = (echeance - aujourd_hui).days
             if meilleure is None or jours_restants < meilleure[2]:
-                meilleure = (categorie, hist[-1], jours_restants, prochaine)
+                meilleure = (categorie, hist[-1], jours_restants, echeance)
         if meilleure:
             echeances.append((t, *meilleure))
     return sorted(echeances, key=lambda x: x[3])  # la plus proche d'abord
