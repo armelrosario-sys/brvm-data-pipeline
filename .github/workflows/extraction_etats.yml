@@ -38,4 +38,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add collecte/propositions_extraction/ collecte/extractions_traitees.json
           git commit -m "Extraction automatique - lot du $(date -u +%F)" || echo "rien a committer"
+          git pull --rebase origin main
           git push
