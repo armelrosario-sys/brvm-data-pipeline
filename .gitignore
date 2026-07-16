@@ -7,3 +7,9 @@ moteur/brvm.db
 moteur/test.db
 __pycache__/
 *.pyc
+
+# Portefeuille reel (Vue 1, 16/07/2026) : DONNEE PRIVEE, ne doit JAMAIS etre
+# committee dans ce depot public (positions, quantites, prix d'achat).
+# Garde-fou technique en plus de la doctrine : meme en cas d'oubli, git
+# refusera de suivre ce fichier tant qu'il porte ce nom exact.
+config/portefeuille.yaml
