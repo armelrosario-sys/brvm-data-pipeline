@@ -99,7 +99,9 @@ def main():
             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
                 f.write(resp.content)
                 chemin_tmp = f.name
-            proposition = extraire_pdf(chemin_tmp, ticker, referentiel)
+            m_annee = re.search(r"exercice[_\s]+(\d{4})", r["nom_fichier"], re.IGNORECASE)
+            annee_connue = int(m_annee.group(1)) if m_annee else None
+            proposition = extraire_pdf(chemin_tmp, ticker, referentiel, annee_connue=annee_connue)
             proposition["fichier_source"] = r["nom_fichier"]
             proposition["sha256"] = r["sha256"]
             nom_sortie = f"{ticker}_{r['sha256'][:10]}.json"
