@@ -1,0 +1,50 @@
+{
+  "ticker": "ORAC",
+  "fichier_source": "d0f08617_20260608_-_etats_financiers_approuves_-_exercice_2025_-_orange_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "ocr",
+    "ocr",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1678,
+      "valeur_precedente": 1582,
+      "ligne_source": "Résultat net de l'ensemble consolidé 167,8 158,2 9,6 6,1%",
+      "valeur_courante_M_FCFA": 1.678,
+      "valeur_precedente_M_FCFA": 1.582
+    },
+    "capitaux_propres": {
+      "valeur_courante": 6167,
+      "valeur_precedente": 6163,
+      "ligne_source": "Capitaux propres attribuables aux propriétaires de la société mère 616,7 616,3 0,4 0,1%",
+      "valeur_courante_M_FCFA": 6.167,
+      "valeur_precedente_M_FCFA": 6.163
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 41,
+      "valeur_precedente": 11971,
+      "ligne_source": "Chiffre d'affaires 4.1 1 197,1 1 084,1 113,0 10,4%",
+      "valeur_courante_M_FCFA": 0.041,
+      "valeur_precedente_M_FCFA": 11.971
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "29b2f803402875999a4b3d12a6cc0044976914c28aec5e184018e5844f5e703c"
+}

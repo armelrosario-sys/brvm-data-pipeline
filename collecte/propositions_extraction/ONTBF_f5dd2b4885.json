@@ -1,0 +1,20 @@
+{
+  "ticker": "ONTBF",
+  "fichier_source": "5f6141dd_20250505_-_etats_financiers_-_exercice_2024_-_onatel_bf.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f5dd2b48857895617eee2cae875c07f11c6577c5bdebfe6d60ec15a200ad9693"
+}

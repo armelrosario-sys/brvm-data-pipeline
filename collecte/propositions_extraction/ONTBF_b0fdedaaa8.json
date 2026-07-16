@@ -1,0 +1,20 @@
+{
+  "ticker": "ONTBF",
+  "fichier_source": "28d515f2_20240710_-_etats_financiers_approuves_-_exercice_2023_-_onatel_bf.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b0fdedaaa81c5cb129401ab87e6e9fed087e2f95b9b887329dd87f3f43a0744e"
+}

@@ -1,0 +1,20 @@
+{
+  "ticker": "ONTBF",
+  "fichier_source": "de411192_20240419_-_etats_financiers_provisoires_certifies_par_les_cac_-_exercice_2023_-_onatel_bf.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "5a310f401d677e8bbf9e2a1404e326def7485378461e4ee3f81261d777eef393"
+}

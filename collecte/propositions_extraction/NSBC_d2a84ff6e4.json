@@ -1,0 +1,54 @@
+{
+  "ticker": "NSBC",
+  "fichier_source": "8aa033b4_20260513_-_etats_financiers_et_communique_-_exercice_2025_-_nsia_banque_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "bancaire_umoa",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 38112,
+      "valeur_precedente": 40712,
+      "ligne_source": "Résultat Net 38 112 40 712",
+      "valeur_courante_M_FCFA": 38112.0,
+      "valeur_precedente_M_FCFA": 40712.0
+    },
+    "total_actif": {
+      "valeur_courante": 2510429,
+      "valeur_precedente": 3073062,
+      "ligne_source": "TOTAL DE L'ACTIF 2 510 429 3 073 062",
+      "valeur_courante_M_FCFA": 2510429.0,
+      "valeur_precedente_M_FCFA": 3073062.0
+    },
+    "total_passif": {
+      "valeur_courante": 2510429,
+      "valeur_precedente": 3073062,
+      "ligne_source": "HORS BILAN TOTAL PASSIF 2 510 429 3 073 062",
+      "valeur_courante_M_FCFA": 2510429.0,
+      "valeur_precedente_M_FCFA": 3073062.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 211371,
+      "valeur_precedente": 233303,
+      "ligne_source": "Comptes de régularisation 8 949 11 987 Capitaux propres et ressources assimilées 211 371 233 303",
+      "valeur_courante_M_FCFA": 211371.0,
+      "valeur_precedente_M_FCFA": 233303.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 97819,
+      "valeur_precedente": 112928,
+      "ligne_source": "Produit Net Bancaire 97 819 112 928",
+      "valeur_courante_M_FCFA": 97819.0,
+      "valeur_precedente_M_FCFA": 112928.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "d2a84ff6e4b5707188dbb15b3af004df1072f16583c62187184aad7415ea9f04"
+}
