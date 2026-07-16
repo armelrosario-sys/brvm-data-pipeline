@@ -1,0 +1,48 @@
+{
+  "ticker": "SHEC",
+  "fichier_source": "e7b3ce86_20250516_-_etats_financiers_2024_et_rapport_dactivites_du_1er_trimestre_2025_-_vivo_energy_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 5354,
+      "valeur_precedente": null,
+      "ligne_source": "Ceux-ci font ressortir un bénéfice net de FCFA 5 354 millions.",
+      "valeur_courante_M_FCFA": 5354.0
+    },
+    "total_actif": {
+      "valeur_courante": 207064380555,
+      "valeur_precedente": 168468608785,
+      "ligne_source": "TOTAL ACTIF 207 064 380 555 168 468 608 785 TOTAL PASSIF 207 064 380 555 168 468 608 785",
+      "valeur_courante_M_FCFA": 207064380555.0,
+      "valeur_precedente_M_FCFA": 168468608785.0
+    },
+    "total_passif": {
+      "valeur_courante": 207064380555,
+      "valeur_precedente": 168468608785,
+      "ligne_source": "TOTAL ACTIF 207 064 380 555 168 468 608 785 TOTAL PASSIF 207 064 380 555 168 468 608 785",
+      "valeur_courante_M_FCFA": 207064380555.0,
+      "valeur_precedente_M_FCFA": 168468608785.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 600708,
+      "valeur_precedente": 550696,
+      "ligne_source": "Chiffre d'Affaires 600 708 550 696 50 012 9%",
+      "valeur_courante_M_FCFA": 600708.0,
+      "valeur_precedente_M_FCFA": 550696.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b88401ae19d81d9dcd4a1723cd1929bad8c0269dfa811c06e7c9b878b58b61c0"
+}

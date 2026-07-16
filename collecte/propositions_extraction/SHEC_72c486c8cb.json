@@ -1,0 +1,55 @@
+{
+  "ticker": "SHEC",
+  "fichier_source": "84f59d4a_20240606_-_etats_financiers_provisoire_-_exercice_2023_-_vivo_energy_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 4011602748,
+      "valeur_precedente": 3548638458,
+      "ligne_source": "Résultat de l'exercice 4 011 602 748 3 548 638 458",
+      "valeur_courante_M_FCFA": 4011602.748,
+      "valeur_precedente_M_FCFA": 3548638.458
+    },
+    "total_actif": {
+      "valeur_courante": 169830273541,
+      "valeur_precedente": 119461700193,
+      "ligne_source": "TOTAL ACTIF 169 830 273 541 119 461 700 193 TOTAL PASSIF 169 830 273 541 119 461 700 193",
+      "valeur_courante_M_FCFA": 169830273.541,
+      "valeur_precedente_M_FCFA": 119461700.193
+    },
+    "total_passif": {
+      "valeur_courante": 169830273541,
+      "valeur_precedente": 119461700193,
+      "ligne_source": "TOTAL ACTIF 169 830 273 541 119 461 700 193 TOTAL PASSIF 169 830 273 541 119 461 700 193",
+      "valeur_courante_M_FCFA": 169830273.541,
+      "valeur_precedente_M_FCFA": 119461700.193
+    },
+    "dettes_financieres": {
+      "valeur_courante": 13609237352,
+      "valeur_precedente": 12675296717,
+      "ligne_source": "Dettes financières et ressources assimilées 13 609 237 352 12 675 296 717",
+      "valeur_courante_M_FCFA": 13609237.352,
+      "valeur_precedente_M_FCFA": 12675296.717
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 550696009519,
+      "valeur_precedente": 488901792280,
+      "ligne_source": "Chiffre d'Affaires 550 696 009 519 488 901 792 280 61 794 217 239 13%",
+      "valeur_courante_M_FCFA": 550696009.519,
+      "valeur_precedente_M_FCFA": 488901792.28
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 4,011,603 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 3,548,638 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "72c486c8cb9effaba181f357bfb8267723769149d8770ace882386d2992a1c73"
+}

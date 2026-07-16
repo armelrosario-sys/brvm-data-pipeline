@@ -1,0 +1,41 @@
+{
+  "ticker": "SHEC",
+  "fichier_source": "3a830a67_20230504_-_etats_financiers_exercice_2022_et_rapport_dactivite_au_1er_trimestre_2023_-_vivo_energy_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 3753,
+      "valeur_precedente": null,
+      "ligne_source": "en Janvier 2023 et qui font ressortir un bénéfice net de FCFA 3 753 millions.",
+      "valeur_courante_M_FCFA": 3.753
+    },
+    "total_actif": {
+      "valeur_courante": 119190957932,
+      "valeur_precedente": 101262735128,
+      "ligne_source": "TOTAL ACTIF 119,190,957,932 101,262,735,128TOTAL PASSIF 119,190,957,932 101,262,735,128",
+      "valeur_courante_M_FCFA": 119190957.932,
+      "valeur_precedente_M_FCFA": 101262735.128
+    },
+    "capitaux_propres": {
+      "valeur_courante": 500376822,
+      "valeur_precedente": 500376822,
+      "ligne_source": "Immobilisations financières 12,018,150,503 11,777,656,427Autres capitaux propres 500,376,822 500,376,822",
+      "valeur_courante_M_FCFA": 500376.822,
+      "valeur_precedente_M_FCFA": 500376.822
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "acdab75be25743dc0837258d686cfc5f2e2c6f76518078e6becc9a94ddb40f86"
+}

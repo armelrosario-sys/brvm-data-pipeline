@@ -1,0 +1,60 @@
+{
+  "ticker": "UNXC",
+  "fichier_source": "558d034f_20220613_-_etats_financiers_certifies_exercice_2021_-_uniwax_ci.pdf",
+  "exercice_courant": 2021,
+  "exercice_precedent": 2020,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1400692889,
+      "valeur_precedente": 231265060,
+      "ligne_source": "Résultat net (Bénéfice - Perte) 1 400 692 889 231 265 060",
+      "valeur_courante_M_FCFA": 1400692.889,
+      "valeur_precedente_M_FCFA": 231265.06
+    },
+    "total_actif": {
+      "valeur_courante": 37292681535,
+      "valeur_precedente": 32742029278,
+      "ligne_source": "TOTAL ACTIF 3 7 292 681 535 3 2 742 029 278",
+      "valeur_courante_M_FCFA": 37292681.535,
+      "valeur_precedente_M_FCFA": 32742029.278
+    },
+    "total_passif": {
+      "valeur_courante": 37292681535,
+      "valeur_precedente": 32742029278,
+      "ligne_source": "TOTAL PASSIF 3 7 292 681 535 3 2 742 029 278",
+      "valeur_courante_M_FCFA": 37292681.535,
+      "valeur_precedente_M_FCFA": 32742029.278
+    },
+    "capitaux_propres": {
+      "valeur_courante": 414479350,
+      "valeur_precedente": null,
+      "ligne_source": "Flux de trésorérie provenant des capitaux propres - 4 14 479 350 -",
+      "valeur_courante_M_FCFA": 414479.35
+    },
+    "dettes_financieres": {
+      "valeur_courante": 1157557654,
+      "valeur_precedente": 1235101540,
+      "ligne_source": "Dettes financières et ressources assimilées 1 157 557 654 1 235 101 540",
+      "valeur_courante_M_FCFA": 1157557.654,
+      "valeur_precedente_M_FCFA": 1235101.54
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 38191193639,
+      "valeur_precedente": 34916710441,
+      "ligne_source": "CHIFFRE D'AFFAIRES 38 191 193 639 34 916 710 441",
+      "valeur_courante_M_FCFA": 38191193.639,
+      "valeur_precedente_M_FCFA": 34916710.441
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 1,400,693 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "277561a25bf346b5fe2432d0df021902b95369d93d83daad4240e49a3a30b3d5"
+}
