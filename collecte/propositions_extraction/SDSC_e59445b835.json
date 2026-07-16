@@ -1,0 +1,52 @@
+{
+  "ticker": "SDSC",
+  "fichier_source": "4025a5b9_20240613_-_etats_financiers_-_exercice_2023_-_africa_global_logistics_ci.pdf",
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 17138527,
+      "valeur_precedente": 10044129,
+      "ligne_source": "Immobilisations corporelles 32978 754 30089 228 RESULTAT DE L'EXERCICE 17 138527 10 044 129",
+      "valeur_courante_M_FCFA": 17138.527,
+      "valeur_precedente_M_FCFA": 10044.129
+    },
+    "capitaux_propres": {
+      "valeur_courante": 61034257,
+      "valeur_precedente": 48903778,
+      "ligne_source": "Avances et acomptes versés sur immobilisations 5314278 7377 396 Situation nette 61034257 48 903 778",
+      "valeur_courante_M_FCFA": 61034.257,
+      "valeur_precedente_M_FCFA": 48903.778
+    },
+    "dettes_financieres": {
+      "valeur_courante": 10733982,
+      "valeur_precedente": 9706927,
+      "ligne_source": "Autres créances HAO O 73130 Dettes financières 10 733 982 9 706927",
+      "valeur_courante_M_FCFA": 10733.982,
+      "valeur_precedente_M_FCFA": 9706.927
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 712820,
+      "valeur_precedente": 729380,
+      "ligne_source": "Immobilisations financières 4335 325 4 444688 Autres capitaux propres 712 820 729 380",
+      "valeur_courante_M_FCFA": 712.82,
+      "valeur_precedente_M_FCFA": 729.38
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 82623385,
+      "valeur_precedente": 86997124,
+      "ligne_source": "Chiffre d'Affaires 82623 385 86997 124 Variation de l'actif circulant HAO - 0 0",
+      "valeur_courante_M_FCFA": 82623.385,
+      "valeur_precedente_M_FCFA": 86997.124
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "e59445b835841b0dfa0ad2203b460a8025f38bd16f137fd5db3655368c9ff16a"
+}

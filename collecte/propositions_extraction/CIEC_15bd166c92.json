@@ -1,0 +1,38 @@
+{
+  "ticker": "CIEC",
+  "fichier_source": "4627aac3_20230427_-_etats_financiers_syscohada_exercice_2022_-_cie_ci.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2021,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 9819,
+      "valeur_precedente": 9757,
+      "ligne_source": "0 0 Résultat de l'exercice 9 819 9 757",
+      "valeur_courante_M_FCFA": 9819.0,
+      "valeur_precedente_M_FCFA": 9757.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 56665,
+      "valeur_precedente": 57327,
+      "ligne_source": "Immobilisations financières 86 747 77 838 Dettes financières 56 665 57 327",
+      "valeur_courante_M_FCFA": 56665.0,
+      "valeur_precedente_M_FCFA": 57327.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 238854,
+      "valeur_precedente": 231783,
+      "ligne_source": "Chiffre d'affaires (A+B+C+D)=XB 238 854 231 783 Flux de trésorerie provenant des activités opérationnelles (B+C) 26 158 -33 811",
+      "valeur_courante_M_FCFA": 238854.0,
+      "valeur_precedente_M_FCFA": 231783.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "15bd166c920c1ab6a0d3466bafc6cf1711d60ee75e9b377cfbf1e585228878c2"
+}

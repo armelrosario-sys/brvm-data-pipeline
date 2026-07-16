@@ -1,0 +1,51 @@
+{
+  "ticker": "CIEC",
+  "fichier_source": "ab5ae066_20240606_-_etats_financiers_-_exercice_2023_-_cie_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 10633181710,
+      "valeur_precedente": 9819236247,
+      "ligne_source": "CJ Résultat net de l'exercice (bénéfice + ou perte -) 10 633 181 710 9 819 236 247",
+      "valeur_courante_M_FCFA": 10633181.71,
+      "valeur_precedente_M_FCFA": 9819236.247
+    },
+    "capitaux_propres": {
+      "valeur_courante": 33453907540,
+      "valeur_precedente": 32620725830,
+      "ligne_source": "CP | TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 33 453 907 540 32 620 725 830",
+      "valeur_courante_M_FCFA": 33453907.54,
+      "valeur_precedente_M_FCFA": 32620725.83
+    },
+    "dettes_financieres": {
+      "valeur_courante": 15,
+      "valeur_precedente": 4188377975,
+      "ligne_source": "DA Emprunts et dettes financières diverses 15 41 883 Q77 975 47 877 746 781",
+      "valeur_courante_M_FCFA": 0.015,
+      "valeur_precedente_M_FCFA": 4188377.975
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 257217627632,
+      "valeur_precedente": 238854385981,
+      "ligne_source": "XB | CHIFFRE D'AFFAIRES (A +B + C + D} 257 217 627 632 238 854 385 981",
+      "valeur_courante_M_FCFA": 257217627.632,
+      "valeur_precedente_M_FCFA": 238854385.981
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 10,633,182 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 9,819,236 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "494d0fcab41f02fa863805052596be00326530495865344fa9fb342119f3cb7a"
+}
