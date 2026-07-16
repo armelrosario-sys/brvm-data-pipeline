@@ -53,10 +53,17 @@ def _categoriser(libelle):
     'autre' capte tout ce qui ne correspond a aucun motif connu -- volontairement
     peu couvrant plutot que de deviner a tort (integrite > couverture)."""
     l = libelle.lower()
+    # Correctif (15/07/2026, decouvert en branchant l'extracteur automatique) :
+    # un vrai "rapport des CAC" s'intitule souvent "...sur les ETATS
+    # FINANCIERS annuels" -- le test etats_financiers, place AVANT celui du
+    # CAC, capturait donc a tort ces documents (aucune donnee chiffree
+    # exploitable dedans, juste l'opinion textuelle des commissaires).
+    # Le test CAC doit passer EN PREMIER.
+    if ("rapport_des_cac" in l or "attestation_des_commissaires" in l or "attestation_des_cac" in l
+            or "rapport_des_commissaires_aux_comptes" in l):
+        return "rapport_cac"
     if "etats_financiers" in l or "etat_financier" in l:
         return "etats_financiers"
-    if "rapport_des_cac" in l or "attestation_des_commissaires" in l or "attestation_des_cac" in l:
-        return "rapport_cac"
     if "1er_trimestre" in l or "premier_trimestre" in l or "1er_trim" in l:
         return "activite_T1"
     if "2eme_trimestre" in l or "2e_trimestre" in l:
