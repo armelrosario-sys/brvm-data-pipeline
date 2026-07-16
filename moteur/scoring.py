@@ -383,7 +383,7 @@ def per_secteur_reproductible(cur, secteur, marche, min_titres=3):
         (secteur,)).fetchall()
     pers = [r[0] for r in rows]
     if len(pers) >= min_titres:
-        return _mediane(pers), f"mediane sur {len(pers)} titres (reproductible)"
+        return _mediane(pers), f"médiane sur {len(pers)} titres (reproductible)"
     return marche["per_sectoriel"].get(secteur), "repli marche.yaml (echantillon insuffisant)"
 
 
