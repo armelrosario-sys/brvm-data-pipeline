@@ -1,0 +1,39 @@
+{
+  "ticker": "ORGT",
+  "fichier_source": "487e59d9_20240429_-_etats_financiers_-_exercice_2023_-_oragroup_togo.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": -18186,
+      "valeur_precedente": 19199,
+      "ligne_source": "Résultat net -18 186 19 199",
+      "valeur_courante_M_FCFA": -18186.0,
+      "valeur_precedente_M_FCFA": 19199.0
+    },
+    "total_actif": {
+      "valeur_courante": 4236478,
+      "valeur_precedente": 4732757,
+      "ligne_source": "TOTAL ACTIF 4 236 478 4 732 757",
+      "valeur_courante_M_FCFA": 4236478.0,
+      "valeur_precedente_M_FCFA": 4732757.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 6987,
+      "valeur_precedente": 7440,
+      "ligne_source": "Instruments de capitaux propres 6 987 7 440",
+      "valeur_courante_M_FCFA": 6987.0,
+      "valeur_precedente_M_FCFA": 7440.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "eaa3f88c4695206526eefc8d11f665164b2a46bc7e60d0128c65279aebedf736"
+}

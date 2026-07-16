@@ -1,0 +1,28 @@
+{
+  "ticker": "ONTBF",
+  "fichier_source": "258655db_20250718_-_etats_financiers_certifies_et_approuves_exercice_2024_-_onatel_bf.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "dettes_financieres": {
+      "valeur_courante": 67226213127,
+      "valeur_precedente": 66984694692,
+      "ligne_source": "rorar DETTES FINANCIERES ET RESSOURCES ASSIMILEES | 67 226 213 127 66 984 694 692]",
+      "valeur_courante_M_FCFA": 67226213.127,
+      "valeur_precedente_M_FCFA": 66984694.692
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "df6d8c17ffa64404f12c44f6af773c74060855dca30fb57444fd9413627abd7d"
+}

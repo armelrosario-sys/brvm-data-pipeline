@@ -1,0 +1,28 @@
+{
+  "ticker": "ONTBF",
+  "fichier_source": "3e6df959_20260611_-_etats_financiers_approuves_-_exercice_2025_-_onatel_bf.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "chiffre_affaires": {
+      "valeur_courante": 146176657128,
+      "valeur_precedente": 141841255383,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 146 176 657 128 141 841 255 383",
+      "valeur_courante_M_FCFA": 146176657.128,
+      "valeur_precedente_M_FCFA": 141841255.383
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "59bc68627a88ef54b005bc9348a993e670f648ff41ce12adc5972882b55066d6"
+}

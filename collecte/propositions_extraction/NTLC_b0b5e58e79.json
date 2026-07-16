@@ -1,0 +1,41 @@
+{
+  "ticker": "NTLC",
+  "fichier_source": "0ff7a494_20230424_-_etats_financiers_exercice_2022_-_nestle_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 16627044028,
+      "valeur_precedente": 21268135622,
+      "ligne_source": "BENEFICE NET 16,627,044,028 21,268,135,622",
+      "valeur_courante_M_FCFA": 16627044.028,
+      "valeur_precedente_M_FCFA": 21268135.622
+    },
+    "dettes_financieres": {
+      "valeur_courante": 7791708694,
+      "valeur_precedente": 14307349288,
+      "ligne_source": "Autres dettes financières 7,791,708,694 14,307,349,288",
+      "valeur_courante_M_FCFA": 7791708.694,
+      "valeur_precedente_M_FCFA": 14307349.288
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 206734071633,
+      "valeur_precedente": 195188462419,
+      "ligne_source": "Sous total Chiffre d'affaires 206,734,071,633 195,188,462,419 Autres achats et 34,890,902,912 25,703,254,566",
+      "valeur_courante_M_FCFA": 206734071.633,
+      "valeur_precedente_M_FCFA": 195188462.419
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 16,627,044 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 21,268,136 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b0b5e58e79ec6cbd581b6029e8b1ca5d7eb1f461e9554474831c11cd19ef37b6"
+}

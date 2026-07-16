@@ -1,0 +1,27 @@
+{
+  "ticker": "ONTBF",
+  "fichier_source": "b9e97df8_20230720_-_etats_financiers_certifies_et_approuves_exercice_2022_-_onatel_bf.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "dettes_financieres": {
+      "valeur_courante": 10101007310051011100631007510121100633410108100681005766210116100731005101158100835100581013310063371008110060100956,
+      "valeur_precedente": null,
+      "ligne_source": "DA(cid:38)(cid:51)Emprunts et dettes financières diverses (cid:1010)(cid:1007)(cid:3)(cid:1005)(cid:1011)(cid:1006)(cid:3)(cid:1007)5(cid:1012)1 (cid:1006)3(cid:3)4(cid:1010)8(cid:1006) 8(cid:1005)76 62(cid:1011)6(cid:1007)(cid:3)(cid:1005)(cid:1011)58(cid:1008) (cid:3)5(cid:1005)8(cid:1013)3(cid:1006) 3(cid:3)7(cid:1008)1(cid:1006) 0(cid:1009)56",
+      "valeur_courante_M_FCFA": 1.0101007310051012e+112
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "e0476780cba7b6aa6f9ad233b70c803d0d0dfe93a17a35cfe7a13260c4baea6a"
+}

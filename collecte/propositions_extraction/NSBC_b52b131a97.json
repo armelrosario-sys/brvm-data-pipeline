@@ -1,0 +1,54 @@
+{
+  "ticker": "NSBC",
+  "fichier_source": "6d35d33e_20250325_-_etats_financiers_certifies_par_les_commissaires_aux_comptes_-_exercice_2024_-_nsia_banque_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "bancaire_umoa",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 34813,
+      "valeur_precedente": 38112,
+      "ligne_source": "Résultat Net 34 813 38 112 NB : Etats financiers de synthèse de l’exercice 2024 vérifiés par les Commissaires aux comptes.",
+      "valeur_courante_M_FCFA": 34813.0,
+      "valeur_precedente_M_FCFA": 38112.0
+    },
+    "total_actif": {
+      "valeur_courante": 2037064,
+      "valeur_precedente": 2514388,
+      "ligne_source": "TOTAL DE L'ACTIF 2 037 064 2 514 388 Report à nouveau(+/-) 69 997 87 087",
+      "valeur_courante_M_FCFA": 2037064.0,
+      "valeur_precedente_M_FCFA": 2514388.0
+    },
+    "total_passif": {
+      "valeur_courante": 2037064,
+      "valeur_precedente": 2514388,
+      "ligne_source": "2023 TOTAL PASSIF 2 037 064 2 514 388",
+      "valeur_courante_M_FCFA": 2037064.0,
+      "valeur_precedente_M_FCFA": 2514388.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 189719,
+      "valeur_precedente": 215330,
+      "ligne_source": "Comptes de régularisation 3 126 8 949 Capitaux propres et ressources assimilées 189 719 215 330",
+      "valeur_courante_M_FCFA": 189719.0,
+      "valeur_precedente_M_FCFA": 215330.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 91002,
+      "valeur_precedente": 97819,
+      "ligne_source": "Produit Net Bancaire 91 002 97 819",
+      "valeur_courante_M_FCFA": 91002.0,
+      "valeur_precedente_M_FCFA": 97819.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b52b131a9707a265554a2173382abba4f7c8d51ed8f2df314cb23479a33010f8"
+}
