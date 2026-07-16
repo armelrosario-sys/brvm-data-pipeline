@@ -6,6 +6,17 @@ on:
       - 'config/**'
       - 'collecte/**'
       - 'dashboard/**'
+  # Ajoute le 15/07/2026 : un push effectue par un AUTRE workflow via le
+  # jeton automatique GITHUB_TOKEN (ex. P9 - Collecte quotidienne) ne
+  # declenche JAMAIS un autre workflow par "push", meme si le chemin
+  # correspond -- protection anti-boucle infinie de GitHub, indocumentee
+  # dans notre config mais bien reelle (constat direct : P9 reussi, aucune
+  # republication automatique du dashboard, relance manuelle necessaire).
+  # workflow_run n'est PAS soumis a cette restriction : il se declenche
+  # quel que soit le jeton utilise par le workflow surveille.
+  workflow_run:
+    workflows: ["P9 - Collecte quotidienne des cours"]
+    types: [completed]
   schedule:
     - cron: "30 3 * * 1,4"   # juste apres la collecte BOC (lundi/jeudi)
   workflow_dispatch:
@@ -21,12 +32,15 @@ concurrency:
 
 jobs:
   publier:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
