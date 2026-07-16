@@ -13,23 +13,23 @@ tests) ; ce module ne fait QUE l'affichage, jamais la logique.
 
 SIGNAUX = {
     "D1_PREMIERE_PERTE":   {"libelle": "Premiere perte",      "classe": "def",
-        "description": "Le dernier exercice publie est en perte, apres un exercice positif."},
+        "description": "Le dernier exercice publié est en perte, après un exercice positif."},
     "D2_CHUTE_RESULTAT":   {"libelle": "Chute du resultat",   "classe": "def",
-        "description": "Le resultat net recule d'au moins 30% par rapport a l'exercice precedent (les deux positifs)."},
+        "description": "Le résultat net recule d'au moins 30% par rapport à l'exercice précédent (les deux positifs)."},
     "D3_COUPE_DIVIDENDE":  {"libelle": "Coupe de dividende",  "classe": "def",
-        "description": "Le dividende verse est inferieur a celui de l'exercice precedent."},
+        "description": "Le dividende versé est inférieur à celui de l'exercice précédent."},
     "D4_RETARD_PUBLICATION": {"libelle": "Retard de publication", "classe": "def",
-        "description": "Un retard de publication des comptes a ete constate et n'est pas encore resorbe."},
+        "description": "Un retard de publication des comptes a été constaté et n'est pas encore résorbé."},
     "D4_RETARD_CALENDRIER": {"libelle": "Retard reglementaire", "classe": "def",
-        "description": "Echeance reglementaire CREPMF depassee sans nouveau depot (detecte automatiquement, sans avis officiel)."},
+        "description": "Échéance réglementaire CREPMF dépassée sans nouveau dépôt (détecté automatiquement, sans avis officiel)."},
     "D5_INFO_PERIMEE": {"libelle": "Information perimee", "classe": "def",
-        "description": "Aucun document recu depuis plus d'un an, toutes categories confondues -- axe independant de D4, ne l'attenue jamais."},
+        "description": "Aucun document reçu depuis plus d'un an, toutes catégories confondues -- axe indépendant de D4, ne l'atténue jamais."},
     "A_QUALITE_DECOTEE":  {"libelle": "Decote qualifiee",     "classe": "fav",
-        "description": "PER inferieur a 70% de la mediane sectorielle, resultat en progression, titre eligible."},
+        "description": "PER inférieur à 70% de la médiane sectorielle, résultat en progression, titre éligible."},
     "B1_RECORD":          {"libelle": "Nouveau record",       "classe": "info",
-        "description": "Le cours de cloture depasse son plus-haut sur 12 mois (ou sur tout l'historique)."},
+        "description": "Le cours de clôture dépasse son plus-haut sur 12 mois (ou sur tout l'historique)."},
     "RERATING_EN_COURS":  {"libelle": "Re-rating en cours",   "classe": "fav",
-        "description": "Le titre est sorti de sa decote par hausse du cours, fondamentaux inchanges."},
+        "description": "Le titre est sorti de sa décote par hausse du cours, fondamentaux inchangés."},
 }
 
 
@@ -100,13 +100,13 @@ def badge_html(code, css_prefix="sig"):
 # inventer de pourcentage ou de montant que le moteur n'a pas calcule lui-meme.
 SIZING = {
     "PLEINE":   {"libelle": "Normal",  "classe": "ok",
-        "description": "Liquidite jugee suffisante pour une entree en une fois, sans precaution particuliere."},
+        "description": "Liquidité jugée suffisante pour une entrée en une fois, sans précaution particulière."},
     "REDUITE":  {"libelle": "Reduit",        "classe": "mid",
-        "description": "Liquidite limitee : reduire la taille de la ligne et etaler les achats sur plusieurs seances."},
+        "description": "Liquidité limitée : réduire la taille de la ligne et étaler les achats sur plusieurs séances."},
     "MINIMALE": {"libelle": "Minimal", "classe": "bad",
-        "description": "Marche quasi illiquide sur ce titre : n'engager qu'une position tres reduite, sortie difficile."},
+        "description": "Marché quasi illiquide sur ce titre : n'engager qu'une position très réduite, sortie difficile."},
     "PRUDENCE": {"libelle": "Donnee manquante", "classe": "na",
-        "description": "Aucune donnee de liquidite collectee pour ce titre (chantier de collecte en cours) : a defaut, traiter comme une taille minimale par prudence."},
+        "description": "Aucune donnée de liquidité collectée pour ce titre (chantier de collecte en cours) : à défaut, traiter comme une taille minimale par prudence."},
 }
 
 
