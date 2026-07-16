@@ -1,0 +1,52 @@
+{
+  "ticker": "PRSC",
+  "fichier_source": "d391f0a4_20230803_-_etats_financiers_certifies_et_approuves_-_exercice_2022_-_tractafric_motors_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 3644,
+      "valeur_precedente": 3067,
+      "ligne_source": "7 507 6 836 Résultat de l'exercice 3 644 3 067 + Subventions d'investissement reçues",
+      "valeur_courante_M_FCFA": 3644.0,
+      "valeur_precedente_M_FCFA": 3067.0
+    },
+    "total_actif": {
+      "valeur_courante": 52169,
+      "valeur_precedente": 36448,
+      "ligne_source": "Transports -82 -30 Total Actif 52 169 36 448 0 0",
+      "valeur_courante_M_FCFA": 52169.0,
+      "valeur_precedente_M_FCFA": 36448.0
+    },
+    "total_passif": {
+      "valeur_courante": 52169,
+      "valeur_precedente": 36448,
+      "ligne_source": "RESULTAT NET 3 644 3 067 Total Passif 52 169 36 448",
+      "valeur_courante_M_FCFA": 52169.0,
+      "valeur_precedente_M_FCFA": 36448.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 2650,
+      "valeur_precedente": 3661,
+      "ligne_source": "Total dettes financières 2 650 3 661",
+      "valeur_courante_M_FCFA": 2650.0,
+      "valeur_precedente_M_FCFA": 3661.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 70092,
+      "valeur_precedente": 65019,
+      "ligne_source": "CHIFFRE D'AFFAIRES 70 092 65 019 Clients et comptes rattachés 6 785 6 557 3 893 2 519",
+      "valeur_courante_M_FCFA": 70092.0,
+      "valeur_precedente_M_FCFA": 65019.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "febc6bdcf38e0fc2678e4a045dd1a351d078a1ddb06a58b78e479518662da269"
+}

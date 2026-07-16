@@ -1,0 +1,40 @@
+{
+  "ticker": "PRSC",
+  "fichier_source": "367f06a6_20250613_-_etats_financiers_-_exercices_2018-2023_-_tractafric_motors_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2044698,
+      "valeur_precedente": 3562811,
+      "ligne_source": "Résultat net de l’exercice 2 044 698 3 562 811 2 952 005 1 723 627 1 804 027 2 048 423",
+      "valeur_courante_M_FCFA": 2044.698,
+      "valeur_precedente_M_FCFA": 3562.811
+    },
+    "total_passif": {
+      "valeur_courante": 4613984,
+      "valeur_precedente": 5392154,
+      "ligne_source": "Total passif non courants 4 613 984 5 392 154 4 836 614 5 238 827 2 454 809 1 341 588",
+      "valeur_courante_M_FCFA": 4613.984,
+      "valeur_precedente_M_FCFA": 5392.154
+    },
+    "dettes_financieres": {
+      "valeur_courante": 8000,
+      "valeur_precedente": 8000,
+      "ligne_source": "Emprunts et dettes financières 8 000 8 000 8 000 8 000 8 000 8 000",
+      "valeur_courante_M_FCFA": 8.0,
+      "valeur_precedente_M_FCFA": 8.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "e654d6b0c512661674e046b1f58d5308409d8d81ed0436485087bbd604c27d9d"
+}

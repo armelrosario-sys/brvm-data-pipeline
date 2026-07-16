@@ -1,0 +1,50 @@
+{
+  "ticker": "UNXC",
+  "fichier_source": "cf92b8ce_20250828_-_etats_financiers_-_exercice_2024_-_uniwax_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 4,
+      "valeur_precedente": 2188337302,
+      "ligne_source": "XI | RESULTAT NET (XG+XH+RG4#RS) “2188 337 302 -2 054 070 773",
+      "valeur_courante_M_FCFA": 0.004,
+      "valeur_precedente_M_FCFA": 2188337.302
+    },
+    "capitaux_propres": {
+      "valeur_courante": 15551475518,
+      "valeur_precedente": 17781488715,
+      "ligne_source": "CP TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 15 551 475 518 17781 488 715",
+      "valeur_courante_M_FCFA": 15551475.518,
+      "valeur_precedente_M_FCFA": 17781488.715
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 328600545,
+      "ligne_source": "DA | Emprunts et dettes financières diverses 16 328 600 545 625 293 241",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 328600.545
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 39849556,
+      "valeur_precedente": 23686986978,
+      "ligne_source": "XB | CHIFFRE D'AFFAIRES (A + B + C + D} AT 398 49 556 23 686 986.978",
+      "valeur_courante_M_FCFA": 39849.556,
+      "valeur_precedente_M_FCFA": 23686986.978
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_precedente_M_FCFA = 2,188,337 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "38eb427a44a401a808592e15e9b9547ae369e696478cce6df03bae08cfd1431e"
+}

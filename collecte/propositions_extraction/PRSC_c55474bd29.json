@@ -1,0 +1,50 @@
+{
+  "ticker": "PRSC",
+  "fichier_source": "7322521d_20240529_-_etats_financiers_-_exercice_2023_-_tractafric_motors_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2084428358,
+      "valeur_precedente": 3644246893,
+      "ligne_source": "CJ Résultat net de l'exercice (bénéfice + ou perte -) 2 084 428 358 3 644 246 893",
+      "valeur_courante_M_FCFA": 2084428.358,
+      "valeur_precedente_M_FCFA": 3644246.893
+    },
+    "capitaux_propres": {
+      "valeur_courante": 11015041886,
+      "valeur_precedente": 11480373528,
+      "ligne_source": "CP TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 11 015 041 886 11 480 373 528",
+      "valeur_courante_M_FCFA": 11015041.886,
+      "valeur_precedente_M_FCFA": 11480373.528
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 8000000,
+      "ligne_source": "DA Emprunts et dettes financières diverses 16 8 000 000 8 000 000",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 8000.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 77878845847,
+      "valeur_precedente": 70092374932,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 77 878 845 847 70 092 374 932",
+      "valeur_courante_M_FCFA": 77878845.847,
+      "valeur_precedente_M_FCFA": 70092374.932
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 2,084,428 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 3,644,247 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "c55474bd2906c60db0200f60ac415482db5c55baf34a68a4b27c5ce96f84b7dc"
+}

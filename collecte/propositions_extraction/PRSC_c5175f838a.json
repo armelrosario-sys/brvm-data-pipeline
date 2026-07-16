@@ -1,0 +1,49 @@
+{
+  "ticker": "PRSC",
+  "fichier_source": "e6ac7a64_20251030_-_etats_financiers_-_1er_semestre_2025_-_tractafric_motors_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1435853490,
+      "valeur_precedente": 50601620,
+      "ligne_source": "CJ Résultat net de l'exercice (bénéfice + ou perte -) - 1 435 853 490 50 601 620",
+      "valeur_courante_M_FCFA": 1435853.49,
+      "valeur_precedente_M_FCFA": 50601.62
+    },
+    "capitaux_propres": {
+      "valeur_courante": 10599206983,
+      "valeur_precedente": 8986923506,
+      "ligne_source": "CP | TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES , - 10 599 206 983 8 986 923 506",
+      "valeur_courante_M_FCFA": 10599206.983,
+      "valeur_precedente_M_FCFA": 8986923.506
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 8000000,
+      "ligne_source": "DA | Empruntis et dettes financières diverses 16 8 000 000 8 000 000",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 8000.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 39968388798,
+      "valeur_precedente": 34722614717,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 39 968 388 798 34722 614 717",
+      "valeur_courante_M_FCFA": 39968388.798,
+      "valeur_precedente_M_FCFA": 34722614.717
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 1,435,853 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "c5175f838afaaed295c775428415a24dbc969604910914a7c176621204645a2e"
+}
