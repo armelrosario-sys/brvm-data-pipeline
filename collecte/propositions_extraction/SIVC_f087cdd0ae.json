@@ -1,0 +1,16 @@
+{
+  "ticker": "SIVC",
+  "fichier_source": "6cdde24b_20200915_-_etats_financiers_exercice_2019_-_air_liquide_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f087cdd0ae618faf6e2f3050381d54a110e0ea4b200ce480aee8d340caa49c66"
+}

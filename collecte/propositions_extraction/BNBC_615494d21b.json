@@ -1,0 +1,50 @@
+{
+  "ticker": "BNBC",
+  "fichier_source": "327bdbef_20250430_-_etats_financiers_-_exercice_2024_-_bernabe_ci.pdf",
+  "exercice_courant": 2024,
+  "exercice_precedent": 2024,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 7313440,
+      "valeur_precedente": 35580771,
+      "ligne_source": "Résultat net de l'exercice (bénéfice + ou perte -) 7 313 440 35 580 771 Flux de trésorerie provenant des activités d'investissements ( 397 633 366) ( 441 161 012)",
+      "valeur_courante_M_FCFA": 7313.44,
+      "valeur_precedente_M_FCFA": 35580.771
+    },
+    "capitaux_propres": {
+      "valeur_courante": 2974139,
+      "valeur_precedente": null,
+      "ligne_source": "Autres capitaux propres - 2 974 139 Flux de trésorerie provenant du financement par les capitaux propres",
+      "valeur_courante_M_FCFA": 2974.139
+    },
+    "dettes_financieres": {
+      "valeur_courante": 896547706,
+      "valeur_precedente": 649009031,
+      "ligne_source": "Emprunts et dettes financières diverses 896 547 706 649 009 031 + Subventions d'investissement reçues - -",
+      "valeur_courante_M_FCFA": 896547.706,
+      "valeur_precedente_M_FCFA": 649009.031
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 2974139,
+      "valeur_precedente": null,
+      "ligne_source": "Autres capitaux propres - 2 974 139 Flux de trésorerie provenant du financement par les capitaux propres",
+      "valeur_courante_M_FCFA": 2974.139
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 45312422329,
+      "valeur_precedente": 45955470400,
+      "ligne_source": "CHIFFRE D'AFFAIRES 4 5 312 422 329 4 5 955 470 400 (en francs CFA)",
+      "valeur_courante_M_FCFA": 45312422.329,
+      "valeur_precedente_M_FCFA": 45955470.4
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "615494d21bd17b384d430abfaa5e5153aebc01dc41598c95cc3806535e71211f"
+}

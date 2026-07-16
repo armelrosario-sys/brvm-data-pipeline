@@ -1,0 +1,52 @@
+{
+  "ticker": "BNBC",
+  "fichier_source": "9e26eab0_20230425_-_etats_financiers_exercice_2022_-_bernabe_ci.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1809,
+      "valeur_precedente": 1598,
+      "ligne_source": "Résultat net de l'exercice (bénéfice + ou perte -) 1 809 1 598 Flux de trésorerie provenant des activités d'investissements ( 725) ( 437)",
+      "valeur_courante_M_FCFA": 1809.0,
+      "valeur_precedente_M_FCFA": 1598.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 6,
+      "valeur_precedente": 9,
+      "ligne_source": "Autres capitaux propres 6 9 Flux de trésorerie provenant du financement par les capitaux propres",
+      "valeur_courante_M_FCFA": 6.0,
+      "valeur_precedente_M_FCFA": 9.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 1477,
+      "valeur_precedente": 1333,
+      "ligne_source": "Emprunts et dettes financières diverses 1 477 1 333 + Subventions d'investissement reçues - -",
+      "valeur_courante_M_FCFA": 1477.0,
+      "valeur_precedente_M_FCFA": 1333.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 6,
+      "valeur_precedente": 9,
+      "ligne_source": "Autres capitaux propres 6 9 Flux de trésorerie provenant du financement par les capitaux propres",
+      "valeur_courante_M_FCFA": 6.0,
+      "valeur_precedente_M_FCFA": 9.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 51384,
+      "valeur_precedente": 44428,
+      "ligne_source": "CHIFFRE D'AFFAIRES 5 1 384 4 4 428 (en millions de Francs CFA)",
+      "valeur_courante_M_FCFA": 51384.0,
+      "valeur_precedente_M_FCFA": 44428.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "9de3fe2df8903803a89e1d669a886700a0422a93a6d2360a116f0e0dfeaa54ee"
+}

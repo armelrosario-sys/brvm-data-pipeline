@@ -1,0 +1,38 @@
+{
+  "ticker": "BNBC",
+  "fichier_source": "dc78d1ae_20220503_-_etats_financiers_exercice_2021_-_bernabe_ci.pdf",
+  "exercice_courant": 2021,
+  "exercice_precedent": 2021,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1598214,
+      "valeur_precedente": 629845,
+      "ligne_source": "Résultat net de l'exercice (bénéfice + ou perte -) 1 598 214 629 845 Flux de trésorerie provenant des activités d'investissements ( 437 215) ( 667 182)",
+      "valeur_courante_M_FCFA": 1598.214,
+      "valeur_precedente_M_FCFA": 629.845
+    },
+    "dettes_financieres": {
+      "valeur_courante": 1332999,
+      "valeur_precedente": 2612866,
+      "ligne_source": "Emprunts et dettes financières diverses 1 332 999 2 612 866 + Subventions d'investissement reçues - -",
+      "valeur_courante_M_FCFA": 1332.999,
+      "valeur_precedente_M_FCFA": 2612.866
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 44428368,
+      "valeur_precedente": 39471950,
+      "ligne_source": "CHIFFRE D'AFFAIRES 44 428 368 39 471 950 (en milliers de Francs CFA)",
+      "valeur_courante_M_FCFA": 44428.368,
+      "valeur_precedente_M_FCFA": 39471.95
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "66b5895aed1bb2afafc89e96be59b56f320f8460da0077e3eea8b393dd624765"
+}

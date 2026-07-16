@@ -1,0 +1,27 @@
+{
+  "ticker": "BOAS",
+  "fichier_source": "83504fb9_20240403_-_etats_financiers_certifies_-_exercice_2023_-_boa_senegal.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 15581,
+      "valeur_precedente": 17022,
+      "ligne_source": "RESULTAT NET 15581 17 022",
+      "valeur_courante_M_FCFA": 15.581,
+      "valeur_precedente_M_FCFA": 17.022
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "977470de5d1adf9b96e7315a49c8e796ecdbb5afd7cc13f89de59e89cfdd2d0e"
+}
