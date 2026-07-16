@@ -145,7 +145,7 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
                 if rn0 < 0 and rn1 > 0:
                     cand[(t, "D1_PREMIERE_PERTE")] = dict(
                         direction="DEFAVORABLE",
-                        detail=f"RN {ex0} negatif ({rn0:.0f} M FCFA) apres un "
+                        detail=f"RN {ex0} négatif ({rn0:.0f} M FCFA) après un "
                                f"exercice {ex1} positif ({rn1:.0f} M FCFA)",
                         valeur_reference=rn0,
                         source_donnee=f"etats_financiers {ex1}->{ex0}")
@@ -179,8 +179,8 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
             if not pub_apres:
                 cand[(t, "D4_RETARD_PUBLICATION")] = dict(
                     direction="DEFAVORABLE",
-                    detail=f"Retard de publication constate le {date_avis}, "
-                           f"aucune publication enregistree depuis",
+                    detail=f"Retard de publication constaté le {date_avis}, "
+                           f"aucune publication enregistrée depuis",
                     valeur_reference=None,
                     source_donnee=f"avis_reglementaires {date_avis}")
 
@@ -189,8 +189,8 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
             jours_ecart, categorie, dernier, echeance, _ = retards_calendrier[t]
             cand[(t, "D4_RETARD_CALENDRIER")] = dict(
                 direction="DEFAVORABLE",
-                detail=f"{categorie} : echeance reglementaire CREPMF du "
-                       f"{echeance.isoformat()} depassee de {jours_ecart}j "
+                detail=f"{categorie} : échéance réglementaire CREPMF du "
+                       f"{echeance.isoformat()} dépassée de {jours_ecart}j "
                        f"(dernier depot connu : {dernier.isoformat()})",
                 valeur_reference=jours_ecart,
                 source_donnee=f"calendrier.json + delais_reglementaires ({categorie})")
@@ -206,9 +206,9 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
             if derniere_info is not None and jours_info > seuil_perime:
                 cand[(t, "D5_INFO_PERIMEE")] = dict(
                     direction="DEFAVORABLE",
-                    detail=f"Aucun document recu (toutes categories confondues) depuis "
+                    detail=f"Aucun document reçu (toutes catégories confondues) depuis "
                            f"{jours_info}j (dernier : {derniere_info.isoformat()}) -- "
-                           f"seuil de {seuil_perime}j depasse",
+                           f"seuil de {seuil_perime}j dépassé",
                     valeur_reference=jours_info,
                     source_donnee="calendrier.json (toutes categories)")
 
@@ -234,8 +234,8 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
                     peg_txt = f" ; PEG {per / g_ann:.2f}"
             cand[(t, "A_QUALITE_DECOTEE")] = dict(
                 direction="FAVORABLE",
-                detail=f"PER {per:.2f} < 70% de la mediane sectorielle {med:.2f} "
-                       f"({src_med}) ; RN {rns[1][1]:.0f} -> {rns[0][1]:.0f} M FCFA{peg_txt} ; titre eligible",
+                detail=f"PER {per:.2f} < 70% de la médiane sectorielle {med:.2f} "
+                       f"({src_med}) ; RN {rns[1][1]:.0f} -> {rns[0][1]:.0f} M FCFA{peg_txt} ; titre éligible",
                 valeur_reference=cours_per,
                 source_donnee=f"cours_mensuels {mois_per} + etats_financiers")
 
@@ -283,7 +283,7 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
                     cand[(t, "B1_RECORD")] = dict(
                         direction="FAVORABLE",
                         detail=("Plus-haut historique" if historique else "Plus-haut 12 mois")
-                               + f" a {cours_actuel:.0f} FCFA ({mention_source})",
+                               + f" à {cours_actuel:.0f} FCFA ({mention_source})",
                         valeur_reference=cours_actuel,
                         source_donnee=source_prix)
     return cand
@@ -367,7 +367,7 @@ def reconcilier(db_path=DB_DEFAUT, aujourd_hui=None):
                 eteints.append((t, ty, "REMPLACE->RERATING_EN_COURS"))
                 inserer(t, "RERATING_EN_COURS", dict(
                     direction="FAVORABLE",
-                    detail=f"Sortie de decote par hausse du cours ({vref:.0f} -> "
+                    detail=f"Sortie de décote par hausse du cours ({vref:.0f} -> "
                            f"{cours_now:.0f} FCFA), fondamentaux intacts ; PER {per:.2f} "
                            f"vs mediane {med:.2f}",
                     valeur_reference=cours_now,
