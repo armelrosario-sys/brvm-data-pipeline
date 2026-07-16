@@ -236,7 +236,13 @@ def _detecter_unite(lignes):
     return "milliers (hypothese par defaut, aucune mention explicite trouvee)", 1000
 
 
-def extraire_pdf(chemin_pdf, ticker, referentiel="syscohada"):
+def extraire_pdf(chemin_pdf, ticker, referentiel="syscohada", annee_connue=None):
+    """annee_connue (16/07/2026) : l'annee d'exercice, quand elle est deja
+    fiable (ex. tiree du nom de fichier "..._exercice_2025_...", comme le
+    fait extraire_lot.py) doit TOUJOURS primer sur la detection interne au
+    texte -- decouvert sur 5/159 documents reels ou celle-ci produisait des
+    annees impossibles (2096, 2088...), une simple confusion entre un
+    nombre comptable et une annee dans le texte du bilan."""
     labels = charger_labels(referentiel)
     toutes_lignes, methodes = [], []
     with pdfplumber.open(chemin_pdf) as pdf:
@@ -247,6 +253,8 @@ def extraire_pdf(chemin_pdf, ticker, referentiel="syscohada"):
 
     unite_libelle, diviseur = _detecter_unite(toutes_lignes)
     champs, annee_c, annee_p = extraire_champs(toutes_lignes, labels)
+    if annee_connue is not None:
+        annee_c, annee_p = annee_connue, annee_connue - 1
     for champ, v in champs.items():
         if v["valeur_courante"] is not None:
             v["valeur_courante_M_FCFA"] = round(v["valeur_courante"] / diviseur, 3)
