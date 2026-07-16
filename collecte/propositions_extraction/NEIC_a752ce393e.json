@@ -1,0 +1,48 @@
+{
+  "ticker": "NEIC",
+  "fichier_source": "22423a90_20240422_-_etats_financiers_syscohada_-_exercice_2023_-_nei_ceda_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1167140182,
+      "valeur_precedente": 1212304460,
+      "ligne_source": "XI RESULTAT NET (XG+XH+RQ+RS) 1 167 140 182 1 212 304 460",
+      "valeur_courante_M_FCFA": 1167140.182,
+      "valeur_precedente_M_FCFA": 1212304.46
+    },
+    "capitaux_propres": {
+      "valeur_courante": 56376433644970503202,
+      "valeur_precedente": null,
+      "ligne_source": "AN |atériel de transport cP [TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 5637 643 364 4970 503 202|",
+      "valeur_courante_M_FCFA": 5.6376433644970504e+16
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 0,
+      "ligne_source": "AP_|AVANCES ET ACOMPTES VERSES SUR IMMOBILISATIONS 3 - - - = | DA JEmprunts et dettes financières diverses 16 0 0",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 8525436230,
+      "valeur_precedente": 8988063184,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 8 525 436 230 8 988 063 184,",
+      "valeur_courante_M_FCFA": 8525436.23,
+      "valeur_precedente_M_FCFA": 8988063.184
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 1,167,140 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 1,212,304 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "a752ce393e9ae37067c098ac81dd24284ef84ea7a7978cff7c4cf6c1fd748208"
+}

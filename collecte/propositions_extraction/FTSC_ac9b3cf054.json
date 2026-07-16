@@ -1,0 +1,45 @@
+{
+  "ticker": "FTSC",
+  "fichier_source": "7574a24f_20250523_-_etats_financiers_-_exercice_2024_-_filtisac_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 18595275,
+      "valeur_precedente": 3075972,
+      "ligne_source": "Immobilisations financières 1 437 244 1 1 099 137 Résultat net de l'exercice 1 8 595 275 3 075 972 Autres charges 2 613 910 2 533 730 Transferts de charges 3 26 426 3 48 563",
+      "valeur_courante_M_FCFA": 18595.275,
+      "valeur_precedente_M_FCFA": 3075.972
+    },
+    "total_actif": {
+      "valeur_courante": 61061747,
+      "valeur_precedente": 50701178,
+      "ligne_source": "TOTAL ACTIF 6 1 061 747 5 0 701 178 TOTAL PASSIF 6 1 061 747 5 0 701 178 Dotations aux amort. et prov. 2 741 028 2 833 482 Reprises de provisions 1 385 531 1 464 894",
+      "valeur_courante_M_FCFA": 61061.747,
+      "valeur_precedente_M_FCFA": 50701.178
+    },
+    "total_passif": {
+      "valeur_courante": 61061747,
+      "valeur_precedente": 50701178,
+      "ligne_source": "TOTAL ACTIF 6 1 061 747 5 0 701 178 TOTAL PASSIF 6 1 061 747 5 0 701 178 Dotations aux amort. et prov. 2 741 028 2 833 482 Reprises de provisions 1 385 531 1 464 894",
+      "valeur_courante_M_FCFA": 61061.747,
+      "valeur_precedente_M_FCFA": 50701.178
+    },
+    "dettes_financieres": {
+      "valeur_courante": 3531444,
+      "valeur_precedente": 4201704,
+      "ligne_source": "Stocks 1 3 439 847 1 5 441 962 Dettes financières 3 531 444 4 201 704",
+      "valeur_courante_M_FCFA": 3531.444,
+      "valeur_precedente_M_FCFA": 4201.704
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ac9b3cf054e48e2f73b01fb1b9d004ba1f686aa7681e0c697dc7c7aca94d4191"
+}

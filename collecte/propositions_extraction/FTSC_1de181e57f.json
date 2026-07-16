@@ -1,0 +1,31 @@
+{
+  "ticker": "FTSC",
+  "fichier_source": "8afdbdf5_20240513_-_etats_financiers_-_exercice_2023_-_filtisac_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 3075971,
+      "valeur_precedente": 153483,
+      "ligne_source": "Résultat Net 3 075 971 153 483",
+      "valeur_courante_M_FCFA": 3075.971,
+      "valeur_precedente_M_FCFA": 153.483
+    },
+    "total_actif": {
+      "valeur_courante": 50701178,
+      "valeur_precedente": 54851509,
+      "ligne_source": "TOTAL ACTIF 50 701 178 54851509 |TOTAL PASSIF 50 701 178 54 851 509",
+      "valeur_courante_M_FCFA": 50701.178,
+      "valeur_precedente_M_FCFA": 54851.509
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "1de181e57f0a5abec1f491c6a152ff63832390281f496f6ec2810449edea1603"
+}

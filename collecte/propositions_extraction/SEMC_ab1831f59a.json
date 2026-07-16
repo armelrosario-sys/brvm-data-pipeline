@@ -1,0 +1,46 @@
+{
+  "ticker": "SEMC",
+  "fichier_source": "1335eb6d_20241216_-_etats_financiers_de_synthese_-exercice_2023_-_eviosys_packaging_siem_ci.pdf",
+  "exercice_courant": 2073,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1012055129,
+      "valeur_precedente": 36857786280,
+      "ligne_source": "Immobilisations corporelles 2 986 211 921 2 835 369 667 Résultat net de l'exercice 1 012 055 129) 36857 786 280]",
+      "valeur_courante_M_FCFA": 1012055.129,
+      "valeur_precedente_M_FCFA": 36857786.28
+    },
+    "total_actif": {
+      "valeur_courante": 3074525976232641610848,
+      "valeur_precedente": 3074525976432641610848,
+      "ligne_source": "TOTAL ACTIF 30745 259762] 32641 610 848 TOTAL PASSIF 30745259 764| 32 641 610 848]",
+      "valeur_courante_M_FCFA": 3.0745259762326415e+18,
+      "valeur_precedente_M_FCFA": 3.0745259764326415e+18
+    },
+    "total_passif": {
+      "valeur_courante": 3074525976432641610848,
+      "valeur_precedente": null,
+      "ligne_source": "TOTAL ACTIF 30745 259762] 32641 610 848 TOTAL PASSIF 30745259 764| 32 641 610 848]",
+      "valeur_courante_M_FCFA": 3.0745259764326415e+18
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 21814817813729602761049,
+      "valeur_precedente": null,
+      "ligne_source": "CHIFFRE D'AFFAIRES 218148178137] 29602 761 049! Flux de trésorerie provenant des capitaux propres",
+      "valeur_courante_M_FCFA": 2.1814817813729604e+19
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 1,012,055 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 36,857,786 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ab1831f59ae077e03e509095ac9465061a33b88bc05bf6f5c2de134589d60769"
+}

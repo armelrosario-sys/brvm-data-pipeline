@@ -1,0 +1,55 @@
+{
+  "ticker": "NTLC",
+  "fichier_source": "23ec62d9_20260430_-_etats_financiers_-_exercice_2025_-_nestle_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 18426899479,
+      "valeur_precedente": 18149967087,
+      "ligne_source": "Ecarts de conversion Actif 49,431,591 209,249,250 Résultat net de l'exercice 18,426,899,479 1 8,149,967,087",
+      "valeur_courante_M_FCFA": 18426899.479,
+      "valeur_precedente_M_FCFA": 18149967.087
+    },
+    "dettes_financieres": {
+      "valeur_courante": 8098245354,
+      "valeur_precedente": 6619661320,
+      "ligne_source": "Autres dettes financières 8,098,245,354 6 ,619,661,320",
+      "valeur_courante_M_FCFA": 8098245.354,
+      "valeur_precedente_M_FCFA": 6619661.32
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 233261162741,
+      "valeur_precedente": 220113267165,
+      "ligne_source": "Sous total Chiffre d'affaires 233,261,162,741 220,113,267,165 Autres achats et - 28,938,539,464 - 2 9,049,885,199",
+      "valeur_courante_M_FCFA": 233261162.741,
+      "valeur_precedente_M_FCFA": 220113267.165
+    },
+    "total_actif": {
+      "valeur_courante": 189958727992,
+      "valeur_precedente": 177852053839,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] TOTAL 189,958,727,992 177,852,053,839 TOTAL 189,958,727,992 177,852,053,839",
+      "valeur_courante_M_FCFA": 189958727.992,
+      "valeur_precedente_M_FCFA": 177852053.839
+    },
+    "total_passif": {
+      "valeur_courante": 189958727992,
+      "valeur_precedente": 177852053839,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] TOTAL 189,958,727,992 177,852,053,839 TOTAL 189,958,727,992 177,852,053,839",
+      "valeur_courante_M_FCFA": 189958727.992,
+      "valeur_precedente_M_FCFA": 177852053.839
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 18,426,899 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 18,149,967 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ceb16039b34ade886424e85672306d0ce1f8f949091a222b0b76c411a4315cd7"
+}

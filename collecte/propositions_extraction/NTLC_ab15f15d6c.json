@@ -1,0 +1,31 @@
+{
+  "ticker": "NTLC",
+  "fichier_source": "18f0051e_20240521_-_etats_financiers_-_exercice_2023_-_nestle_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 16556698463,
+      "valeur_precedente": null,
+      "ligne_source": "BENEFICE NET 16 556 698 463",
+      "valeur_courante_M_FCFA": 16556698.463
+    },
+    "dettes_financieres": {
+      "valeur_courante": 5162136183,
+      "valeur_precedente": null,
+      "ligne_source": "Autres dettes financières 5 162 136 183",
+      "valeur_courante_M_FCFA": 5162136.183
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 16,556,698 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ab15f15d6c3d062ca7faa8c137f2b90b614f4d02ecdf6eaf11a5c38f25c55852"
+}

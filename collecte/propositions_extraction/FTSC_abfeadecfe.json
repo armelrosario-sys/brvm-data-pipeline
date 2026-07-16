@@ -1,0 +1,45 @@
+{
+  "ticker": "FTSC",
+  "fichier_source": "4ab33c59_20260610_-_etats_financiers_-_exercice_2025_-_filtisac_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 465981,
+      "valeur_precedente": 18595275,
+      "ligne_source": "Immobilisations financières 1 714 596 1 437 244 Résultat net de l'exercice 4 65 981 1 8 595 275",
+      "valeur_courante_M_FCFA": 465.981,
+      "valeur_precedente_M_FCFA": 18595.275
+    },
+    "total_actif": {
+      "valeur_courante": 39148981,
+      "valeur_precedente": 61061747,
+      "ligne_source": "TOTAL ACTIF 3 9 148 981 6 1 061 747 TOTAL PASSIF 3 9 148 981 6 1 061 747",
+      "valeur_courante_M_FCFA": 39148.981,
+      "valeur_precedente_M_FCFA": 61061.747
+    },
+    "total_passif": {
+      "valeur_courante": 39148981,
+      "valeur_precedente": 61061747,
+      "ligne_source": "TOTAL ACTIF 3 9 148 981 6 1 061 747 TOTAL PASSIF 3 9 148 981 6 1 061 747",
+      "valeur_courante_M_FCFA": 39148.981,
+      "valeur_precedente_M_FCFA": 61061.747
+    },
+    "dettes_financieres": {
+      "valeur_courante": 3786625,
+      "valeur_precedente": 3531444,
+      "ligne_source": "Stocks 1 2 387 461 1 3 439 847 Dettes financières 3 786 625 3 531 444",
+      "valeur_courante_M_FCFA": 3786.625,
+      "valeur_precedente_M_FCFA": 3531.444
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "abfeadecfe031e1a1a6a5f162b95eda98659a5d4822ed5a45d57cc7064914262"
+}
