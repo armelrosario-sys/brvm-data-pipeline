@@ -21,7 +21,7 @@ v3 (15/07/2026) — colonnes distinctes, resume capital toujours visible :
 Genere trois cartes injectees EN TETE du dashboard (avant les onglets) :
   1. "Ma liste de suivi" : les tickers de liste_suivi avec leurs signaux ACTIFS.
   2. "Signaux actifs — marche" : tous les signaux ACTIFS, groupes par titre.
-  3. "Introductions et cotations a venir".
+  3. "Introductions et cotations à venir".
 Aucune donnee personnelle : la liste de suivi ne contient que des codes.
 
 Usage : python3 bloc_signaux.py   (apres generer_dashboard_html.py)
@@ -111,9 +111,9 @@ def generer_blocs():
         par_ticker.setdefault(t, []).append((ty, di, de, dd, so))
 
     en_tete_signaux = ("<thead><tr><th>Titre</th><th>Signal</th><th>Essentiel</th>"
-                       "<th>Detail</th><th class=\"sig-col-optionnelle\">Depuis</th></tr></thead>")
+                       "<th>Détail</th><th class=\"sig-col-optionnelle\">Depuis</th></tr></thead>")
     en_tete_marche = ("<thead><tr><th>Titre</th><th>Signal</th><th>Essentiel</th>"
-                      "<th>Detail</th><th class=\"sig-col-optionnelle\">Detecte le — Source</th></tr></thead>")
+                      "<th>Détail</th><th class=\"sig-col-optionnelle\">Detecte le — Source</th></tr></thead>")
 
     # ---- Bloc 1 : liste de suivi ----
     lignes = []
@@ -181,7 +181,7 @@ def generer_blocs():
                           f"<td>{statut}</td><td class='sig-note-cell'>{note or ''}</td></tr>")
         bloc3 = f"""
 <div class="sig-carte">
-  <h2>Introductions et cotations a venir <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
+  <h2>Introductions et cotations à venir <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
       ({len(intro)} titre{'s' if len(intro)>1 else ''} — pas encore de cours, distinct d'une exclusion)</span></h2>
   <table class="sig-table">
     <thead><tr><th>Titre</th><th>Nom</th><th>Secteur</th><th>Statut</th><th>Note</th></tr></thead>
