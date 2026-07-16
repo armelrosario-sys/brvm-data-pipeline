@@ -6,8 +6,9 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pathlib import Path as _Path
-from scoring import evaluer_titre, DB, per_le_plus_recent, LIQUIDITE_JOUR_PATH
+from scoring import evaluer_titre, DB, per_le_plus_recent, LIQUIDITE_JOUR_PATH, HISTORIQUE_LIQUIDITE_PATH
 LIQUIDITE_JOUR_PATH = _Path(LIQUIDITE_JOUR_PATH)  # str -> Path (scoring.py l'expose en str)
+HISTORIQUE_LIQUIDITE_PATH = _Path(HISTORIQUE_LIQUIDITE_PATH)
 
 # Correctif 15/07/2026 : les tests 9/10/35/36 valident le CHEMIN DE REPLI
 # (qualitatif marche.yaml / statistique) et le test 81 valide la PRIORITE
@@ -24,6 +25,15 @@ _sauvegarde_liquidite_jour = (LIQUIDITE_JOUR_PATH.read_text(encoding="utf-8")
                                if LIQUIDITE_JOUR_PATH.exists() else None)
 if LIQUIDITE_JOUR_PATH.exists():
     LIQUIDITE_JOUR_PATH.unlink()
+
+# Symetrique (15/07/2026) : historique_liquidite.json est desormais lu par
+# modificateur_taille (mediane glissante SNTS) -- meme discipline que
+# liquidite_jour.json, sinon le test 81 (qui fournit sa PROPRE fixture de
+# reference) polluerait ou perdrait le vrai historique de production.
+_sauvegarde_historique_liquidite = (HISTORIQUE_LIQUIDITE_PATH.read_text(encoding="utf-8")
+                                     if HISTORIQUE_LIQUIDITE_PATH.exists() else None)
+if HISTORIQUE_LIQUIDITE_PATH.exists():
+    HISTORIQUE_LIQUIDITE_PATH.unlink()
 
 ECHECS = []
 
@@ -686,9 +696,9 @@ verifie(cp_stbc == 45642.447915, f"CP STBC 2025 = 45642.447915, obtenu : {cp_stb
 r = evaluer_titre("STBC")
 verifie(r["score_rentabilite"] is not None, "ROE desormais calculable pour STBC")
 
-print("\n=== Golden test 81 (P8, 12/07/2026) : liquidite du jour prioritaire, repli marche.yaml propre ===")
+print("\n=== Golden test 81 (P8, 12/07/2026 ; revise 15/07/2026 : mediane glissante) : liquidite du jour prioritaire, repli marche.yaml propre ===")
 import json as _json, os as _os
-from scoring import charger_marche  # LIQUIDITE_JOUR_PATH deja importee (en Path) en tete de fichier
+from scoring import charger_marche
 
 # Sans fichier du jour : repli attendu (CBIBF -> FLOTTANT_RESTREINT via marche.yaml)
 if _os.path.exists(LIQUIDITE_JOUR_PATH):
@@ -698,13 +708,19 @@ verifie(r["sizing"]["statut"] == "FLOTTANT_RESTREINT",
         f"sans fichier du jour, repli marche.yaml actif, obtenu : {r['sizing']['statut']}")
 verifie("[repli marche.yaml]" in r["sizing"]["note"], "la note signale explicitement le repli")
 
-# Avec fichier du jour : priorite au jour, meme pour un titre absent du marche.yaml
+# Avec fichier du jour : priorite au jour, meme pour un titre absent du marche.yaml.
+# Revision 15/07/2026 : la reference SNTS est desormais la MEDIANE de
+# collecte/historique_liquidite.json (pas la valeur du jour meme) -- le test
+# doit donc fournir SA PROPRE fixture d'historique, symetrique a son propre
+# liquidite_jour.json, pour rester self-contained (sinon il dependrait de
+# l'historique REEL du depot, non controle, non reproductible).
 _json.dump({
     "SNTS": {"volume_jour": 1744, "cours_cloture": 30900, "valeur_echangee_jour": 53899600,
               "date_maj_brvm": "test", "collecte_le": "2026-07-12T00:00:00"},
     "UNLC": {"volume_jour": 20, "cours_cloture": 50500, "valeur_echangee_jour": 1010000,
               "date_maj_brvm": "test", "collecte_le": "2026-07-12T00:00:00"},
 }, open(LIQUIDITE_JOUR_PATH, "w", encoding="utf-8"))
+_json.dump({"2026-07-12": {"SNTS": 53899600}}, open(HISTORIQUE_LIQUIDITE_PATH, "w", encoding="utf-8"))
 r = evaluer_titre("SNTS")
 verifie(r["sizing"]["statut"] == "LIQUIDITE_NORMALE_JOUR",
         f"avec fichier du jour, priorite donnee au jour, obtenu : {r['sizing']['statut']}")
@@ -715,6 +731,8 @@ r = evaluer_titre("CBIBF")
 verifie(r["sizing"]["statut"] == "FLOTTANT_RESTREINT",
         f"CBIBF absent du fichier du jour -> repli marche.yaml correct, obtenu : {r['sizing']['statut']}")
 _os.remove(LIQUIDITE_JOUR_PATH)  # nettoie : ne pas polluer l'etat du depot avec un fichier de test
+if HISTORIQUE_LIQUIDITE_PATH.exists():
+    HISTORIQUE_LIQUIDITE_PATH.unlink()
 
 print("\n=== Golden test 82 (P9/P10, 12/07/2026) : liquidite generale et tendance chargent correctement ===")
 from scoring import charger_liquidite_generale, charger_tendance_liquidite
@@ -776,6 +794,12 @@ if _sauvegarde_liquidite_jour is not None:
     print("\n[tester.py] collecte/liquidite_jour.json (production) restaure apres les tests.")
 elif LIQUIDITE_JOUR_PATH.exists():
     LIQUIDITE_JOUR_PATH.unlink()  # aucun fichier reel avant les tests -> aucun apres
+
+if _sauvegarde_historique_liquidite is not None:
+    HISTORIQUE_LIQUIDITE_PATH.write_text(_sauvegarde_historique_liquidite, encoding="utf-8")
+    print("[tester.py] collecte/historique_liquidite.json (production) restaure apres les tests.")
+elif HISTORIQUE_LIQUIDITE_PATH.exists():
+    HISTORIQUE_LIQUIDITE_PATH.unlink()
 
 print("\n" + "=" * 60)
 if ECHECS:
