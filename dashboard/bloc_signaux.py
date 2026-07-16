@@ -26,6 +26,7 @@ Aucune donnee personnelle : la liste de suivi ne contient que des codes.
 
 Usage : python3 bloc_signaux.py   (apres generer_dashboard_html.py)
 """
+import json
 import sqlite3
 import sys
 from pathlib import Path
@@ -105,6 +106,8 @@ def _lignes_ticker(t, sigs, avec_source):
 def generer_blocs():
     cur = sqlite3.connect(DB).cursor()
     suivi = [r[0] for r in cur.execute("SELECT ticker FROM liste_suivi ORDER BY ticker")]
+    tous_tickers = [r[0] for r in cur.execute(
+        "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
     actifs = _signaux_actifs(cur)
     par_ticker = {}
     for t, ty, di, de, dd, so in actifs:
@@ -114,6 +117,20 @@ def generer_blocs():
                        "<th>Détail</th><th class=\"sig-col-optionnelle\">Depuis</th></tr></thead>")
     en_tete_marche = ("<thead><tr><th>Titre</th><th>Signal</th><th>Essentiel</th>"
                       "<th>Détail</th><th class=\"sig-col-optionnelle\">Détecté le — Source</th></tr></thead>")
+
+    # Pre-rendu HTML par ticker (15/07/2026), pour tous les titres reels, pas
+    # seulement liste_suivi -- permet au navigateur d'ajouter n'importe quel
+    # titre a "Ma liste de suivi" (stockage local, cf. script d'injection
+    # plus bas) et d'en afficher les VRAIS signaux, sans dupliquer en JS la
+    # logique de rendu des badges/resumes (deja fiable cote Python).
+    lignes_ras = "<tr><td class='sig-ticker-cell'><b>__TICKER__</b></td><td colspan='3' class='sig-ras'>RAS</td><td class='sig-col-optionnelle'></td></tr>"
+    lignes_par_ticker_html = {}
+    for t in tous_tickers:
+        sigs = par_ticker.get(t, [])
+        if sigs:
+            lignes_par_ticker_html[t] = "".join(_lignes_ticker(t, sigs, avec_source=False))
+        else:
+            lignes_par_ticker_html[t] = lignes_ras.replace("__TICKER__", t)
 
     # ---- Bloc 1 : liste de suivi ----
     lignes = []
@@ -134,19 +151,120 @@ def generer_blocs():
         corps_suivi = ("""<div style="padding:16px;text-align:center;color:var(--muted,#94a3b8);"""
                        """border:1px dashed var(--border,#334155);border-radius:8px;">"""
                        """Aucun titre dans la liste de suivi pour l'instant.<br>"""
-                       """<span style="font-size:0.85em">Ajoute des codes (ex. SNTS, CBIBF) dans"""
-                       """ <code>config/liste_suivi.yaml</code> pour que ce tableau se peuple"""
-                       """ automatiquement au prochain calcul.</span></div>""")
+                       """<span style="font-size:0.85em">Ajoute un titre ci-dessous, ou des codes"""
+                       """ dans <code>config/liste_suivi.yaml</code> pour qu'il apparaisse"""
+                       """ pour tout le monde.</span></div>""")
+
+    # Donnees pour la gestion cote navigateur (15/07/2026) : ajouter un titre
+    # depuis le dashboard, sans toucher au depot. Stockage dans le
+    # navigateur de la personne (localStorage) uniquement -- jamais envoye
+    # nulle part, jamais visible par quelqu'un d'autre. Un titre ajoute ici
+    # se rajoute a la liste du fichier config/liste_suivi.yaml (celle-ci
+    # reste la liste "pour tout le monde qui ouvre ce dashboard").
     bloc1 = f"""
 <div class="sig-carte">
   <h2>Ma liste de suivi <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
-      ({len(suivi)} titres — codes seuls, aucune donnee personnelle)</span></h2>
-  <button class="sig-toggle" onclick="sigToggleColonnes('tbl-suivi', this)">Afficher les dates et sources</button>
-  {corps_suivi}
+      (<span id="suivi-compte">{len(suivi)}</span> titres — codes seuls, aucune donnee personnelle)</span></h2>
+  <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
+    <input id="suivi-input" list="suivi-datalist" placeholder="Code du titre (ex. SNTS)"
+           style="background:var(--bg,#0f172a);border:1px solid var(--border,#334155);color:var(--text,#e2e8f0);
+           border-radius:6px;padding:5px 10px;font-size:0.85em;width:200px;text-transform:uppercase">
+    <datalist id="suivi-datalist"></datalist>
+    <button class="sig-toggle" onclick="suiviAjouter()">+ Ajouter un titre</button>
+    <button class="sig-toggle" onclick="sigToggleColonnes('tbl-suivi', this)">Afficher les dates et sources</button>
+    <span id="suivi-message" style="font-size:0.8em;color:var(--muted,#94a3b8)"></span>
+  </div>
+  <div id="suivi-conteneur">{corps_suivi}</div>
   <div class="sig-note">Règle d'escalade : deux signaux défavorables simultanés sur un
   titre suivi = revue obligatoire sous 10 séances, décision écrite au journal.
-  Le système ne décide jamais seul. Survolez un badge pour le code technique et sa définition.</div>
-</div>"""
+  Le système ne décide jamais seul. Survolez un badge pour le code technique et sa définition.
+  <br>Les titres ajoutés via le champ ci-dessus sont enregistrés uniquement dans ce navigateur
+  (aucune donnée envoyée nulle part) — sur un autre appareil, tu ne les verras pas, sauf à les
+  ajouter aussi via <code>config/liste_suivi.yaml</code> pour qu'ils apparaissent pour tout le monde.</div>
+</div>
+<script>
+(function() {{
+  const CLE_LOCALE = 'brvm_liste_suivi_locale';
+  const SUIVI_SERVEUR = {json.dumps(suivi)};
+  const LIGNES_PAR_TICKER = {json.dumps(lignes_par_ticker_html)};
+  const ENTETE_SUIVI = {json.dumps(en_tete_signaux)};
+
+  function listeLocale() {{
+    try {{ return JSON.parse(localStorage.getItem(CLE_LOCALE) || '[]'); }}
+    catch(e) {{ return []; }}
+  }}
+  function sauverListeLocale(l) {{ localStorage.setItem(CLE_LOCALE, JSON.stringify(l)); }}
+
+  window.suiviAjouter = function() {{
+    const champ = document.getElementById('suivi-input');
+    const code = (champ.value || '').trim().toUpperCase();
+    const msg = document.getElementById('suivi-message');
+    if (!code) {{ return; }}
+    if (!LIGNES_PAR_TICKER.hasOwnProperty(code)) {{
+      msg.textContent = `"${{code}}" ne correspond a aucun titre connu.`;
+      msg.style.color = '#f87171';
+      return;
+    }}
+    const locale = listeLocale();
+    if (SUIVI_SERVEUR.includes(code) || locale.includes(code)) {{
+      msg.textContent = `${{code}} est deja dans la liste.`;
+      msg.style.color = 'var(--muted,#94a3b8)';
+      champ.value = '';
+      return;
+    }}
+    locale.push(code);
+    sauverListeLocale(locale);
+    champ.value = '';
+    msg.textContent = '';
+    suiviRerendre();
+  }};
+
+  window.suiviRetirer = function(code) {{
+    sauverListeLocale(listeLocale().filter(t => t !== code));
+    suiviRerendre();
+  }};
+
+  function suiviRerendre() {{
+    const locale = listeLocale();
+    const tous = SUIVI_SERVEUR.concat(locale.filter(t => !SUIVI_SERVEUR.includes(t))).sort();
+    document.getElementById('suivi-compte').textContent = tous.length;
+    if (tous.length === 0) {{
+      document.getElementById('suivi-conteneur').innerHTML =
+        '<div style="padding:16px;text-align:center;color:var(--muted,#94a3b8);border:1px dashed var(--border,#334155);border-radius:8px;">Aucun titre dans la liste de suivi pour l\\'instant.</div>';
+      return;
+    }}
+    let lignes = '';
+    for (const t of tous) {{
+      const estLocal = locale.includes(t) && !SUIVI_SERVEUR.includes(t);
+      let ligne = LIGNES_PAR_TICKER[t] || '';
+      if (estLocal) {{
+        // Ajoute un bouton de retrait uniquement sur les titres ajoutes localement
+        ligne = ligne.replace(`<b>${{t}}</b>`,
+          `<b>${{t}}</b> <button onclick="suiviRetirer('${{t}}')" title="Retirer de ma liste"
+           style="background:none;border:none;color:var(--muted,#94a3b8);cursor:pointer;font-size:0.9em;padding:0 4px">&times;</button>`);
+      }}
+      lignes += ligne;
+    }}
+    document.getElementById('suivi-conteneur').innerHTML =
+      `<table class="sig-table" id="tbl-suivi">${{ENTETE_SUIVI}}<tbody>${{lignes}}</tbody></table>`;
+  }}
+
+  document.addEventListener('DOMContentLoaded', function() {{
+    const dl = document.getElementById('suivi-datalist');
+    if (dl && typeof TICKERS !== 'undefined') {{
+      dl.innerHTML = TICKERS.map(t => `<option value="${{t}}">`).join('');
+    }}
+    suiviRerendre();
+  }});
+  if (document.readyState !== 'loading') {{
+    const dl = document.getElementById('suivi-datalist');
+    if (dl && typeof TICKERS !== 'undefined') {{
+      dl.innerHTML = TICKERS.map(t => `<option value="${{t}}">`).join('');
+    }}
+    suiviRerendre();
+  }}
+}})();
+</script>"""
 
     # ---- Bloc 2 : tous les signaux actifs du marche ----
     lignes2 = []
