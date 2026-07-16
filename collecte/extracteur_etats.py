@@ -155,6 +155,13 @@ def extraire_annees_bilan(lignes):
 def extraire_champs(lignes, labels_normalises):
     resultats = {}
     annee_c, annee_p = extraire_annees_bilan(lignes)
+    # Correctif (15/07/2026, decouvert sur BNBC) : "TOTAL ACTIF IMMOBILISE"
+    # et "TOTAL PASSIF CIRCULANT" sont des SOUS-totaux, pas le total general
+    # -- un match sur les seuls premiers mots du libelle ("total actif")
+    # les capturait a tort. On rejette le match si le mot qui suit
+    # immediatement le libelle est un qualificatif de sous-total connu.
+    QUALIFICATIFS_SOUS_TOTAL = {"immobilise", "circulant", "d'exploitation",
+                                "hors", "financier", "courant"}
 
     for champ, labels in labels_normalises.items():
         for ligne in lignes:
@@ -164,6 +171,9 @@ def extraire_champs(lignes, labels_normalises):
                 n_mots_lbl = len(lbl.split())
                 for i in range(len(mots_norm) - n_mots_lbl + 1):
                     if " ".join(mots_norm[i:i + n_mots_lbl]) == lbl:
+                        mot_suivant = mots_norm[i + n_mots_lbl] if i + n_mots_lbl < len(mots_norm) else ""
+                        if mot_suivant in QUALIFICATIFS_SOUS_TOTAL:
+                            continue  # sous-total, pas le total recherche -- on ignore ce match
                         label_trouve, idx_fin = lbl, i + n_mots_lbl
                         break
                 if label_trouve:
@@ -182,6 +192,19 @@ def extraire_champs(lignes, labels_normalises):
     return resultats, annee_c, annee_p
 
 
+def _detecter_unite(lignes):
+    """Cherche une mention EXPLICITE de l'unite dans le document ("en millions
+    de Francs CFA", "en milliers de FCFA") -- decouvert le 15/07/2026 (BNBC) :
+    l'hypothese par defaut "toujours en milliers" est parfois contredite par
+    le document lui-meme. Priorite absolue a ce qui est ecrit noir sur blanc."""
+    texte_complet = " ".join(m["texte"] for ligne in lignes for m in ligne).lower()
+    if "en millions" in texte_complet:
+        return "millions", 1
+    if "en milliers" in texte_complet:
+        return "milliers", 1000
+    return "milliers (hypothese par defaut, aucune mention explicite trouvee)", 1000
+
+
 def extraire_pdf(chemin_pdf, ticker, referentiel="syscohada"):
     labels = charger_labels(referentiel)
     toutes_lignes, methodes = [], []
@@ -191,18 +214,39 @@ def extraire_pdf(chemin_pdf, ticker, referentiel="syscohada"):
             toutes_lignes.extend(lignes)
             methodes.append(methode)
 
+    unite_libelle, diviseur = _detecter_unite(toutes_lignes)
     champs, annee_c, annee_p = extraire_champs(toutes_lignes, labels)
     for champ, v in champs.items():
         if v["valeur_courante"] is not None:
-            v["valeur_courante_M_FCFA"] = round(v["valeur_courante"] / 1000, 3)
+            v["valeur_courante_M_FCFA"] = round(v["valeur_courante"] / diviseur, 3)
         if v["valeur_precedente"] is not None:
-            v["valeur_precedente_M_FCFA"] = round(v["valeur_precedente"] / 1000, 3)
+            v["valeur_precedente_M_FCFA"] = round(v["valeur_precedente"] / diviseur, 3)
+
+    # Garde-fou de plausibilite (15/07/2026, decouvert sur un cas reel BOAB) :
+    # l'hypothese "toujours en milliers de FCFA" a ete verifiee sur UN SEUL
+    # document (SDSC, via son capital social connu) -- elle ne tient pas
+    # forcement pour tous les emetteurs/gabarits de rapport. Plutot que de
+    # deviner une autre unite, on signale EXPLICITEMENT tout resultat_net
+    # qui depasse le plafond de plausibilite deja etabli dans le projet
+    # (config/seuils.yaml, applique par ailleurs par moteur/tester.py),
+    # pour que la relecture humaine (statut A_VERIFIER_HUMAIN) ne le rate pas.
+    alertes = []
+    seuils_cfg = yaml.safe_load((RACINE / "config" / "seuils.yaml").read_text())
+    plafond_fcfa = seuils_cfg.get("extraction", {}).get("plafond_plausibilite_fcfa", 1_000_000_000_000)
+    plafond_m_fcfa = plafond_fcfa / 1_000_000
+    rn = champs.get("resultat_net", {})
+    for cle in ("valeur_courante_M_FCFA", "valeur_precedente_M_FCFA"):
+        v = rn.get(cle)
+        if v is not None and abs(v) > plafond_m_fcfa:
+            alertes.append(f"{cle} = {v:,.0f} M FCFA depasse le plafond de plausibilite "
+                          f"({plafond_m_fcfa:,.0f} M FCFA) -- l'hypothese 'milliers de FCFA' "
+                          f"est probablement fausse pour ce document, unite reelle a verifier manuellement")
 
     return dict(
         ticker=ticker, fichier_source=str(Path(chemin_pdf).name),
         exercice_courant=annee_c, exercice_precedent=annee_p, referentiel=referentiel,
-        unite_detectee="milliers_fcfa_convertis_en_millions",
-        methode_pages=methodes, champs=champs,
+        unite_detectee=unite_libelle,
+        methode_pages=methodes, champs=champs, alertes_plausibilite=alertes,
         date_extraction=date.today().isoformat(), statut="A_VERIFIER_HUMAIN",
     )
 
