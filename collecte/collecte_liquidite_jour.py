@@ -52,6 +52,22 @@ def recuperer_liquidite_jour():
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
+    # Garde-fou (16/07/2026, retour utilisateur) : la page BRVM affiche
+    # explicitement le statut de la seance ("Seance Ouverte" / "Seance
+    # fermee"). Un run declenche AVANT la cloture (constat reel : 09h45,
+    # volume=0 pour tous les titres, variation=0% partout -- exact pour cet
+    # instant, mais premature) donnerait une photo prematuree si on la
+    # laissait ecraser silencieusement le fichier. On avertit et on
+    # n'ecrit rien tant que la seance n'est pas fermee.
+    texte_page = soup.get_text()
+    if re.search(r"s[ée]ance ouverte", texte_page, re.IGNORECASE):
+        print("ATTENTION : la page BRVM indique la seance encore OUVERTE -- "
+              "aucune donnee fiable de cloture pour l'instant. "
+              "Fichier NON modifie (evite d'ecraser une vraie cloture precedente "
+              "par une photo prematuree). Relancer apres la cloture officielle "
+              "(15h00 heure d'Abidjan + 15 min de differe).")
+        return None
+
     # Date de mise a jour affichee par BRVM elle-meme (pas la date du jour ou
     # tourne ce script — peut differer un jour non-ouvre)
     maj_texte = soup.find(string=re.compile("Dernière mise à jour"))
@@ -116,6 +132,8 @@ def mettre_a_jour_historique(resultats):
 
 def main():
     resultats = recuperer_liquidite_jour()
+    if resultats is None:
+        return  # seance encore ouverte -- message deja affiche, rien a ecrire ni committer
     json.dump(resultats, open(SORTIE, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
     print(f"{len(resultats)} titres — liquidite du jour ecrite dans {SORTIE}")
     if resultats:
