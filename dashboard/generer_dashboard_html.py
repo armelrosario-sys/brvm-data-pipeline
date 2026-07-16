@@ -303,7 +303,7 @@ def _prochaines_echeances_annee_en_cours(aujourd_hui):
     """Echeance REGLEMENTAIRE CREPMF (config: delais_reglementaires) du cycle
     en cours, par titre -- deplace de dashboard/bloc_signaux.py vers ici le
     15/07/2026 (demande : afficher ce bloc en bas de la Synthese, sous
-    'Donnees perimees', plutot qu'en tete de page). Logique inchangee :
+    'Données périmées', plutot qu'en tete de page). Logique inchangee :
     l'historique confirme seulement que le titre publie la categorie et si
     le cycle est deja satisfait ; la date elle-meme vient du texte
     reglementaire. Seules les echeances de l'ANNEE EN COURS sont retenues."""
@@ -656,7 +656,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 
   <div id="p-synthese" class="panneau actif">
     <div class="carte">
-      <h2>Synthese classee <span style="font-weight:400;color:var(--muted);font-size:0.8em">(clic sur une ligne pour la fiche titre)</span></h2>
+      <h2>Synthèse classée <span style="font-weight:400;color:var(--muted);font-size:0.8em">(clic sur une ligne pour la fiche titre)</span></h2>
       <div class="barre-outils">
         <input type="text" id="recherche" placeholder="Rechercher un titre ou un secteur..." onkeyup="filtrerTable()">
         <select id="tri" onchange="trierTable()">
@@ -687,14 +687,14 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
       <tbody>{lignes_exclus}</tbody></table>
     </div>
     <div class="carte">
-      <h2>Donnees perimees (seuil {fraicheur['seuil_jours']}j)</h2>
+      <h2>Données périmées (seuil {fraicheur['seuil_jours']}j)</h2>
       <table><thead><tr><th>Titre</th><th>Dernier mois</th><th>Anciennete</th></tr></thead>
       <tbody>{lignes_fraicheur or '<tr><td colspan="3">Aucune donnee perimee</td></tr>'}</tbody></table>
     </div>
     <div class="carte">
       <h2>Calendrier des publications <span style="font-weight:400;color:var(--muted);font-size:0.75em">
           (echeance reglementaire la plus proche par titre, annee en cours uniquement)</span></h2>
-      <table><thead><tr><th>Titre</th><th>Categorie</th><th>Dernier depot</th><th>Echeance</th></tr></thead>
+      <table><thead><tr><th>Titre</th><th>Catégorie</th><th>Dernier depot</th><th>Echeance</th></tr></thead>
       <tbody>{lignes_calendrier or '<tr><td colspan="4">Aucune echeance en attente pour l\'annee en cours</td></tr>'}</tbody></table>
       <div style="font-size:0.75em;color:var(--muted);margin-top:8px">Echeance = delai reglementaire CREPMF
       (etats financiers et T1 : 30 avril ; T3 et semestriel : 31 octobre) applique au cycle en cours.
@@ -714,7 +714,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 
   <div id="p-fiche" class="panneau">
     <div class="carte">
-      <h2>Fiche titre detaillee</h2>
+      <h2>Fiche titre détaillée</h2>
       <select id="select-fiche" onchange="afficherFicheSelect()"></select>
       <div id="contenu-fiche"></div>
     </div>
@@ -802,6 +802,13 @@ function renderCours(cours, variation, source) {{
   }}
   const puce = source === 'jour' ? '<span class="puce-jour" title="Cours du jour">&#9679;</span>' : '';
   return `${{puce}}${{txt_cours}} ${{badge_var}}`;
+}}
+function libelleStatutDonnee(s) {{
+  // Correctif orthographe (15/07/2026) : la valeur brute de la base
+  // ("VALIDE"/"PROBABLE"/"QUARANTAINE") s'affichait telle quelle, en
+  // capitales, incoherente avec la casse normale du reste du site.
+  const LIB = {{VALIDE: 'Valid\u00e9', PROBABLE: 'Probable', QUARANTAINE: 'Quarantaine'}};
+  return LIB[s] || s || '\u2014';
 }}
 function renderROE(v) {{
   // ROE en % (pas un score 0-100) : seuils propres au marche BRVM
@@ -942,7 +949,7 @@ function construireFiche(t) {{
     html += '<div class="fiche-grille">';
     html += `<div class="fiche-stat"><div class="label">Exercice</div><div class="valeur">${{f.exercice}}</div></div>`;
     html += `<div class="fiche-stat"><div class="label">Résultat net (M FCFA)</div><div class="valeur">${{f.resultat_net ?? '—'}}</div></div>`;
-    html += `<div class="fiche-stat"><div class="label">Statut de la donnée</div><div class="valeur">${{f.statut_donnee ?? '—'}}</div></div>`;
+    html += `<div class="fiche-stat"><div class="label">Statut de la donnée</div><div class="valeur">${{libelleStatutDonnee(f.statut_donnee)}}</div></div>`;
     html += `<div class="fiche-stat"><div class="label">Score</div><div class="valeur">${{r.score_composite ? r.score_composite.toFixed(1) : '—'}}</div></div>`;
     html += `<div class="fiche-stat"><div class="label">PEG</div><div class="valeur">${{PROFILS[t]?.peg ?? '—'}}</div></div>`;
     html += `<div class="fiche-stat"><div class="label">Taille</div><div class="valeur">${{r.sizing ? renderSizing(r.sizing.recommandation) : '—'}}</div></div>`;
@@ -962,11 +969,11 @@ function construireFiche(t) {{
   html += ligne('Capitaux propres (M FCFA)', f => f.capitaux_propres);
   html += ligne('ROE calcule', f => (f.resultat_net != null && f.capitaux_propres && f.capitaux_propres > 0)
     ? (f.resultat_net / f.capitaux_propres * 100).toFixed(1) + '%' : null);
-  html += ligne('Statut de la donnée', f => f.statut_donnee);
+  html += ligne('Statut de la donnée', f => libelleStatutDonnee(f.statut_donnee));
   html += '</tbody></table></div>';
   html += '<div style="font-size:0.75em;color:var(--muted);margin:6px 0 14px">Chiffre d\\'affaires non collecté actuellement (lacune connue) — affiché pour référence, pas une omission masquée.</div>';
   if (av.length > 0) {{
-    html += '<h2 style="font-size:1em">Avis réglementaires</h2><table><thead><tr><th>Type</th><th>Date</th><th>Detail</th></tr></thead><tbody>';
+    html += '<h2 style="font-size:1em">Avis réglementaires</h2><table><thead><tr><th>Type</th><th>Date</th><th>Détail</th></tr></thead><tbody>';
     av.forEach(a => {{ html += `<tr><td>${{a.type}}</td><td>${{a.date_avis}}</td><td class="alertes">${{a.note}}</td></tr>`; }});
     html += '</tbody></table>';
   }}
