@@ -36,11 +36,79 @@ DB = RACINE / "moteur" / "brvm.db"
 PROFILS = RACINE / "collecte" / "profils.json"
 LIQ = RACINE / "collecte" / "liquidite_generale.json"
 SORTIE = RACINE / "docs_site" / "poste_decision.html"
+PORTEFEUILLE = RACINE / "config" / "portefeuille.yaml"
 
 sys.path.insert(0, str(RACINE / "moteur"))
 sys.path.insert(0, str(RACINE / "dashboard"))
-from scoring import charger_marche, rendement_net_estime  # reutilisation moteur
+from scoring import charger_marche, rendement_net_estime, charger_seuils, charger_liquidite_jour  # reutilisation moteur
 from glossaire_signaux import libelle as libelle_signal  # 14/07/2026 : codes -> libelles clairs
+
+
+def charger_portefeuille(cur, liquidite_jour):
+    """Vue 1 reelle (16/07/2026) : lit config/portefeuille.yaml -- ce fichier
+    est TOUJOURS PRIVE, jamais committe dans le depot public (voir .gitignore
+    et la doctrine du projet, rappelee depuis le premier chantier : aucune
+    donnee personnelle dans le depot public). Absent -> mode degrade
+    (comportement precedent, inchange). Present -> calcule valeur, plus-value,
+    poids dans la poche actions, et applique la regle de reequilibrage."""
+    if not PORTEFEUILLE.exists():
+        return None
+    import yaml
+    cfg = yaml.safe_load(PORTEFEUILLE.read_text(encoding="utf-8")) or {}
+    positions = cfg.get("positions", [])
+    if not positions:
+        return None
+
+    seuils = charger_seuils()
+    seuil_reequilibrage = seuils.get("portefeuille", {}).get("seuil_reequilibrage_pct_poche", 20)
+
+    lignes = []
+    valeur_totale = 0.0
+    for p in positions:
+        t = p["ticker"]
+        qte = p["quantite"]
+        prix_achat = p["prix_achat_moyen"]
+        # Cours actuel : priorite au jour (cf. moteur/signaux.py, meme regle),
+        # repli sur le dernier bulletin mensuel connu.
+        entree_jour = (liquidite_jour or {}).get(t)
+        cours = entree_jour["cours_cloture"] if entree_jour else None
+        if cours is None:
+            r = cur.execute(
+                "SELECT cours FROM cours_mensuels WHERE ticker=? ORDER BY fin_mois DESC LIMIT 1",
+                (t,)).fetchone()
+            cours = r[0] if r else None
+        if cours is None:
+            lignes.append(dict(ticker=t, quantite=qte, cours=None, valeur=None,
+                               plus_value_pct=None, poids_pct=None, note="cours indisponible"))
+            continue
+        valeur = qte * cours
+        valeur_totale += valeur
+        plus_value_pct = ((cours - prix_achat) / prix_achat * 100) if prix_achat else None
+        lignes.append(dict(ticker=t, quantite=qte, cours=cours, valeur=valeur,
+                           prix_achat=prix_achat, plus_value_pct=plus_value_pct))
+
+    for l in lignes:
+        if l.get("valeur") is not None and valeur_totale > 0:
+            l["poids_pct"] = round(100 * l["valeur"] / valeur_totale, 1)
+            l["alerte_reequilibrage"] = l["poids_pct"] > seuil_reequilibrage
+        else:
+            l["poids_pct"] = None
+            l["alerte_reequilibrage"] = False
+
+    patrimoine = cfg.get("patrimoine_financier_total")
+    plafond_poche_pct = cfg.get("plafond_poche_actions_pct")
+    poids_reel_pct = (100 * valeur_totale / patrimoine) if patrimoine else None
+
+    return dict(
+        lignes=sorted(lignes, key=lambda l: -(l.get("poids_pct") or 0)),
+        valeur_totale=valeur_totale,
+        patrimoine=patrimoine,
+        plafond_poche_pct=plafond_poche_pct,
+        poids_reel_pct=poids_reel_pct,
+        depasse_plafond=(poids_reel_pct is not None and plafond_poche_pct is not None
+                        and poids_reel_pct > plafond_poche_pct),
+        seuil_reequilibrage=seuil_reequilibrage,
+    )
 
 def dy_net(dy_brut_pct, pays):
     """DY net d'IRVM en %, via la table officielle du moteur (moteur/scoring.py::IRVM_PAR_PAYS).
@@ -76,6 +144,41 @@ def absorption(liq, t):
     if m >= 2:
         return (f"{m:.1f} M/mois — étroit", "c-mid")
     return (f"{m:.1f} M/mois — impraticable", "c-bad")
+
+
+def _html_vue1_portefeuille(pf):
+    """Rendu HTML de la Vue 1 reelle -- position par position, poids dans la
+    poche actions, alerte de reequilibrage si une position depasse le seuil
+    (config/seuils.yaml :: portefeuille.seuil_reequilibrage_pct_poche, 16/07/2026).
+    Meme principe que l'escalade deja en place pour les signaux defavorables :
+    le systeme signale, il ne decide jamais seul."""
+    lignes_html = []
+    for l in pf["lignes"]:
+        if l.get("valeur") is None:
+            lignes_html.append(f"<tr><td><b>{l['ticker']}</b></td><td colspan='4' class='c-mid'>"
+                              f"{l.get('note','donnee indisponible')}</td></tr>")
+            continue
+        pv = l["plus_value_pct"]
+        cls_pv = "c-ok" if (pv or 0) >= 0 else "c-bad"
+        alerte = (" <span class='esc'>⚠ position &gt; seuil de rééquilibrage "
+                 f"({pf['seuil_reequilibrage']}%)</span>") if l.get("alerte_reequilibrage") else ""
+        lignes_html.append(
+            f"<tr><td><b>{l['ticker']}</b></td><td>{l['quantite']}</td>"
+            f"<td>{l['cours']:,.0f} FCFA</td>"
+            f"<td class='{cls_pv}'>{pv:+.1f}%</td>"
+            f"<td>{l['poids_pct']}% de la poche{alerte}</td></tr>")
+
+    note_plafond = ""
+    if pf["poids_reel_pct"] is not None and pf["plafond_poche_pct"] is not None:
+        cls = "c-bad" if pf["depasse_plafond"] else "c-ok"
+        note_plafond = (f"<div class='note {cls}'>Poche actions : <b>{pf['poids_reel_pct']:.1f}%</b> "
+                        f"du patrimoine total (plafond fixé : {pf['plafond_poche_pct']}%)"
+                        + (" — <b>PLAFOND DÉPASSÉ</b>" if pf["depasse_plafond"] else "") + "</div>")
+
+    return f"""<table><tr><th>Titre</th><th>Quantité</th><th>Cours</th><th>Plus-value</th><th>Poids</th></tr>
+{''.join(lignes_html)}</table>
+<div class="note">Valeur totale de la poche : <b>{pf['valeur_totale']:,.0f} FCFA</b></div>
+{note_plafond}"""
 
 
 def generer():
@@ -159,9 +262,10 @@ def generer():
                     f"non affichés (sélectivité faible sans décote) : "
                     f"{', '.join(sorted(records_isoles))}</div>")
 
-    # ---------- Vue 1 : allocation (mode degrade) ----------
+    # ---------- Vue 1 : allocation ----------
     moy = sum(nets) / len(nets) if nets else 0
     n_bat = sum(1 for d in nets if d > taux)
+    portefeuille = charger_portefeuille(cur, charger_liquidite_jour())
 
     # ---------- Vue 4 : journal ----------
     rows4 = [f"<tr><td>{r[0]}</td><td><b>{r[1]}</b></td><td>{r[2]}</td><td>{r[3] or ''}</td></tr>"
@@ -200,8 +304,8 @@ td{{padding:7px 8px;border-bottom:1px solid rgba(148,163,184,.15);vertical-align
 <div class="o" onclick="go(2)">3 · Opportunités</div><div class="o" onclick="go(3)">4 · Journal</div></div>
 
 <div class="p a"><div class="carte"><h2>Mon allocation tient-elle ?</h2>
-<div class="deg">MODE DÉGRADÉ — aucune donnée personnelle renseignée. Vue marché uniquement.
-Renseigner (en privé, jamais dans le dépôt public) : patrimoine financier, poche actions, positions.</div>
+{_html_vue1_portefeuille(portefeuille) if portefeuille else '''<div class="deg">MODE DÉGRADÉ — aucune donnée personnelle renseignée. Vue marché uniquement.
+Renseigner (en privé, jamais dans le dépôt public) : patrimoine financier, poche actions, positions.</div>'''}
 <table><tr><th>Référence</th><th>Valeur</th></tr>
 <tr><td>Taux obligataire UEMOA (config — à actualiser trimestriellement, UMOA-Titres)</td><td><b>{taux:.1f} %</b></td></tr>
 <tr><td>DY net d'IRVM moyen des titres éligibles</td><td>{moy:.1f} %</td></tr>
