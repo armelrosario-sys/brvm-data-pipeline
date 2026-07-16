@@ -239,51 +239,53 @@ def calculer_candidats(cur, seuils, marche, aujourd_hui=None):
                 valeur_reference=cours_per,
                 source_donnee=f"cours_mensuels {mois_per} + etats_financiers")
 
-        # B1_RECORD : cloture mensuelle > max des 12 mois precedents.
-        # Correctif T1 (13/07/2026) : exige gate ELIGIBLE — un record sur un
-        # titre exclu (pertes chroniques, capitaux propres negatifs...) est du
-        # bruit speculatif, pas un reveil (cas decouvert : SCRC).
+        # B1_RECORD : cloture la plus RECENTE connue > max des 12 mois
+        # precedents. Correctif T1 (13/07/2026) : exige gate ELIGIBLE.
+        #
+        # Correctif de coherence (15/07/2026, retour utilisateur) : les deux
+        # sources (bulletin mensuel, cours quotidien) etaient auparavant
+        # traitees en either/or ("si le mensuel detecte deja un record, on
+        # n'examine meme pas le jour") -- un titre dont le bulletin de juillet
+        # etablissait deja un record restait fige a CETTE valeur, meme si le
+        # cours du jour avait ensuite grimpe plus haut encore (CBIBF : signal
+        # fige a 25700 FCFA/bulletin alors que la Synthese affichait 30005
+        # FCFA/jour, le MEME jour -- incoherence visible entre les deux
+        # tableaux). Desormais : UNE SEULE source de verite pour "le cours
+        # actuel" -- le jour s'il existe, sinon le mensuel -- utilisee a la
+        # fois pour la comparaison au record ET pour la valeur affichee,
+        # exactement comme la colonne "Cours (FCFA)" de la Synthese le fait
+        # deja (generer_dashboard_html.py) : les deux tableaux ne peuvent
+        # plus diverger, ils lisent desormais la meme regle de priorite.
         serie = _serie_cours(cur, t)
-        detecte_ce_run = False
-        if (dernier_mois and len(serie) >= 13 and serie[-1][0] == dernier_mois
-                and statut_gate == "ELIGIBLE"):
-            cours_now = serie[-1][1]
-            max12 = max(x for _, x in serie[-13:-1])
-            if cours_now > max12:
-                max_hist = max(x for _, x in serie[:-1])
-                historique = cours_now > max_hist
-                cand[(t, "B1_RECORD")] = dict(
-                    direction="FAVORABLE",
-                    detail=("Plus-haut historique" if historique else "Plus-haut 12 mois")
-                           + f" a {cours_now:.0f} FCFA (bulletin {dernier_mois})",
-                    valeur_reference=cours_now,
-                    source_donnee=f"cours_mensuels {dernier_mois}")
-                detecte_ce_run = True
+        if statut_gate == "ELIGIBLE" and len(serie) >= 12:
+            entree_jour = (liquidite_jour_cache or {}).get(t)
+            cours_jour = entree_jour.get("cours_cloture") if entree_jour else None
+            if cours_jour is not None:
+                cours_actuel = cours_jour
+                source_prix = "liquidite_jour.json (cours quotidien)"
+                mention_source = f"cours du jour, {entree_jour.get('date_maj_brvm', 'date inconnue')}"
+                fenetre_12m = serie[-12:]
+                fenetre_hist = serie
+            elif dernier_mois and serie[-1][0] == dernier_mois:
+                cours_actuel = serie[-1][1]
+                source_prix = f"cours_mensuels {dernier_mois}"
+                mention_source = f"bulletin {dernier_mois}"
+                fenetre_12m = serie[-13:-1]
+                fenetre_hist = serie[:-1]
+            else:
+                cours_actuel = None
 
-        # B1_RECORD (complement quotidien, 15/07/2026) : le bulletin mensuel
-        # peut laisser un record reel invisible jusqu'a un mois entier --
-        # constat direct de l'utilisateur, cours en direct tres au-dessus du
-        # dernier bulletin traite. Si liquidite_jour.json existe (collecte
-        # quotidienne, cf. collecte/collecte_liquidite_jour.py) et est plus
-        # recent que le dernier bulletin mensuel connu, on compare AUSSI le
-        # cours de cloture DU JOUR a l'historique -- sans jamais remplacer la
-        # detection mensuelle (les deux coexistent, la plus recente l'emporte
-        # naturellement car un seul candidat est retenu par ticker).
-        if not detecte_ce_run and statut_gate == "ELIGIBLE" and liquidite_jour_cache:
-            entree_jour = liquidite_jour_cache.get(t)
-            if entree_jour and entree_jour.get("cours_cloture") and len(serie) >= 12:
-                cours_jour = entree_jour["cours_cloture"]
-                max12_incl = max(x for _, x in serie[-12:])  # 12 derniers bulletins connus
-                if cours_jour > max12_incl:
-                    max_hist_incl = max(x for _, x in serie)
-                    historique = cours_jour > max_hist_incl
+            if cours_actuel is not None and len(fenetre_12m) >= 1:
+                max12 = max(x for _, x in fenetre_12m)
+                if cours_actuel > max12:
+                    max_hist = max(x for _, x in fenetre_hist) if fenetre_hist else max12
+                    historique = cours_actuel > max_hist
                     cand[(t, "B1_RECORD")] = dict(
                         direction="FAVORABLE",
                         detail=("Plus-haut historique" if historique else "Plus-haut 12 mois")
-                               + f" a {cours_jour:.0f} FCFA (cours du jour, "
-                               + f"{entree_jour.get('date_maj_brvm', 'date inconnue')})",
-                        valeur_reference=cours_jour,
-                        source_donnee="liquidite_jour.json (cours quotidien)")
+                               + f" a {cours_actuel:.0f} FCFA ({mention_source})",
+                        valeur_reference=cours_actuel,
+                        source_donnee=source_prix)
     return cand
 
 
