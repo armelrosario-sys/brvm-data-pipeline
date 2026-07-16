@@ -1,0 +1,48 @@
+{
+  "ticker": "STBC",
+  "fichier_source": "456f3dbd_20240430_-_etats_financiers_provisoire_projets_daffectation_non_verifies_par_les_cac_-_exercice_2023_-_sitab_ci.pdf",
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 12461330558,
+      "valeur_precedente": 11503188097,
+      "ligne_source": "Autre actif circulant Résultat net de l'exercice 12 461 330 558 11 503 188 097",
+      "valeur_courante_M_FCFA": 12461330.558,
+      "valeur_precedente_M_FCFA": 11503188.097
+    },
+    "total_actif": {
+      "valeur_courante": 34714099122,
+      "valeur_precedente": 31612312100,
+      "ligne_source": "Total Actif 34 714 099 122 31 612 312 100Total Passif 34 714 099 122 31 612 312 100",
+      "valeur_courante_M_FCFA": 34714099.122,
+      "valeur_precedente_M_FCFA": 31612312.1
+    },
+    "capitaux_propres": {
+      "valeur_courante": -10773000000,
+      "valeur_precedente": -8618400000,
+      "ligne_source": "Flux de trésorerie provenant des capitaux propres -10 773 000 000 -8 618 400 000",
+      "valeur_courante_M_FCFA": -10773000.0,
+      "valeur_precedente_M_FCFA": -8618400.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 7950000,
+      "valeur_precedente": 7950000,
+      "ligne_source": "Autres dettes financières 7 950 000 7 950 000",
+      "valeur_courante_M_FCFA": 7950.0,
+      "valeur_precedente_M_FCFA": 7950.0
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 12,461,331 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 11,503,188 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "8820e8e0d4d04d5d355ec25d18d5851be9592638028da31b6261195b22cdeca6"
+}

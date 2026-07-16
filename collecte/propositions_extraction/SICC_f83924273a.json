@@ -1,0 +1,55 @@
+{
+  "ticker": "SICC",
+  "fichier_source": "1f304b96_20211122_-_etats_financiers_exercice_2019_-_sicor_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2350841,
+      "valeur_precedente": 989401440,
+      "ligne_source": "AK Bâtiments(1) . 1387 545 685 1 175 429 785 212 115 900 215 191 465] CJ Résultat net de l'exercice (bénéfice + ou perte -) 2 350 841 989 401 440",
+      "valeur_courante_M_FCFA": 2350.841,
+      "valeur_precedente_M_FCFA": 989401.44
+    },
+    "total_passif": {
+      "valeur_courante": 919874390,
+      "valeur_precedente": 848418066,
+      "ligne_source": "DP TOTAL PASSIF CIRCULANT. - 919 874 390 848 418 066 :",
+      "valeur_courante_M_FCFA": 919874.39,
+      "valeur_precedente_M_FCFA": 848418.066
+    },
+    "capitaux_propres": {
+      "valeur_courante": 2895608308,
+      "valeur_precedente": 2893257467,
+      "ligne_source": "CP | TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES - 2 895 608 308 2 893 257 467",
+      "valeur_courante_M_FCFA": 2895608.308,
+      "valeur_precedente_M_FCFA": 2893257.467
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": null,
+      "ligne_source": "AP AVANCES ET ACOMPTES VERSES SUR IMMOBILISATIONS 3 - - - DA Emprunts et dettes financières diverses 16 . -",
+      "valeur_courante_M_FCFA": 0.016
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 1856990827,
+      "valeur_precedente": 1393219028,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A +B+C+D) : 1 856 990 827 1 393 219 028",
+      "valeur_courante_M_FCFA": 1856990.827,
+      "valeur_precedente_M_FCFA": 1393219.028
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f83924273a92451a24370a164d3ef7c124520757e6297960c6965c207edb3846"
+}

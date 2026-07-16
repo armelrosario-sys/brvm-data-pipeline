@@ -1,0 +1,59 @@
+{
+  "ticker": "SMBC",
+  "fichier_source": "4b480dc1_20260512_-_etats_financiers_et_projet_daffectation_du_resultat_-_exercice_2025_-_smb_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 13075,
+      "valeur_precedente": 8698,
+      "ligne_source": "Résultat net de l'exercice 13 075 8 698",
+      "valeur_courante_M_FCFA": 13075.0,
+      "valeur_precedente_M_FCFA": 8698.0
+    },
+    "total_actif": {
+      "valeur_courante": 180003,
+      "valeur_precedente": 163113,
+      "ligne_source": "TOTAL ACTIF 180 003 163 113 EXCEDENT BRUT D'EXPLOITATION 18 480 13 030",
+      "valeur_courante_M_FCFA": 180003.0,
+      "valeur_precedente_M_FCFA": 163113.0
+    },
+    "total_passif": {
+      "valeur_courante": 180003,
+      "valeur_precedente": 163113,
+      "ligne_source": "TOTAL PASSIF 180 003 163 113",
+      "valeur_courante_M_FCFA": 180003.0,
+      "valeur_precedente_M_FCFA": 163113.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 42913,
+      "valeur_precedente": 35294,
+      "ligne_source": "CAPITAUX PROPRES 42 913 35 294 Revenus financiers et assimilés 3 835 3 150",
+      "valeur_courante_M_FCFA": 42913.0,
+      "valeur_precedente_M_FCFA": 35294.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 9204,
+      "valeur_precedente": 6485,
+      "ligne_source": "Emprunts & Dettes Financières 9 204 6485 Transfert de charges financières 0 0",
+      "valeur_courante_M_FCFA": 9204.0,
+      "valeur_precedente_M_FCFA": 6485.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 206740,
+      "valeur_precedente": 229061,
+      "ligne_source": "CHIFFRE D'AFFAIRES 206 740 229 061",
+      "valeur_courante_M_FCFA": 206740.0,
+      "valeur_precedente_M_FCFA": 229061.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "9c60affc9b01b082b9a2f8bfff02eba11e077fa00750154ac113a8f88ccb3b0b"
+}

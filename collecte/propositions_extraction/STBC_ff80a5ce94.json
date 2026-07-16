@@ -1,0 +1,31 @@
+{
+  "ticker": "STBC",
+  "fichier_source": "d98a54fc_20230814_-_attestation_dexecution_de_la_mission_de_commissariat_aux_comptes_-_etats_financiers_exercice_2022_-_sitab_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 11503188097,
+      "valeur_precedente": null,
+      "ligne_source": "Resultat net 11 503 188 097",
+      "valeur_courante_M_FCFA": 11503188.097
+    },
+    "capitaux_propres": {
+      "valeur_courante": 19491383738,
+      "valeur_precedente": null,
+      "ligne_source": "Capitaux propres 19 491 383 738",
+      "valeur_courante_M_FCFA": 19491383.738
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 11,503,188 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ff80a5ce94a44424c3fc717ea24450835a0e256b6092c0392f6a1dbbc95f2b86"
+}

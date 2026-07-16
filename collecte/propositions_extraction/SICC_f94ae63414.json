@@ -1,0 +1,65 @@
+{
+  "ticker": "SICC",
+  "fichier_source": "74085703_20190611_-_etats_financiers_exercice_2018_-_sicor_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 19145300,
+      "valeur_precedente": null,
+      "ligne_source": "Résultat net Variations de stocks de matières premières et fournitu1r9e s14 l5ié 3es00",
+      "valeur_courante_M_FCFA": 19145.3
+    },
+    "total_actif": {
+      "valeur_courante": 3933301419,
+      "valeur_precedente": 3680132932,
+      "ligne_source": "TOTAL GENERAL ACTIF 3 933 301 419 3 680 132 932 Autres produits - -",
+      "valeur_courante_M_FCFA": 3933301.419,
+      "valeur_precedente_M_FCFA": 3680132.932
+    },
+    "total_passif": {
+      "valeur_courante": 3933301419,
+      "valeur_precedente": 3680132932,
+      "ligne_source": "TOTAL GENERAL PASSIF 3 933 301 419 3 680 132 932 -277 951 881 -239 963 051",
+      "valeur_courante_M_FCFA": 3933301.419,
+      "valeur_precedente_M_FCFA": 3680132.932
+    },
+    "capitaux_propres": {
+      "valeur_courante": -123154139,
+      "valeur_precedente": -148448897,
+      "ligne_source": "Autres capitaux propres - - Autres achats -123 154 139 -148 448 897",
+      "valeur_courante_M_FCFA": -123154.139,
+      "valeur_precedente_M_FCFA": -148448.897
+    },
+    "dettes_financieres": {
+      "valeur_courante": 151403043,
+      "valeur_precedente": 78323705,
+      "ligne_source": "Total Dettes financières et ressources assimilées 151 403 043 78 323 705 Transports -90 052 900 -89 189 085",
+      "valeur_courante_M_FCFA": 151403.043,
+      "valeur_precedente_M_FCFA": 78323.705
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": -123154139,
+      "valeur_precedente": -148448897,
+      "ligne_source": "Autres capitaux propres - - Autres achats -123 154 139 -148 448 897",
+      "valeur_courante_M_FCFA": -123154.139,
+      "valeur_precedente_M_FCFA": -148448.897
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 1393219028,
+      "valeur_precedente": 1105303043,
+      "ligne_source": "Créances et emplois assimilés 257 664 636 165 909 289 Chiffre d'affaires 1 393 219 028 1 105 303 043",
+      "valeur_courante_M_FCFA": 1393219.028,
+      "valeur_precedente_M_FCFA": 1105303.043
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f94ae63414e6b7547d068bcb38710caa6df5cd2551ba4a36bf12dbedc4924c9e"
+}

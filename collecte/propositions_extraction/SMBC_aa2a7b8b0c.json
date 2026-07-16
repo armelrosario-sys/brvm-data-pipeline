@@ -1,0 +1,45 @@
+{
+  "ticker": "SMBC",
+  "fichier_source": "ba233610_20230816_-_etats_financiers_certifies_et_approuves_-_exercice_2022_-_smb_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 9421,
+      "valeur_precedente": 8623,
+      "ligne_source": "Résultat net de l'exercice 9 421 8 623",
+      "valeur_courante_M_FCFA": 9421.0,
+      "valeur_precedente_M_FCFA": 8623.0
+    },
+    "total_passif": {
+      "valeur_courante": 164780,
+      "valeur_precedente": 107351,
+      "ligne_source": "TOTAL PASSIF 164 780 107 351",
+      "valeur_courante_M_FCFA": 164780.0,
+      "valeur_precedente_M_FCFA": 107351.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 24932,
+      "valeur_precedente": 21747,
+      "ligne_source": "CAPITAUX PROPRES 24 932 21 747 Revenus financiers et assimilés 1 220 844",
+      "valeur_courante_M_FCFA": 24932.0,
+      "valeur_precedente_M_FCFA": 21747.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 276854,
+      "valeur_precedente": 139353,
+      "ligne_source": "CHIFFRE D'AFFAIRES 276 854 139 353",
+      "valeur_courante_M_FCFA": 276854.0,
+      "valeur_precedente_M_FCFA": 139353.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "aa2a7b8b0c5fc732a13c952eb6662927a6a7c7b92b5e88f025a32697394c760e"
+}

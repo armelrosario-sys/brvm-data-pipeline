@@ -1,0 +1,48 @@
+{
+  "ticker": "STBC",
+  "fichier_source": "c0191c9b_20260430_-_etats_financiers_syscohada_-_exercice_2025_-_sitab_ci.pdf",
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 36157775979,
+      "valeur_precedente": 44173762491,
+      "ligne_source": "Bénéfice net 36 157 775 979 44 173 762 491",
+      "valeur_courante_M_FCFA": 36157775.979,
+      "valeur_precedente_M_FCFA": 44173762.491
+    },
+    "total_actif": {
+      "valeur_courante": 75184091921,
+      "valeur_precedente": 94925572191,
+      "ligne_source": "Total Actif 75 184 091 921 94 925 572 191Total Passif 75 184 091 921 94 925 572 191",
+      "valeur_courante_M_FCFA": 75184091.921,
+      "valeur_precedente_M_FCFA": 94925572.191
+    },
+    "capitaux_propres": {
+      "valeur_courante": -38088960500,
+      "valeur_precedente": -13394943003,
+      "ligne_source": "Flux de trésorerie provenant des capitaux propres -38 088 960 500 -13 394 943 003",
+      "valeur_courante_M_FCFA": -38088960.5,
+      "valeur_precedente_M_FCFA": -13394943.003
+    },
+    "dettes_financieres": {
+      "valeur_courante": 1400000,
+      "valeur_precedente": 7950000,
+      "ligne_source": "Autres dettes financières 1 400 000 7 950 000",
+      "valeur_courante_M_FCFA": 1400.0,
+      "valeur_precedente_M_FCFA": 7950.0
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 36,157,776 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 44,173,762 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "da2897f7336375b4154e745654ee9a6c75f13bc4cf1eebf3a82e022dbe65ad47"
+}
