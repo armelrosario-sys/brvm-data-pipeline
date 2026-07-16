@@ -1,8 +1,8 @@
 {
   "ticker": "SCRC",
   "fichier_source": "3944a65d_20250509_-_etats_financiers_-_normes_syscohada_-_exercice_2024_-_sucrivoire_ci.pdf",
-  "exercice_courant": 2068,
-  "exercice_precedent": 2019,
+  "exercice_courant": 2024,
+  "exercice_precedent": 2023,
   "referentiel": "syscohada",
   "unite_detectee": "milliers",
   "methode_pages": [

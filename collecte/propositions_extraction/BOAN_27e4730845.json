@@ -1,8 +1,8 @@
 {
   "ticker": "BOAN",
   "fichier_source": "8246ebfd_20240325_-_etats_financiers_-_exercice_2023_-_boa_niger.pdf",
-  "exercice_courant": 2097,
-  "exercice_precedent": 2032,
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
   "referentiel": "syscohada",
   "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
   "methode_pages": [

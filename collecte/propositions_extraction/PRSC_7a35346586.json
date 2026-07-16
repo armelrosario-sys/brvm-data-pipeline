@@ -1,8 +1,8 @@
 {
   "ticker": "PRSC",
   "fichier_source": "8f0de31a_20260430_-_etats_financiers_-_exercice_2025_-_tractafric_motors_ci.pdf",
-  "exercice_courant": 2096,
-  "exercice_precedent": 2075,
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
   "referentiel": "syscohada",
   "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
   "methode_pages": [
