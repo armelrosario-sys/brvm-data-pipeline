@@ -1,0 +1,40 @@
+{
+  "ticker": "PALC",
+  "fichier_source": "b006bc6d_20220426_-_etats_financiers_exercice_2021_-_palm_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 42473119895,
+      "valeur_precedente": 3521647345,
+      "ligne_source": "Résultat net 42 473 119 895 3 521 647 345] [Transports -1 273 369 033",
+      "valeur_courante_M_FCFA": 42473119.895,
+      "valeur_precedente_M_FCFA": 3521647.345
+    },
+    "capitaux_propres": {
+      "valeur_courante": 109913559311692012630,
+      "valeur_precedente": null,
+      "ligne_source": "CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 109 913 559 311 69 201 263 0! Impôts et taxes -2 795 190 142 -2 880 348 209",
+      "valeur_courante_M_FCFA": 1.0991355931169202e+17
+    },
+    "dettes_financieres": {
+      "valeur_courante": 1723790244221715097349,
+      "valeur_precedente": 9329051398040669809191,
+      "ligne_source": "Dettes financières et ressources assimilées 17 237 902 442 21 715 097 349[ JVALEUR AJOUTEE 93 290 513 980 40 669 809 191",
+      "valeur_courante_M_FCFA": 1.7237902442217152e+18,
+      "valeur_precedente_M_FCFA": 9.32905139804067e+18
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 42,473,120 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 3,521,647 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "e1f9b45ab80bbc723019491f5f4dde3ff757ea987e33c72713b0a2f64c0e751a"
+}

@@ -1,0 +1,51 @@
+{
+  "ticker": "ORAC",
+  "fichier_source": "24b6e902_20250221_-_etats_financiers_-_exercice_2024_-_orange_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1582,
+      "valeur_precedente": 21,
+      "ligne_source": "Le résultat net consolidé s’élève à 158,2 milliards de FCFA, en croissance de 2,1% par rapport à l’année dernière,",
+      "valeur_courante_M_FCFA": 1.582,
+      "valeur_precedente_M_FCFA": 0.021
+    },
+    "capitaux_propres": {
+      "valeur_courante": 6163,
+      "valeur_precedente": 6272,
+      "ligne_source": "Capitaux propres attribuables aux propriétaires de la société mère 616,3 627,2 (10,8) (1,7,%)",
+      "valeur_courante_M_FCFA": 6.163,
+      "valeur_precedente_M_FCFA": 6.272
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 41,
+      "valeur_precedente": 10841,
+      "ligne_source": "Chiffre d'affaires 4.1 1 084,1 1 016,5 67,5 6,6%",
+      "valeur_courante_M_FCFA": 0.041,
+      "valeur_precedente_M_FCFA": 10.841
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "5067b47de6362133c6cc480c8bc098305385b8f509c930d1a3a332861041c204"
+}

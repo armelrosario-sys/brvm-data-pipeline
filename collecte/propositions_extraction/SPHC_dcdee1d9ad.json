@@ -1,0 +1,69 @@
+{
+  "ticker": "SPHC",
+  "fichier_source": "0f168459_20250319_-_etats_financiers_certifies_par_les_cacs_-_exercice_2024_-_saph_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 18790217905,
+      "valeur_precedente": 3635138559,
+      "ligne_source": "Résultat net 18 790 217 905 3 635 138 559",
+      "valeur_courante_M_FCFA": 18790217.905,
+      "valeur_precedente_M_FCFA": 3635138.559
+    },
+    "total_actif": {
+      "valeur_courante": 222208164550,
+      "valeur_precedente": 195801292931,
+      "ligne_source": "TOTAL ACTIF 222 208 164 550 195 801 292 931 Achats de matières premières et fournitures liées -166 266 403 509 -112 046 597 033",
+      "valeur_courante_M_FCFA": 222208164.55,
+      "valeur_precedente_M_FCFA": 195801292.931
+    },
+    "total_passif": {
+      "valeur_courante": 222208164550,
+      "valeur_precedente": 195801292931,
+      "ligne_source": "TOTAL PASSIF 222 208 164 550 195 801 292 931",
+      "valeur_courante_M_FCFA": 222208164.55,
+      "valeur_precedente_M_FCFA": 195801292.931
+    },
+    "capitaux_propres": {
+      "valeur_courante": 8649304155,
+      "valeur_precedente": 8649304155,
+      "ligne_source": "Autres capitaux propres 8 649 304 155 8 649 304 155",
+      "valeur_courante_M_FCFA": 8649304.155,
+      "valeur_precedente_M_FCFA": 8649304.155
+    },
+    "dettes_financieres": {
+      "valeur_courante": 30585044004,
+      "valeur_precedente": 24355185501,
+      "ligne_source": "Dettes financières et ressources assimilées 30 585 044 004 24 355 185 501",
+      "valeur_courante_M_FCFA": 30585044.004,
+      "valeur_precedente_M_FCFA": 24355185.501
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 8649304155,
+      "valeur_precedente": 8649304155,
+      "ligne_source": "Autres capitaux propres 8 649 304 155 8 649 304 155",
+      "valeur_courante_M_FCFA": 8649304.155,
+      "valeur_precedente_M_FCFA": 8649304.155
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 279437727425,
+      "valeur_precedente": 206469431933,
+      "ligne_source": "CHIFFRE D'AFFAIRES 279 437 727 425 206 469 431 933",
+      "valeur_courante_M_FCFA": 279437727.425,
+      "valeur_precedente_M_FCFA": 206469431.933
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 18,790,218 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 3,635,139 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "dcdee1d9ad70c49d35933a165f8148708e7342a190499d36d7c9db4980034992"
+}

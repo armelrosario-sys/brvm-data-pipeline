@@ -1,0 +1,69 @@
+{
+  "ticker": "SPHC",
+  "fichier_source": "eeabee5d_20240718_-_etats_financiers_certifies_et_approuves_par_les_cac_-_exercice_2023_-_syscohada_-_saph_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 3635138559,
+      "valeur_precedente": 16700611131,
+      "ligne_source": "Résultat net 3 635 138 559 16 700 611 131",
+      "valeur_courante_M_FCFA": 3635138.559,
+      "valeur_precedente_M_FCFA": 16700611.131
+    },
+    "total_actif": {
+      "valeur_courante": 195801292931,
+      "valeur_precedente": 183889630318,
+      "ligne_source": "TOTAL ACTIF 195 801 292 931 183 889 630 318 Achats de matières premières et fournitures liées -112 046 597 033 -114 837 761 541",
+      "valeur_courante_M_FCFA": 195801292.931,
+      "valeur_precedente_M_FCFA": 183889630.318
+    },
+    "total_passif": {
+      "valeur_courante": 195801292931,
+      "valeur_precedente": 183889630318,
+      "ligne_source": "TOTAL PASSIF 195 801 292 931 183 889 630 318 Dotations aux amortissements, aux provisions et dépréciations -10 282 386 971 -8 623 779 155",
+      "valeur_courante_M_FCFA": 195801292.931,
+      "valeur_precedente_M_FCFA": 183889630.318
+    },
+    "capitaux_propres": {
+      "valeur_courante": 8649304155,
+      "valeur_precedente": 8649304155,
+      "ligne_source": "Autres capitaux propres 8 649 304 155 8 649 304 155 Services extérieurs -20 398 901 287 -18 213 236 232",
+      "valeur_courante_M_FCFA": 8649304.155,
+      "valeur_precedente_M_FCFA": 8649304.155
+    },
+    "dettes_financieres": {
+      "valeur_courante": 24355185501,
+      "valeur_precedente": 19012367970,
+      "ligne_source": "Dettes financières et ressources assimilées 24 355 185 501 19 012 367 970",
+      "valeur_courante_M_FCFA": 24355185.501,
+      "valeur_precedente_M_FCFA": 19012367.97
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 8649304155,
+      "valeur_precedente": 8649304155,
+      "ligne_source": "Autres capitaux propres 8 649 304 155 8 649 304 155 Services extérieurs -20 398 901 287 -18 213 236 232",
+      "valeur_courante_M_FCFA": 8649304.155,
+      "valeur_precedente_M_FCFA": 8649304.155
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 206469431933,
+      "valeur_precedente": 224421228771,
+      "ligne_source": "CHIFFRE D'AFFAIRES 206 469 431 933 224 421 228 771",
+      "valeur_courante_M_FCFA": 206469431.933,
+      "valeur_precedente_M_FCFA": 224421228.771
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 3,635,139 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 16,700,611 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b1ae9286e288516b4f18e52809d04f06c18908579cc14da6fd5537b27b118433"
+}

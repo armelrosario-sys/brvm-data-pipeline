@@ -1,0 +1,59 @@
+{
+  "ticker": "PALC",
+  "fichier_source": "3985fb15_20260323_-_etats_financiers_-_exercice_2025_-_palm_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 15508655,
+      "valeur_precedente": 15861643,
+      "ligne_source": "Résultat net 15 508 655 15 861 643 Services extérieurs -23 133 174 -17 747 669",
+      "valeur_courante_M_FCFA": 15508.655,
+      "valeur_precedente_M_FCFA": 15861.643
+    },
+    "total_actif": {
+      "valeur_courante": 199116293,
+      "valeur_precedente": 202603319,
+      "ligne_source": "TOTAL ACTIF 199 116 293 202 603 319 Achats de matières premières et fournitures liées -85 706 070 -55 737 873",
+      "valeur_courante_M_FCFA": 199116.293,
+      "valeur_precedente_M_FCFA": 202603.319
+    },
+    "total_passif": {
+      "valeur_courante": 199116293,
+      "valeur_precedente": 202603319,
+      "ligne_source": "TOTAL PASSIF 199 116 293 202 603 319 Dotations aux amortissements, aux provisions et dépré. -19 109 395 -18 179 127",
+      "valeur_courante_M_FCFA": 199116.293,
+      "valeur_precedente_M_FCFA": 202603.319
+    },
+    "capitaux_propres": {
+      "valeur_courante": 142638984,
+      "valeur_precedente": 135061151,
+      "ligne_source": "CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 142 638 984 135 061 151 Impôts et taxes -5 053 739 -3 223 113",
+      "valeur_courante_M_FCFA": 142638.984,
+      "valeur_precedente_M_FCFA": 135061.151
+    },
+    "dettes_financieres": {
+      "valeur_courante": 796559,
+      "valeur_precedente": 4047029,
+      "ligne_source": "Dettes financières et ressources assimilées 796 559 4 047 029 VALEUR AJOUTEE 62 647 945 65 600 007",
+      "valeur_courante_M_FCFA": 796.559,
+      "valeur_precedente_M_FCFA": 4047.029
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 197629996,
+      "valeur_precedente": 172182502,
+      "ligne_source": "Actifs circulants HAO 0 0 CHIFFRE D'AFFAIRES 197 629 996 172 182 502",
+      "valeur_courante_M_FCFA": 197629.996,
+      "valeur_precedente_M_FCFA": 172182.502
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "357373b0d11bbbc109617875938f8932c9a4c627030995812e63ac0b42c6c149"
+}
