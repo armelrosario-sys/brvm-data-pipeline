@@ -189,6 +189,37 @@ def extraire_champs(lignes, labels_normalises):
                 resultats[champ] = dict(valeur_courante=valeurs[0], valeur_precedente=None,
                                         ligne_source=" ".join(m["texte"] for m in ligne))
             break
+
+    # Secours (15/07/2026, decouvert sur SDSC reel) : certains documents
+    # n'ecrivent jamais "TOTAL ACTIF"/"TOTAL PASSIF" explicitement -- juste
+    # "TOTAL" seul, DEUX FOIS sur la meme ligne (cote actif, cote passif,
+    # cote a cote dans le bilan). Plutot que de deviner lequel est lequel,
+    # on exploite l'EQUILIBRE COMPTABLE : Total Actif = Total Passif, TOUJOURS,
+    # par definition. Si "TOTAL" apparait exactement 2 fois sur une ligne et
+    # que les deux occurrences donnent la MEME valeur, c'est necessairement
+    # la ligne du total general du bilan -- assignee aux deux champs a la
+    # fois, sans ambiguite. Ne s'applique QUE si la recherche normale n'a
+    # RIEN trouve pour ces deux champs (jamais prioritaire sur un libelle
+    # explicite "TOTAL ACTIF"/"TOTAL PASSIF").
+    if "total_actif" not in resultats and "total_passif" not in resultats:
+        for ligne in lignes:
+            mots_norm = [_normaliser(m["texte"]) for m in ligne]
+            positions_total = [i for i, m in enumerate(mots_norm) if m == "total"]
+            if len(positions_total) != 2:
+                continue
+            i1, i2 = positions_total
+            fin_premier = i1 + 1
+            debut_second = i2
+            groupe1 = _regrouper_nombres(ligne[fin_premier:debut_second])
+            groupe2 = _regrouper_nombres(ligne[debut_second + 1:])
+            if len(groupe1) >= 2 and len(groupe2) >= 2 and groupe1[:2] == groupe2[:2]:
+                source = " ".join(m["texte"] for m in ligne)
+                resultats["total_actif"] = dict(valeur_courante=groupe1[0], valeur_precedente=groupe1[1],
+                                                ligne_source=f"[TOTAL seul, equilibre actif=passif verifie] {source}")
+                resultats["total_passif"] = dict(valeur_courante=groupe2[0], valeur_precedente=groupe2[1],
+                                                 ligne_source=f"[TOTAL seul, equilibre actif=passif verifie] {source}")
+                break
+
     return resultats, annee_c, annee_p
 
 
