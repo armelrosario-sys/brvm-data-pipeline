@@ -1,7 +1,7 @@
 {
   "ticker": "SEMC",
   "fichier_source": "1335eb6d_20241216_-_etats_financiers_de_synthese_-exercice_2023_-_eviosys_packaging_siem_ci.pdf",
-  "exercice_courant": 2073,
+  "exercice_courant": 2023,
   "exercice_precedent": 2022,
   "referentiel": "syscohada",
   "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",

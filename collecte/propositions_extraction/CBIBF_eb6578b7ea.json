@@ -1,8 +1,8 @@
 {
   "ticker": "CBIBF",
   "fichier_source": "682834bc_20260707_-_etats_financiers_-_exercice_2025_-_coris_bank_international_bf.pdf",
-  "exercice_courant": 2088,
-  "exercice_precedent": 2088,
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
   "referentiel": "bancaire_umoa",
   "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
   "methode_pages": [
