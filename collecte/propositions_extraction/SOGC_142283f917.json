@@ -1,0 +1,52 @@
+{
+  "ticker": "SOGC",
+  "fichier_source": "071f8a23_20230424_-_etats_financiers_exercice_2022_-_sogb_ci.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2021,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 15652984,
+      "valeur_precedente": 14728280,
+      "ligne_source": "immobilisations corporelles 62 749 925 64 499 032 Résultat net l'exercice 15 652 984 14 728 280",
+      "valeur_courante_M_FCFA": 15652.984,
+      "valeur_precedente_M_FCFA": 14728.28
+    },
+    "capitaux_propres": {
+      "valeur_courante": 13004308,
+      "valeur_precedente": 6000511,
+      "ligne_source": "Flux de trésorerie provenantdes capitaux propres (13 004 308) (6 000 511)",
+      "valeur_courante_M_FCFA": 13004.308,
+      "valeur_precedente_M_FCFA": 6000.511
+    },
+    "dettes_financieres": {
+      "valeur_courante": 3631602,
+      "valeur_precedente": 6116745,
+      "ligne_source": "Autres immobilisations 538 005 524 042 Dettes financières 3 631 602 6 116 745",
+      "valeur_courante_M_FCFA": 3631.602,
+      "valeur_precedente_M_FCFA": 6116.745
+    },
+    "total_actif": {
+      "valeur_courante": 93857925,
+      "valeur_precedente": 97008610,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] TOTAL 93 857 925 97 008 610 TOTAL 93 857 925 97 008 610",
+      "valeur_courante_M_FCFA": 93857.925,
+      "valeur_precedente_M_FCFA": 97008.61
+    },
+    "total_passif": {
+      "valeur_courante": 93857925,
+      "valeur_precedente": 97008610,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] TOTAL 93 857 925 97 008 610 TOTAL 93 857 925 97 008 610",
+      "valeur_courante_M_FCFA": 93857.925,
+      "valeur_precedente_M_FCFA": 97008.61
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "142283f917c008058e58f47bbe2123ffea72b8212d181f221e5dc2cf37291aed"
+}

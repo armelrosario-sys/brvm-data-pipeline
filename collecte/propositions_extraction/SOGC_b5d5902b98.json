@@ -1,0 +1,52 @@
+{
+  "ticker": "SOGC",
+  "fichier_source": "b84ea812_20260422_-_etats_financiers_syscohada_-_exercice_2025_-_sogb_ci.pdf",
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 12492623,
+      "valeur_precedente": 13110790,
+      "ligne_source": "immobilisations corporelles 61 200 183 60 611 927 Résultat net l'exercice 12 492 623 13 110 790",
+      "valeur_courante_M_FCFA": 12492.623,
+      "valeur_precedente_M_FCFA": 13110.79
+    },
+    "capitaux_propres": {
+      "valeur_courante": -12898314,
+      "valeur_precedente": -4968423,
+      "ligne_source": "Flux de trésorerie provenant des capitaux propres -12 898 314 -4 968 423",
+      "valeur_courante_M_FCFA": -12898.314,
+      "valeur_precedente_M_FCFA": -4968.423
+    },
+    "dettes_financieres": {
+      "valeur_courante": 9323,
+      "valeur_precedente": 9323,
+      "ligne_source": "Autres immobilisations 752 940 568 142 Dettes financières 9 323 9 323",
+      "valeur_courante_M_FCFA": 9.323,
+      "valeur_precedente_M_FCFA": 9.323
+    },
+    "total_actif": {
+      "valeur_courante": 90288082,
+      "valeur_precedente": 88962049,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] TOTAL 90 288 082 88 962 049 TOTAL 90 288 082 88 962 049",
+      "valeur_courante_M_FCFA": 90288.082,
+      "valeur_precedente_M_FCFA": 88962.049
+    },
+    "total_passif": {
+      "valeur_courante": 90288082,
+      "valeur_precedente": 88962049,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] TOTAL 90 288 082 88 962 049 TOTAL 90 288 082 88 962 049",
+      "valeur_courante_M_FCFA": 90288.082,
+      "valeur_precedente_M_FCFA": 88962.049
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b5d5902b98055b4b54503f5299080c72376f8211697c336af2d2b848be377487"
+}

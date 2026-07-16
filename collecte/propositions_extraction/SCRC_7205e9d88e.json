@@ -1,0 +1,55 @@
+{
+  "ticker": "SCRC",
+  "fichier_source": "3c1125fc_20260430_-_etats_financiers_syscohada_-_exercice_2025_-_sucrivoire_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 6131800226,
+      "valeur_precedente": 2590611302,
+      "ligne_source": "Résultat net - 6 131 800 226 2 590 611 302 Services extérieurs - 1 2 011 972 904 - 9 806 142 738",
+      "valeur_courante_M_FCFA": 6131800.226,
+      "valeur_precedente_M_FCFA": 2590611.302
+    },
+    "total_actif": {
+      "valeur_courante": 146852084757,
+      "valeur_precedente": 123092041899,
+      "ligne_source": "TOTAL ACTIF 146 852 084 757 123 092 041 899 - Variation de stocks de matières premières et fournitures liées - -",
+      "valeur_courante_M_FCFA": 146852084.757,
+      "valeur_precedente_M_FCFA": 123092041.899
+    },
+    "total_passif": {
+      "valeur_courante": 146852084757,
+      "valeur_precedente": 123092041899,
+      "ligne_source": "TOTAL PASSIF 146 852 084 757 123 092 041 899 Dotations aux amortissements, aux provisions et dépréciations - 1 3 801 582 572 - 1 3 088 582 639",
+      "valeur_courante_M_FCFA": 146852084.757,
+      "valeur_precedente_M_FCFA": 123092041.899
+    },
+    "capitaux_propres": {
+      "valeur_courante": 13822035189,
+      "valeur_precedente": 19953835415,
+      "ligne_source": "Total capitaux propres 13 822 035 189 19 953 835 415 Impôts et taxes - 2 588 702 951 - 1 961 624 680",
+      "valeur_courante_M_FCFA": 13822035.189,
+      "valeur_precedente_M_FCFA": 19953835.415
+    },
+    "dettes_financieres": {
+      "valeur_courante": 69108844430,
+      "valeur_precedente": 32078800331,
+      "ligne_source": "Dettes financières et resources assimilées 69 108 844 430 32 078 800 331 VALEUR AJOUTEE 2 8 883 985 260 3 3 243 309 172",
+      "valeur_courante_M_FCFA": 69108844.43,
+      "valeur_precedente_M_FCFA": 32078800.331
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 6,131,800 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 2,590,611 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "7205e9d88e378ceb8068b23624f96897ce347081370912c982f6bbb27f709a08"
+}

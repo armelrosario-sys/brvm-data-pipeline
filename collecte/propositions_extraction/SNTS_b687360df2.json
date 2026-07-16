@@ -1,0 +1,49 @@
+{
+  "ticker": "SNTS",
+  "fichier_source": "a5b600e9_20240222_-_etats_financiers_-_exercice_2023_-_sonatel_sn.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "ocr",
+    "natif",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "ocr"
+  ],
+  "champs": {
+    "total_actif": {
+      "valeur_courante": 2573858,
+      "valeur_precedente": null,
+      "ligne_source": "Total actif : 2.573.858",
+      "valeur_courante_M_FCFA": 2573858.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b687360df23964d97c5e912fa96598dbee06cb55ce62f284290633869dca656e"
+}

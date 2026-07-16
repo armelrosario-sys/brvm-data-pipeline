@@ -1,0 +1,65 @@
+{
+  "ticker": "SLBC",
+  "fichier_source": "6b681bb1_20190405_-_etats_financiers_exercice_2018_-_solibra_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1305,
+      "valeur_precedente": 4250,
+      "ligne_source": "BENEFICE NET 1 305 4 250",
+      "valeur_courante_M_FCFA": 1305.0,
+      "valeur_precedente_M_FCFA": 4250.0
+    },
+    "total_actif": {
+      "valeur_courante": 271179,
+      "valeur_precedente": 258729,
+      "ligne_source": "Total Actif 271 179 258 729",
+      "valeur_courante_M_FCFA": 271179.0,
+      "valeur_precedente_M_FCFA": 258729.0
+    },
+    "total_passif": {
+      "valeur_courante": 271179,
+      "valeur_precedente": 258729,
+      "ligne_source": "Total Passif 271 179 258 729",
+      "valeur_courante_M_FCFA": 271179.0,
+      "valeur_precedente_M_FCFA": 258729.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 63422,
+      "valeur_precedente": null,
+      "ligne_source": "Transfert de charges Augmentation Autres dettes Financières 63 422",
+      "valeur_courante_M_FCFA": 63422.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 202816,
+      "valeur_precedente": 193372,
+      "ligne_source": "CHIFFRE D'AFFAIRES ET AUTRES PRODUITS 202 816 193 372 RESSOURCES",
+      "valeur_courante_M_FCFA": 202816.0,
+      "valeur_precedente_M_FCFA": 193372.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "8996711b83e9d09661ff6ac7e665855f0520d4a9d688f55e04dec0c347f28ed9"
+}

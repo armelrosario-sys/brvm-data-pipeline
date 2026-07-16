@@ -1,0 +1,66 @@
+{
+  "ticker": "SLBC",
+  "fichier_source": "c4edd3a8_20240513_-_etats_financiers_de_synthese_-_exercice_2023_-_solibra_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 15078,
+      "valeur_precedente": 1217,
+      "ligne_source": "BENEFICE NET 15 078 1 217 Acquisition d'immobilisations Financières 119 79",
+      "valeur_courante_M_FCFA": 15078.0,
+      "valeur_precedente_M_FCFA": 1217.0
+    },
+    "total_actif": {
+      "valeur_courante": 327698,
+      "valeur_precedente": 334102,
+      "ligne_source": "Total Actif 327 698 334 102",
+      "valeur_courante_M_FCFA": 327698.0,
+      "valeur_precedente_M_FCFA": 334102.0
+    },
+    "total_passif": {
+      "valeur_courante": 327698,
+      "valeur_precedente": 334102,
+      "ligne_source": "Total Passif 327 698 334 102",
+      "valeur_courante_M_FCFA": 327698.0,
+      "valeur_precedente_M_FCFA": 334102.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 45000,
+      "ligne_source": "Transfert de charges 839 701 Augmentation Autres dettes Financières 0 45 000",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 45000.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 311395,
+      "valeur_precedente": 281880,
+      "ligne_source": "CHIFFRE D'AFFAIRES ET AUTRES PRODUITS 311 395 281 880 RESSOURCES",
+      "valeur_courante_M_FCFA": 311395.0,
+      "valeur_precedente_M_FCFA": 281880.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "5fe202f9077c2b0a30ad3b0721175afc69f73ea307e0d34d2beda4231dd8a45d"
+}

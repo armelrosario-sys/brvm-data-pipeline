@@ -1,0 +1,16 @@
+{
+  "ticker": "SLBC",
+  "fichier_source": "b380e6c1_20260519_-_etats_financiers_-_exercice_2025_-_solibra_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f264816485f8e3dcb258dfb10b815691dce8a17b12a6d168edc8e0602d35ee32"
+}
