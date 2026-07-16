@@ -1,0 +1,36 @@
+{
+  "ticker": "BOAB",
+  "fichier_source": "caa58b11_20240403_-_etats_financiers_-_exercice_2023_-_boa_benin.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 19143162703,
+      "valeur_precedente": 21528745870,
+      "ligne_source": "16 RESULTAT DE L'EXERCICE (+/-) 19 143 162 703 21 528 745 870",
+      "valeur_courante_M_FCFA": 19143162.703,
+      "valeur_precedente_M_FCFA": 21528745.87
+    },
+    "capitaux_propres": {
+      "valeur_courante": 104674009283112817609313,
+      "valeur_precedente": null,
+      "ligne_source": "9 CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 104 674 009 283 112 817 609 313",
+      "valeur_courante_M_FCFA": 1.0467400928311281e+20
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 19,143,163 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 21,528,746 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "670da39f89166fb9db162654e50437e8902acd9b7129fc0267a0a09d802e3a07"
+}

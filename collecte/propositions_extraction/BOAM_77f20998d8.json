@@ -1,0 +1,37 @@
+{
+  "ticker": "BOAM",
+  "fichier_source": "2db77cd6_20240405_-_etats_financiers_-_exercice_2023_-_boa_mali.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2460477481,
+      "valeur_precedente": 5778294073,
+      "ligne_source": "16 RESULTAT DE L'EXERCICE 2460 477 481 5778 294073",
+      "valeur_courante_M_FCFA": 2460477.481,
+      "valeur_precedente_M_FCFA": 5778294.073
+    },
+    "capitaux_propres": {
+      "valeur_courante": 34541828466,
+      "valeur_precedente": 40197098666,
+      "ligne_source": "9 CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 34 541 828 466 40 197 098 666",
+      "valeur_courante_M_FCFA": 34541828.466,
+      "valeur_precedente_M_FCFA": 40197098.666
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 2,460,477 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 5,778,294 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "77f20998d8b1def30299a400bbe4584093fb54a6e40d05f7ab5fa7721896e31e"
+}

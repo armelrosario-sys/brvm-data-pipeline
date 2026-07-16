@@ -1,0 +1,63 @@
+{
+  "ticker": "BOAN",
+  "fichier_source": "8246ebfd_20240325_-_etats_financiers_-_exercice_2023_-_boa_niger.pdf",
+  "exercice_courant": 2097,
+  "exercice_precedent": 2032,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 10134089251,
+      "valeur_precedente": 10076732131,
+      "ligne_source": "16 RESULTAT DE L'EXERCICE 10 134 089 251 10 076 732 131",
+      "valeur_courante_M_FCFA": 10134089.251,
+      "valeur_precedente_M_FCFA": 10076732.131
+    },
+    "capitaux_propres": {
+      "valeur_courante": 44172691398,
+      "valeur_precedente": 45669476857,
+      "ligne_source": "9 CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 44 172 691 398 45 669 476 857",
+      "valeur_courante_M_FCFA": 44172691.398,
+      "valeur_precedente_M_FCFA": 45669476.857
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 10,134,089 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 10,076,732 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "27e47308455e317b78a9dea1565b14ae0cd371af6bf84b9424660df435de99de"
+}

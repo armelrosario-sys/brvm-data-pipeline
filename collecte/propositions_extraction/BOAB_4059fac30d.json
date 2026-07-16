@@ -1,0 +1,34 @@
+{
+  "ticker": "BOAB",
+  "fichier_source": "80cc42bc_20250422_-_etats_financiers_certifies_par_les_commissaires_aux_comptes_-_exercice_2024_-_boa_benin.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2152874587019647175711,
+      "valeur_precedente": null,
+      "ligne_source": "RBP_0160|9.7 RESULTAT DE L'EXERCICE (+/-) 21 528 745 870| 19 647 175 711",
+      "valeur_courante_M_FCFA": 2.1528745870196472e+18
+    },
+    "capitaux_propres": {
+      "valeur_courante": 112817609313117396355692,
+      "valeur_precedente": null,
+      "ligne_source": "RBP_0090 |9. CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 112 817 609 313] 117 396 355 692",
+      "valeur_courante_M_FCFA": 1.1281760931311739e+20
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 2,152,874,587,019,647,232 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "4059fac30d58ea7fe736827e9fe9396711d17ceab7aa165293bf34356b26aaa7"
+}

@@ -1,0 +1,27 @@
+{
+  "ticker": "BOAS",
+  "fichier_source": "03870081_20250319_-_etats_financiers_certifies_par_les_cacs_-_exercice_2024_-_boa_senegal.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 17022,
+      "valeur_precedente": 19984,
+      "ligne_source": "RESULTAT NET 17022 19 984",
+      "valeur_courante_M_FCFA": 17.022,
+      "valeur_precedente_M_FCFA": 19.984
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "bc583de24f34b4eecc95129a07b843cf6ac0f53c4628249093be694bf2ae2754"
+}

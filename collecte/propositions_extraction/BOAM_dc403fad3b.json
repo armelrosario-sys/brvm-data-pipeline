@@ -1,0 +1,27 @@
+{
+  "ticker": "BOAM",
+  "fichier_source": "84c91238_20250319_-_etats_financiers_certifies_par_les_cacs_-_exercice_2024_-_boa_mali.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "capitaux_propres": {
+      "valeur_courante": 40197098666,
+      "valeur_precedente": 46195155867,
+      "ligne_source": "9 CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 40 197 098 666 46 195 155 867",
+      "valeur_courante_M_FCFA": 40197098.666,
+      "valeur_precedente_M_FCFA": 46195155.867
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "dc403fad3b516f6a94eecefafb56db518987c5fb3097edd0d68a7ffe8077f207"
+}
