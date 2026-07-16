@@ -113,7 +113,7 @@ def generer_blocs():
     en_tete_signaux = ("<thead><tr><th>Titre</th><th>Signal</th><th>Essentiel</th>"
                        "<th>Détail</th><th class=\"sig-col-optionnelle\">Depuis</th></tr></thead>")
     en_tete_marche = ("<thead><tr><th>Titre</th><th>Signal</th><th>Essentiel</th>"
-                      "<th>Détail</th><th class=\"sig-col-optionnelle\">Detecte le — Source</th></tr></thead>")
+                      "<th>Détail</th><th class=\"sig-col-optionnelle\">Détecté le — Source</th></tr></thead>")
 
     # ---- Bloc 1 : liste de suivi ----
     lignes = []
@@ -143,9 +143,9 @@ def generer_blocs():
       ({len(suivi)} titres — codes seuls, aucune donnee personnelle)</span></h2>
   <button class="sig-toggle" onclick="sigToggleColonnes('tbl-suivi', this)">Afficher les dates et sources</button>
   {corps_suivi}
-  <div class="sig-note">Regle d'escalade : deux signaux defavorables simultanes sur un
-  titre suivi = revue obligatoire sous 10 seances, decision ecrite au journal.
-  Le systeme ne decide jamais seul. Survolez un badge pour le code technique et sa definition.</div>
+  <div class="sig-note">Règle d'escalade : deux signaux défavorables simultanés sur un
+  titre suivi = revue obligatoire sous 10 séances, décision écrite au journal.
+  Le système ne décide jamais seul. Survolez un badge pour le code technique et sa définition.</div>
 </div>"""
 
     # ---- Bloc 2 : tous les signaux actifs du marche ----
@@ -176,7 +176,7 @@ def generer_blocs():
     if intro:
         lignes3 = []
         for t, nom, sec, date_intro, note in intro:
-            statut = f"cotation prevue le {date_intro}" if date_intro else "date de cotation a preciser"
+            statut = f"cotation prévue le {date_intro}" if date_intro else "date de cotation à préciser"
             lignes3.append(f"<tr><td><b>{t}</b></td><td>{nom}</td><td>{sec.replace('_',' ').title()}</td>"
                           f"<td>{statut}</td><td class='sig-note-cell'>{note or ''}</td></tr>")
         bloc3 = f"""
@@ -187,8 +187,8 @@ def generer_blocs():
     <thead><tr><th>Titre</th><th>Nom</th><th>Secteur</th><th>Statut</th><th>Note</th></tr></thead>
     <tbody>{''.join(lignes3)}</tbody>
   </table>
-  <div class="sig-note">Absence de cours = pas encore cote, pas un probleme de donnee ni un risque --
-  ce titre rejoindra les autres tableaux des que ses premieres cotations seront collectees.</div>
+  <div class="sig-note">Absence de cours = pas encore côté, pas un problème de donnée ni un risque --
+  ce titre rejoindra les autres tableaux dès que ses premières cotations seront collectées.</div>
 </div>"""
 
     return STYLE + bloc1 + bloc2 + bloc3
