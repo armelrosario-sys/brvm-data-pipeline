@@ -1,0 +1,48 @@
+{
+  "ticker": "STBC",
+  "fichier_source": "0aaab670_20240605_-_etats_financiers_verifie_par_les_cac_-_exercice_2023_-_sitab_ci.pdf",
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 12399004223,
+      "valeur_precedente": 11503188097,
+      "ligne_source": "Autre actif circulant Résultat net de l'exercice 12 399 004 223 11 503 188 097",
+      "valeur_courante_M_FCFA": 12399004.223,
+      "valeur_precedente_M_FCFA": 11503188.097
+    },
+    "total_actif": {
+      "valeur_courante": 35417065559,
+      "valeur_precedente": 31612312100,
+      "ligne_source": "Total Actif 35 417 065 559 31 612 312 100Total Passif 35 417 065 559 31 612 312 100",
+      "valeur_courante_M_FCFA": 35417065.559,
+      "valeur_precedente_M_FCFA": 31612312.1
+    },
+    "capitaux_propres": {
+      "valeur_courante": -10773000000,
+      "valeur_precedente": -8618400000,
+      "ligne_source": "Flux de trésorerie provenant des capitaux propres -10 773 000 000 -8 618 400 000",
+      "valeur_courante_M_FCFA": -10773000.0,
+      "valeur_precedente_M_FCFA": -8618400.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 7950000,
+      "valeur_precedente": 7950000,
+      "ligne_source": "Autres dettes financières 7 950 000 7 950 000",
+      "valeur_courante_M_FCFA": 7950.0,
+      "valeur_precedente_M_FCFA": 7950.0
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 12,399,004 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 11,503,188 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "a1c6365ed9cc6645032f0416f7a8fec56cf79816135a02b5e39ca18dbdd668a0"
+}

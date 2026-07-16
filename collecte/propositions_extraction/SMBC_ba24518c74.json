@@ -1,0 +1,59 @@
+{
+  "ticker": "SMBC",
+  "fichier_source": "136c98fa_20240513_-_etats_financiers_de_synthese_-_exercice_2023_-_smb_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 17255,
+      "valeur_precedente": 9421,
+      "ligne_source": "Résultat net de l'exercice 17 255 9 421",
+      "valeur_courante_M_FCFA": 17255.0,
+      "valeur_precedente_M_FCFA": 9421.0
+    },
+    "total_actif": {
+      "valeur_courante": 183993,
+      "valeur_precedente": 164761,
+      "ligne_source": "TOTAL ACTIF 183 993 164 761 EXCEDENT BRUT D'EXPLOITATION 30 283 14 390",
+      "valeur_courante_M_FCFA": 183993.0,
+      "valeur_precedente_M_FCFA": 164761.0
+    },
+    "total_passif": {
+      "valeur_courante": 183993,
+      "valeur_precedente": 164761,
+      "ligne_source": "TOTAL PASSIF 183 993 164 761",
+      "valeur_courante_M_FCFA": 183993.0,
+      "valeur_precedente_M_FCFA": 164761.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 35951,
+      "valeur_precedente": 24932,
+      "ligne_source": "CAPITAUX PROPRES 35 951 24 932 Revenus financiers et assimilés 2 971 1 220",
+      "valeur_courante_M_FCFA": 35951.0,
+      "valeur_precedente_M_FCFA": 24932.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 2367,
+      "valeur_precedente": 3218,
+      "ligne_source": "Emprunts & Dettes Financières 2 367 3218 Transfert de charges financières 0 0",
+      "valeur_courante_M_FCFA": 2367.0,
+      "valeur_precedente_M_FCFA": 3218.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 247646,
+      "valeur_precedente": 276854,
+      "ligne_source": "CHIFFRE D'AFFAIRES 247 646 276 854",
+      "valeur_courante_M_FCFA": 247646.0,
+      "valeur_precedente_M_FCFA": 276854.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ba24518c745bc692cd9a280230cfc87c2624754b4ee011313fd9b1dc0b2d28e5"
+}

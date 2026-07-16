@@ -1,0 +1,41 @@
+{
+  "ticker": "STBC",
+  "fichier_source": "d9dbba08_20230713_-_etats_financiers_consolides_-_exercice_2022_-_sitab_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 11331559237,
+      "valeur_precedente": 10747776452,
+      "ligne_source": "Immobilisa corporelles(1) et (2)AI 34 119 473 728 19 288 011 600 14 831 462 128 12 141 183 313 Résultat net (part de l’entité consolidante) 11 331 559 237 10 747 776 452",
+      "valeur_courante_M_FCFA": 11331559.237,
+      "valeur_precedente_M_FCFA": 10747776.452
+    },
+    "dettes_financieres": {
+      "valeur_courante": 9350000,
+      "valeur_precedente": 8300000,
+      "ligne_source": "Titres mis en équivalence Emprunts et dettes financières 9 350 000 8 300 000",
+      "valeur_courante_M_FCFA": 9350.0,
+      "valeur_precedente_M_FCFA": 8300.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 358571540404,
+      "valeur_precedente": 195734637327,
+      "ligne_source": "Chiffre d'affaires 358 571 540 404 195 734 637 327 Variation du BF lié aux activités 17 380 627 625 2 010 967 316",
+      "valeur_courante_M_FCFA": 358571540.404,
+      "valeur_precedente_M_FCFA": 195734637.327
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 11,331,559 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 10,747,776 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f11289beab8328bc9ff555e94c7de11c769f61f8efd89530c84fddf231abedbc"
+}

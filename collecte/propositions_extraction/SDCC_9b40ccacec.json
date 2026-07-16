@@ -1,0 +1,67 @@
+{
+  "ticker": "SDCC",
+  "fichier_source": "fec37bef_20250430_-_etats_financiers_-_exercice_2024_-_sode_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 36,
+      "valeur_precedente": null,
+      "ligne_source": "• Résultat Net : Le résultat net de l’exercice s’établit à 3,6 milliards FCFA. Il est supérieur aux",
+      "valeur_courante_M_FCFA": 36.0
+    },
+    "total_actif": {
+      "valeur_courante": 432406017,
+      "valeur_precedente": 381717984,
+      "ligne_source": "Total actif 432.406.017 381.717.984",
+      "valeur_courante_M_FCFA": 432406017.0,
+      "valeur_precedente_M_FCFA": 381717984.0
+    },
+    "total_passif": {
+      "valeur_courante": 432406017,
+      "valeur_precedente": 381717984,
+      "ligne_source": "Total passif 432.406.017 381.717.984",
+      "valeur_courante_M_FCFA": 432406017.0,
+      "valeur_precedente_M_FCFA": 381717984.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 3072525,
+      "valeur_precedente": 2975242,
+      "ligne_source": "Autres capitaux propres 3.072.525 2.975.242",
+      "valeur_courante_M_FCFA": 3072525.0,
+      "valeur_precedente_M_FCFA": 2975242.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 65170225,
+      "valeur_precedente": 62574348,
+      "ligne_source": "Dettes financières & ressources assimilées 65.170.225 62.574.348",
+      "valeur_courante_M_FCFA": 65170225.0,
+      "valeur_precedente_M_FCFA": 62574348.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 3072525,
+      "valeur_precedente": 2975242,
+      "ligne_source": "Autres capitaux propres 3.072.525 2.975.242",
+      "valeur_courante_M_FCFA": 3072525.0,
+      "valeur_precedente_M_FCFA": 2975242.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 172235053175458474,
+      "valeur_precedente": 47446685,
+      "ligne_source": "Chiffre d'affaires 172.235.053 175.458.474 + Variation du passif circulant 47.446.685 28.467.534",
+      "valeur_courante_M_FCFA": 1.7223505317545846e+17,
+      "valeur_precedente_M_FCFA": 47446685.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "9b40ccacecff9e7d4ab819e6e18a2635cc696fef3aff6e73633345b96b924ee9"
+}

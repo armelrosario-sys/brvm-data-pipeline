@@ -1,0 +1,48 @@
+{
+  "ticker": "STBC",
+  "fichier_source": "c9c4b45f_20230814_-_etats_financiers_certifies_et_approuves_-_exercice_2022_-_sitab_ci.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2021,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 11503188097,
+      "valeur_precedente": 9642415475,
+      "ligne_source": "Autre actif circulant Résultat net de l'exercice 11 503 188 097 9 642 415 475",
+      "valeur_courante_M_FCFA": 11503188.097,
+      "valeur_precedente_M_FCFA": 9642415.475
+    },
+    "total_actif": {
+      "valeur_courante": 31612312100,
+      "valeur_precedente": 37826007574,
+      "ligne_source": "Total Actif 31 612 312 100 37 826 007 574Total Passif 31 612 312 100 37 826 007 574",
+      "valeur_courante_M_FCFA": 31612312.1,
+      "valeur_precedente_M_FCFA": 37826007.574
+    },
+    "capitaux_propres": {
+      "valeur_courante": -8618400000,
+      "valeur_precedente": -8618400000,
+      "ligne_source": "capitaux propres -8 618 400 000 -8 618 400 000",
+      "valeur_courante_M_FCFA": -8618400.0,
+      "valeur_precedente_M_FCFA": -8618400.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 7950000,
+      "valeur_precedente": 6900000,
+      "ligne_source": "Autres dettes financières 7 950 000 6 900 000",
+      "valeur_courante_M_FCFA": 7950.0,
+      "valeur_precedente_M_FCFA": 6900.0
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 11,503,188 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 9,642,415 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "80d20de3b08a399d4c690e8bc88aa5fca2b969676a156f4729fee953b82aee96"
+}

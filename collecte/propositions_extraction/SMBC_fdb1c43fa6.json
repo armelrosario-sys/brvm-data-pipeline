@@ -1,0 +1,59 @@
+{
+  "ticker": "SMBC",
+  "fichier_source": "5545a0e2_20250430_-_etats_financiers_-_exercice_2024_-_smb_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 8698,
+      "valeur_precedente": 17255,
+      "ligne_source": "Résultat net de l'exercice 8 698 17 255",
+      "valeur_courante_M_FCFA": 8698.0,
+      "valeur_precedente_M_FCFA": 17255.0
+    },
+    "total_actif": {
+      "valeur_courante": 163113,
+      "valeur_precedente": 183993,
+      "ligne_source": "TOTAL ACTIF 163 113 183 993 EXCEDENT BRUT D'EXPLOITATION 13 030 30 283",
+      "valeur_courante_M_FCFA": 163113.0,
+      "valeur_precedente_M_FCFA": 183993.0
+    },
+    "total_passif": {
+      "valeur_courante": 163113,
+      "valeur_precedente": 183993,
+      "ligne_source": "TOTAL PASSIF 163 113 183 993",
+      "valeur_courante_M_FCFA": 163113.0,
+      "valeur_precedente_M_FCFA": 183993.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 35294,
+      "valeur_precedente": 35951,
+      "ligne_source": "CAPITAUX PROPRES 35 294 35 951 Revenus financiers et assimilés 3 150 2 971",
+      "valeur_courante_M_FCFA": 35294.0,
+      "valeur_precedente_M_FCFA": 35951.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 6485,
+      "valeur_precedente": 2367,
+      "ligne_source": "Emprunts & Dettes Financières 6 485 2367 Transfert de charges financières 0 0",
+      "valeur_courante_M_FCFA": 6485.0,
+      "valeur_precedente_M_FCFA": 2367.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 229061,
+      "valeur_precedente": 247646,
+      "ligne_source": "CHIFFRE D'AFFAIRES 229 061 247 646",
+      "valeur_courante_M_FCFA": 229061.0,
+      "valeur_precedente_M_FCFA": 247646.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "fdb1c43fa6e94fed21f9f78268a1dc0ef1f97f26ac1ece066b9f88d686166ac5"
+}
