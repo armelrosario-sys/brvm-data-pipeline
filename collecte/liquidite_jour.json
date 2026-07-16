@@ -1,331 +1,425 @@
 {
  "ABJC": {
   "volume_jour": 990.0,
+  "cours_veille": 3125.0,
   "cours_cloture": 3150.0,
+  "variation_pct": 0.8,
   "valeur_echangee_jour": 3118500.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976619+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855087+00:00"
  },
  "BICB": {
   "volume_jour": 8110.0,
+  "cours_veille": 6480.0,
   "cours_cloture": 6550.0,
+  "variation_pct": 1.08,
   "valeur_echangee_jour": 53120500.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976655+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855135+00:00"
  },
  "BICC": {
   "volume_jour": 645.0,
+  "cours_veille": 28050.0,
   "cours_cloture": 27800.0,
+  "variation_pct": -2.8,
   "valeur_echangee_jour": 17931000.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976676+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855165+00:00"
  },
  "BNBC": {
   "volume_jour": 1869.0,
+  "cours_veille": 1850.0,
   "cours_cloture": 1880.0,
+  "variation_pct": 7.43,
   "valeur_echangee_jour": 3513720.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976696+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855193+00:00"
  },
  "BOAB": {
   "volume_jour": 4019.0,
+  "cours_veille": 8840.0,
   "cours_cloture": 8765.0,
+  "variation_pct": -0.85,
   "valeur_echangee_jour": 35226535.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976715+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855228+00:00"
  },
  "BOABF": {
   "volume_jour": 10110.0,
+  "cours_veille": 6825.0,
   "cours_cloture": 6825.0,
+  "variation_pct": 7.48,
   "valeur_echangee_jour": 69000750.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976736+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855255+00:00"
  },
  "BOAC": {
   "volume_jour": 10538.0,
+  "cours_veille": 9750.0,
   "cours_cloture": 9650.0,
+  "variation_pct": -1.03,
   "valeur_echangee_jour": 101691700.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976753+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855280+00:00"
  },
  "BOAM": {
   "volume_jour": 4872.0,
+  "cours_veille": 5750.0,
   "cours_cloture": 5680.0,
+  "variation_pct": -0.09,
   "valeur_echangee_jour": 27672960.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976774+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855305+00:00"
  },
  "BOAN": {
   "volume_jour": 14419.0,
+  "cours_veille": 5105.0,
   "cours_cloture": 5110.0,
+  "variation_pct": 7.47,
   "valeur_echangee_jour": 73681090.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976790+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855368+00:00"
  },
  "BOAS": {
   "volume_jour": 18796.0,
+  "cours_veille": 7315.0,
   "cours_cloture": 7320.0,
+  "variation_pct": 0.07,
   "valeur_echangee_jour": 137586720.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976805+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855394+00:00"
  },
  "CABC": {
   "volume_jour": 4152.0,
+  "cours_veille": 3705.0,
   "cours_cloture": 3710.0,
+  "variation_pct": -2.37,
   "valeur_echangee_jour": 15403920.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976822+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855422+00:00"
  },
  "CBIBF": {
   "volume_jour": 2256.0,
+  "cours_veille": 30005.0,
   "cours_cloture": 30005.0,
+  "variation_pct": 0.02,
   "valeur_echangee_jour": 67691280.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976838+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855448+00:00"
  },
  "CFAC": {
   "volume_jour": 5912.0,
+  "cours_veille": 1560.0,
   "cours_cloture": 1560.0,
+  "variation_pct": -2.8,
   "valeur_echangee_jour": 9222720.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976854+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855473+00:00"
  },
  "CIEC": {
   "volume_jour": 4123.0,
+  "cours_veille": 5195.0,
   "cours_cloture": 5190.0,
+  "variation_pct": -0.19,
   "valeur_echangee_jour": 21398370.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976873+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855497+00:00"
  },
  "ECOC": {
   "volume_jour": 6512.0,
+  "cours_veille": 15900.0,
   "cours_cloture": 15900.0,
+  "variation_pct": -2.87,
   "valeur_echangee_jour": 103540800.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976890+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855521+00:00"
  },
  "ETIT": {
   "volume_jour": 1871864.0,
+  "cours_veille": 78.0,
   "cours_cloture": 78.0,
+  "variation_pct": 6.85,
   "valeur_echangee_jour": 146005392.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976906+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855545+00:00"
  },
  "FTSC": {
   "volume_jour": 4183.0,
+  "cours_veille": 1990.0,
   "cours_cloture": 1975.0,
+  "variation_pct": -0.75,
   "valeur_echangee_jour": 8261425.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976922+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855587+00:00"
  },
  "LNBB": {
   "volume_jour": 1507.0,
+  "cours_veille": 4340.0,
   "cours_cloture": 4320.0,
+  "variation_pct": -0.46,
   "valeur_echangee_jour": 6510240.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976939+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855616+00:00"
  },
  "NEIC": {
   "volume_jour": 5865.0,
+  "cours_veille": 2325.0,
   "cours_cloture": 2310.0,
+  "variation_pct": 0.0,
   "valeur_echangee_jour": 13548150.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976955+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855641+00:00"
  },
  "NSBC": {
   "volume_jour": 1750.0,
+  "cours_veille": 21260.0,
   "cours_cloture": 21000.0,
+  "variation_pct": -1.22,
   "valeur_echangee_jour": 36750000.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976970+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855666+00:00"
  },
  "NTLC": {
   "volume_jour": 384.0,
+  "cours_veille": 16000.0,
   "cours_cloture": 15930.0,
+  "variation_pct": -0.44,
   "valeur_echangee_jour": 6117120.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.976985+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855694+00:00"
  },
  "ONTBF": {
   "volume_jour": 15499.0,
+  "cours_veille": 2745.0,
   "cours_cloture": 2745.0,
+  "variation_pct": 1.67,
   "valeur_echangee_jour": 42544755.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977000+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855719+00:00"
  },
  "ORAC": {
   "volume_jour": 1465.0,
+  "cours_veille": 15800.0,
   "cours_cloture": 15800.0,
+  "variation_pct": -2.23,
   "valeur_echangee_jour": 23147000.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977019+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855745+00:00"
  },
  "ORGT": {
   "volume_jour": 4592.0,
+  "cours_veille": 2670.0,
   "cours_cloture": 2680.0,
+  "variation_pct": 0.37,
   "valeur_echangee_jour": 12306560.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977034+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855771+00:00"
  },
  "PALC": {
   "volume_jour": 10056.0,
+  "cours_veille": 8700.0,
   "cours_cloture": 8700.0,
+  "variation_pct": 2.35,
   "valeur_echangee_jour": 87487200.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977050+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855797+00:00"
  },
  "PRSC": {
   "volume_jour": 723.0,
+  "cours_veille": 4295.0,
   "cours_cloture": 4290.0,
+  "variation_pct": -0.23,
   "valeur_echangee_jour": 3101670.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977065+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855821+00:00"
  },
  "SAFC": {
   "volume_jour": 4887.0,
+  "cours_veille": 4550.0,
   "cours_cloture": 4540.0,
+  "variation_pct": 3.18,
   "valeur_echangee_jour": 22186980.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977080+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855845+00:00"
  },
  "SCRC": {
   "volume_jour": 13669.0,
+  "cours_veille": 3650.0,
   "cours_cloture": 3650.0,
+  "variation_pct": 5.49,
   "valeur_echangee_jour": 49891850.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977095+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855868+00:00"
  },
  "SDCC": {
   "volume_jour": 583.0,
+  "cours_veille": 11300.0,
   "cours_cloture": 11275.0,
+  "variation_pct": -0.22,
   "valeur_echangee_jour": 6573325.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977110+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855891+00:00"
  },
  "SDSC": {
   "volume_jour": 26749.0,
+  "cours_veille": 2525.0,
   "cours_cloture": 2525.0,
+  "variation_pct": 7.45,
   "valeur_echangee_jour": 67541225.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977125+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855915+00:00"
  },
  "SEMC": {
   "volume_jour": 5388.0,
+  "cours_veille": 1535.0,
   "cours_cloture": 1535.0,
+  "variation_pct": 2.68,
   "valeur_echangee_jour": 8270580.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977140+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855938+00:00"
  },
  "SGBC": {
   "volume_jour": 2911.0,
+  "cours_veille": 38200.0,
   "cours_cloture": 38010.0,
+  "variation_pct": -0.5,
   "valeur_echangee_jour": 110647110.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977155+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855961+00:00"
  },
  "SHEC": {
   "volume_jour": 3390.0,
+  "cours_veille": 2200.0,
   "cours_cloture": 2170.0,
+  "variation_pct": -1.36,
   "valeur_echangee_jour": 7356300.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977171+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.855984+00:00"
  },
  "SIBC": {
   "volume_jour": 7675.0,
+  "cours_veille": 8700.0,
   "cours_cloture": 8700.0,
+  "variation_pct": -2.25,
   "valeur_echangee_jour": 66772500.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977186+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856007+00:00"
  },
  "SICC": {
   "volume_jour": 35.0,
+  "cours_veille": 4755.0,
   "cours_cloture": 4755.0,
+  "variation_pct": -6.76,
   "valeur_echangee_jour": 166425.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977202+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856030+00:00"
  },
  "SIVC": {
   "volume_jour": 10595.0,
+  "cours_veille": 2530.0,
   "cours_cloture": 2530.0,
+  "variation_pct": 6.53,
   "valeur_echangee_jour": 26805350.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977220+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856053+00:00"
  },
  "SLBC": {
   "volume_jour": 1268.0,
+  "cours_veille": 39900.0,
   "cours_cloture": 39900.0,
+  "variation_pct": 2.03,
   "valeur_echangee_jour": 50593200.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977235+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856080+00:00"
  },
  "SMBC": {
   "volume_jour": 693.0,
+  "cours_veille": 16400.0,
   "cours_cloture": 16315.0,
+  "variation_pct": -4.03,
   "valeur_echangee_jour": 11306295.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977250+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856103+00:00"
  },
  "SNTS": {
   "volume_jour": 35123.0,
+  "cours_veille": 32000.0,
   "cours_cloture": 32500.0,
+  "variation_pct": 3.16,
   "valeur_echangee_jour": 1141497500.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977265+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856126+00:00"
  },
  "SOGC": {
   "volume_jour": 1889.0,
+  "cours_veille": 8200.0,
   "cours_cloture": 8200.0,
+  "variation_pct": 0.0,
   "valeur_echangee_jour": 15489800.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977281+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856150+00:00"
  },
  "SPHC": {
   "volume_jour": 3650.0,
+  "cours_veille": 7500.0,
   "cours_cloture": 7400.0,
+  "variation_pct": -1.33,
   "valeur_echangee_jour": 27010000.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977295+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856173+00:00"
  },
  "STAC": {
   "volume_jour": 6217.0,
+  "cours_veille": 3185.0,
   "cours_cloture": 3195.0,
+  "variation_pct": 3.06,
   "valeur_echangee_jour": 19863315.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977310+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856199+00:00"
  },
  "STBC": {
   "volume_jour": 2303.0,
+  "cours_veille": 23000.0,
   "cours_cloture": 23005.0,
+  "variation_pct": -4.92,
   "valeur_echangee_jour": 52980515.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977325+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856222+00:00"
  },
  "TTLC": {
   "volume_jour": 13280.0,
+  "cours_veille": 2800.0,
   "cours_cloture": 2800.0,
+  "variation_pct": -4.92,
   "valeur_echangee_jour": 37184000.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977341+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856250+00:00"
  },
  "TTLS": {
   "volume_jour": 2770.0,
+  "cours_veille": 4110.0,
   "cours_cloture": 4110.0,
+  "variation_pct": -7.43,
   "valeur_echangee_jour": 11384700.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977358+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856278+00:00"
  },
  "UNLC": {
   "volume_jour": 4.0,
+  "cours_veille": 53735.0,
   "cours_cloture": 53735.0,
+  "variation_pct": 0.0,
   "valeur_echangee_jour": 214940.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977373+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856303+00:00"
  },
  "UNXC": {
   "volume_jour": 4612.0,
+  "cours_veille": 1660.0,
   "cours_cloture": 1660.0,
+  "variation_pct": 7.44,
   "valeur_echangee_jour": 7655920.0,
-  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 19:45",
-  "collecte_le": "2026-07-15T20:01:45.977400+00:00"
+  "date_maj_brvm": "Dernière mise à jour : Mercredi, 15 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-16T02:42:56.856326+00:00"
  }
 }
