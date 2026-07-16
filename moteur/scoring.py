@@ -26,6 +26,7 @@ def charger_marche():
 
 
 LIQUIDITE_JOUR_PATH = str(_RACINE / "collecte" / "liquidite_jour.json")
+HISTORIQUE_LIQUIDITE_PATH = str(_RACINE / "collecte" / "historique_liquidite.json")
 
 
 def charger_liquidite_jour():
@@ -38,6 +39,29 @@ def charger_liquidite_jour():
         return json.load(open(LIQUIDITE_JOUR_PATH, encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
+
+
+def mediane_liquidite_historique(ticker):
+    """Correctif (15/07/2026, retour utilisateur) : la reference de liquidite
+    utilisait la valeur echangee d'UN SEUL JOUR pour SNTS -- sujette a de
+    fortes variations ponctuelles (constat reel : 1,14 Md FCFA un jour,
+    faussant le classement Taille de tout le marche ce jour-la). Utilise
+    desormais la MEDIANE de l'historique glissant accumule par
+    collecte/collecte_liquidite_jour.py (collecte/historique_liquidite.json,
+    fenetre 60 jours). Avec peu de jours accumules (chantier tout juste
+    lance), la mediane porte sur peu de points -- s'ameliore naturellement
+    au fil des collectes, sans aucune intervention manuelle."""
+    try:
+        historique = json.load(open(HISTORIQUE_LIQUIDITE_PATH, encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None, 0
+    valeurs = [jour.get(ticker) for jour in historique.values() if jour.get(ticker) is not None]
+    if not valeurs:
+        return None, 0
+    valeurs.sort()
+    n = len(valeurs)
+    mediane = valeurs[n // 2] if n % 2 == 1 else (valeurs[n // 2 - 1] + valeurs[n // 2]) / 2
+    return mediane, n
 
 
 LIQUIDITE_GENERALE_PATH = str(_RACINE / "collecte" / "liquidite_generale.json")
@@ -497,29 +521,34 @@ def modificateur_taille(ticker, marche):
     jours sans collecte (week-end, jour ferie, script pas encore execute)."""
     liquidite_jour = charger_liquidite_jour()
     donnee_jour = liquidite_jour.get(ticker)
-    ref_jour = liquidite_jour.get("SNTS", {}).get("valeur_echangee_jour")
+    # Correctif (15/07/2026) : ref_jour utilisait la valeur DU JOUR MEME de
+    # SNTS -- remplace par la MEDIANE de son historique glissant (60j),
+    # nettement moins sensible a une seule seance exceptionnelle.
+    ref_mediane, n_jours_ref = mediane_liquidite_historique("SNTS")
 
-    if donnee_jour is not None and ref_jour:
+    if donnee_jour is not None and ref_mediane:
         valeur = donnee_jour["valeur_echangee_jour"]
-        ratio = valeur / ref_jour
+        ratio = valeur / ref_mediane
         date_maj = donnee_jour.get("date_maj_brvm", "date inconnue")
+        mention_ref = (f"mediane SNTS sur {n_jours_ref}j" if n_jours_ref > 1
+                       else "valeur SNTS du jour, historique pas encore accumule")
         if ratio < 0.01:
             return {
                 "statut": "QUASI_INTRADABLE_JOUR",
                 "recommandation": "MINIMALE",
                 "note": f"valeur echangee du jour a {ratio:.1%} de la reference marche "
-                       f"({date_maj}) — donnee BRVM directe, pas une reconstruction",
+                       f"({mention_ref}, {date_maj}) — donnee BRVM directe, pas une reconstruction",
             }
         if ratio < 0.25:
             return {
                 "statut": "LIQUIDITE_FAIBLE_JOUR",
                 "recommandation": "REDUITE",
-                "note": f"valeur echangee du jour a {ratio:.1%} de la reference marche ({date_maj})",
+                "note": f"valeur echangee du jour a {ratio:.1%} de la reference marche ({mention_ref}, {date_maj})",
             }
         return {
             "statut": "LIQUIDITE_NORMALE_JOUR",
             "recommandation": "PLEINE",
-            "note": f"valeur echangee du jour a {ratio:.1%} de la reference marche ({date_maj})",
+            "note": f"valeur echangee du jour a {ratio:.1%} de la reference marche ({mention_ref}, {date_maj})",
         }
 
     # --- Repli : marche.yaml (pas de collecte du jour disponible) ---
