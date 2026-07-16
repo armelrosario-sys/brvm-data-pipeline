@@ -41,7 +41,7 @@ PORTEFEUILLE = RACINE / "config" / "portefeuille.yaml"
 sys.path.insert(0, str(RACINE / "moteur"))
 sys.path.insert(0, str(RACINE / "dashboard"))
 from scoring import charger_marche, rendement_net_estime, charger_seuils, charger_liquidite_jour  # reutilisation moteur
-from glossaire_signaux import libelle as libelle_signal  # 14/07/2026 : codes -> libelles clairs
+from glossaire_signaux import libelle as libelle_signal, badge_html  # 14/07/2026 : codes -> libelles clairs
 
 
 def charger_portefeuille(cur, liquidite_jour):
@@ -62,14 +62,39 @@ def charger_portefeuille(cur, liquidite_jour):
     seuils = charger_seuils()
     seuil_reequilibrage = seuils.get("portefeuille", {}).get("seuil_reequilibrage_pct_poche", 20)
 
-    lignes = []
-    valeur_totale = 0.0
+    # Fusion par ticker (16/07/2026, retour utilisateur : plusieurs lignes du
+    # meme titre saisies separement -- ex. deux achats de SNTS a des dates
+    # differentes -- restaient affichees separement, faussant le poids
+    # visible dans la poche). Regroupement ici : quantite sommee, CMP
+    # recalcule en moyenne PONDEREE par quantite (pas une simple moyenne
+    # arithmetique des deux prix -- un achat de 100 titres pese plus qu'un
+    # achat de 5 dans le cout moyen reel).
+    par_ticker = {}
     for p in positions:
         t = p["ticker"]
         qte = p["quantite"]
-        prix_achat = p["prix_achat_moyen"]
-        # Cours actuel : priorite au jour (cf. moteur/signaux.py, meme regle),
-        # repli sur le dernier bulletin mensuel connu.
+        prix = p["prix_achat_moyen"]
+        if t not in par_ticker:
+            par_ticker[t] = dict(quantite=0, cout_total=0.0)
+        par_ticker[t]["quantite"] += qte
+        par_ticker[t]["cout_total"] += qte * prix
+
+    # Signaux actifs par titre detenu (16/07/2026) : reconnecte Vue 1 aux
+    # outils de diagnostic deja construits (D1-D5, B1_RECORD...) -- la table
+    # signaux couvre TOUS les titres, pas seulement liste_suivi (qui n'est
+    # qu'un filtre d'affichage pour "Ma liste de suivi"), donc aucune
+    # dependance a ajouter cote donnees, juste une requete de plus ici.
+    signaux_par_ticker = {}
+    for t in par_ticker:
+        rows = cur.execute(
+            "SELECT type, direction FROM signaux WHERE ticker=? AND statut='ACTIF'", (t,)).fetchall()
+        signaux_par_ticker[t] = rows
+
+    lignes = []
+    valeur_totale = 0.0
+    for t, agg in par_ticker.items():
+        qte = agg["quantite"]
+        prix_achat = agg["cout_total"] / qte if qte else 0
         entree_jour = (liquidite_jour or {}).get(t)
         cours = entree_jour["cours_cloture"] if entree_jour else None
         if cours is None:
@@ -79,13 +104,15 @@ def charger_portefeuille(cur, liquidite_jour):
             cours = r[0] if r else None
         if cours is None:
             lignes.append(dict(ticker=t, quantite=qte, cours=None, valeur=None,
-                               plus_value_pct=None, poids_pct=None, note="cours indisponible"))
+                               plus_value_pct=None, poids_pct=None, note="cours indisponible",
+                               signaux=signaux_par_ticker.get(t, [])))
             continue
         valeur = qte * cours
         valeur_totale += valeur
         plus_value_pct = ((cours - prix_achat) / prix_achat * 100) if prix_achat else None
         lignes.append(dict(ticker=t, quantite=qte, cours=cours, valeur=valeur,
-                           prix_achat=prix_achat, plus_value_pct=plus_value_pct))
+                           prix_achat=prix_achat, plus_value_pct=plus_value_pct,
+                           signaux=signaux_par_ticker.get(t, [])))
 
     for l in lignes:
         if l.get("valeur") is not None and valeur_totale > 0:
@@ -155,18 +182,24 @@ def _html_vue1_portefeuille(pf):
     lignes_html = []
     for l in pf["lignes"]:
         if l.get("valeur") is None:
-            lignes_html.append(f"<tr><td><b>{l['ticker']}</b></td><td colspan='4' class='c-mid'>"
+            lignes_html.append(f"<tr><td><b>{l['ticker']}</b></td><td colspan='5' class='c-mid'>"
                               f"{l.get('note','donnee indisponible')}</td></tr>")
             continue
         pv = l["plus_value_pct"]
         cls_pv = "c-ok" if (pv or 0) >= 0 else "c-bad"
         alerte = (" <span class='esc'>⚠ position &gt; seuil de rééquilibrage "
                  f"({pf['seuil_reequilibrage']}%)</span>") if l.get("alerte_reequilibrage") else ""
+        sigs = l.get("signaux", [])
+        if sigs:
+            badges = " ".join(badge_html(ty) for ty, di in sigs)
+        else:
+            badges = "<span class='c-mid'>RAS</span>"
         lignes_html.append(
             f"<tr><td><b>{l['ticker']}</b></td><td>{l['quantite']}</td>"
             f"<td>{l['cours']:,.0f} FCFA</td>"
             f"<td class='{cls_pv}'>{pv:+.1f}%</td>"
-            f"<td>{l['poids_pct']}% de la poche{alerte}</td></tr>")
+            f"<td>{l['poids_pct']}% de la poche{alerte}</td>"
+            f"<td>{badges}</td></tr>")
 
     note_plafond = ""
     if pf["poids_reel_pct"] is not None and pf["plafond_poche_pct"] is not None:
@@ -175,7 +208,7 @@ def _html_vue1_portefeuille(pf):
                         f"du patrimoine total (plafond fixé : {pf['plafond_poche_pct']}%)"
                         + (" — <b>PLAFOND DÉPASSÉ</b>" if pf["depasse_plafond"] else "") + "</div>")
 
-    return f"""<table><tr><th>Titre</th><th>Quantité</th><th>Cours</th><th>Plus-value</th><th>Poids</th></tr>
+    return f"""<table><tr><th>Titre</th><th>Quantité</th><th>Cours</th><th>Plus-value</th><th>Poids</th><th>Alertes</th></tr>
 {''.join(lignes_html)}</table>
 <div class="note">Valeur totale de la poche : <b>{pf['valeur_totale']:,.0f} FCFA</b></div>
 {note_plafond}"""
