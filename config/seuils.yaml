@@ -92,6 +92,16 @@ delais_reglementaires:
 fraicheur_fondamentaux:
   seuil_perimee_jours: 365  # un cycle annuel complet sans AUCUN depot, toutes categories confondues
 
+# ------------------------------------------------------------------
+# Portefeuille reel (Vue 1, 16/07/2026) : SEUL le SEUIL est public --
+# les positions elles-memes vivent dans config/portefeuille.yaml, qui
+# n'est JAMAIS committe (voir .gitignore). Regle de reequilibrage :
+# symetrique de l'escalade deja en place pour les signaux defavorables
+# ("deux signaux simultanes = revue obligatoire") -- ici, "une position
+# trop concentree = revue obligatoire", pas une vente automatique.
+portefeuille:
+  seuil_reequilibrage_pct_poche: 20  # une position > 20% de la poche actions -> revue au journal
+
 extraction:
   plafond_plausibilite_fcfa: 1000000000000  # 1 000 Mds FCFA — APPLIQUE (moteur/tester.py) AU SEUL RESULTAT_NET (pas au bilan : total_actif/capitaux_propres de groupes bancaires panafricains le depassent legitimement — decouvert au 1er run reel, 14/07/2026)
   statut_ocr_max_sans_2e_source: "PROBABLE"  # APPLIQUE (moteur/tester.py::verifier_statut_ocr)
