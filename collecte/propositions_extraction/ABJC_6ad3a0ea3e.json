@@ -1,0 +1,16 @@
+{
+  "ticker": "ABJC",
+  "fichier_source": "87386494_20250430_-_etats_financiers_-_norme_syscohada_-_exercice_2024_-_servair_abidjan_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "6ad3a0ea3ed17d540b68efb560fa839eae62d5fe93dcca9ac72070888f3d2cfc"
+}

@@ -1,0 +1,64 @@
+{
+  "ticker": "SICC",
+  "fichier_source": "c367e08c_20260612_-_rapport_dactivites_annuel_et_etats_financiers_-_exercice_2025_-_sicor_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 31,
+      "valeur_precedente": 2024,
+      "ligne_source": "Affectation du résultat de l'exercice clos le 31 décembre 2024",
+      "valeur_courante_M_FCFA": 0.031,
+      "valeur_precedente_M_FCFA": 2.024
+    },
+    "capitaux_propres": {
+      "valeur_courante": 2975325212,
+      "valeur_precedente": null,
+      "ligne_source": "Capitaux propres | 2975 325 212",
+      "valeur_courante_M_FCFA": 2975325.212
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16896226,
+      "valeur_precedente": 16896226,
+      "ligne_source": "Dettes financières 16 896 226 16 896 226 | 0 ü %",
+      "valeur_courante_M_FCFA": 16896.226,
+      "valeur_precedente_M_FCFA": 16896.226
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "a729d4238141e3a12fc902744dd96453af8d6680bf2634b77e4ad3f50584d891"
+}

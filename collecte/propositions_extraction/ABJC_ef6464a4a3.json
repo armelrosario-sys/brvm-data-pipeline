@@ -1,0 +1,14 @@
+{
+  "ticker": "ABJC",
+  "fichier_source": "1def3574_20240425_-_etats_financiers_provisoires_-_exercice_2023_-_servair_abidjan_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ef6464a4a3f23b469bfa4ad95432b73dbb3d8434f07c6624a7aef802bad95b78"
+}

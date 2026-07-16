@@ -1,0 +1,59 @@
+{
+  "ticker": "CABC",
+  "fichier_source": "e8b07171_20260311_-_etats_financiers_ifrs_-_exercice_2025_-_sicable_ci.pdf",
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1439474,
+      "valeur_precedente": 1375096,
+      "ligne_source": "Résultat net de l'exercice; perte entre ( ) 1 439 474 1 375 096 1 134 614 795 528 695 648 1 278 894 576 556",
+      "valeur_courante_M_FCFA": 1439.474,
+      "valeur_precedente_M_FCFA": 1375.096
+    },
+    "total_actif": {
+      "valeur_courante": 23609026,
+      "valeur_precedente": 21797159,
+      "ligne_source": "TOTAL ACTIF 23 609 026 21 797 159 21 402 583 19 534 981 18 473 162 14 786 028 15 307 205",
+      "valeur_courante_M_FCFA": 23609.026,
+      "valeur_precedente_M_FCFA": 21797.159
+    },
+    "total_passif": {
+      "valeur_courante": 23609026,
+      "valeur_precedente": 21797159,
+      "ligne_source": "TOTAL PASSIF 23 609 026 21 797 159 21 402 583 19 534 981 18 473 162 14 786 028 15 307 205",
+      "valeur_courante_M_FCFA": 23609.026,
+      "valeur_precedente_M_FCFA": 21797.159
+    },
+    "capitaux_propres": {
+      "valeur_courante": 758352,
+      "valeur_precedente": 523446,
+      "ligne_source": "Flux de trésorerie du financement par les capitaux propres (758 352) (523 446) (453 886) (453 886) (874 844) (493 333) (493 333)",
+      "valeur_courante_M_FCFA": 758.352,
+      "valeur_precedente_M_FCFA": 523.446
+    },
+    "dettes_financieres": {
+      "valeur_courante": 417601,
+      "valeur_precedente": 427574,
+      "ligne_source": "Dettes financières et ressources assimilées 417 601 427 574 436 992 445 884 458 336 471 554 485 004",
+      "valeur_courante_M_FCFA": 417.601,
+      "valeur_precedente_M_FCFA": 427.574
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 21263067,
+      "valeur_precedente": 19125319,
+      "ligne_source": "Chiffre d'Affaires total 21 263 067 19 125 319 17 752 564 16 481 281 19 036 864 18 897 904 15 199 537",
+      "valeur_courante_M_FCFA": 21263.067,
+      "valeur_precedente_M_FCFA": 19125.319
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "a96ed5bf4ba28beb4358f32164ba64013cf41431c8988bf31dc9914aa348d4c3"
+}

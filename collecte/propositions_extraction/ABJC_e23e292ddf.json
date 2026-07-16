@@ -1,0 +1,33 @@
+{
+  "ticker": "ABJC",
+  "fichier_source": "9709d35f_20260427_-_etats_financiers_syscohada_-_exercice_2025_-_servair_abidjan_ci.pdf",
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1350660521,
+      "valeur_precedente": 1519221935,
+      "ligne_source": "CJ Résultat net de l'exercice (bénéfice + ou perte -) 1350 660 521 1519221935 |[xC VALEUR AJOUTEE (XB + RA + RB)+(somme TE à RJ) 4919 339 566 4 680 139 855",
+      "valeur_courante_M_FCFA": 1350660.521,
+      "valeur_precedente_M_FCFA": 1519221.935
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 1329831922512466921255,
+      "valeur_precedente": null,
+      "ligne_source": "BR Valeurs à encaisser - -_ [[XB_ CHIFFRE D'AFFAIRES (A + B + C + D) 13 298 319 225 12466 921 255 Flux de trésorerie provenant du financement par les capitaux étrangers - -",
+      "valeur_courante_M_FCFA": 1.329831922512467e+18
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 1,350,661 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 1,519,222 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "e23e292ddf038441d0cfb6ac648c169202e9545bb40a0ed21d95c559ae79db71"
+}

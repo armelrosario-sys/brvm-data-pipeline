@@ -1,0 +1,47 @@
+{
+  "ticker": "ABJC",
+  "fichier_source": "30ba26c2_20250430_-_etats_financiers_-_norme_ifrs_-_exercice_2024_-_servair_abidjan_ci.pdf",
+  "exercice_courant": 2024,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1,
+      "valeur_precedente": 1515,
+      "ligne_source": "Résultat de l'exercice 1 1515 1 358",
+      "valeur_courante_M_FCFA": 1.0,
+      "valeur_precedente_M_FCFA": 1515.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 2024,
+      "valeur_precedente": 2023,
+      "ligne_source": "PASSIF ET CAPITAUX PROPRES {en millions de FCFA) Note 2024 2023",
+      "valeur_courante_M_FCFA": 2024.0,
+      "valeur_precedente_M_FCFA": 2023.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 13,
+      "valeur_precedente": 79,
+      "ligne_source": "Emprunts et dettes financières non courants 13 79 63",
+      "valeur_courante_M_FCFA": 13.0,
+      "valeur_precedente_M_FCFA": 79.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 17,
+      "valeur_precedente": 12467,
+      "ligne_source": "Chiffre d'affaires 17 12467 11 254",
+      "valeur_courante_M_FCFA": 17.0,
+      "valeur_precedente_M_FCFA": 12467.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "90f3becd82db6def81d3cc3151fc99bb0f5ed9173dd933b936f2cecc6d56864c"
+}
