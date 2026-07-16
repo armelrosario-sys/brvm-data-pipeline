@@ -1,0 +1,40 @@
+{
+  "ticker": "TTLS",
+  "fichier_source": "93827ef3_20260430_-_etats_financiers_ifrs_-_exercice_2025_-_totalenergies_marketing_sn.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "ocr",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 6779,
+      "valeur_precedente": 7140,
+      "ligne_source": "Résultat net de l'ensemble consolidé 6 779 7 140",
+      "valeur_courante_M_FCFA": 6779.0,
+      "valeur_precedente_M_FCFA": 7140.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 3032,
+      "valeur_precedente": 1968,
+      "ligne_source": "Autres dettes financieres non courantes 3 032 1 968",
+      "valeur_courante_M_FCFA": 3032.0,
+      "valeur_precedente_M_FCFA": 1968.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 455209,
+      "valeur_precedente": 484945,
+      "ligne_source": "Chiffre d'affaires 455 209 484 945",
+      "valeur_courante_M_FCFA": 455209.0,
+      "valeur_precedente_M_FCFA": 484945.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "22cfbb09abd9b9136f7deebe5b81310b1272f4d31de99a37d03b5c69b7464dc9"
+}

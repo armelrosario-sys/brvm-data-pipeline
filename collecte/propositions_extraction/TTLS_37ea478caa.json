@@ -1,0 +1,26 @@
+{
+  "ticker": "TTLS",
+  "fichier_source": "2b8d03a8_20260430_-_etats_financiers_syscohada_-_exercice_2025_-_totalenergies_marketing_sn.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 6146527,
+      "valeur_precedente": 7090811,
+      "ligne_source": "RESULTAT NET 6 146 527 7 090 811",
+      "valeur_courante_M_FCFA": 6146.527,
+      "valeur_precedente_M_FCFA": 7090.811
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "37ea478caa43f4cbf645eec7e6e38c4d37118a016c7ab1375d3d70616938d292"
+}

@@ -1,0 +1,65 @@
+{
+  "ticker": "TTLC",
+  "fichier_source": "8c452eec_20230427_-_etats_financiers_exercice_2022_-_totalenergies_marketing_ci.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2021,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 12279,
+      "valeur_precedente": 11143,
+      "ligne_source": "Bénéfice net 12 279 11 143 10,19%",
+      "valeur_courante_M_FCFA": 12279.0,
+      "valeur_precedente_M_FCFA": 11143.0
+    },
+    "total_actif": {
+      "valeur_courante": 159651,
+      "valeur_precedente": 156297,
+      "ligne_source": "Total Actif 159 651 156 297 Total Passif 159 651 156 297",
+      "valeur_courante_M_FCFA": 159651.0,
+      "valeur_precedente_M_FCFA": 156297.0
+    },
+    "total_passif": {
+      "valeur_courante": 159651,
+      "valeur_precedente": 156297,
+      "ligne_source": "Total Actif 159 651 156 297 Total Passif 159 651 156 297",
+      "valeur_courante_M_FCFA": 159651.0,
+      "valeur_precedente_M_FCFA": 156297.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 11143,
+      "valeur_precedente": 7647,
+      "ligne_source": "Flux de trésorerie provenant du financement par les capitaux propres (11 143) (7 647)",
+      "valeur_courante_M_FCFA": 11143.0,
+      "valeur_precedente_M_FCFA": 7647.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 246,
+      "valeur_precedente": null,
+      "ligne_source": "Autres dettes financières 246 -",
+      "valeur_courante_M_FCFA": 246.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 4033,
+      "valeur_precedente": 4033,
+      "ligne_source": "Immobilisationsfinancières 10 769 9 544 Autres capitaux propres 4 033 4 033 Variation de la trésorerie nette de la période (9 948) 1 922",
+      "valeur_courante_M_FCFA": 4033.0,
+      "valeur_precedente_M_FCFA": 4033.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 573130,
+      "valeur_precedente": 494433,
+      "ligne_source": "Chiffre d'affaires 573 130 494 433",
+      "valeur_courante_M_FCFA": 573130.0,
+      "valeur_precedente_M_FCFA": 494433.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "80d09ed8167af71ffcb97da9fd13f994d1069ada06fc00b2903674a997fb76bb"
+}

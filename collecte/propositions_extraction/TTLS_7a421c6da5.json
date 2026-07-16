@@ -1,0 +1,33 @@
+{
+  "ticker": "TTLS",
+  "fichier_source": "49ceaaa9_20250502_-_etats_financiers_-_norme_ifrs_-_exercice_2024_-_totalenergies_marketing_sn.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "dettes_financieres": {
+      "valeur_courante": 1968,
+      "valeur_precedente": 2182,
+      "ligne_source": "Autres dettes financieres non courantes 1 968 2 182",
+      "valeur_courante_M_FCFA": 1968.0,
+      "valeur_precedente_M_FCFA": 2182.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 484945,
+      "valeur_precedente": 499194,
+      "ligne_source": "Chiffre d'affaires 484 945 499 194",
+      "valeur_courante_M_FCFA": 484945.0,
+      "valeur_precedente_M_FCFA": 499194.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "7a421c6da5a67c2629c310c24ea31cd311fc9afcb3b31356577fcce5b06b5f01"
+}

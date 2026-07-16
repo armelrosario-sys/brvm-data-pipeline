@@ -1,0 +1,25 @@
+{
+  "ticker": "TTLS",
+  "fichier_source": "5f3fdb42_20250502_-_etats_financiers_-_norme_syscohada_-_exercice_2024_-_totalenergies_marketing_sn.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "dettes_financieres": {
+      "valeur_courante": 4,
+      "valeur_precedente": null,
+      "ligne_source": "Dettes Financières & Ressources 4",
+      "valeur_courante_M_FCFA": 0.004
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "6e80be0f451df16f59e854732e8e3ce087927cf5dae29e14bc785ae3cc9f4251"
+}
