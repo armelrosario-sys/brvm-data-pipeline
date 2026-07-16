@@ -1,0 +1,41 @@
+name: P10 - Extraction automatique des etats financiers
+
+# Cree le 15/07/2026 : traite par lots budgetes (15 documents/run, comme
+# P2c - Reparation) les rapports "etats financiers" deja identifies dans
+# MANIFESTE.csv. Produit des PROPOSITIONS (collecte/propositions_extraction/)
+# a relire avant toute integration dans peupler.py -- jamais d'insertion
+# automatique (l'OCR peut se tromper, cf. doctrine du projet).
+#
+# Declenchement manuel uniquement (comme P2c) : chaque lot avance la liste,
+# relancer plusieurs fois pour traiter les 160 documents identifies au
+# lancement (voir collecte/extractions_traitees.json pour la progression).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extraction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installer les dependances (OCR francais inclus)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-fra
+          pip install pdfplumber pyyaml requests
+      - name: Extraire le lot du jour
+        run: python3 collecte/extraire_lot.py
+      - name: Committer les propositions et l'etat d'avancement
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add collecte/propositions_extraction/ collecte/extractions_traitees.json
+          git commit -m "Extraction automatique - lot du $(date -u +%F)" || echo "rien a committer"
+          git push
