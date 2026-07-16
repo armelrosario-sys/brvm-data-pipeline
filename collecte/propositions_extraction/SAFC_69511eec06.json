@@ -1,0 +1,52 @@
+{
+  "ticker": "SAFC",
+  "fichier_source": "bda7bd96_20220425_-_etats_financiers_exercice_2021_-_safca_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "bancaire_umoa",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 603,
+      "valeur_precedente": 1640,
+      "ligne_source": "16 RESULTAT DE L'EXERCICE (+/-)- 6 03 - 1 640",
+      "valeur_courante_M_FCFA": 603.0,
+      "valeur_precedente_M_FCFA": 1640.0
+    },
+    "total_actif": {
+      "valeur_courante": 64690,
+      "valeur_precedente": 66533,
+      "ligne_source": "TOTAL ACTIF 6 4 690 6 6 533 TOTAL PASSIF 64 690 66 533",
+      "valeur_courante_M_FCFA": 64690.0,
+      "valeur_precedente_M_FCFA": 66533.0
+    },
+    "total_passif": {
+      "valeur_courante": 64690,
+      "valeur_precedente": 66533,
+      "ligne_source": "TOTAL ACTIF 6 4 690 6 6 533 TOTAL PASSIF 64 690 66 533",
+      "valeur_courante_M_FCFA": 64690.0,
+      "valeur_precedente_M_FCFA": 66533.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 6195,
+      "valeur_precedente": 6798,
+      "ligne_source": "9 COMPTES DE REGULARISATION 1 444 851 9 CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 6 195 6 798",
+      "valeur_courante_M_FCFA": 6195.0,
+      "valeur_precedente_M_FCFA": 6798.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 3567,
+      "valeur_precedente": 3414,
+      "ligne_source": "10 PRODUIT NET BANCAIRE 3 567 3 414",
+      "valeur_courante_M_FCFA": 3567.0,
+      "valeur_precedente_M_FCFA": 3414.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "69511eec065dfb6b03c4a31ae7c9011afb5eafa70446991e9b7062b4d2120194"
+}

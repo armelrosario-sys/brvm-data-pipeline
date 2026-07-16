@@ -1,0 +1,36 @@
+{
+  "ticker": "PALC",
+  "fichier_source": "67dda82d_20230425_-_etats_financiers_exercice_2022_-_palm_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "total_actif": {
+      "valeur_courante": 211882054214167045712552,
+      "valeur_precedente": null,
+      "ligne_source": "TOTAL ACTIF 211 882054 214) 167 045 712 552] Achats de matières premières et fournitures liées -88 247 905 733] -69 367 149 818",
+      "valeur_courante_M_FCFA": 2.1188205421416704e+20
+    },
+    "total_passif": {
+      "valeur_courante": 211882054215167045712552,
+      "valeur_precedente": null,
+      "ligne_source": "TOTAL PASSIF 211882054215) 167 045 712 552] Dotations aux amort., aux provisions et dépréciations -13 953 832 188] -13 553 652 215",
+      "valeur_courante_M_FCFA": 2.1188205421516705e+20
+    },
+    "dettes_financieres": {
+      "valeur_courante": 10611776115,
+      "valeur_precedente": 172379024421,
+      "ligne_source": "Dettes financières et ressources assimilées 10 611 776 115 17 237 902 4421 [VALEUR AJOUTEE 93 732 274 8 93 290 513 980}",
+      "valeur_courante_M_FCFA": 10611776.115,
+      "valeur_precedente_M_FCFA": 172379024.421
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "1c081e5b560e13f41624516ec44aeabbeb2b6b6ebf888afe802a9b956441d6d0"
+}

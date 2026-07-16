@@ -1,0 +1,69 @@
+{
+  "ticker": "SPHC",
+  "fichier_source": "6b3f7cc0_20260318_-_etats_financiers_syscohada_-_exercice_2025_-_saph_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 24972070150,
+      "valeur_precedente": 18790217905,
+      "ligne_source": "Résultat net 24 972 070 150 18 790 217 905",
+      "valeur_courante_M_FCFA": 24972070.15,
+      "valeur_precedente_M_FCFA": 18790217.905
+    },
+    "total_actif": {
+      "valeur_courante": 225842735644,
+      "valeur_precedente": 222208164550,
+      "ligne_source": "TOTAL ACTIF 225 842 735 644 222 208 164 550 Achats de matières premières et fournitures liées -185 052 282 570 -166 266 403 509",
+      "valeur_courante_M_FCFA": 225842735.644,
+      "valeur_precedente_M_FCFA": 222208164.55
+    },
+    "total_passif": {
+      "valeur_courante": 225842735644,
+      "valeur_precedente": 222208164550,
+      "ligne_source": "TOTAL PASSIF 225 842 735 644 222 208 164 550",
+      "valeur_courante_M_FCFA": 225842735.644,
+      "valeur_precedente_M_FCFA": 222208164.55
+    },
+    "capitaux_propres": {
+      "valeur_courante": 8649304155,
+      "valeur_precedente": 8649304155,
+      "ligne_source": "Autres capitaux propres 8 649 304 155 8 649 304 155 Services extérieurs -22 139 256 649 -20 625 090 805",
+      "valeur_courante_M_FCFA": 8649304.155,
+      "valeur_precedente_M_FCFA": 8649304.155
+    },
+    "dettes_financieres": {
+      "valeur_courante": 35598886719,
+      "valeur_precedente": 30585044004,
+      "ligne_source": "Dettes financières et ressources assimilées 35 598 886 719 30 585 044 004",
+      "valeur_courante_M_FCFA": 35598886.719,
+      "valeur_precedente_M_FCFA": 30585044.004
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 8649304155,
+      "valeur_precedente": 8649304155,
+      "ligne_source": "Autres capitaux propres 8 649 304 155 8 649 304 155 Services extérieurs -22 139 256 649 -20 625 090 805",
+      "valeur_courante_M_FCFA": 8649304.155,
+      "valeur_precedente_M_FCFA": 8649304.155
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 340830548704,
+      "valeur_precedente": 279437727425,
+      "ligne_source": "Actifs circulants HAO CHIFFRE D'AFFAIRES 340 830 548 704 279 437 727 425",
+      "valeur_courante_M_FCFA": 340830548.704,
+      "valeur_precedente_M_FCFA": 279437727.425
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 24,972,070 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 18,790,218 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "4b5b335b1a153061854e16be615b3e43832a7354eb19aeca4493d83f9197c6c0"
+}
