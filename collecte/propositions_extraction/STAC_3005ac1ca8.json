@@ -1,0 +1,52 @@
+{
+  "ticker": "STAC",
+  "fichier_source": "64bd563a_20230426_-_etats_financiers_exercice_2022_-_setao_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": -70544,
+      "valeur_precedente": 1119448,
+      "ligne_source": "Résultat net -70 544 1 119 448",
+      "valeur_courante_M_FCFA": -70.544,
+      "valeur_precedente_M_FCFA": 1119.448
+    },
+    "total_actif": {
+      "valeur_courante": 15068263,
+      "valeur_precedente": 16260295,
+      "ligne_source": "Total Actif 15 068 263 16 260 295",
+      "valeur_courante_M_FCFA": 15068.263,
+      "valeur_precedente_M_FCFA": 16260.295
+    },
+    "total_passif": {
+      "valeur_courante": 15068263,
+      "valeur_precedente": 16260295,
+      "ligne_source": "Total Passif 15 068 263 16 260 295",
+      "valeur_courante_M_FCFA": 15068.263,
+      "valeur_precedente_M_FCFA": 16260.295
+    },
+    "capitaux_propres": {
+      "valeur_courante": 1919221,
+      "valeur_precedente": 2977605,
+      "ligne_source": "Capitaux Propres 1 919 221 2 977 605",
+      "valeur_courante_M_FCFA": 1919.221,
+      "valeur_precedente_M_FCFA": 2977.605
+    },
+    "dettes_financieres": {
+      "valeur_courante": 420023,
+      "valeur_precedente": 512965,
+      "ligne_source": "Dettes Financières 420 023 512 965",
+      "valeur_courante_M_FCFA": 420.023,
+      "valeur_precedente_M_FCFA": 512.965
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "3005ac1ca8bd50378ed29e3bd9d2eef2d9e963d0e193573b95ef8dc60faebd8c"
+}

@@ -1,0 +1,75 @@
+{
+  "ticker": "ABJC",
+  "fichier_source": "c8a8277a_20240819_-_etats_financiers_approuves_-_exercice_2023_-_servair_abidjan_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1,
+      "valeur_precedente": 1358,
+      "ligne_source": "Résultat de l'exercice 1 1 358 1 272",
+      "valeur_courante_M_FCFA": 1.0,
+      "valeur_precedente_M_FCFA": 1358.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 7,
+      "valeur_precedente": null,
+      "ligne_source": "IV. Etat de variation des capitaux propres ................................................................................................. 7",
+      "valeur_courante_M_FCFA": 7.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 25,
+      "valeur_precedente": null,
+      "ligne_source": "NOTE 13 : Les emprunts et dettes financières .................................................................................. 25",
+      "valeur_courante_M_FCFA": 25.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 17,
+      "valeur_precedente": 11254,
+      "ligne_source": "Chiffre d'affaires 17 11 254 10 804",
+      "valeur_courante_M_FCFA": 17.0,
+      "valeur_precedente_M_FCFA": 11254.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "092b94a9670bdce08864f97a54ad37595e55a74cde2f94d92ac11684b35e4f08"
+}

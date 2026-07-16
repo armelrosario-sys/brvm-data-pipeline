@@ -1,0 +1,25 @@
+{
+  "ticker": "STAC",
+  "fichier_source": "6034a58e_20250410_-_etats_financiers_provisoires_-_exercice_2024_-_setao_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": -348195,
+      "valeur_precedente": -1117719,
+      "ligne_source": "Résultat net -348 195 -1 117 719",
+      "valeur_courante_M_FCFA": -348.195,
+      "valeur_precedente_M_FCFA": -1117.719
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "e4497e6d1d251bb20fb8d41d2d04a464b46f6d6b65628c2d6423bf8f227163cc"
+}

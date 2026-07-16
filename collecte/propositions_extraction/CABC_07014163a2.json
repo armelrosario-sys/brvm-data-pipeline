@@ -1,0 +1,55 @@
+{
+  "ticker": "CABC",
+  "fichier_source": "2d011a40_20250313_-_etats_financiers_verifies_par_les_cacs_-_exercice_2024_-_sicable_ci.pdf",
+  "exercice_courant": 2024,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1224827540,
+      "valeur_precedente": 1429806646,
+      "ligne_source": "Immobilisations financières 46 581 783 46 581 783 Résultat net de l'exercice; perte entre ( ) 1 224 827 540 1 429 806 646",
+      "valeur_courante_M_FCFA": 1224827.54,
+      "valeur_precedente_M_FCFA": 1429806.646
+    },
+    "total_actif": {
+      "valeur_courante": 19656293617,
+      "valeur_precedente": 19349647741,
+      "ligne_source": "TOTAL ACTIF 19 656 293 617 19 349 647 741 TOTAL PASSIF 19 656 293 617 19 349 647 741",
+      "valeur_courante_M_FCFA": 19656293.617,
+      "valeur_precedente_M_FCFA": 19349647.741
+    },
+    "total_passif": {
+      "valeur_courante": 19656293617,
+      "valeur_precedente": 19349647741,
+      "ligne_source": "TOTAL ACTIF 19 656 293 617 19 349 647 741 TOTAL PASSIF 19 656 293 617 19 349 647 741",
+      "valeur_courante_M_FCFA": 19656293.617,
+      "valeur_precedente_M_FCFA": 19349647.741
+    },
+    "dettes_financieres": {
+      "valeur_courante": 3786930306,
+      "valeur_precedente": 3789952563,
+      "ligne_source": "Provisions Dettes financières et ressources assimilées 3 786 930 306 3 789 952 563",
+      "valeur_courante_M_FCFA": 3786930.306,
+      "valeur_precedente_M_FCFA": 3789952.563
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 19125318524,
+      "valeur_precedente": 17752564089,
+      "ligne_source": "Chiffre d'Affaires total 19 125 318 524 17 752 564 089",
+      "valeur_courante_M_FCFA": 19125318.524,
+      "valeur_precedente_M_FCFA": 17752564.089
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 1,224,828 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 1,429,807 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "07014163a20b318ae885a2ddfd9d759fc8587b0e9789833940699190babc5777"
+}
