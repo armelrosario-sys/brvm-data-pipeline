@@ -1,0 +1,51 @@
+{
+  "ticker": "LNBB",
+  "fichier_source": "082082d7_20250602_-_etats_financiers_-_exercice_2024_-_lnb_bn.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "ocr",
+    "natif",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2024,
+      "valeur_precedente": null,
+      "ligne_source": "Section 4 : Projet d'affectation du résultat net 2024",
+      "valeur_courante_M_FCFA": 2.024
+    },
+    "capitaux_propres": {
+      "valeur_courante": 23614741046,
+      "valeur_precedente": null,
+      "ligne_source": "Capitaux propres : 23.614.741.046",
+      "valeur_courante_M_FCFA": 23614741.046
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "9935c5639c5ef59c3728b17ce60b6abf0e5e79957aa0a02a5b70f65d797580cb"
+}

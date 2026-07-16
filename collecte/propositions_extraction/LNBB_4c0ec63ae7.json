@@ -1,0 +1,63 @@
+{
+  "ticker": "LNBB",
+  "fichier_source": "75375bba_20260430_-_etats_financiers_-_exercice_2025_-_lnb_bn.pdf",
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "ocr",
+    "ocr",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2025,
+      "valeur_precedente": null,
+      "ligne_source": "Section 4 : Projet d’affectation du résultat net 2025",
+      "valeur_courante_M_FCFA": 2.025
+    },
+    "capitaux_propres": {
+      "valeur_courante": 21953860132,
+      "valeur_precedente": null,
+      "ligne_source": "Capitaux propres : 21 953 860 132",
+      "valeur_courante_M_FCFA": 21953860.132
+    },
+    "dettes_financieres": {
+      "valeur_courante": 563235115,
+      "valeur_precedente": 562495115,
+      "ligne_source": "Emprunts et dettes financières diverses 563 235 115 562 495 115",
+      "valeur_courante_M_FCFA": 563235.115,
+      "valeur_precedente_M_FCFA": 562495.115
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 98598057859,
+      "valeur_precedente": null,
+      "ligne_source": "Chiffre d'affaires : 98 598 057 859",
+      "valeur_courante_M_FCFA": 98598057.859
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "4c0ec63ae7b5de83c1952fd745c435632f6fe3b1939efd48343b83ec664be393"
+}

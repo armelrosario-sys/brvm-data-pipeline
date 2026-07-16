@@ -1,0 +1,47 @@
+{
+  "ticker": "NEIC",
+  "fichier_source": "202d2911_20250409_-_etats_financiers_-_exercice_2024_-_nei_ceda_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": -759371358,
+      "valeur_precedente": 1167140182,
+      "ligne_source": "XI RESULTAT NET (XG+XH+RQ+RS) -759 371 358 1167 140182",
+      "valeur_courante_M_FCFA": -759371.358,
+      "valeur_precedente_M_FCFA": 1167140.182
+    },
+    "capitaux_propres": {
+      "valeur_courante": 37182720265637643384,
+      "valeur_precedente": null,
+      "ligne_source": "AN [Matériel de transport cP [TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 3718272026 5 637 643 384]",
+      "valeur_courante_M_FCFA": 3.718272026563764e+16
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 0,
+      "ligne_source": "AP_|AVANCES ET ACOMPTES VERSES SUR IMMOBILISATIONS 3 - = - = | DA JEmprunis et dettes financières diverses 16 0 0",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 6744255774,
+      "valeur_precedente": 8525436230,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 6 744 255 774) 8 525 436 230]",
+      "valeur_courante_M_FCFA": 6744255.774,
+      "valeur_precedente_M_FCFA": 8525436.23
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_precedente_M_FCFA = 1,167,140 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "db790dcd034d6013da38aad4094dc4cf6616b19f019aa79303025221d2b147f8"
+}

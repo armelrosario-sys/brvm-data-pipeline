@@ -1,0 +1,31 @@
+{
+  "ticker": "FTSC",
+  "fichier_source": "80c5c2a4_20220506_-_etats_financiers_exercice_2021_-_filtisac_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1276336,
+      "valeur_precedente": 3551668,
+      "ligne_source": "Résultat Net = 1 276 336 3551668",
+      "valeur_courante_M_FCFA": 1276.336,
+      "valeur_precedente_M_FCFA": 3551.668
+    },
+    "total_actif": {
+      "valeur_courante": 53741474,
+      "valeur_precedente": 53788997,
+      "ligne_source": "TOTAL ACTIF 53 741 474 53788997 |TOTAL PASSIF 53 741 474 53 788 997",
+      "valeur_courante_M_FCFA": 53741.474,
+      "valeur_precedente_M_FCFA": 53788.997
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "0e14057879b25d39e49eea9100bec6d2e9076e9b72135ba72c1e40181dc371e3"
+}

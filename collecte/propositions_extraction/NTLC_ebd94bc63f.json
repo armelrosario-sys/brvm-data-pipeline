@@ -1,0 +1,51 @@
+{
+  "ticker": "NTLC",
+  "fichier_source": "02ebadfe_20250502_-_etats_financiers_-_exercice_2024_-_nestle_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 18149967087,
+      "valeur_precedente": 16556698463,
+      "ligne_source": "BENEFICE NET 18,149,967,087 16,556,698,463",
+      "valeur_courante_M_FCFA": 18149967.087,
+      "valeur_precedente_M_FCFA": 16556698.463
+    },
+    "dettes_financieres": {
+      "valeur_courante": 6619661320,
+      "valeur_precedente": 5162136183,
+      "ligne_source": "Autres dettes financières 6,619,661,320 5,162,136,183",
+      "valeur_courante_M_FCFA": 6619661.32,
+      "valeur_precedente_M_FCFA": 5162136.183
+    },
+    "total_actif": {
+      "valeur_courante": 177852053839,
+      "valeur_precedente": 170340779234,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] BZ TOTAL GENERAL 177,852,053,839 170,340,779,234 DZ TOTAL GENERAL 177,852,053,839 170,340,779,234",
+      "valeur_courante_M_FCFA": 177852053.839,
+      "valeur_precedente_M_FCFA": 170340779.234
+    },
+    "total_passif": {
+      "valeur_courante": 177852053839,
+      "valeur_precedente": 170340779234,
+      "ligne_source": "[TOTAL seul, equilibre actif=passif verifie] BZ TOTAL GENERAL 177,852,053,839 170,340,779,234 DZ TOTAL GENERAL 177,852,053,839 170,340,779,234",
+      "valeur_courante_M_FCFA": 177852053.839,
+      "valeur_precedente_M_FCFA": 170340779.234
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 18,149,967 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 16,556,698 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ebd94bc63fc28498f51263e274e62da7ecb797908e14ec17503c0f199fccb656"
+}
