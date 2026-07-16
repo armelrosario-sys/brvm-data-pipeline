@@ -1,0 +1,41 @@
+{
+  "ticker": "PRSC",
+  "fichier_source": "4a20615d_20230608_-_etats_financiers_exercice_2022_-_tractafric_motors_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "capitaux_propres": {
+      "valeur_courante": 11480373528,
+      "valeur_precedente": 9837022635,
+      "ligne_source": "CP TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 11 480 373 528 9 837 022 635",
+      "valeur_courante_M_FCFA": 11480373.528,
+      "valeur_precedente_M_FCFA": 9837022.635
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 8000000,
+      "ligne_source": "DA Emprunts et dettes financières diverses 16 8 000 000 8 000 000",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 8000.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 70092374932,
+      "valeur_precedente": 65019456272,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 70 092 374 932 65 019 456 272",
+      "valeur_courante_M_FCFA": 70092374.932,
+      "valeur_precedente_M_FCFA": 65019456.272
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "749d3c38021e8e8bb557d6584a2b8ad4dd53b46995625cb4257bdd7fb452dfe0"
+}

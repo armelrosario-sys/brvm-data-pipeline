@@ -1,0 +1,42 @@
+{
+  "ticker": "UNLC",
+  "fichier_source": "1dfbed91_20210430_-_etats_financiers_-_exercice_2020_-_unilever_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": -3690619307,
+      "valeur_precedente": -21857271556,
+      "ligne_source": "AK 7 211 274 441 5 905 747 592 1 305 526 849 1 248 063 313 CJ Résultat net de l'exercice (bénéfice + ou perte -) -3 690 619 307 -21 857 271 556",
+      "valeur_courante_M_FCFA": -3690619.307,
+      "valeur_precedente_M_FCFA": -21857271.556
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 264399600,
+      "ligne_source": "AP AVANCES ET ACOMPTES VERSES SUR IMMOBILISATIONS 3 127 971 307 127 971 307 127 971 307 DA Emprunts et dettes financières diverses 16 264 399 600 148 250 000",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 264399.6
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 39693424149,
+      "valeur_precedente": 56379065697,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 39 693 424 149 56 379 065 697",
+      "valeur_courante_M_FCFA": 39693424.149,
+      "valeur_precedente_M_FCFA": 56379065.697
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = -3,690,619 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = -21,857,272 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "322eadbb5eda8b1f86bf2a435c75be2df500feb1fee5a88c61970a477c20c641"
+}

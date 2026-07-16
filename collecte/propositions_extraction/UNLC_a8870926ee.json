@@ -1,0 +1,45 @@
+{
+  "ticker": "UNLC",
+  "fichier_source": "0916a313_20220520_-_etats_financiers_exercice_2021_-_unilever_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 6090755732,
+      "valeur_precedente": -2409525247,
+      "ligne_source": "AK 7 258 871 193 6 058 832 125 1 200 039 068 1 323 125 826 CJ Résultat net de l'exercice (bénéfice + ou perte -) 6 090 755 732 -2 409 525 247",
+      "valeur_courante_M_FCFA": 6090755.732,
+      "valeur_precedente_M_FCFA": -2409525.247
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 246399600,
+      "ligne_source": "AP AVANCES ET ACOMPTES VERSES SUR IMMOBILISATIONS 3 0 DA Emprunts et dettes financières diverses 16 246 399 600 264 399 600",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 246399.6
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 46059378554,
+      "valeur_precedente": 41393490983,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 46 059 378 554 41 393 490 983",
+      "valeur_courante_M_FCFA": 46059378.554,
+      "valeur_precedente_M_FCFA": 41393490.983
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 6,090,756 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = -2,409,525 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "a8870926eecbb2c91babaf1f812dd01fec6b2432c575ee492357dde879669b08"
+}

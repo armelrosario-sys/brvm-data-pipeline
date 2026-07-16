@@ -1,0 +1,47 @@
+{
+  "ticker": "PRSC",
+  "fichier_source": "a07a8cac_20241031_-_etats_financiers_-_1er_semestre_2024_-_tractafric_motors_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 0,
+      "valeur_precedente": 50601620,
+      "ligne_source": "CJ Résultat net de l'exercice (bénéfice + ou perte -) 0 50 601 620 1 045 756 860",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 50601.62
+    },
+    "capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 8986923506,
+      "ligne_source": "CP TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 0 8 986 923 506 9 976 370 388",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 8986923.506
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 8000000,
+      "ligne_source": "DA Emprunts et dettes financières diverses 16 8 000 000 8 000 000",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 8000.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 34722614717,
+      "valeur_precedente": 37254218579,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 34 722 614 717 37 254 218 579",
+      "valeur_courante_M_FCFA": 34722614.717,
+      "valeur_precedente_M_FCFA": 37254218.579
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "8d39be3d4f888a1c702c04efe21fca943a98c74a65cb1e2655b5faa993897612"
+}

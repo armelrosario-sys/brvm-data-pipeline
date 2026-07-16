@@ -1,0 +1,40 @@
+{
+  "ticker": "PRSC",
+  "fichier_source": "41c8923a_20250613_-_etats_financiers_-_normes_ifrs_-_exercice_2024_-_tractafric_motors_ci.pdf",
+  "exercice_courant": 2024,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2177264,
+      "valeur_precedente": 2044698,
+      "ligne_source": "Résultat net de l’exercice 2 177 264 2 044 698",
+      "valeur_courante_M_FCFA": 2177.264,
+      "valeur_precedente_M_FCFA": 2044.698
+    },
+    "total_passif": {
+      "valeur_courante": 4144265,
+      "valeur_precedente": 4613984,
+      "ligne_source": "Total passif non courants 4 144 265 4 613 984",
+      "valeur_courante_M_FCFA": 4144.265,
+      "valeur_precedente_M_FCFA": 4613.984
+    },
+    "dettes_financieres": {
+      "valeur_courante": 8000,
+      "valeur_precedente": 8000,
+      "ligne_source": "Emprunts et dettes financières 8 000 8 000",
+      "valeur_courante_M_FCFA": 8.0,
+      "valeur_precedente_M_FCFA": 8.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "a8166b7149b5333948eaa8bf8562435605c7f0141614b9a12a5da26ed7902759"
+}

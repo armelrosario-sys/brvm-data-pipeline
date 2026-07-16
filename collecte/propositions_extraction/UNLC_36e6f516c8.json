@@ -1,0 +1,41 @@
+{
+  "ticker": "UNLC",
+  "fichier_source": "8147851b_20230503_-_etats_financiers_exercice_2022_-_unilever_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": -6382600386,
+      "valeur_precedente": 175130,
+      "ligne_source": "AK 6 088 483 908 4 953 436 812 1 135 047 096 1 245 973 841 CJ Résultat net de l'exercice (bénéfice + ou perte -) -6 382 600 386 175 130",
+      "valeur_courante_M_FCFA": -6382600.386,
+      "valeur_precedente_M_FCFA": 175.13
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": 266899600,
+      "ligne_source": "AP AVANCES ET ACOMPTES VERSES SUR IMMOBILISATIONS 3 0 0 0 0 DA Emprunts et dettes financières diverses 16 266 899 600 246 399 600",
+      "valeur_courante_M_FCFA": 0.016,
+      "valeur_precedente_M_FCFA": 266899.6
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 36174563380,
+      "valeur_precedente": 46059378554,
+      "ligne_source": "XB CHIFFRE D'AFFAIRES (A + B + C + D) 36 174 563 380 46 059 378 554",
+      "valeur_courante_M_FCFA": 36174563.38,
+      "valeur_precedente_M_FCFA": 46059378.554
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = -6,382,600 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "36e6f516c88c313d077c5a93d1ff85f58a945ad122a4ed00695eb8bd815b4754"
+}
