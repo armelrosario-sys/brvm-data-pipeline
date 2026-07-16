@@ -34,4 +34,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add collecte/liquidite_jour.json
           git commit -m "Cours du jour $(date -u +%F)" || echo "rien a committer"
+          git pull --rebase origin main
           git push
