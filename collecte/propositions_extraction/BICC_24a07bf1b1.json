@@ -1,0 +1,31 @@
+{
+  "ticker": "BICC",
+  "fichier_source": "fb5e87b3_20260417_-_etats_financiers_-_exercice_2025_-_bici_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 26226,
+      "valeur_precedente": 36520,
+      "ligne_source": "RESULTAT NET 26 226 36 520",
+      "valeur_courante_M_FCFA": 26226.0,
+      "valeur_precedente_M_FCFA": 36520.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 99783,
+      "valeur_precedente": 120570,
+      "ligne_source": "COMPTES DE REGULARISATION 13 038 2 124 CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 99 783 120 570",
+      "valeur_courante_M_FCFA": 99783.0,
+      "valeur_precedente_M_FCFA": 120570.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "24a07bf1b1476bea597cf172533102cec574fdec99a8ffa27723205cb8e4a771"
+}

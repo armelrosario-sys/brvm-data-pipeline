@@ -1,0 +1,23 @@
+{
+  "ticker": "BICC",
+  "fichier_source": "ebe51de4_20250328_-_etats_financiers_-_exercice_2024_-_bici_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 26226,
+      "valeur_precedente": null,
+      "ligne_source": "RESULTAT DE L'EXERCICE 16-694 26 226",
+      "valeur_courante_M_FCFA": 26.226
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "51f397023617f9efa071454160ae5f15b62484435a5842df0054e3eb24b77fe2"
+}

@@ -1,0 +1,24 @@
+{
+  "ticker": "CIEC",
+  "fichier_source": "f8964bfe_20230427_-_etats_financiers_par_secteur_syscohada_exercice_2022_-_cie_ci.pdf",
+  "exercice_courant": 2022,
+  "exercice_precedent": 2021,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "dettes_financieres": {
+      "valeur_courante": 139212,
+      "valeur_precedente": 57065,
+      "ligne_source": "Immobilisations financières 106 190 96 153 Dettes financières 139 212 57 065",
+      "valeur_courante_M_FCFA": 139212.0,
+      "valeur_precedente_M_FCFA": 57065.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "d09512bcf0b0c09563c862a89af849c5f45c19ebb64cced1044e888a4bbb8f23"
+}

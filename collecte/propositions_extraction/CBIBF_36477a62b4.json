@@ -1,0 +1,19 @@
+{
+  "ticker": "CBIBF",
+  "fichier_source": "62e20d8e_20230427_-_etats_financiers_exercice_2022_-_coris_bank_international_bf.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "bancaire_umoa",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "36477a62b4f17fd78e941763b471f090835bc5fbdc0ed8484e65b226ceeaf938"
+}

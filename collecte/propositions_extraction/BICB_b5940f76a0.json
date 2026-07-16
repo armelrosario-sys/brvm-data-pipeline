@@ -1,0 +1,44 @@
+{
+  "ticker": "BICB",
+  "fichier_source": "400839df_20260619_-_rapport_dactivites_annuel_et_etats_financiers_ifrs_-_exercice_2025_-_biic.pdf",
+  "exercice_courant": 2024,
+  "exercice_precedent": 2025,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "total_passif": {
+      "valeur_courante": 1709481759653,
+      "valeur_precedente": 1709482,
+      "ligne_source": "Total Passif 1 709 481 759 653 1 709 482 1 402 230 1 251 530",
+      "valeur_courante_M_FCFA": 1709481759653.0,
+      "valeur_precedente_M_FCFA": 1709482.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "b5940f76a0502976889f3c8afa0b8551d113b9973620d528e3a12110274612c2"
+}

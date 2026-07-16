@@ -1,0 +1,47 @@
+{
+  "ticker": "CIEC",
+  "fichier_source": "bbbc328b_20250430_-_etats_financiers_-_norme_syscohada_-_exercice_2024_-_cie_ci.pdf",
+  "exercice_courant": 2024,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 10101,
+      "valeur_precedente": 10633,
+      "ligne_source": "Résultat de l'exercice 10 101 10 633",
+      "valeur_courante_M_FCFA": 10101.0,
+      "valeur_precedente_M_FCFA": 10633.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": -10640,
+      "valeur_precedente": -9800,
+      "ligne_source": "Flux de trésorerie provenant des capitaux propres E -10 640 -9 800",
+      "valeur_courante_M_FCFA": -10640.0,
+      "valeur_precedente_M_FCFA": -9800.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 59052,
+      "valeur_precedente": 57666,
+      "ligne_source": "Immobilisations financières 105 484 96 474 Dettes financières 59 052 57 666",
+      "valeur_courante_M_FCFA": 59052.0,
+      "valeur_precedente_M_FCFA": 57666.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 263294,
+      "valeur_precedente": 257218,
+      "ligne_source": "Chiffre d'affaires (A+B+C+D)=XB 263 294 257 218 Flux de trésorerie provenant des activités opérationnelles (B+C) 41 129 -10 547",
+      "valeur_courante_M_FCFA": 263294.0,
+      "valeur_precedente_M_FCFA": 257218.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "3f65befea7c97079be468425b5898ebb5cca215b53c312a38363243cc5f5f652"
+}

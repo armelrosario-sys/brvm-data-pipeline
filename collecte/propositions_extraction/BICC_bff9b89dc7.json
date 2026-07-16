@@ -1,0 +1,38 @@
+{
+  "ticker": "BICC",
+  "fichier_source": "a16f7d51_20240502_-_etats_financiers_-_exercice_2023_-_bici_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 12391,
+      "valeur_precedente": 16694,
+      "ligne_source": "RESULTAT DE L'EXERCICE 12 391 16 694",
+      "valeur_courante_M_FCFA": 12391.0,
+      "valeur_precedente_M_FCFA": 16694.0
+    },
+    "total_actif": {
+      "valeur_courante": 926252,
+      "valeur_precedente": 920563,
+      "ligne_source": "TOTAL ACTIF 926 252 920 563 TOTAL PASSIF 926 252 920 563",
+      "valeur_courante_M_FCFA": 926252.0,
+      "valeur_precedente_M_FCFA": 920563.0
+    },
+    "total_passif": {
+      "valeur_courante": 926252,
+      "valeur_precedente": 920563,
+      "ligne_source": "TOTAL ACTIF 926 252 920 563 TOTAL PASSIF 926 252 920 563",
+      "valeur_courante_M_FCFA": 926252.0,
+      "valeur_precedente_M_FCFA": 920563.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "bff9b89dc7197aa352166eb31ec87a6909d5d3d44186d9379bbd4e45ee6acb66"
+}

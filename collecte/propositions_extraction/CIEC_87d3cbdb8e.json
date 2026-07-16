@@ -1,0 +1,45 @@
+{
+  "ticker": "CIEC",
+  "fichier_source": "2cd6dc9b_20230427_-_etats_financiers_ifrs_exercice_2022_-_cie_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 10262,
+      "valeur_precedente": 10511,
+      "ligne_source": "Résultat de l'exercice 10 262 10 511",
+      "valeur_courante_M_FCFA": 10262.0,
+      "valeur_precedente_M_FCFA": 10511.0
+    },
+    "total_actif": {
+      "valeur_courante": 524294,
+      "valeur_precedente": 558201,
+      "ligne_source": "Total actif 524 294 558 201 Total passif et capitaux propres 524 294 558 201",
+      "valeur_courante_M_FCFA": 524294.0,
+      "valeur_precedente_M_FCFA": 558201.0
+    },
+    "total_passif": {
+      "valeur_courante": 524294,
+      "valeur_precedente": 558201,
+      "ligne_source": "Total actif 524 294 558 201 Total passif et capitaux propres 524 294 558 201",
+      "valeur_courante_M_FCFA": 524294.0,
+      "valeur_precedente_M_FCFA": 558201.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 47856,
+      "valeur_precedente": 47856,
+      "ligne_source": "Immobilisations corporelles 33 258 31 551 Emprunts et Dettes financières non courantes 47 856 47 856",
+      "valeur_courante_M_FCFA": 47856.0,
+      "valeur_precedente_M_FCFA": 47856.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "87d3cbdb8e972f269aaeb28f691d5c6b5676c583c7b2030b8305160e0ee0336a"
+}

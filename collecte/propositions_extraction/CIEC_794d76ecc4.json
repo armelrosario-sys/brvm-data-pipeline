@@ -1,0 +1,61 @@
+{
+  "ticker": "CIEC",
+  "fichier_source": "caaaf9a9_20240502_-_etats_financiers_syscohada_-_exercice_2023_-_cie_ci.pdf",
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 10633,
+      "valeur_precedente": 9819,
+      "ligne_source": "Résultat de l'exercice 10 633 9 819",
+      "valeur_courante_M_FCFA": 10633.0,
+      "valeur_precedente_M_FCFA": 9819.0
+    },
+    "total_actif": {
+      "valeur_courante": 1975051,
+      "valeur_precedente": 1816387,
+      "ligne_source": "Total actif 1 975 051 1 816 387 Total passif 1 975 051 1 816 387",
+      "valeur_courante_M_FCFA": 1975051.0,
+      "valeur_precedente_M_FCFA": 1816387.0
+    },
+    "total_passif": {
+      "valeur_courante": 1975051,
+      "valeur_precedente": 1816387,
+      "ligne_source": "Total actif 1 975 051 1 816 387 Total passif 1 975 051 1 816 387",
+      "valeur_courante_M_FCFA": 1975051.0,
+      "valeur_precedente_M_FCFA": 1816387.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": -9800,
+      "valeur_precedente": -9530,
+      "ligne_source": "Flux de trésorerie provenant des capitaux propres E -9 800 -9 530",
+      "valeur_courante_M_FCFA": -9800.0,
+      "valeur_precedente_M_FCFA": -9530.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 57666,
+      "valeur_precedente": 56665,
+      "ligne_source": "Immobilisations financières 96 474 86 747 Dettes financières 57 666 56 665",
+      "valeur_courante_M_FCFA": 57666.0,
+      "valeur_precedente_M_FCFA": 56665.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 257218,
+      "valeur_precedente": 238854,
+      "ligne_source": "Chiffre d'affaires (A+B+C+D)=XB 257 218 238 854 Flux de trésorerie provenant des activités opérationnelles (B+C) -10 547 26 158",
+      "valeur_courante_M_FCFA": 257218.0,
+      "valeur_precedente_M_FCFA": 238854.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "794d76ecc4ce4a409798a0c11fc2dda1f3520837400a08e96363467ccc9bb961"
+}

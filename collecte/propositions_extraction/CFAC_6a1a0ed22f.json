@@ -1,0 +1,37 @@
+{
+  "ticker": "CFAC",
+  "fichier_source": "e8605313_20250516_-_etats_financiers_-_exercice_2024_-_cfao_motors_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 4693479450,
+      "valeur_precedente": 6399494092,
+      "ligne_source": "CJ Résultat net de l'exercice (bénéfice + ou perte -) 4 693 479 450 6 399 494 092",
+      "valeur_courante_M_FCFA": 4693479.45,
+      "valeur_precedente_M_FCFA": 6399494.092
+    },
+    "dettes_financieres": {
+      "valeur_courante": 16,
+      "valeur_precedente": null,
+      "ligne_source": "DA Emprunts et dettes financières diverses 16",
+      "valeur_courante_M_FCFA": 0.016
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 4,693,479 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 6,399,494 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "6a1a0ed22fea83726e2bb596560d19c6e9e3dc406ec5dc2a515ccd6b8f5d7ebf"
+}
