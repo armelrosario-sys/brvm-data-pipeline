@@ -1,0 +1,48 @@
+{
+  "ticker": "SHEC",
+  "fichier_source": "57807e3e_20231103_-_etats_financiers_-_exercice_2022_-_vivo_energy_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 3548638458,
+      "valeur_precedente": 2359622661,
+      "ligne_source": "Résultat de l'exercice 3 548 638 458 2 359 622 661",
+      "valeur_courante_M_FCFA": 3548638.458,
+      "valeur_precedente_M_FCFA": 2359622.661
+    },
+    "total_actif": {
+      "valeur_courante": 119461700193,
+      "valeur_precedente": 101262735128,
+      "ligne_source": "TOTAL ACTIF 119 461 700 193 101 262 735 128TOTAL PASSIF 119 461 700 193 101 262 735 128",
+      "valeur_courante_M_FCFA": 119461700.193,
+      "valeur_precedente_M_FCFA": 101262735.128
+    },
+    "capitaux_propres": {
+      "valeur_courante": 500376822,
+      "valeur_precedente": 500376822,
+      "ligne_source": "Immobilisations financières 11 861 504 143 11 777 656 427Autres capitaux propres 500 376 822 500 376 822",
+      "valeur_courante_M_FCFA": 500376.822,
+      "valeur_precedente_M_FCFA": 500376.822
+    },
+    "dettes_financieres": {
+      "valeur_courante": 558684874,
+      "valeur_precedente": 781645443,
+      "ligne_source": "Dettes financières 558 684 874 781 645 443Dettes financières -258 139 472 964 821 056",
+      "valeur_courante_M_FCFA": 558684.874,
+      "valeur_precedente_M_FCFA": 781645.443
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 3,548,638 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 2,359,623 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f89382a6df04d4d360f245548c0c8d5217e6172410c235a63aeb7c6065f75f08"
+}

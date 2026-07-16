@@ -1,0 +1,63 @@
+{
+  "ticker": "UNXC",
+  "fichier_source": "b18aeac5_20240430_-_etats_financiers_de_synthese_projets_daffectation_non_verifies_par_les_cac_-_exercice_2023_-_uniwax_ci.pdf",
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 2035492389,
+      "valeur_precedente": 1298674972,
+      "ligne_source": "Résultat net (Bénéfice - Perte) - 2 035 492 389 - 1 298 674 972",
+      "valeur_courante_M_FCFA": 2035492.389,
+      "valeur_precedente_M_FCFA": 1298674.972
+    },
+    "total_actif": {
+      "valeur_courante": 38585032514,
+      "valeur_precedente": 39705901306,
+      "ligne_source": "TOTAL ACTIF 3 8 585 032 514 3 9 705 901 306",
+      "valeur_courante_M_FCFA": 38585032.514,
+      "valeur_precedente_M_FCFA": 39705901.306
+    },
+    "total_passif": {
+      "valeur_courante": 38585032514,
+      "valeur_precedente": 39705901306,
+      "ligne_source": "TOTAL PASSIF 3 8 585 032 514 3 9 705 901 306",
+      "valeur_courante_M_FCFA": 38585032.514,
+      "valeur_precedente_M_FCFA": 39705901.306
+    },
+    "capitaux_propres": {
+      "valeur_courante": 11704916,
+      "valeur_precedente": 1400364822,
+      "ligne_source": "Flux de trésorérie provenant des capitaux propres 11 704 916 - 1 400 364 822",
+      "valeur_courante_M_FCFA": 11704.916,
+      "valeur_precedente_M_FCFA": 1400364.822
+    },
+    "dettes_financieres": {
+      "valeur_courante": 1221476629,
+      "valeur_precedente": 1202350710,
+      "ligne_source": "Dettes financières et ressources assimilées 1 221 476 629 1 202 350 710",
+      "valeur_courante_M_FCFA": 1221476.629,
+      "valeur_precedente_M_FCFA": 1202350.71
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 29686986976,
+      "valeur_precedente": 36372536951,
+      "ligne_source": "CHIFFRE D'AFFAIRES 29 686 986 976 36 372 536 951",
+      "valeur_courante_M_FCFA": 29686986.976,
+      "valeur_precedente_M_FCFA": 36372536.951
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 2,035,492 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 1,298,675 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "4a832d1aac81b30097e97d31e0bdae9bc6be3b0c9146efd4471a4859dcf2a42c"
+}
