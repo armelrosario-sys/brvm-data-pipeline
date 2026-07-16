@@ -1,0 +1,48 @@
+{
+  "ticker": "SCRC",
+  "fichier_source": "fc2222e5_20240510_-_etats_financiers_-_exercice_2023_-_sucrivoire_ci.pdf",
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": -10324162375,
+      "valeur_precedente": -8755668861,
+      "ligne_source": "Résultat net de l'exercice (bénéfice + ou perte -) -10 324 162 375 -8 755 668 861",
+      "valeur_courante_M_FCFA": -10324162.375,
+      "valeur_precedente_M_FCFA": -8755668.861
+    },
+    "capitaux_propres": {
+      "valeur_courante": 17363224113,
+      "valeur_precedente": 27687386488,
+      "ligne_source": "TOTAL CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 17 363 224 113 27 687 386 488 Produits des cessions d'immobilisations 10 977 186 20 378 522",
+      "valeur_courante_M_FCFA": 17363224.113,
+      "valeur_precedente_M_FCFA": 27687386.488
+    },
+    "dettes_financieres": {
+      "valeur_courante": 35876628027,
+      "valeur_precedente": 41052624697,
+      "ligne_source": "Emprunts et dettes financières diverses 35 876 628 027 41 052 624 697 Autres produits H.A.O. 20 000 115 212 593",
+      "valeur_courante_M_FCFA": 35876628.027,
+      "valeur_precedente_M_FCFA": 41052624.697
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 68134693800,
+      "valeur_precedente": 68635110937,
+      "ligne_source": "Matériel, mobilier et actifs biologiques 58 795 610 939 53 542 421 236 CHIFFRE D'AFFAIRES (A + B + C + D) 68 134 693 800 68 635 110 937",
+      "valeur_courante_M_FCFA": 68134693.8,
+      "valeur_precedente_M_FCFA": 68635110.937
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = -10,324,162 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = -8,755,669 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "29538cde42aa5defe0c583e6873da1b9b1b8b5c04aca732e3c675f36d5758c03"
+}

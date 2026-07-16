@@ -1,0 +1,59 @@
+{
+  "ticker": "TTLC",
+  "fichier_source": "f76113ea_20260601_-_etats_financiers_approuves_-_exercice_2025_-_totalenergies_marketing_ci.pdf",
+  "exercice_courant": 2025,
+  "exercice_precedent": 2024,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 9087,
+      "valeur_precedente": 9374,
+      "ligne_source": "Bénéfice net 9 087 9 374 -3% Dividendes versés -14 000 -13 959",
+      "valeur_courante_M_FCFA": 9087.0,
+      "valeur_precedente_M_FCFA": 9374.0
+    },
+    "total_actif": {
+      "valeur_courante": 188472,
+      "valeur_precedente": 191526,
+      "ligne_source": "Total Actif 188 472 191 526 Total Passif 188 472 191 526",
+      "valeur_courante_M_FCFA": 188472.0,
+      "valeur_precedente_M_FCFA": 191526.0
+    },
+    "total_passif": {
+      "valeur_courante": 188472,
+      "valeur_precedente": 191526,
+      "ligne_source": "Total Actif 188 472 191 526 Total Passif 188 472 191 526",
+      "valeur_courante_M_FCFA": 188472.0,
+      "valeur_precedente_M_FCFA": 191526.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": -14000,
+      "valeur_precedente": -13959,
+      "ligne_source": "BILAN AU 31/12/2025 Flux de trésorerie provenant du financement par les capitaux propres -14 000 -13 959",
+      "valeur_courante_M_FCFA": -14000.0,
+      "valeur_precedente_M_FCFA": -13959.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 4033,
+      "valeur_precedente": 4033,
+      "ligne_source": "Immobilisations financières 7 941 8 209 Autres capitaux propres 4 033 4 033",
+      "valeur_courante_M_FCFA": 4033.0,
+      "valeur_precedente_M_FCFA": 4033.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 588709,
+      "valeur_precedente": 621042,
+      "ligne_source": "Chiffre d'affaires 588 709 621 042 -8 204 -11 030",
+      "valeur_courante_M_FCFA": 588709.0,
+      "valeur_precedente_M_FCFA": 621042.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "40e6b3ff3219dfd1c694a6f505745dfcdda1c57331e6ce47b02a3459d3dc2405"
+}

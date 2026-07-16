@@ -1,0 +1,62 @@
+{
+  "ticker": "SCRC",
+  "fichier_source": "8310d519_20230428_-_etats_financiers_exercice_2022_-_sucrivoire_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr",
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 8755668861,
+      "valeur_precedente": 6572600809,
+      "ligne_source": "Résultat net - 8755668861 |- 6572 600 809 Services extérieurs - 9 780 431 353 9 061 328 804",
+      "valeur_courante_M_FCFA": 8755668.861,
+      "valeur_precedente_M_FCFA": 6572600.809
+    },
+    "total_actif": {
+      "valeur_courante": 124042067779107246529979,
+      "valeur_precedente": null,
+      "ligne_source": "TOTAL ACTIF 124 042 067 779 107 246 529 979 - Variaïon de stocks de maïères premières et fournitures liées",
+      "valeur_courante_M_FCFA": 1.2404206777910724e+20
+    },
+    "total_passif": {
+      "valeur_courante": 124042067779107246529979,
+      "valeur_precedente": 11679486399,
+      "ligne_source": "TOTAL PASSIF 124 042 067 779 107 246 529 979 Doiaïons aux amorissements, aux provisions et dépréciaions - 11 679 486 399 9 654 565 009",
+      "valeur_courante_M_FCFA": 1.2404206777910724e+20,
+      "valeur_precedente_M_FCFA": 11679486.399
+    },
+    "capitaux_propres": {
+      "valeur_courante": 2022,
+      "valeur_precedente": 2021,
+      "ligne_source": "Flux de tré ie p du fi par les capitaux propres : ORIGINES 2022 2021",
+      "valeur_courante_M_FCFA": 2.022,
+      "valeur_precedente_M_FCFA": 2.021
+    },
+    "dettes_financieres": {
+      "valeur_courante": 43777846162,
+      "valeur_precedente": 32955948896,
+      "ligne_source": "Dettes financières et resources assimilées 43 777 846 162 32 955 948 896 VALEUR AJOUTEE 20237 580635 19415378 547 |",
+      "valeur_courante_M_FCFA": 43777846.162,
+      "valeur_precedente_M_FCFA": 32955948.896
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 68635110937,
+      "valeur_precedente": 62497301147,
+      "ligne_source": "Stocks 34 528 510 031 32 597 363 457 CHIFFRE D'AFFAIRES 68 635 110 937 62 497 301 147",
+      "valeur_courante_M_FCFA": 68635110.937,
+      "valeur_precedente_M_FCFA": 62497301.147
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 8,755,669 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 6,572,601 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "58ec05c482e5c99d82f4ecadd73f23b8a235a4219610e7eed71327697b87e78a"
+}

@@ -1,0 +1,52 @@
+{
+  "ticker": "TTLC",
+  "fichier_source": "694b0d83_20250430_-_etats_financiers_-_exercice_2024_-_totalenergies_marketing_ci.pdf",
+  "exercice_courant": 2024,
+  "exercice_precedent": 2023,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 9374,
+      "valeur_precedente": 8709,
+      "ligne_source": "Bénéfice net 9 374 8 709 8%",
+      "valeur_courante_M_FCFA": 9374.0,
+      "valeur_precedente_M_FCFA": 8709.0
+    },
+    "total_actif": {
+      "valeur_courante": 191526,
+      "valeur_precedente": 167625,
+      "ligne_source": "Total Actif 191 526 167 625 Total Passif 191 526 167 625 Générale.",
+      "valeur_courante_M_FCFA": 191526.0,
+      "valeur_precedente_M_FCFA": 167625.0
+    },
+    "total_passif": {
+      "valeur_courante": 191526,
+      "valeur_precedente": 167625,
+      "ligne_source": "Total Actif 191 526 167 625 Total Passif 191 526 167 625 Générale.",
+      "valeur_courante_M_FCFA": 191526.0,
+      "valeur_precedente_M_FCFA": 167625.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 4033,
+      "valeur_precedente": 4033,
+      "ligne_source": "Immobilisations financières 8 209 10 846 Autres capitaux propres 4 033 4 033",
+      "valeur_courante_M_FCFA": 4033.0,
+      "valeur_precedente_M_FCFA": 4033.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 621042,
+      "valeur_precedente": 578922,
+      "ligne_source": "Chiffre d'affaires 621 042 578 922",
+      "valeur_courante_M_FCFA": 621042.0,
+      "valeur_precedente_M_FCFA": 578922.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "f8253e13210d0ce50f2504f5b6f5337f4493a5ea408a9246c8b320f9c189db59"
+}

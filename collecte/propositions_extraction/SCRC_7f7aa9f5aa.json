@@ -1,0 +1,60 @@
+{
+  "ticker": "SCRC",
+  "fichier_source": "f9d44f52_20240510_-_etats_financiers_ifrs_-_exercice_2023_-_sucrivoire_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 9010129,
+      "valeur_precedente": 6991817,
+      "ligne_source": "Résultat net - 9 010 129 - 6 991 817",
+      "valeur_courante_M_FCFA": 9010.129,
+      "valeur_precedente_M_FCFA": 6991.817
+    },
+    "total_actif": {
+      "valeur_courante": 124182623,
+      "valeur_precedente": 131234880,
+      "ligne_source": "Total actif 124 182 623 131 234 880",
+      "valeur_courante_M_FCFA": 124182.623,
+      "valeur_precedente_M_FCFA": 131234.88
+    },
+    "total_passif": {
+      "valeur_courante": 124182623,
+      "valeur_precedente": 131234880,
+      "ligne_source": "Total passif 124 182 623 131 234 880",
+      "valeur_courante_M_FCFA": 124182.623,
+      "valeur_precedente_M_FCFA": 131234.88
+    },
+    "capitaux_propres": {
+      "valeur_courante": 22310492,
+      "valeur_precedente": 30924421,
+      "ligne_source": "Capitaux propres 2 2 310 492 3 0 924 421",
+      "valeur_courante_M_FCFA": 22310.492,
+      "valeur_precedente_M_FCFA": 30924.421
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 68134694,
+      "valeur_precedente": 68635111,
+      "ligne_source": "Chiffre d'affaires 68 134 694 68 635 111",
+      "valeur_courante_M_FCFA": 68134.694,
+      "valeur_precedente_M_FCFA": 68635.111
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "7f7aa9f5aa33f5c6e6ab30424903ad574c7e9e0393221f858e1e4620860ecf40"
+}

@@ -1,0 +1,16 @@
+{
+  "ticker": "SCRC",
+  "fichier_source": "3944a65d_20250509_-_etats_financiers_-_normes_syscohada_-_exercice_2024_-_sucrivoire_ci.pdf",
+  "exercice_courant": 2068,
+  "exercice_precedent": 2019,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {},
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "379617f6e58c1e6714da401c426d6cbf157d434d172492279475633dcd766307"
+}

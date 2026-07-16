@@ -1,0 +1,61 @@
+{
+  "ticker": "SCRC",
+  "fichier_source": "03fd63c8_20230612_-_etats_financiers_syscohada_exercice_2022_-_sucrivoire_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 8755668861,
+      "valeur_precedente": 6572600809,
+      "ligne_source": "- Décai: liés aux isili di bilisali corporelles 24698180 435 |. 17 224 808 289 RESULTAT NET 8755668861 |- 6 572 600 809",
+      "valeur_courante_M_FCFA": 8755668.861,
+      "valeur_precedente_M_FCFA": 6572600.809
+    },
+    "total_actif": {
+      "valeur_courante": 124042067779107246529979,
+      "valeur_precedente": null,
+      "ligne_source": "TOTAL ACTIF 124 042 067 779 107 246 529 979 - Varialion de slocks de matières premieres el lournitures llèes",
+      "valeur_courante_M_FCFA": 1.2404206777910724e+20
+    },
+    "total_passif": {
+      "valeur_courante": 124042067779107246529979,
+      "valeur_precedente": 11679486359,
+      "ligne_source": "TOTAL PASSIF 124 042 067 779 107 246 529 979 Dotalions aux amorlissements, aux provisions el déprécialions 11 679 486 359 9 654 555 009",
+      "valeur_courante_M_FCFA": 1.2404206777910724e+20,
+      "valeur_precedente_M_FCFA": 11679486.359
+    },
+    "capitaux_propres": {
+      "valeur_courante": 2768736648836443055349,
+      "valeur_precedente": 1584849957,
+      "ligne_source": "[Total capitaux propres 27 687 366 488 36 443 055 349 Impôts el taxes 1 584 849 957 1451772269",
+      "valeur_courante_M_FCFA": 2.768736648836443e+18,
+      "valeur_precedente_M_FCFA": 1584849.957
+    },
+    "dettes_financieres": {
+      "valeur_courante": 4377784616232955948896,
+      "valeur_precedente": 20237580615,
+      "ligne_source": "Dettes financières et resources assimilées 43 777 846 162 32 955 948 896 VALEUR AJOUTÉE 20 237 580 615 19 415 378 547",
+      "valeur_courante_M_FCFA": 4.377784616232956e+18,
+      "valeur_precedente_M_FCFA": 20237580.615
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 68635110937,
+      "valeur_precedente": 62497301147,
+      "ligne_source": "Stacks 34 528 510 031 32 597 363 457 CHIFFRE D'AFFAIRES 68 635 110 937 _62 497 301 147",
+      "valeur_courante_M_FCFA": 68635110.937,
+      "valeur_precedente_M_FCFA": 62497301.147
+    }
+  },
+  "alertes_plausibilite": [
+    "valeur_courante_M_FCFA = 8,755,669 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
+    "valeur_precedente_M_FCFA = 6,572,601 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
+  ],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "006a0480eea2a15fe4664a44d24a209c1818b184d8da98c83b20f409bb0e2aae"
+}

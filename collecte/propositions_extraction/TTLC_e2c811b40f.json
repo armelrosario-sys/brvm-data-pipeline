@@ -1,0 +1,65 @@
+{
+  "ticker": "TTLC",
+  "fichier_source": "42880330_20240910_-_etats_financiers_definitifs_2023_-_totalenergies_marketing_ci.pdf",
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 31,
+      "valeur_precedente": null,
+      "ligne_source": "Le résultat net de TotalEnergies Marketing Côte d’Ivoire S.A au titre de l’exercice clos le 31 décembre",
+      "valeur_courante_M_FCFA": 31.0
+    },
+    "total_actif": {
+      "valeur_courante": 167625,
+      "valeur_precedente": 159651,
+      "ligne_source": "Total Actif 167 625 159 651 Total Passif 167 625 159 651",
+      "valeur_courante_M_FCFA": 167625.0,
+      "valeur_precedente_M_FCFA": 159651.0
+    },
+    "total_passif": {
+      "valeur_courante": 167625,
+      "valeur_precedente": 159651,
+      "ligne_source": "Total Actif 167 625 159 651 Total Passif 167 625 159 651",
+      "valeur_courante_M_FCFA": 167625.0,
+      "valeur_precedente_M_FCFA": 159651.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 12279,
+      "valeur_precedente": 11143,
+      "ligne_source": "Flux de trésorerie provenant du financement par les capitaux propres (12 279) (11 143)",
+      "valeur_courante_M_FCFA": 12279.0,
+      "valeur_precedente_M_FCFA": 11143.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 2384,
+      "valeur_precedente": 3933,
+      "ligne_source": "Remboursements des emprunts et autres dettes financières (2 384) (3 933)",
+      "valeur_courante_M_FCFA": 2384.0,
+      "valeur_precedente_M_FCFA": 3933.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 4033,
+      "valeur_precedente": 4033,
+      "ligne_source": "Immobilisations financières 10 846 10 769 Autres capitaux propres 4 033 4 033",
+      "valeur_courante_M_FCFA": 4033.0,
+      "valeur_precedente_M_FCFA": 4033.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 578922,
+      "valeur_precedente": 573130,
+      "ligne_source": "Chiffre d'affaires 578 922 573 130 Flux de trésorerie provenant des activités opérationnelles",
+      "valeur_courante_M_FCFA": 578922.0,
+      "valeur_precedente_M_FCFA": 573130.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "e2c811b40fbd143c454c64d62d8a160da65bd5a30a69a148a2197573d0fbaf5b"
+}
