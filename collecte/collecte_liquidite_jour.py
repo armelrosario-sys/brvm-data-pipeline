@@ -25,6 +25,17 @@ UA = {"User-Agent": "brvm-data-pipeline/0.1 (liquidite quotidienne; "
 _BASE = Path(__file__).resolve().parent
 SORTIE = _BASE / "liquidite_jour.json"
 
+# Historique d'accumulation (15/07/2026) : liquidite_jour.json est un
+# INSTANTANE ecrase chaque jour -- aucune memoire du passe, donc aucune
+# mediane glissante possible. Ce second fichier ACCUMULE (append) une
+# valeur par jour de collecte, fenetre glissante de 60 jours max, pour
+# servir de reference stable a moteur/scoring.py (au lieu de la valeur
+# d'un seul jour de SNTS, sujette a de fortes variations ponctuelles --
+# constat reel : 1,14 Md FCFA un jour, largement au-dessus de la normale,
+# faussant tout le classement Taille du jour meme).
+HISTORIQUE = _BASE / "historique_liquidite.json"
+FENETRE_JOURS = 60
+
 
 def to_nombre(s):
     if not s:
@@ -87,6 +98,22 @@ def recuperer_liquidite_jour():
     return resultats
 
 
+def mettre_a_jour_historique(resultats):
+    """Ajoute l'observation du jour a l'historique glissant (60 jours max),
+    une entree par date de collecte (ecrase si le script tourne 2 fois le
+    meme jour, ne duplique jamais). Cle = date ISO (jour), valeur = valeur
+    echangee du jour par ticker."""
+    historique = json.loads(HISTORIQUE.read_text(encoding="utf-8")) if HISTORIQUE.exists() else {}
+    aujourd_hui = datetime.now(timezone.utc).date().isoformat()
+    historique[aujourd_hui] = {t: v["valeur_echangee_jour"] for t, v in resultats.items()}
+    # Purge au-dela de la fenetre (tri par date, conserve les FENETRE_JOURS plus recentes)
+    dates_triees = sorted(historique.keys())
+    for d in dates_triees[:-FENETRE_JOURS]:
+        del historique[d]
+    HISTORIQUE.write_text(json.dumps(historique, ensure_ascii=False, indent=1), encoding="utf-8")
+    return len(historique)
+
+
 def main():
     resultats = recuperer_liquidite_jour()
     json.dump(resultats, open(SORTIE, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
@@ -94,6 +121,9 @@ def main():
     if resultats:
         exemple = next(iter(resultats.items()))
         print(f"Exemple : {exemple[0]} -> {exemple[1]}")
+    n_jours = mettre_a_jour_historique(resultats)
+    print(f"Historique glissant mis a jour : {n_jours} jour(s) de donnees disponibles "
+          f"(fenetre max {FENETRE_JOURS}j) dans {HISTORIQUE}")
 
 
 if __name__ == "__main__":
