@@ -124,6 +124,18 @@ def collecter_donnees():
             (t,)).fetchall()
         avis[t] = [dict(r, type=humaniser(r["type"]), note=humaniser(r["note"])) for r in rows]
 
+    # Historique des dividendes (15/07/2026) : ajoute pour la Fiche titre.
+    # Audit prealable : seulement 3/47 titres ont >=2 ans de montant connu --
+    # la liste sera courte, voire vide, pour la plupart des titres AUJOURD'HUI ;
+    # affiche honnetement tel quel (jamais de valeur inventee), s'enrichira
+    # a mesure que la dette de donnees se resorbe (chantier distinct).
+    dividendes = {}
+    for t in tickers:
+        rows = cur.execute(
+            "SELECT exercice_couvert, montant_net, date_paiement FROM dividendes "
+            "WHERE ticker=? ORDER BY exercice_couvert DESC", (t,)).fetchall()
+        dividendes[t] = [dict(r) for r in rows]
+
     conn.close()
     # Point 1 (audit ergonomie, 14/07/2026) : integrer le profilage de style
     # (VALUE/GROWTH/GARP), calcule par moteur/profils.py, dans le dashboard
@@ -132,7 +144,7 @@ def collecter_donnees():
     # que l'utilisateur avait signalee.
     profils_path = Path(__file__).resolve().parent.parent / "collecte" / "profils.json"
     profils = json.loads(profils_path.read_text()) if profils_path.exists() else {}
-    return resultats, series, fondamentaux, avis, source_urls, profils
+    return resultats, series, fondamentaux, avis, source_urls, profils, dividendes
 
 
 def calculer_roe(fonda_ticker):
@@ -339,7 +351,7 @@ def _prochaines_echeances_annee_en_cours(aujourd_hui):
     return sorted(echeances, key=lambda x: x[3])
 
 
-def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche, liquidite_jour, liquidite_generale, tendance_liquidite, profils):
+def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche, liquidite_jour, liquidite_generale, tendance_liquidite, profils, dividendes):
     elig = [r for r in resultats if r["statut_gate"] == "ELIGIBLE" and r["score_composite"]]
     elig.sort(key=lambda r: -r["score_composite"])
     excl = [r for r in resultats if r["statut_gate"] == "EXCLU"]
@@ -561,7 +573,6 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .var-hausse {{ color: #34d399; font-weight: 600; }}
   .var-baisse {{ color: #f87171; font-weight: 600; }}
   .var-stable {{ color: var(--muted, #94a3b8); }}
-  .puce-jour {{ color: #60a5fa; font-size: 0.6em; margin-right: 3px; cursor: help; }}
   .score-fort {{ color: #34d399; font-weight: 600; }}
   .score-moyen {{ color: #fbbf24; }}
   .score-faible {{ color: #f87171; }}
@@ -643,14 +654,14 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 
   <div class="onglets">
     <span class="groupe-onglets">Essentiel</span>
-    <div class="onglet actif" onclick="onglet('synthese')">Synthese</div>
+    <div class="onglet actif" onclick="onglet('synthese')">Synthèse</div>
     <div class="onglet" onclick="onglet('surveillance')">Surveillance</div>
     <span class="separateur-onglets"></span>
-    <span class="groupe-onglets">Marche</span>
+    <span class="groupe-onglets">Marché</span>
     <div class="onglet" onclick="onglet('secteurs')">Secteurs</div>
     <div class="onglet" onclick="onglet('comparaison')">Comparaison</div>
     <span class="separateur-onglets"></span>
-    <span class="groupe-onglets">Detail</span>
+    <span class="groupe-onglets">Détail</span>
     <div class="onglet" onclick="onglet('fiche')">Fiche titre</div>
   </div>
 
@@ -660,9 +671,9 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
       <div class="barre-outils">
         <input type="text" id="recherche" placeholder="Rechercher un titre ou un secteur..." onkeyup="filtrerTable()">
         <select id="tri" onchange="trierTable()">
-          <option value="rentabilite_desc">Rentabilite (decroissant)</option>
-          <option value="solidite_desc">Solidite (decroissant)</option>
-          <option value="valorisation_desc">Valorisation (decroissant)</option>
+          <option value="rentabilite_desc">Rentabilité (décroissant)</option>
+          <option value="solidite_desc">Solidité (décroissant)</option>
+          <option value="valorisation_desc">Valorisation (décroissante)</option>
           <option value="secteur">Secteur</option>
           <option value="ticker">Titre (A-Z)</option>
         </select>
@@ -742,6 +753,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 const SERIES = {json.dumps(series)};
 const FONDAMENTAUX = {json.dumps(fondamentaux)};
 const AVIS = {json.dumps(avis)};
+const DIVIDENDES = {json.dumps(dividendes)};
 const SOURCE_URLS = {json.dumps(source_urls)};
 const RESULTATS = {json.dumps({r["ticker"]: r for r in resultats})};
 const TENDANCE_LIQUIDITE = {json.dumps(tendance_liquidite)};
@@ -792,16 +804,22 @@ function renderScore(v) {{
   return `<span class="${{cls}}">${{v}}</span>`;
 }}
 function renderCours(cours, variation, source) {{
+  // Correctif ergonomie (15/07/2026) : le point bleu indiquait seulement
+  // "cours du jour" (fraicheur), sans rapport avec le sens du mouvement --
+  // remplace par une fleche coloree qui porte l'information utile (hausse/
+  // baisse/stable), la source (jour/mensuel) restant disponible au survol.
   if (cours === null || cours === undefined) return '<span class="score-na">—</span>';
   const txt_cours = `${{cours.toLocaleString('fr-FR')}}`;
-  let badge_var = '';
+  let fleche = '', badge_var = '';
   if (variation !== null && variation !== undefined) {{
     const cls = variation > 0 ? 'var-hausse' : variation < 0 ? 'var-baisse' : 'var-stable';
+    const symbole = variation > 0 ? '&#9650;' : variation < 0 ? '&#9660;' : '&#9679;';
     const signe = variation > 0 ? '+' : '';
+    fleche = `<span class="${{cls}}" title="Variation du jour">${{symbole}}</span> `;
     badge_var = `<span class="${{cls}}">${{signe}}${{variation}}%</span>`;
   }}
-  const puce = source === 'jour' ? '<span class="puce-jour" title="Cours du jour">&#9679;</span>' : '';
-  return `${{puce}}${{txt_cours}} ${{badge_var}}`;
+  const titre_source = source === 'jour' ? 'Cours du jour' : 'Dernier bulletin mensuel (pas de cours du jour disponible)';
+  return `<span title="${{titre_source}}">${{fleche}}${{txt_cours}} ${{badge_var}}</span>`;
 }}
 function libelleStatutDonnee(s) {{
   // Correctif orthographe (15/07/2026) : la valeur brute de la base
@@ -956,6 +974,20 @@ function construireFiche(t) {{
     html += '</div>';
     html += `<div style="margin-bottom:14px">${{ligneSource(t)}}</div>`;
   }}
+  // Historique des dividendes (15/07/2026) : liste sobre, pas un graphique --
+  // reste honnete meme quand tres court (1 seul exercice pour la plupart
+  // des titres aujourd'hui) plutot que de suggerer une tendance illusoire.
+  const divs = (DIVIDENDES[t] || []).filter(d => d.montant_net !== null);
+  html += `<h2 style="font-size:1em">Historique des dividendes (${{divs.length}} exercice(s) avec montant connu)</h2>`;
+  if (divs.length === 0) {{
+    html += '<div class="photo-unique">Aucun montant de dividende sourcé, information non disponible.</div>';
+  }} else {{
+    html += '<table style="margin-bottom:14px"><thead><tr><th>Exercice</th><th>Dividende net (FCFA/action)</th></tr></thead><tbody>';
+    for (const d of divs) {{
+      html += `<tr><td>${{d.exercice_couvert ?? '—'}}</td><td>${{d.montant_net}}</td></tr>`;
+    }}
+    html += '</tbody></table>';
+  }}
   html += '<h2 style="font-size:1em">Historique fondamental — vue transposée (' + fonda.length + ' exercice(s))</h2>';
   const exercicesTries = [...fonda].sort((a,b) => a.exercice - b.exercice);
   const cols = exercicesTries.map(f => f.exercice);
@@ -1038,7 +1070,7 @@ function onglet(nom) {{
 
 
 def main():
-    resultats, series, fondamentaux, avis, source_urls, profils = collecter_donnees()
+    resultats, series, fondamentaux, avis, source_urls, profils, dividendes = collecter_donnees()
     seuils = charger_seuils()
     marche = charger_marche()
     liquidite_jour = charger_liquidite_jour()
@@ -1046,7 +1078,7 @@ def main():
     tendance_liquidite = charger_tendance_liquidite()
     fraicheur = rapport_fraicheur()
     html = generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche,
-                        liquidite_jour, liquidite_generale, tendance_liquidite, profils)
+                        liquidite_jour, liquidite_generale, tendance_liquidite, profils, dividendes)
     sortie = Path(__file__).resolve().parent.parent / "docs_site"
     sortie.mkdir(exist_ok=True)
     (sortie / "index.html").write_text(html, encoding="utf-8")
