@@ -1,0 +1,65 @@
+{
+  "ticker": "SLBC",
+  "fichier_source": "18550e5a_20230512_-_etats_financiers_exercice_2022_-_solibra_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 1217,
+      "valeur_precedente": 22020,
+      "ligne_source": "BENEFICE NET 1 217 22 020 Acquisition d'immobilisations Financières 79 375",
+      "valeur_courante_M_FCFA": 1217.0,
+      "valeur_precedente_M_FCFA": 22020.0
+    },
+    "total_actif": {
+      "valeur_courante": 334102,
+      "valeur_precedente": 316350,
+      "ligne_source": "Total Actif 334 102 316 350",
+      "valeur_courante_M_FCFA": 334102.0,
+      "valeur_precedente_M_FCFA": 316350.0
+    },
+    "total_passif": {
+      "valeur_courante": 334102,
+      "valeur_precedente": 316350,
+      "ligne_source": "Total Passif 334 102 316 350",
+      "valeur_courante_M_FCFA": 334102.0,
+      "valeur_precedente_M_FCFA": 316350.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "dettes_financieres": {
+      "valeur_courante": 45000,
+      "valeur_precedente": null,
+      "ligne_source": "Transfert de charges 701 640 Augmentation Autres dettes Financières 45 000",
+      "valeur_courante_M_FCFA": 45000.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 281880,
+      "valeur_precedente": 299269,
+      "ligne_source": "CHIFFRE D'AFFAIRES ET AUTRES PRODUITS 281 880 299 269 RESSOURCES",
+      "valeur_courante_M_FCFA": 281880.0,
+      "valeur_precedente_M_FCFA": 299269.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "1ac35f5546c4ae71505ef19b87790325cc03427d96ed2ececbc45f13887cf1f5"
+}

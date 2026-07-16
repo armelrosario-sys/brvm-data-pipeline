@@ -1,0 +1,62 @@
+{
+  "ticker": "SNTS",
+  "fichier_source": "74429b0b_20250221_-_etats_financiers_-_exercice_2024_-_sonatel_sn.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "ocr",
+    "natif",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "natif",
+    "ocr",
+    "natif",
+    "ocr",
+    "natif",
+    "ocr",
+    "natif",
+    "ocr",
+    "ocr",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "natif",
+    "ocr"
+  ],
+  "champs": {
+    "total_actif": {
+      "valeur_courante": 3105287,
+      "valeur_precedente": null,
+      "ligne_source": "Total actif : 3.105.287",
+      "valeur_courante_M_FCFA": 3105287.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 1776443,
+      "valeur_precedente": 1620701,
+      "ligne_source": "Chiffre d'affaires 1 776 443 1 620 701 1 455 049",
+      "valeur_courante_M_FCFA": 1776443.0,
+      "valeur_precedente_M_FCFA": 1620701.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "105c1756580297199e82fb2dbfd8942644049e1e90dd6df51d2a37dd855e794e"
+}

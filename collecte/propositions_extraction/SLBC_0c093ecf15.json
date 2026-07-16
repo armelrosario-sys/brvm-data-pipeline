@@ -1,0 +1,59 @@
+{
+  "ticker": "SLBC",
+  "fichier_source": "56f11b31_20210504_-_etats_financiers_-_exercice_2020_-_solibra_ci.pdf",
+  "exercice_courant": null,
+  "exercice_precedent": null,
+  "referentiel": "syscohada",
+  "unite_detectee": "millions",
+  "methode_pages": [
+    "natif"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 17520,
+      "valeur_precedente": 13095,
+      "ligne_source": "BENEFICE NET 17 520 13 095 Acquisition d'immobilisations Financières 12 248 10",
+      "valeur_courante_M_FCFA": 17520.0,
+      "valeur_precedente_M_FCFA": 13095.0
+    },
+    "total_actif": {
+      "valeur_courante": 294111,
+      "valeur_precedente": 275982,
+      "ligne_source": "Total Actif 294 111 275 982",
+      "valeur_courante_M_FCFA": 294111.0,
+      "valeur_precedente_M_FCFA": 275982.0
+    },
+    "total_passif": {
+      "valeur_courante": 294111,
+      "valeur_precedente": 275982,
+      "ligne_source": "Total Passif 294 111 275 982",
+      "valeur_courante_M_FCFA": 294111.0,
+      "valeur_precedente_M_FCFA": 275982.0
+    },
+    "capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "autres_capitaux_propres": {
+      "valeur_courante": 0,
+      "valeur_precedente": 0,
+      "ligne_source": "Autres capitaux propres 0 0",
+      "valeur_courante_M_FCFA": 0.0,
+      "valeur_precedente_M_FCFA": 0.0
+    },
+    "chiffre_affaires": {
+      "valeur_courante": 229359,
+      "valeur_precedente": 225004,
+      "ligne_source": "CHIFFRE D'AFFAIRES ET AUTRES PRODUITS 229 359 225 004 RESSOURCES",
+      "valeur_courante_M_FCFA": 229359.0,
+      "valeur_precedente_M_FCFA": 225004.0
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "0c093ecf15f9bee229f2c01c1e6adf4546b58041c056ac180580456f35c4fa17"
+}

@@ -1,0 +1,37 @@
+{
+  "ticker": "SOGC",
+  "fichier_source": "faffff28_20220429_-_etats_financiers_exercice_2021_-_sogb_ci.pdf",
+  "exercice_courant": 2020,
+  "exercice_precedent": 2021,
+  "referentiel": "syscohada",
+  "unite_detectee": "milliers",
+  "methode_pages": [
+    "ocr"
+  ],
+  "champs": {
+    "resultat_net": {
+      "valeur_courante": 14728280,
+      "valeur_precedente": 7652581,
+      "ligne_source": "immobilisations corporelles 64 499 032] 64 176 907 Résultat net l'exercice 14 728 280 7652581",
+      "valeur_courante_M_FCFA": 14728.28,
+      "valeur_precedente_M_FCFA": 7652.581
+    },
+    "capitaux_propres": {
+      "valeur_courante": 6000511,
+      "valeur_precedente": 3024258,
+      "ligne_source": "Flux de trésorerie provenantdes capitaux propres {6 000 511) (3 024 258)",
+      "valeur_courante_M_FCFA": 6000.511,
+      "valeur_precedente_M_FCFA": 3024.258
+    },
+    "dettes_financieres": {
+      "valeur_courante": 6116745,
+      "valeur_precedente": null,
+      "ligne_source": "Autres immobilisations 524 042 516 234 Dettes financières 6 116 745 BREST",
+      "valeur_courante_M_FCFA": 6116.745
+    }
+  },
+  "alertes_plausibilite": [],
+  "date_extraction": "2026-07-16",
+  "statut": "A_VERIFIER_HUMAIN",
+  "sha256": "ef45f0d5751c0ad05794ddab8642794962592c171e478d6848bd686a0939393a"
+}
