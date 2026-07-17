@@ -32,7 +32,12 @@ concurrency:
 
 jobs:
   publier:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Correctif 17/07/2026 : la condition "if: ... conclusion == 'success'"
+    # provoquait des runs IGNORES (icone grise) deroutants, pour un risque
+    # qui n'existe pas vraiment -- si P9 echoue reellement, rien de nouveau
+    # n'est committe, et P5b republie alors simplement les memes donnees
+    # qu'avant (sans danger). Retiree : plus simple, moins de confusion,
+    # aucune perte reelle de securite.
     runs-on: ubuntu-latest
     environment:
       name: github-pages
