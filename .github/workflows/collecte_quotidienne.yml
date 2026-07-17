@@ -10,8 +10,13 @@ name: P9 - Collecte quotidienne des cours
 
 on:
   workflow_dispatch:
+    inputs:
+      forcer_malgre_seance_ouverte:
+        description: "Forcer la collecte meme si la seance BRVM est encore ouverte (instantane partiel, marque comme tel, jamais confondu avec une vraie cloture)"
+        type: boolean
+        default: false
   schedule:
-    - cron: "0 17 * * 1-5"   # 17h00 UTC, du lundi au vendredi
+    - cron: "0 17 * * 1-5"   # 17h00 UTC, du lundi au vendredi -- toujours en mode strict
 
 permissions:
   contents: write
@@ -27,6 +32,11 @@ jobs:
           python-version: "3.12"
       - run: pip install requests beautifulsoup4
       - name: Collecter les cours du jour (brvm.org/fr/cours-actions/0)
+        env:
+          # Actif UNIQUEMENT sur declenchement manuel explicite avec la case
+          # cochee (16/07/2026) -- jamais sur le declenchement programme,
+          # qui reste toujours strict (protege le releve quotidien officiel).
+          FORCER_MALGRE_SEANCE_OUVERTE: ${{ github.event_name == 'workflow_dispatch' && inputs.forcer_malgre_seance_ouverte && '1' || '' }}
         run: python3 collecte/collecte_liquidite_jour.py
       - name: Committer si changement
         run: |
