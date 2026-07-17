@@ -117,6 +117,21 @@ def collecter_donnees():
         fondamentaux[t] = [dict(r) for r in rows]
         source_urls[t] = rows[0]["source_url"] if rows else None
 
+    # Signaux actifs, tous titres (17/07/2026 : integration du portefeuille
+    # prive directement dans le dashboard public, en JS cote client -- cf.
+    # onglet "Mon portefeuille". Reutilise resume_capital() (deja fiable,
+    # deja utilise par bloc_signaux.py) plutot que de dupliquer la logique
+    # d'extraction en JS.)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from glossaire_signaux import resume_capital
+    signaux_tous = {}
+    for t in tickers:
+        rows = cur.execute(
+            "SELECT type, direction, detail FROM signaux WHERE ticker=? AND statut='ACTIF'",
+            (t,)).fetchall()
+        signaux_tous[t] = [dict(type=r["type"], direction=r["direction"],
+                                essentiel=resume_capital(r["type"], r["detail"]) or "") for r in rows]
+
     avis = {}
     for t in tickers:
         rows = cur.execute(
@@ -144,7 +159,7 @@ def collecter_donnees():
     # que l'utilisateur avait signalee.
     profils_path = Path(__file__).resolve().parent.parent / "collecte" / "profils.json"
     profils = json.loads(profils_path.read_text()) if profils_path.exists() else {}
-    return resultats, series, fondamentaux, avis, source_urls, profils, dividendes
+    return resultats, series, fondamentaux, avis, source_urls, profils, dividendes, signaux_tous
 
 
 def calculer_roe(fonda_ticker):
@@ -351,7 +366,7 @@ def _prochaines_echeances_annee_en_cours(aujourd_hui):
     return sorted(echeances, key=lambda x: x[3])
 
 
-def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche, liquidite_jour, liquidite_generale, tendance_liquidite, profils, dividendes):
+def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche, liquidite_jour, liquidite_generale, tendance_liquidite, profils, dividendes, signaux_tous):
     elig = [r for r in resultats if r["statut_gate"] == "ELIGIBLE" and r["score_composite"]]
     elig.sort(key=lambda r: -r["score_composite"])
     excl = [r for r in resultats if r["statut_gate"] == "EXCLU"]
@@ -539,6 +554,18 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .separateur-onglets {{ width: 1px; background: var(--border); margin: 4px 6px; }}
   .panneau {{ display: none; }}
   .panneau.actif {{ display: block; }}
+  .avert-portefeuille {{ background: #3f2e17; color: #fbbf24; border: 1px solid #fbbf24;
+    border-radius: 8px; padding: 10px 14px; font-size: 0.85em; margin-bottom: 14px; }}
+  .ligne-champs-pf {{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }}
+  .ligne-champs-pf label {{ display: block; font-size: 0.8em; color: var(--muted); margin-bottom: 3px; }}
+  .ligne-champs-pf input {{ background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 6px 10px; font-size: 0.9em; width: 100%; box-sizing: border-box; }}
+  .position-pf {{ border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 8px; align-items: end; }}
+  .position-pf label {{ display: block; font-size: 0.78em; color: var(--muted); margin-bottom: 2px; }}
+  .position-pf input {{ background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 5px 8px; font-size: 0.85em; width: 100%; box-sizing: border-box; }}
+  .position-pf button {{ background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1em; }}
   .carte {{ background: var(--card); border: 1px solid var(--border); border-radius: 12px;
             padding: 18px; margin-bottom: 20px; }}
   h2 {{ font-size: 1.1em; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; }}
@@ -663,6 +690,9 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
     <span class="separateur-onglets"></span>
     <span class="groupe-onglets">Détail</span>
     <div class="onglet" onclick="onglet('fiche')">Fiche titre</div>
+    <span class="separateur-onglets"></span>
+    <span class="groupe-onglets">Personnel</span>
+    <div class="onglet" onclick="onglet('portefeuille')">Mon portefeuille</div>
   </div>
 
   <div id="p-synthese" class="panneau actif">
@@ -731,6 +761,27 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
     </div>
   </div>
 
+  <div id="p-portefeuille" class="panneau">
+    <div class="carte">
+      <h2>Mon portefeuille <span style="font-weight:400;color:var(--muted);font-size:0.8em">
+          (calculé entièrement dans ton navigateur — rien n'est jamais envoyé nulle part)</span></h2>
+      <div class="avert-portefeuille">Tes positions sont enregistrées uniquement dans ce navigateur
+      (stockage local). Elles ne sont ni envoyées à un serveur, ni committées dans un dépôt Git —
+      exactement comme "Ma liste de suivi". Sur un autre appareil ou navigateur, tu ne les verras pas.</div>
+      <div class="ligne-champs-pf">
+        <div><label>Patrimoine financier total (FCFA)</label>
+          <input type="text" inputmode="decimal" id="pf-patrimoine" oninput="pfSauver()"></div>
+        <div><label>Plafond poche actions (%)</label>
+          <input type="text" inputmode="decimal" id="pf-plafond" oninput="pfSauver()"></div>
+      </div>
+      <div id="pf-positions"></div>
+      <datalist id="pf-datalist"></datalist>
+      <button class="sig-toggle" onclick="pfAjouterPosition()">+ Ajouter une position</button>
+      <hr style="border-color:var(--border);margin:16px 0">
+      <div id="pf-resultats"></div>
+    </div>
+  </div>
+
   <div id="p-comparaison" class="panneau">
     <div class="carte">
       <h2>Comparaison à deux titres <span style="font-weight:400;color:var(--muted);font-size:0.8em">(table uniquement — la précision compte plus qu'un graphique ici)</span></h2>
@@ -754,6 +805,7 @@ const SERIES = {json.dumps(series)};
 const FONDAMENTAUX = {json.dumps(fondamentaux)};
 const AVIS = {json.dumps(avis)};
 const DIVIDENDES = {json.dumps(dividendes)};
+const SIGNAUX_TOUS = {json.dumps(signaux_tous)};
 const SOURCE_URLS = {json.dumps(source_urls)};
 const RESULTATS = {json.dumps({r["ticker"]: r for r in resultats})};
 const TENDANCE_LIQUIDITE = {json.dumps(tendance_liquidite)};
@@ -845,12 +897,14 @@ function renderProfil(dominant, scores) {{
        + `<div class="profil-mini" title="${{titre}}">${{barre('VALUE','value')}}${{barre('GROWTH','growth')}}${{barre('GARP','garp')}}</div>`;
 }}
 const TICKERS = {json.dumps(tous_tickers)};
+const SEUIL_REEQUILIBRAGE_PCT = {seuils.get("portefeuille", {}).get("seuil_reequilibrage_pct_poche", 20)};
 // Point 4 (audit ergonomie, 14/07/2026) : une seule liste de tickers peuple
 // les 4 menus deroulants (Surveillance, Fiche, Comparaison x2), au lieu de
 // 4 copies HTML identiques generees cote serveur.
 for (const id of ['select-surveillance','select-fiche','select-comp-a','select-comp-b']) {{
   document.getElementById(id).innerHTML = TICKERS.map(t => `<option value="${{t}}">${{t}}</option>`).join('');
 }}
+document.getElementById('pf-datalist').innerHTML = TICKERS.map(t => `<option value="${{t}}">`).join('');
 const GLOSSAIRE = {json.dumps(GLOSSAIRE)};
 
 function rendreSynthese(lignes) {{
@@ -1063,14 +1117,153 @@ function onglet(nom) {{
   if (nom === 'surveillance' && !chartCours) tracerSurveillance();
   if (nom === 'fiche' && !document.getElementById('contenu-fiche').innerHTML) construireFiche(document.getElementById('select-fiche').value);
   if (nom === 'comparaison' && !document.getElementById('contenu-comparaison').innerHTML) comparer();
+  if (nom === 'portefeuille') pfRerendre();
 }}
+
+// ============ Mon portefeuille (17/07/2026) : integre directement dans le
+// dashboard public, calcule cote client, jamais envoye nulle part -- meme
+// principe que "Ma liste de suivi". Reagit aux MEMES donnees deja chargees
+// sur la page (LIGNES_SYNTHESE, SIGNAUX_TOUS), donc aussi reactif que le
+// reste du dashboard : une chute de cours du jour se reflete ici des le
+// prochain rafraichissement du site, sans workflow separe a lancer.
+const PF_CLE = 'brvm_portefeuille_personnel';
+
+function pfChargerEtat() {{
+  try {{ return JSON.parse(localStorage.getItem(PF_CLE) || 'null') || {{patrimoine:'', plafond:'', positions:[]}}; }}
+  catch(e) {{ return {{patrimoine:'', plafond:'', positions:[]}}; }}
+}}
+
+function pfNormaliserNombre(txt) {{
+  if (!txt) return txt;
+  return String(txt).replace(/\\s/g, '').replace(',', '.');
+}}
+
+function pfSauver() {{
+  const positions = [...document.querySelectorAll('.position-pf')].map(el => ({{
+    ticker: el.querySelector('.pf-ticker').value.trim().toUpperCase(),
+    quantite: el.querySelector('.pf-quantite').value,
+    prix_achat_moyen: el.querySelector('.pf-prix').value,
+    date_achat: el.querySelector('.pf-date').value,
+  }}));
+  localStorage.setItem(PF_CLE, JSON.stringify({{
+    patrimoine: document.getElementById('pf-patrimoine').value,
+    plafond: document.getElementById('pf-plafond').value,
+    positions,
+  }}));
+  pfRerendre();
+}}
+
+function pfLigneHtml(p) {{
+  p = p || {{ticker:'', quantite:'', prix_achat_moyen:'', date_achat:''}};
+  const div = document.createElement('div');
+  div.className = 'position-pf';
+  div.innerHTML = `
+    <div><label>Titre</label><input class="pf-ticker" list="pf-datalist" value="${{p.ticker}}"
+      style="text-transform:uppercase" onchange="pfSauver()"></div>
+    <div><label>Quantité</label><input class="pf-quantite" value="${{p.quantite}}" onchange="pfSauver()"></div>
+    <div><label>Prix d'achat moyen</label><input class="pf-prix" value="${{p.prix_achat_moyen}}" onchange="pfSauver()"></div>
+    <div><label>Date d'achat</label><input class="pf-date" type="date" value="${{p.date_achat}}" onchange="pfSauver()"></div>
+    <button onclick="this.parentElement.remove(); pfSauver();" title="Retirer">&times;</button>`;
+  return div;
+}}
+
+function pfAjouterPosition(p) {{
+  document.getElementById('pf-positions').appendChild(pfLigneHtml(p));
+  if (!p) pfSauver();
+}}
+
+function pfRerendre() {{
+  const cours_par_ticker = {{}};
+  (LIGNES_SYNTHESE || []).forEach(l => {{ cours_par_ticker[l.ticker] = l; }});
+
+  const brutes = [...document.querySelectorAll('.position-pf')].map(el => ({{
+    ticker: el.querySelector('.pf-ticker').value.trim().toUpperCase(),
+    quantite: parseFloat(pfNormaliserNombre(el.querySelector('.pf-quantite').value)) || 0,
+    prix: parseFloat(pfNormaliserNombre(el.querySelector('.pf-prix').value)) || 0,
+  }})).filter(p => p.ticker);
+
+  // Fusion par ticker (moyenne ponderee), meme principe que la version prive
+  const parTicker = {{}};
+  for (const p of brutes) {{
+    if (!parTicker[p.ticker]) parTicker[p.ticker] = {{quantite: 0, cout_total: 0}};
+    parTicker[p.ticker].quantite += p.quantite;
+    parTicker[p.ticker].cout_total += p.quantite * p.prix;
+  }}
+
+  let valeurTotale = 0;
+  const lignes = Object.entries(parTicker).map(([ticker, agg]) => {{
+    const cmp = agg.quantite ? agg.cout_total / agg.quantite : 0;
+    const info = cours_par_ticker[ticker];
+    const cours = info ? info.cours : null;
+    if (cours === null || cours === undefined) {{
+      return {{ticker, quantite: agg.quantite, cours: null}};
+    }}
+    const valeur = agg.quantite * cours;
+    valeurTotale += valeur;
+    const plusValuePct = cmp ? ((cours - cmp) / cmp * 100) : null;
+    return {{ticker, quantite: agg.quantite, cours, valeur, plusValuePct}};
+  }});
+
+  for (const l of lignes) {{
+    l.poidsPct = (l.valeur !== undefined && valeurTotale > 0) ? Math.round(100 * l.valeur / valeurTotale * 10) / 10 : null;
+  }}
+  lignes.sort((a, b) => (b.poidsPct || 0) - (a.poidsPct || 0));
+
+  const patrimoine = parseFloat(pfNormaliserNombre(document.getElementById('pf-patrimoine').value)) || null;
+  const plafond = parseFloat(pfNormaliserNombre(document.getElementById('pf-plafond').value)) || null;
+  const poidsReelPct = (patrimoine && valeurTotale) ? (100 * valeurTotale / patrimoine) : null;
+  const depassePlafond = (poidsReelPct !== null && plafond !== null && poidsReelPct > plafond);
+
+  let html = '<table><tr><th>Titre</th><th>Quantité</th><th>Cours</th><th>Plus-value</th><th>Poids</th><th>Alertes</th></tr>';
+  for (const l of lignes) {{
+    if (l.cours === null) {{
+      html += `<tr><td><b>${{l.ticker}}</b></td><td colspan="5" class="c-mid">cours indisponible</td></tr>`;
+      continue;
+    }}
+    const clsPv = (l.plusValuePct || 0) >= 0 ? 'c-ok' : 'c-bad';
+    const alerteReeq = (l.poidsPct > SEUIL_REEQUILIBRAGE_PCT)
+      ? ` <span class="esc">&#9888; position &gt; seuil de rééquilibrage (${{SEUIL_REEQUILIBRAGE_PCT}}%)</span>` : '';
+    const sigs = (SIGNAUX_TOUS[l.ticker] || []);
+    const badges = sigs.length
+      ? sigs.map(s => `<span class="${{s.direction === 'DEFAVORABLE' ? 'sig-def' : 'sig-fav'}}">${{s.essentiel || s.type}}</span>`).join(' ')
+      : '<span class="c-mid">RAS</span>';
+    html += `<tr><td><b>${{l.ticker}}</b></td><td>${{l.quantite}}</td>`
+      + `<td>${{l.cours.toLocaleString('fr-FR')}} FCFA</td>`
+      + `<td class="${{clsPv}}">${{l.plusValuePct !== null ? l.plusValuePct.toFixed(1) : '—'}}%</td>`
+      + `<td>${{l.poidsPct}}% de la poche${{alerteReeq}}</td>`
+      + `<td>${{badges}}</td></tr>`;
+  }}
+  html += '</table>';
+  html += `<div class="note" style="margin-top:10px">Valeur totale de la poche : <b>${{valeurTotale.toLocaleString('fr-FR')}} FCFA</b></div>`;
+  if (poidsReelPct !== null) {{
+    html += `<div class="note ${{depassePlafond ? 'c-bad' : 'c-ok'}}">Poche actions : <b>${{poidsReelPct.toFixed(1)}}%</b> `
+      + `du patrimoine total (plafond fixé : ${{plafond}}%)${{depassePlafond ? ' — <b>PLAFOND DÉPASSÉ</b>' : ''}}</div>`;
+  }}
+  document.getElementById('pf-resultats').innerHTML = html;
+}}
+
+// Initialisation (deplacee ici le 17/07/2026 : appelee trop tot plus haut
+// dans le script, avant que PF_CLE/pfAjouterPosition ne soient definis --
+// erreur "Cannot access before initialization" trouvee en testant reellement
+// avec jsdom, pas en relisant le code).
+(function pfInit() {{
+  const etat = pfChargerEtat();
+  document.getElementById('pf-patrimoine').value = etat.patrimoine || '';
+  document.getElementById('pf-plafond').value = etat.plafond || '';
+  if (etat.positions && etat.positions.length) {{
+    etat.positions.forEach(p => pfAjouterPosition(p));
+  }} else {{
+    pfAjouterPosition();
+  }}
+}})();
+
 </script>
 </body>
 </html>"""
 
 
 def main():
-    resultats, series, fondamentaux, avis, source_urls, profils, dividendes = collecter_donnees()
+    resultats, series, fondamentaux, avis, source_urls, profils, dividendes, signaux_tous = collecter_donnees()
     seuils = charger_seuils()
     marche = charger_marche()
     liquidite_jour = charger_liquidite_jour()
@@ -1078,7 +1271,7 @@ def main():
     tendance_liquidite = charger_tendance_liquidite()
     fraicheur = rapport_fraicheur()
     html = generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fraicheur, marche,
-                        liquidite_jour, liquidite_generale, tendance_liquidite, profils, dividendes)
+                        liquidite_jour, liquidite_generale, tendance_liquidite, profils, dividendes, signaux_tous)
     sortie = Path(__file__).resolve().parent.parent / "docs_site"
     sortie.mkdir(exist_ok=True)
     (sortie / "index.html").write_text(html, encoding="utf-8")
