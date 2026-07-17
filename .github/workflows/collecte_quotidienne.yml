@@ -32,7 +32,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add collecte/liquidite_jour.json
+          # Correctif 16/07/2026 : historique_liquidite.json (mediane
+          # glissante SNTS, moteur/scoring.py::mediane_liquidite_historique)
+          # etait cree par le script mais jamais committe -- perdu a chaque
+          # execution depuis sa creation. Le "git add" n'incluait que
+          # liquidite_jour.json. Trouve lors d'un audit complet des flux,
+          # jamais detecte par les tests locaux (qui simulent le fichier,
+          # jamais le vrai commit du workflow).
+          git add collecte/liquidite_jour.json collecte/historique_liquidite.json
           git commit -m "Cours du jour $(date -u +%F)" || echo "rien a committer"
           git pull --rebase origin main
           git push
