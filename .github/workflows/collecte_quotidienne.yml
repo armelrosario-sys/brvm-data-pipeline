@@ -39,7 +39,15 @@ jobs:
           # liquidite_jour.json. Trouve lors d'un audit complet des flux,
           # jamais detecte par les tests locaux (qui simulent le fichier,
           # jamais le vrai commit du workflow).
-          git add collecte/liquidite_jour.json collecte/historique_liquidite.json
+          #
+          # 2e correctif, meme jour : si la seance est encore OUVERTE au
+          # moment du run, collecte_liquidite_jour.py s'arrete plus tot et
+          # n'ecrit RIEN (aucun des deux fichiers) -- un "git add" strict
+          # plantait alors sur un chemin totalement absent (jamais commite
+          # avant). On verifie l'existence de chaque fichier avant de
+          # l'ajouter, plutot que de supposer qu'il existe toujours.
+          [ -f collecte/liquidite_jour.json ] && git add collecte/liquidite_jour.json
+          [ -f collecte/historique_liquidite.json ] && git add collecte/historique_liquidite.json
           git commit -m "Cours du jour $(date -u +%F)" || echo "rien a committer"
           git pull --rebase origin main
           git push
