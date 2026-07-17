@@ -47,7 +47,15 @@ def to_nombre(s):
         return None
 
 
-def recuperer_liquidite_jour():
+def recuperer_liquidite_jour(strict=True):
+    """strict=True (par defaut, utilise par le declenchement PROGRAMME) :
+    refuse d'ecrire toute donnee tant que la seance est ouverte -- protege
+    le releve quotidien officiel d'une photo prematuree.
+    strict=False (declenchement MANUEL explicite, 16/07/2026) : autorise
+    une collecte meme en seance ouverte, mais MARQUE chaque entree
+    ("seance_ouverte_lors_collecte": true) pour que personne ne confonde
+    un instantane partiel avec une vraie cloture -- "sans echec" ne doit
+    jamais vouloir dire "sans transparence sur ce que la donnee vaut"."""
     resp = requests.get(f"{BASE}/fr/cours-actions/0", headers=UA, timeout=30)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -57,16 +65,22 @@ def recuperer_liquidite_jour():
     # fermee"). Un run declenche AVANT la cloture (constat reel : 09h45,
     # volume=0 pour tous les titres, variation=0% partout -- exact pour cet
     # instant, mais premature) donnerait une photo prematuree si on la
-    # laissait ecraser silencieusement le fichier. On avertit et on
-    # n'ecrit rien tant que la seance n'est pas fermee.
+    # laissait ecraser silencieusement le fichier. En mode strict, on
+    # avertit et on n'ecrit rien tant que la seance n'est pas fermee.
     texte_page = soup.get_text()
-    if re.search(r"s[ée]ance ouverte", texte_page, re.IGNORECASE):
+    seance_ouverte = bool(re.search(r"s[ée]ance ouverte", texte_page, re.IGNORECASE))
+    if seance_ouverte and strict:
         print("ATTENTION : la page BRVM indique la seance encore OUVERTE -- "
               "aucune donnee fiable de cloture pour l'instant. "
               "Fichier NON modifie (evite d'ecraser une vraie cloture precedente "
               "par une photo prematuree). Relancer apres la cloture officielle "
-              "(15h00 heure d'Abidjan + 15 min de differe).")
+              "(15h00 heure d'Abidjan + 15 min de differe), ou declencher "
+              "manuellement pour forcer une collecte partielle marquee comme telle.")
         return None
+    if seance_ouverte:
+        print("ATTENTION : seance encore ouverte -- collecte manuelle forcee. "
+              "Donnees marquees 'seance_ouverte_lors_collecte' : true, a ne "
+              "jamais confondre avec une vraie cloture.")
 
     # Date de mise a jour affichee par BRVM elle-meme (pas la date du jour ou
     # tourne ce script — peut differer un jour non-ouvre)
@@ -110,6 +124,7 @@ def recuperer_liquidite_jour():
             "valeur_echangee_jour": round(volume * cours_cloture, 2),
             "date_maj_brvm": date_maj,
             "collecte_le": datetime.now(timezone.utc).isoformat(),
+            "seance_ouverte_lors_collecte": seance_ouverte,
         }
     return resultats
 
@@ -131,17 +146,35 @@ def mettre_a_jour_historique(resultats):
 
 
 def main():
-    resultats = recuperer_liquidite_jour()
+    import os
+    # Mode strict par defaut (declenchement PROGRAMME) ; le workflow passe
+    # FORCER_MALGRE_SEANCE_OUVERTE=1 uniquement pour un declenchement MANUEL
+    # explicite (16/07/2026 : "collectes qui fonctionnent sur criteres
+    # preetablis ET au besoin, sans echec" -- deux comportements distincts,
+    # jamais un plantage).
+    strict = os.environ.get("FORCER_MALGRE_SEANCE_OUVERTE", "") != "1"
+    resultats = recuperer_liquidite_jour(strict=strict)
     if resultats is None:
-        return  # seance encore ouverte -- message deja affiche, rien a ecrire ni committer
+        return  # seance encore ouverte, mode strict -- message deja affiche, rien a ecrire ni committer
     json.dump(resultats, open(SORTIE, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
     print(f"{len(resultats)} titres — liquidite du jour ecrite dans {SORTIE}")
     if resultats:
         exemple = next(iter(resultats.items()))
         print(f"Exemple : {exemple[0]} -> {exemple[1]}")
-    n_jours = mettre_a_jour_historique(resultats)
-    print(f"Historique glissant mis a jour : {n_jours} jour(s) de donnees disponibles "
-          f"(fenetre max {FENETRE_JOURS}j) dans {HISTORIQUE}")
+
+    # L'historique glissant (mediane SNTS) ne doit recevoir que de VRAIES
+    # clotures -- une collecte manuelle forcee en seance ouverte est un
+    # instantane partiel, pas une cloture, et fausserait la mediane si on
+    # l'y ajoutait. On l'exclut donc de l'historique, tout en ecrivant quand
+    # meme liquidite_jour.json (utile pour un coup d'oeil ponctuel).
+    seance_ouverte = any(v.get("seance_ouverte_lors_collecte") for v in resultats.values())
+    if seance_ouverte:
+        print("Collecte marquee 'seance ouverte' -- PAS ajoutee a l'historique glissant "
+              "(fausserait la mediane). liquidite_jour.json ecrit quand meme, a titre indicatif.")
+    else:
+        n_jours = mettre_a_jour_historique(resultats)
+        print(f"Historique glissant mis a jour : {n_jours} jour(s) de donnees disponibles "
+              f"(fenetre max {FENETRE_JOURS}j) dans {HISTORIQUE}")
 
 
 if __name__ == "__main__":
