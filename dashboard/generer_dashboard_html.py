@@ -123,7 +123,7 @@ def collecter_donnees():
     # deja utilise par bloc_signaux.py) plutot que de dupliquer la logique
     # d'extraction en JS.)
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from glossaire_signaux import resume_capital, recommandation
+    from glossaire_signaux import resume_capital, recommandation, libelle
     signaux_tous = {}
     for t in tickers:
         rows = cur.execute(
@@ -131,6 +131,7 @@ def collecter_donnees():
             (t,)).fetchall()
         signaux_tous[t] = [dict(type=r["type"], direction=r["direction"],
                                 essentiel=resume_capital(r["type"], r["detail"]) or "",
+                                libelle=libelle(r["type"]),
                                 recommandation=recommandation(r["type"])) for r in rows]
 
     avis = {}
@@ -768,13 +769,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
     <div class="carte">
       <h2>Mon portefeuille <span style="font-weight:400;color:var(--muted);font-size:0.8em">
           (calculé entièrement dans ton navigateur — rien n'est jamais envoyé nulle part)</span></h2>
-      <div class="avert-portefeuille">Tes positions sont enregistrées uniquement dans ce navigateur
-      (stockage local). Elles ne sont ni envoyées à un serveur, ni committées dans un dépôt Git —
-      exactement comme "Ma liste de suivi". Sur un autre appareil ou navigateur, tu ne les verras pas.</div>
-      <div class="note">Cours et signaux : données de ce dashboard, généré le {maj}. La BRVM elle-même
-      ne publie ses cours qu'une fois par jour (clôture officielle) — recharger cette page plus souvent
-      qu'une fois par jour n'apporterait donc rien de plus récent. Si tu gardes cet onglet ouvert
-      plusieurs heures, recharge-le (F5) après la clôture pour voir les cours du jour.</div>
+      <div class="note">Cours et signaux : données de ce dashboard, généré le {maj}.</div>
 
       <details id="pf-details" open>
         <summary style="cursor:pointer;color:var(--muted);font-size:0.85em;margin-bottom:10px">
@@ -1196,6 +1191,29 @@ function pfAjouterPosition(p) {{
   if (!p) pfSauver();
 }}
 
+// Tendance court terme (17/07/2026) : mise en avant directement dans le
+// portefeuille, a la demande de l'utilisateur -- c'est le signal de
+// detection precoce le plus important pour la strategie satellite (ecart
+// de volume echange corrobore par le prix), auparavant visible seulement
+// en ouvrant la Fiche titre, un par un. Reutilise TENDANCE_LIQUIDITE, deja
+// charge sur la page.
+function pfBadgeTendance(ticker) {{
+  const tend = TENDANCE_LIQUIDITE[ticker];
+  if (!tend) return '<span class="c-mid">—</span>';
+  const ecart = (tend.ecart_volume_3v12*100).toFixed(0);
+  const varPrix = tend.variation_prix_meme_periode !== null ? (tend.variation_prix_meme_periode*100).toFixed(1) : '—';
+  const infobulle = `Ecart de volume echange : ${{ecart}}% · Variation du prix sur la meme periode : ${{varPrix}}%`;
+  if (tend.statut === 'CONFIRMEE_HAUSSE')
+    return `<span class="sig-fav" title="${{infobulle}} | Confirme statistiquement (test de permutation, seuil 95%).">Hausse confirmee</span>`;
+  if (tend.statut === 'CONFIRMEE_BAISSE')
+    return `<span class="sig-def" title="${{infobulle}} | Confirme statistiquement (test de permutation, seuil 95%).">Baisse confirmee</span>`;
+  if (tend.statut === 'A_SURVEILLER_HAUSSE')
+    return `<span class="sig-info" title="${{infobulle}} | NON confirme statistiquement, corrobore par le prix -- detection precoce uniquement.">A surveiller (hausse)</span>`;
+  if (tend.statut === 'A_SURVEILLER_BAISSE')
+    return `<span class="sig-info" title="${{infobulle}} | NON confirme statistiquement, corrobore par le prix -- detection precoce uniquement.">A surveiller (baisse)</span>`;
+  return '<span class="c-mid">Stable</span>';
+}}
+
 function pfRerendre() {{
   const cours_par_ticker = {{}};
   (LIGNES_SYNTHESE || []).forEach(l => {{ cours_par_ticker[l.ticker] = l; }});
@@ -1246,10 +1264,10 @@ function pfRerendre() {{
   const poidsReelPct = (patrimoine && valeurTotale) ? (100 * valeurTotale / patrimoine) : null;
   const depassePlafond = (poidsReelPct !== null && plafond !== null && poidsReelPct > plafond);
 
-  let html = '<table><tr><th>Titre</th><th>Quantité</th><th>Cours</th><th>Plus-value</th><th>Poids</th><th>Alertes</th></tr>';
+  let html = '<table><tr><th>Titre</th><th>Quantité</th><th>Cours</th><th>Plus-value</th><th>Poids</th><th>Tendance (3 mois)</th><th>Alertes</th></tr>';
   for (const l of lignes) {{
     if (l.cours === null) {{
-      html += `<tr><td><b>${{l.ticker}}</b></td><td colspan="5" class="c-mid">cours indisponible</td></tr>`;
+      html += `<tr><td><b>${{l.ticker}}</b></td><td colspan="6" class="c-mid">cours indisponible</td></tr>`;
       continue;
     }}
     const clsPv = (l.plusValuePct || 0) >= 0 ? 'c-ok' : 'c-bad';
@@ -1257,22 +1275,17 @@ function pfRerendre() {{
       ? ` <span class="esc">&#9888; position &gt; seuil de rééquilibrage (${{SEUIL_REEQUILIBRAGE_PCT}}%)</span>` : '';
     const sigs = (SIGNAUX_TOUS[l.ticker] || []);
     const badges = sigs.length
-      ? sigs.map(s => `<span class="${{s.direction === 'DEFAVORABLE' ? 'sig-def' : 'sig-fav'}}" title="${{(s.recommandation||'').replace(/"/g,'&quot;')}}">${{s.essentiel || s.type}}</span>`).join(' ')
+      ? sigs.map(s => `<span class="${{s.direction === 'DEFAVORABLE' ? 'sig-def' : 'sig-fav'}}" title="${{(s.recommandation||'').replace(/"/g,'&quot;')}}">${{s.essentiel || s.libelle || s.type}}</span>`).join(' ')
       : '<span class="c-mid">RAS</span>';
+    const badgeTendance = pfBadgeTendance(l.ticker);
     html += `<tr><td><b>${{l.ticker}}</b></td><td>${{l.quantite}}</td>`
       + `<td>${{l.cours.toLocaleString('fr-FR')}} FCFA</td>`
       + `<td class="${{clsPv}}">${{l.plusValuePct !== null ? l.plusValuePct.toFixed(1) : '—'}}%</td>`
       + `<td>${{l.poidsPct}}% de la poche${{alerteReeq}}</td>`
+      + `<td>${{badgeTendance}}</td>`
       + `<td>${{badges}}</td></tr>`;
   }}
   html += '</table>';
-  if (fraisPct > 0) {{
-    html += `<div class="note">Plus-value calculée frais d'achat inclus (${{fraisPct}}% appliqué au coût) —`
-      + ` survole une alerte pour voir la recommandation associée.</div>`;
-  }} else {{
-    html += `<div class="note">Survole une alerte pour voir la recommandation associée. Frais d'achat non renseignés —`
-      + ` la plus-value affichée est donc légèrement optimiste par rapport à ton coût réel.</div>`;
-  }}
   html += `<div class="note" style="margin-top:10px">Valeur totale de la poche : <b>${{valeurTotale.toLocaleString('fr-FR')}} FCFA</b></div>`;
   if (poidsReelPct !== null) {{
     html += `<div class="note ${{depassePlafond ? 'c-bad' : 'c-ok'}}">Poche actions : <b>${{poidsReelPct.toFixed(1)}}%</b> `
