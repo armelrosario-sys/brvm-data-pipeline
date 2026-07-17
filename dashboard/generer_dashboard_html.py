@@ -123,14 +123,15 @@ def collecter_donnees():
     # deja utilise par bloc_signaux.py) plutot que de dupliquer la logique
     # d'extraction en JS.)
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from glossaire_signaux import resume_capital
+    from glossaire_signaux import resume_capital, recommandation
     signaux_tous = {}
     for t in tickers:
         rows = cur.execute(
             "SELECT type, direction, detail FROM signaux WHERE ticker=? AND statut='ACTIF'",
             (t,)).fetchall()
         signaux_tous[t] = [dict(type=r["type"], direction=r["direction"],
-                                essentiel=resume_capital(r["type"], r["detail"]) or "") for r in rows]
+                                essentiel=resume_capital(r["type"], r["detail"]) or "",
+                                recommandation=recommandation(r["type"])) for r in rows]
 
     avis = {}
     for t in tickers:
@@ -566,6 +567,8 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .position-pf input {{ background: var(--bg); border: 1px solid var(--border); color: var(--text);
     border-radius: 6px; padding: 5px 8px; font-size: 0.85em; width: 100%; box-sizing: border-box; }}
   .position-pf button {{ background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1em; }}
+  #pf-details summary::-webkit-details-marker {{ color: var(--muted); }}
+  #pf-details summary:hover {{ color: var(--text); }}
   .carte {{ background: var(--card); border: 1px solid var(--border); border-radius: 12px;
             padding: 18px; margin-bottom: 20px; }}
   h2 {{ font-size: 1.1em; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; }}
@@ -768,15 +771,35 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
       <div class="avert-portefeuille">Tes positions sont enregistrées uniquement dans ce navigateur
       (stockage local). Elles ne sont ni envoyées à un serveur, ni committées dans un dépôt Git —
       exactement comme "Ma liste de suivi". Sur un autre appareil ou navigateur, tu ne les verras pas.</div>
-      <div class="ligne-champs-pf">
-        <div><label>Patrimoine financier total (FCFA)</label>
-          <input type="text" inputmode="decimal" id="pf-patrimoine" oninput="pfSauver()"></div>
-        <div><label>Plafond poche actions (%)</label>
-          <input type="text" inputmode="decimal" id="pf-plafond" oninput="pfSauver()"></div>
-      </div>
-      <div id="pf-positions"></div>
-      <datalist id="pf-datalist"></datalist>
-      <button class="sig-toggle" onclick="pfAjouterPosition()">+ Ajouter une position</button>
+      <div class="note">Cours et signaux : données de ce dashboard, généré le {maj}. La BRVM elle-même
+      ne publie ses cours qu'une fois par jour (clôture officielle) — recharger cette page plus souvent
+      qu'une fois par jour n'apporterait donc rien de plus récent. Si tu gardes cet onglet ouvert
+      plusieurs heures, recharge-le (F5) après la clôture pour voir les cours du jour.</div>
+
+      <details id="pf-details" open>
+        <summary style="cursor:pointer;color:var(--muted);font-size:0.85em;margin-bottom:10px">
+          Renseigner / modifier mes informations</summary>
+        <div class="ligne-champs-pf">
+          <div><label>Patrimoine financier total (FCFA)</label>
+            <input type="text" inputmode="decimal" id="pf-patrimoine" oninput="pfSauver()"></div>
+          <div><label>Plafond poche actions (%)</label>
+            <input type="text" inputmode="decimal" id="pf-plafond" oninput="pfSauver()"></div>
+          <div><label>Frais moyen à l'achat, tout compris (%)</label>
+            <input type="text" inputmode="decimal" id="pf-frais" placeholder="ex. 1.5"
+                   oninput="pfSauver()"></div>
+        </div>
+        <div class="note" style="margin-bottom:14px">Courtage + commissions BRVM/Dépositaire Central +
+        taxes, en un seul taux. Indique le taux exact figurant sur ton "avis d'opéré" (document remis
+        par ta SGI à chaque transaction) — variable selon les SGI, homologué par le CREPMF mais non
+        uniforme d'un courtier à l'autre. Ce taux réduit ta plus-value affichée (coût réel à l'achat),
+        pas encore appliqué aux frais de vente.</div>
+        <div id="pf-positions"></div>
+        <datalist id="pf-datalist"></datalist>
+        <button class="sig-toggle" onclick="pfAjouterPosition()">+ Ajouter une position</button>
+        <button class="sig-toggle" onclick="pfSauver(); document.getElementById('pf-details').open=false;"
+                style="background:#2563eb;border-color:#2563eb;color:#fff">Enregistrer et réduire</button>
+      </details>
+
       <hr style="border-color:var(--border);margin:16px 0">
       <div id="pf-resultats"></div>
     </div>
@@ -1148,6 +1171,7 @@ function pfSauver() {{
   localStorage.setItem(PF_CLE, JSON.stringify({{
     patrimoine: document.getElementById('pf-patrimoine').value,
     plafond: document.getElementById('pf-plafond').value,
+    frais: document.getElementById('pf-frais').value,
     positions,
   }}));
   pfRerendre();
@@ -1190,9 +1214,17 @@ function pfRerendre() {{
     parTicker[p.ticker].cout_total += p.quantite * p.prix;
   }}
 
+  // Frais d'achat (17/07/2026) : applique au COUT, jamais au cours de marche --
+  // reduit la plus-value affichee pour refleter le cout REEL d'entree (courtage
+  // + commissions BRVM/DC-BR + taxes, en un seul taux fourni par la personne
+  // elle-meme depuis son avis d'opere -- pas un taux devine ou suppose ici).
+  const fraisPct = parseFloat(pfNormaliserNombre(document.getElementById('pf-frais').value)) || 0;
+  const facteurFrais = 1 + fraisPct / 100;
+
   let valeurTotale = 0;
   const lignes = Object.entries(parTicker).map(([ticker, agg]) => {{
-    const cmp = agg.quantite ? agg.cout_total / agg.quantite : 0;
+    const cmpBrut = agg.quantite ? agg.cout_total / agg.quantite : 0;
+    const cmpEffectif = cmpBrut * facteurFrais;
     const info = cours_par_ticker[ticker];
     const cours = info ? info.cours : null;
     if (cours === null || cours === undefined) {{
@@ -1200,7 +1232,7 @@ function pfRerendre() {{
     }}
     const valeur = agg.quantite * cours;
     valeurTotale += valeur;
-    const plusValuePct = cmp ? ((cours - cmp) / cmp * 100) : null;
+    const plusValuePct = cmpEffectif ? ((cours - cmpEffectif) / cmpEffectif * 100) : null;
     return {{ticker, quantite: agg.quantite, cours, valeur, plusValuePct}};
   }});
 
@@ -1225,7 +1257,7 @@ function pfRerendre() {{
       ? ` <span class="esc">&#9888; position &gt; seuil de rééquilibrage (${{SEUIL_REEQUILIBRAGE_PCT}}%)</span>` : '';
     const sigs = (SIGNAUX_TOUS[l.ticker] || []);
     const badges = sigs.length
-      ? sigs.map(s => `<span class="${{s.direction === 'DEFAVORABLE' ? 'sig-def' : 'sig-fav'}}">${{s.essentiel || s.type}}</span>`).join(' ')
+      ? sigs.map(s => `<span class="${{s.direction === 'DEFAVORABLE' ? 'sig-def' : 'sig-fav'}}" title="${{(s.recommandation||'').replace(/"/g,'&quot;')}}">${{s.essentiel || s.type}}</span>`).join(' ')
       : '<span class="c-mid">RAS</span>';
     html += `<tr><td><b>${{l.ticker}}</b></td><td>${{l.quantite}}</td>`
       + `<td>${{l.cours.toLocaleString('fr-FR')}} FCFA</td>`
@@ -1234,6 +1266,13 @@ function pfRerendre() {{
       + `<td>${{badges}}</td></tr>`;
   }}
   html += '</table>';
+  if (fraisPct > 0) {{
+    html += `<div class="note">Plus-value calculée frais d'achat inclus (${{fraisPct}}% appliqué au coût) —`
+      + ` survole une alerte pour voir la recommandation associée.</div>`;
+  }} else {{
+    html += `<div class="note">Survole une alerte pour voir la recommandation associée. Frais d'achat non renseignés —`
+      + ` la plus-value affichée est donc légèrement optimiste par rapport à ton coût réel.</div>`;
+  }}
   html += `<div class="note" style="margin-top:10px">Valeur totale de la poche : <b>${{valeurTotale.toLocaleString('fr-FR')}} FCFA</b></div>`;
   if (poidsReelPct !== null) {{
     html += `<div class="note ${{depassePlafond ? 'c-bad' : 'c-ok'}}">Poche actions : <b>${{poidsReelPct.toFixed(1)}}%</b> `
@@ -1250,6 +1289,7 @@ function pfRerendre() {{
   const etat = pfChargerEtat();
   document.getElementById('pf-patrimoine').value = etat.patrimoine || '';
   document.getElementById('pf-plafond').value = etat.plafond || '';
+  document.getElementById('pf-frais').value = etat.frais || '';
   if (etat.positions && etat.positions.length) {{
     etat.positions.forEach(p => pfAjouterPosition(p));
   }} else {{
