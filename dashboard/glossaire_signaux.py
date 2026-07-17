@@ -12,24 +12,33 @@ tests) ; ce module ne fait QUE l'affichage, jamais la logique.
 """
 
 SIGNAUX = {
-    "D1_PREMIERE_PERTE":   {"libelle": "Premiere perte",      "classe": "def",
-        "description": "Le dernier exercice publié est en perte, après un exercice positif."},
-    "D2_CHUTE_RESULTAT":   {"libelle": "Chute du resultat",   "classe": "def",
-        "description": "Le résultat net recule d'au moins 30% par rapport à l'exercice précédent (les deux positifs)."},
-    "D3_COUPE_DIVIDENDE":  {"libelle": "Coupe de dividende",  "classe": "def",
-        "description": "Le dividende versé est inférieur à celui de l'exercice précédent."},
+    "D1_PREMIERE_PERTE": {"libelle": "Perte apres un exercice positif", "classe": "def",
+        "description": "Le dernier exercice publié est en perte, après un exercice positif.",
+        "recommandation": "Vérifier si la perte est exceptionnelle (charge ponctuelle, provision) ou structurelle (dégradation durable) avant toute décision."},
+    "D2_CHUTE_RESULTAT": {"libelle": "Chute du resultat", "classe": "def",
+        "description": "Le résultat net recule d'au moins 30% par rapport à l'exercice précédent (les deux positifs).",
+        "recommandation": "Comparer au secteur : ce recul est-il propre au titre, ou une tendance qui touche tous ses pairs ?"},
+    "D3_COUPE_DIVIDENDE": {"libelle": "Coupe de dividende", "classe": "def",
+        "description": "Le dividende versé est inférieur à celui de l'exercice précédent.",
+        "recommandation": "Distinguer une coupe subie (tension de trésorerie) d'une coupe choisie (réinvestissement stratégique) avant d'en tirer une conclusion."},
     "D4_RETARD_PUBLICATION": {"libelle": "Retard de publication", "classe": "def",
-        "description": "Un retard de publication des comptes a été constaté et n'est pas encore résorbé."},
+        "description": "Un retard de publication des comptes a été constaté et n'est pas encore résorbé.",
+        "recommandation": "Un retard de gouvernance n'annonce pas forcément un problème financier, mais mérite une vigilance renforcée jusqu'à la prochaine publication."},
     "D4_RETARD_CALENDRIER": {"libelle": "Retard reglementaire", "classe": "def",
-        "description": "Échéance réglementaire CREPMF dépassée sans nouveau dépôt (détecté automatiquement, sans avis officiel)."},
+        "description": "Échéance réglementaire CREPMF dépassée sans nouveau dépôt (détecté automatiquement, sans avis officiel).",
+        "recommandation": "Un retard de gouvernance n'annonce pas forcément un problème financier, mais mérite une vigilance renforcée jusqu'à la prochaine publication."},
     "D5_INFO_PERIMEE": {"libelle": "Information perimee", "classe": "def",
-        "description": "Aucun document reçu depuis plus d'un an, toutes catégories confondues -- axe indépendant de D4, ne l'atténue jamais."},
+        "description": "Aucun document reçu depuis plus d'un an, toutes catégories confondues -- axe indépendant de D4, ne l'atténue jamais.",
+        "recommandation": "Décider à l'aveugle sur une information de plus d'un an est risqué -- envisager de solliciter directement l'émetteur ou ta SGI pour des nouvelles récentes."},
     "A_QUALITE_DECOTEE":  {"libelle": "Decote qualifiee",     "classe": "fav",
-        "description": "PER inférieur à 70% de la médiane sectorielle, résultat en progression, titre éligible."},
+        "description": "PER inférieur à 70% de la médiane sectorielle, résultat en progression, titre éligible.",
+        "recommandation": "Correspond au profil recherché par la stratégie satellite -- une occasion à examiner, dans les limites du plafond satellite déjà fixé, jamais en dehors."},
     "B1_RECORD":          {"libelle": "Nouveau record",       "classe": "info",
-        "description": "Le cours de clôture dépasse son plus-haut sur 12 mois (ou sur tout l'historique)."},
+        "description": "Le cours de clôture dépasse son plus-haut sur 12 mois (ou sur tout l'historique). Ni un signal d'achat, ni de vente en soi : une hausse portée par de vrais fondamentaux diffère d'une hausse spéculative.",
+        "recommandation": "Pour une position détenue : bon moment pour vérifier si la thèse d'investissement initiale tient toujours, et si le poids de la ligne dans le portefeuille reste raisonnable."},
     "RERATING_EN_COURS":  {"libelle": "Re-rating en cours",   "classe": "fav",
-        "description": "Le titre est sorti de sa décote par hausse du cours, fondamentaux inchangés."},
+        "description": "Le titre est sorti de sa décote par hausse du cours, fondamentaux inchangés.",
+        "recommandation": "La décote qui justifiait l'entrée s'est résorbée -- vérifier si la thèse reste valable à ce niveau de prix, ou si une prise de gain partielle se justifie."},
 }
 
 
@@ -88,10 +97,19 @@ _ICONES = {"def": "\u26a0", "fav": "\u2713", "info": "\u2139"}  # !, check, i �
 
 def badge_html(code, css_prefix="sig"):
     """Badge HTML complet : icone (accessibilite, pas seulement la couleur) +
-    libelle clair + code technique et definition en info-bulle."""
+    libelle clair + code technique, definition et recommandation en info-bulle."""
     lib, cls, desc = libelle(code), classe(code), description(code)
     icone = _ICONES.get(cls, "")
-    return (f'<span class="{css_prefix}-{cls}" title="{code} — {desc}">{icone} {lib}</span>')
+    reco = SIGNAUX.get(code, {}).get("recommandation", "")
+    titre = f"{code} — {desc}" + (f" | À faire : {reco}" if reco else "")
+    return (f'<span class="{css_prefix}-{cls}" title="{titre}">{icone} {lib}</span>')
+
+
+def recommandation(code):
+    """Recommandation associee a un type de signal -- jamais une directive
+    d'achat/vente, toujours une invitation a verifier/reflechir (doctrine du
+    projet : le systeme ne decide jamais seul)."""
+    return SIGNAUX.get(code, {}).get("recommandation", "")
 
 
 # --- Sizing (moteur/scoring.py) : traduction operationnelle des recommandations ---
