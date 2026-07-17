@@ -52,13 +52,13 @@ def resume_capital(code, detail):
         m = _re_resume.search(r"\(([\d.]+) FCFA\) < dividende \d+ \(([\d.]+) FCFA\)", detail)
         return f"{m.group(1)} < {m.group(2)} FCFA" if m else None
     if code in ("D4_RETARD_PUBLICATION", "D4_RETARD_CALENDRIER"):
-        m = _re_resume.search(r"depassee de (\d+)j", detail)
+        m = _re_resume.search(r"d[ée]pass[ée]e de (\d+)j", detail)
         return f"{m.group(1)}j de retard" if m else None
     if code == "D5_INFO_PERIMEE":
         m = _re_resume.search(r"depuis (\d+)j", detail)
         return f"{m.group(1)}j sans info" if m else None
     if code == "A_QUALITE_DECOTEE":
-        m = _re_resume.search(r"PER ([\d.]+) < 70% de la mediane sectorielle ([\d.]+)", detail)
+        m = _re_resume.search(r"PER ([\d.]+) < 70% de la m[ée]diane sectorielle ([\d.]+)", detail)
         return f"PER {m.group(1)} (m\u00e9d. {m.group(2)})" if m else None
     if code == "B1_RECORD":
         m = _re_resume.search(r"a ([\d\s]+) FCFA", detail)
