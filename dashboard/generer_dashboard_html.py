@@ -771,7 +771,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
           (calculé entièrement dans ton navigateur — rien n'est jamais envoyé nulle part)</span></h2>
       <div class="note">Cours et signaux : données de ce dashboard, généré le {maj}.</div>
 
-      <details id="pf-details" open>
+      <details id="pf-details">
         <summary style="cursor:pointer;color:var(--muted);font-size:0.85em;margin-bottom:10px">
           Renseigner / modifier mes informations</summary>
         <div class="ligne-champs-pf">
