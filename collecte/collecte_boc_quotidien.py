@@ -36,8 +36,29 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from extracteur_boc import extraire_boc
 
 DB = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).resolve().parent.parent / "moteur" / "brvm.db")
-UA = {"User-Agent": "Mozilla/5.0 (brvm-data-pipeline/1.0; +https://github.com/armelrosario-sys/brvm-data-pipeline)"}
+UA = {"User-Agent": "brvm-data-pipeline/0.3 (collecte selective respectueuse; "
+      "https://github.com/armelrosario-sys/brvm-data-pipeline)"}
 MAX_JOURS_EN_ARRIERE = 5
+_session = None
+
+
+def obtenir_session():
+    """Session avec cookies (18/07/2026, correctif) : un GET isole direct
+    sur le PDF echoue en 403 -- meme avec le bon User-Agent -- alors que le
+    collecteur existant (collecteur.py), qui fonctionne depuis des semaines,
+    utilise une Session persistante. Hypothese la plus probable : le WAF de
+    brvm.org exige un cookie de session obtenu en visitant d'abord une page
+    normale, avant d'accepter un telechargement direct de PDF -- comportement
+    naturel d'un visiteur humain, suspect pour un acces direct au fichier."""
+    global _session
+    if _session is None:
+        _session = requests.Session()
+        _session.headers.update(UA)
+        try:
+            _session.get("https://www.brvm.org/fr/bulletins-officiels-de-la-cote", timeout=30)
+        except requests.RequestException:
+            pass
+    return _session
 
 
 def telecharger_boc(jour):
@@ -46,8 +67,9 @@ def telecharger_boc(jour):
     aaaammjj = jour.strftime("%Y%m%d")
     url = f"https://www.brvm.org/sites/default/files/boc_{aaaammjj}_2.pdf"
     try:
-        resp = requests.get(url, headers=UA, timeout=30)
+        resp = obtenir_session().get(url, timeout=30)
         if resp.status_code != 200 or len(resp.content) < 1000:
+            print(f"  {aaaammjj} : statut {resp.status_code}, {len(resp.content)} octets -- ignore")
             return None
         f = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
         f.write(resp.content)
