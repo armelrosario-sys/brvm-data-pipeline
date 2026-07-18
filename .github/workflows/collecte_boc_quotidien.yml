@@ -52,6 +52,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           [ -f collecte/cours_quotidien_boc.csv ] && git add collecte/cours_quotidien_boc.csv
+          [ -f collecte/dividendes_boc.csv ] && git add collecte/dividendes_boc.csv
           git commit -m "BOC quotidien $(date -u +%F)" || echo "rien a committer"
           git pull --rebase origin main
           git push
