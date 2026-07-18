@@ -281,6 +281,24 @@ def extraire_pdf(chemin_pdf, ticker, referentiel="syscohada", annee_connue=None)
                           f"({plafond_m_fcfa:,.0f} M FCFA) -- l'hypothese 'milliers de FCFA' "
                           f"est probablement fausse pour ce document, unite reelle a verifier manuellement")
 
+    # Extension du garde-fou (17/07/2026, decouvert sur un cas reel BNBC) :
+    # le plafond ci-dessus ne portait que sur resultat_net -- une meme
+    # confusion d'unite peut affecter dettes_financieres sans jamais
+    # depasser CE plafond (une dette peut legitimement etre plus grande
+    # qu'un resultat net). Ici, pas de plafond absolu (le bilan d'une
+    # banque depasse legitimement 1000 Mds) mais un ratio dette/capitaux
+    # propres : au-dela de 50x, l'hypothese d'unite est presque certainement
+    # fausse plutot que l'entreprise etant reellement 50x plus endettee que
+    # ses fonds propres.
+    cp = champs.get("capitaux_propres", {}).get("valeur_courante_M_FCFA")
+    dettes = champs.get("dettes_financieres", {})
+    for cle in ("valeur_courante_M_FCFA", "valeur_precedente_M_FCFA"):
+        v = dettes.get(cle)
+        if v is not None and cp and cp > 0 and abs(v) / cp > 50:
+            alertes.append(f"dettes_financieres.{cle} = {v:,.0f} M FCFA represente {v/cp:.0f}x "
+                          f"les capitaux propres ({cp:,.0f} M FCFA) -- ratio implausible, "
+                          f"l'hypothese d'unite est probablement fausse pour cette ligne")
+
     return dict(
         ticker=ticker, fichier_source=str(Path(chemin_pdf).name),
         exercice_courant=annee_c, exercice_precedent=annee_p, referentiel=referentiel,
