@@ -42,6 +42,22 @@ CREATE TABLE IF NOT EXISTS cours_mensuels (
     PRIMARY KEY (ticker, fin_mois)
 );
 
+-- Cours quotidiens du BOC (18/07/2026) : contrairement a cours_mensuels
+-- (une seule ligne par mois, la plus tardive -- ecrase volontairement
+-- l'intra-mensuel), cette table ACCUMULE une ligne par jour de cotation,
+-- sans jamais rien ecraser. Necessaire des lors que la collecte du BOC
+-- passe a une cadence quotidienne (la BRVM publie un BOC chaque jour de
+-- cotation) -- continuer a tout ecraser dans cours_mensuels aurait jete
+-- l'historique intra-mensuel chaque jour, une vraie perte d'information.
+CREATE TABLE IF NOT EXISTS cours_quotidien_boc (
+    ticker TEXT NOT NULL REFERENCES societes(ticker),
+    date_bulletin TEXT NOT NULL,     -- 'AAAA-MM-JJ', date du BOC (pas la date de collecte)
+    cours REAL,
+    per REAL,
+    rendement REAL,
+    PRIMARY KEY (ticker, date_bulletin)
+);
+
 CREATE TABLE IF NOT EXISTS dividendes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticker TEXT NOT NULL REFERENCES societes(ticker),
