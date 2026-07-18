@@ -24,6 +24,7 @@ encore publie (weekend, jour ferie, delai de publication).
 
 Usage : python3 collecte_boc_quotidien.py [chemin_db]
 """
+import re
 import sqlite3
 import sys
 import tempfile
@@ -88,6 +89,58 @@ def date_iso(date_bulletin_aaaammjj):
     return f"{d[:4]}-{d[4:6]}-{d[6:]}"
 
 
+MOIS_FR = {"janv": 1, "févr": 2, "fevr": 2, "mars": 3, "avr": 4, "mai": 5, "juin": 6,
+           "juil": 7, "août": 8, "aout": 8, "sept": 9, "oct": 10, "nov": 11, "déc": 12, "dec": 12}
+
+
+def date_dividende_vers_iso(texte):
+    """Le BOC donne la date de paiement du dividende au format '18-août-25' --
+    convertit en ISO (2025-08-18). Retourne None si illisible (jamais une
+    date inventee)."""
+    if not texte:
+        return None
+    m = re.match(r"(\d{1,2})-([a-zéû]+)\.?-(\d{2})", texte.strip().lower())
+    if not m:
+        return None
+    jour, mois_txt, annee_courte = m.groups()
+    mois = MOIS_FR.get(mois_txt.rstrip("."))
+    if not mois:
+        return None
+    annee = 2000 + int(annee_courte)
+    return f"{annee:04d}-{mois:02d}-{int(jour):02d}"
+
+
+def charger_dividendes_boc(cur, boc_lignes, date_bulletin_iso):
+    """Insere les dividendes lus DIRECTEMENT dans le BOC (colonnes 'Dernier
+    dividende paye' -- Montant net, Date), 18/07/2026. Bien plus fiable que
+    l'extraction PDF/OCR des rapports annuels : donnee officielle BRVM,
+    aucune ambiguite d'unite, aucun risque de regroupement de chiffres errone.
+    Deduplique par (ticker, montant, date) -- le meme dividende reapparait
+    sur chaque BOC tant qu'il reste le "dernier" paye, sans le reinserer.
+    exercice_couvert delibermement laisse NULL : le BOC donne la date de
+    PAIEMENT, pas l'exercice couvert -- jamais devine ici (doctrine du projet)."""
+    n_inseres = 0
+    for r in boc_lignes:
+        montant = r.get("dividende_montant")
+        date_brute = r.get("dividende_date")
+        if montant is None or not date_brute:
+            continue
+        date_paiement = date_dividende_vers_iso(date_brute)
+        if date_paiement is None:
+            continue
+        existe = cur.execute(
+            "SELECT 1 FROM dividendes WHERE ticker=? AND montant_net=? AND date_paiement=?",
+            (r["ticker"], montant, date_paiement)).fetchone()
+        if existe:
+            continue
+        cur.execute(
+            "INSERT INTO dividendes (ticker, montant_net, date_paiement, exercice_couvert, "
+            "statut_donnee, source) VALUES (?,?,?,NULL,'VALIDE',?)",
+            (r["ticker"], montant, date_paiement, f"BOC {date_bulletin_iso}"))
+        n_inseres += 1
+    return n_inseres
+
+
 def recharger_historique_committe(cur):
     """cours_quotidien_boc vit dans brvm.db, qui est reconstruit A NEUF a
     chaque execution du pipeline (jamais committe -- voir .gitignore). Sans
@@ -109,6 +162,45 @@ def recharger_historique_committe(cur):
              float(r["cours"]) if r["cours"] else None,
              float(r["per"]) if r["per"] else None,
              float(r["rendement"]) if r["rendement"] else None))
+    return len(rows)
+
+
+def recharger_dividendes_committes(cur):
+    """Meme piege que cours_quotidien_boc : la table dividendes est rebatie
+    a neuf a chaque execution (liste DIVIDENDES statique de peupler.py).
+    Les dividendes ajoutes ici depuis le BOC doivent etre recharges depuis
+    un fichier committe avant d'accumuler, sinon perdus a chaque run."""
+    import csv
+    chemin = Path(__file__).resolve().parent / "dividendes_boc.csv"
+    if not chemin.exists():
+        return 0
+    with open(chemin, encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    for r in rows:
+        existe = cur.execute(
+            "SELECT 1 FROM dividendes WHERE ticker=? AND montant_net=? AND date_paiement=?",
+            (r["ticker"], float(r["montant_net"]), r["date_paiement"])).fetchone()
+        if not existe:
+            cur.execute(
+                "INSERT INTO dividendes (ticker, montant_net, date_paiement, exercice_couvert, "
+                "statut_donnee, source) VALUES (?,?,?,NULL,'VALIDE',?)",
+                (r["ticker"], float(r["montant_net"]), r["date_paiement"], r["source"]))
+    return len(rows)
+
+
+def exporter_dividendes_boc(cur):
+    """Ecrit TOUS les dividendes source BOC (deja recharges + nouveaux de ce
+    run) vers un CSV committable -- source de verite persistante, la table
+    SQLite n'est qu'un cache de travail reconstruit a chaque fois."""
+    import csv
+    chemin = Path(__file__).resolve().parent / "dividendes_boc.csv"
+    rows = cur.execute(
+        "SELECT ticker, montant_net, date_paiement, source FROM dividendes "
+        "WHERE source LIKE 'BOC%' ORDER BY date_paiement, ticker").fetchall()
+    with open(chemin, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["ticker", "montant_net", "date_paiement", "source"])
+        w.writerows(rows)
     return len(rows)
 
 
@@ -139,6 +231,9 @@ def main():
     n_recharges = recharger_historique_committe(cur)
     if n_recharges:
         print(f"{n_recharges} ligne(s) d'historique deja committe rechargee(s) avant d'accumuler")
+    n_div_recharges = recharger_dividendes_committes(cur)
+    if n_div_recharges:
+        print(f"{n_div_recharges} dividende(s) BOC deja committe(s) recharge(s)")
     n_quotidien, n_mensuel = 0, 0
     for r in boc_lignes:
         cur.execute(
@@ -161,10 +256,15 @@ def main():
              r.get("rendement") / 100 if r.get("rendement") else None))
         n_mensuel += 1
 
+    n_dividendes = charger_dividendes_boc(cur, boc_lignes, d_iso)
+    n_div_exportes = exporter_dividendes_boc(cur)
+
     conn.commit()
     conn.close()
     print(f"{n_quotidien} ligne(s) ajoutee(s)/mise(s) a jour dans cours_quotidien_boc ({d_iso})")
     print(f"{n_mensuel} ligne(s) rafraichie(s) dans cours_mensuels ({p})")
+    print(f"{n_dividendes} nouveau(x) dividende(s) ajoute(s) depuis le BOC (source officielle directe)")
+    print(f"{n_div_exportes} dividende(s) BOC au total exportes vers dividendes_boc.csv")
 
 
 if __name__ == "__main__":
