@@ -1,0 +1,57 @@
+name: P11 - Collecte quotidienne du BOC (PER a jour)
+
+# Cree le 18/07/2026, suite a un constat reel : notre PER etait fige a
+# 11 jours de retard (aucune automatisation ne rafraichissait
+# cours_extraits.csv). La BRVM publie un Bulletin Officiel de la Cote
+# chaque jour de cotation -- cette collecte fait de meme.
+#
+# Alimente DEUX tables (jamais une seule, correction architecturale
+# demandee par l'utilisateur) : cours_quotidien_boc (accumule, ne remplace
+# jamais) et cours_mensuels (rafraichi, compatibilite avec toute la logique
+# de signaux existante).
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 18 * * 1-5"   # 18h00 UTC, du lundi au vendredi -- apres la cloture et son differe
+
+permissions:
+  contents: write
+
+jobs:
+  collecte-boc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pdfplumber requests pyyaml
+      - name: Reconstruire la base (necessaire pour ecrire dedans)
+        run: |
+          cd moteur
+          python3 peupler.py
+          python3 ../collecte/charger_cours.py brvm.db
+      - name: Collecter le BOC du jour
+        run: python3 collecte/collecte_boc_quotidien.py moteur/brvm.db
+      - name: Exporter les nouvelles donnees vers un fichier committable
+        run: |
+          python3 -c "
+          import sqlite3, csv
+          c = sqlite3.connect('moteur/brvm.db').cursor()
+          rows = c.execute('SELECT ticker, date_bulletin, cours, per, rendement FROM cours_quotidien_boc ORDER BY date_bulletin, ticker').fetchall()
+          with open('collecte/cours_quotidien_boc.csv', 'w', newline='', encoding='utf-8') as f:
+              w = csv.writer(f)
+              w.writerow(['ticker', 'date_bulletin', 'cours', 'per', 'rendement'])
+              w.writerows(rows)
+          print(f'{len(rows)} lignes exportees')
+          "
+      - name: Committer si changement
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          [ -f collecte/cours_quotidien_boc.csv ] && git add collecte/cours_quotidien_boc.csv
+          git commit -m "BOC quotidien $(date -u +%F)" || echo "rien a committer"
+          git pull --rebase origin main
+          git push
