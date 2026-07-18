@@ -15,7 +15,7 @@ on:
   # workflow_run n'est PAS soumis a cette restriction : il se declenche
   # quel que soit le jeton utilise par le workflow surveille.
   workflow_run:
-    workflows: ["P9 - Collecte quotidienne des cours"]
+    workflows: ["P9 - Collecte quotidienne des cours", "P11 - Collecte quotidienne du BOC (PER a jour)"]
     types: [completed]
   schedule:
     - cron: "30 3 * * 1,4"   # juste apres la collecte BOC (lundi/jeudi)
