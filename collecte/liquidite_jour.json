@@ -5,8 +5,8 @@
   "cours_cloture": 2990.0,
   "variation_pct": 1.36,
   "valeur_echangee_jour": 9038770.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.106935+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571488+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BICB": {
@@ -15,8 +15,8 @@
   "cours_cloture": 6300.0,
   "variation_pct": -1.33,
   "valeur_echangee_jour": 49121100.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.106977+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571561+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BICC": {
@@ -25,8 +25,8 @@
   "cours_cloture": 28100.0,
   "variation_pct": 1.43,
   "valeur_echangee_jour": 32652200.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107003+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571595+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BNBC": {
@@ -35,8 +35,8 @@
   "cours_cloture": 1875.0,
   "variation_pct": 0.0,
   "valeur_echangee_jour": 8460000.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107025+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571624+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BOAB": {
@@ -45,8 +45,8 @@
   "cours_cloture": 8700.0,
   "variation_pct": -0.91,
   "valeur_echangee_jour": 25003800.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107047+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571653+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BOABF": {
@@ -55,8 +55,8 @@
   "cours_cloture": 7200.0,
   "variation_pct": -0.76,
   "valeur_echangee_jour": 24962400.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107068+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571681+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BOAC": {
@@ -65,8 +65,8 @@
   "cours_cloture": 9745.0,
   "variation_pct": 0.26,
   "valeur_echangee_jour": 16050015.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107088+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571707+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BOAM": {
@@ -75,8 +75,8 @@
   "cours_cloture": 5755.0,
   "variation_pct": -0.26,
   "valeur_echangee_jour": 28383660.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107106+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571732+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BOAN": {
@@ -85,8 +85,8 @@
   "cours_cloture": 5350.0,
   "variation_pct": -0.83,
   "valeur_echangee_jour": 35390250.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107172+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571796+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "BOAS": {
@@ -95,8 +95,8 @@
   "cours_cloture": 7700.0,
   "variation_pct": 4.05,
   "valeur_echangee_jour": 31238900.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107192+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571822+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "CABC": {
@@ -105,8 +105,8 @@
   "cours_cloture": 3650.0,
   "variation_pct": 0.69,
   "valeur_echangee_jour": 9059300.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107210+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571846+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "CBIBF": {
@@ -115,8 +115,8 @@
   "cours_cloture": 28490.0,
   "variation_pct": -5.03,
   "valeur_echangee_jour": 21196560.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107228+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571870+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "CFAC": {
@@ -125,8 +125,8 @@
   "cours_cloture": 1600.0,
   "variation_pct": 1.27,
   "valeur_echangee_jour": 6936000.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107246+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571896+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "CIEC": {
@@ -135,8 +135,8 @@
   "cours_cloture": 5195.0,
   "variation_pct": 5.91,
   "valeur_echangee_jour": 13579730.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107279+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571919+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "ECOC": {
@@ -145,8 +145,8 @@
   "cours_cloture": 16000.0,
   "variation_pct": 0.0,
   "valeur_echangee_jour": 22464000.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107301+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571949+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "ETIT": {
@@ -155,8 +155,8 @@
   "cours_cloture": 68.0,
   "variation_pct": -6.85,
   "valeur_echangee_jour": 113019060.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107324+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.571977+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "FTSC": {
@@ -165,8 +165,8 @@
   "cours_cloture": 1990.0,
   "variation_pct": -0.25,
   "valeur_echangee_jour": 14373770.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107345+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572002+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "LNBB": {
@@ -175,8 +175,8 @@
   "cours_cloture": 4300.0,
   "variation_pct": -0.46,
   "valeur_echangee_jour": 2094100.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107363+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572029+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "NEIC": {
@@ -185,8 +185,8 @@
   "cours_cloture": 2295.0,
   "variation_pct": 6.74,
   "valeur_echangee_jour": 4615245.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107381+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572052+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "NSBC": {
@@ -195,8 +195,8 @@
   "cours_cloture": 23650.0,
   "variation_pct": 7.5,
   "valeur_echangee_jour": 30815950.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107399+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572076+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "NTLC": {
@@ -205,8 +205,8 @@
   "cours_cloture": 15800.0,
   "variation_pct": -1.25,
   "valeur_echangee_jour": 7805200.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107417+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572099+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "ONTBF": {
@@ -215,8 +215,8 @@
   "cours_cloture": 2675.0,
   "variation_pct": -0.74,
   "valeur_echangee_jour": 5652275.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107436+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572130+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "ORAC": {
@@ -225,8 +225,8 @@
   "cours_cloture": 16160.0,
   "variation_pct": -0.03,
   "valeur_echangee_jour": 17824480.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107454+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572155+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "ORGT": {
@@ -235,8 +235,8 @@
   "cours_cloture": 2680.0,
   "variation_pct": 0.0,
   "valeur_echangee_jour": 10703920.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107471+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572179+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "PALC": {
@@ -245,8 +245,8 @@
   "cours_cloture": 8690.0,
   "variation_pct": 0.29,
   "valeur_echangee_jour": 5101030.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107489+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572203+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "PRSC": {
@@ -255,8 +255,8 @@
   "cours_cloture": 4500.0,
   "variation_pct": 0.67,
   "valeur_echangee_jour": 2988000.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107506+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572227+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SAFC": {
@@ -265,8 +265,8 @@
   "cours_cloture": 4295.0,
   "variation_pct": -2.39,
   "valeur_echangee_jour": 5553435.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107523+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572251+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SCRC": {
@@ -275,8 +275,8 @@
   "cours_cloture": 3705.0,
   "variation_pct": -5.48,
   "valeur_echangee_jour": 22148490.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107540+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572275+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SDCC": {
@@ -285,8 +285,8 @@
   "cours_cloture": 11300.0,
   "variation_pct": 0.36,
   "valeur_echangee_jour": 8407200.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107558+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572297+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SDSC": {
@@ -295,8 +295,8 @@
   "cours_cloture": 2720.0,
   "variation_pct": 0.37,
   "valeur_echangee_jour": 68783360.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107575+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572324+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SEMC": {
@@ -305,8 +305,8 @@
   "cours_cloture": 1500.0,
   "variation_pct": 0.0,
   "valeur_echangee_jour": 4332000.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107592+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572347+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SGBC": {
@@ -315,8 +315,8 @@
   "cours_cloture": 37995.0,
   "variation_pct": 0.0,
   "valeur_echangee_jour": 81271305.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107610+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572370+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SHEC": {
@@ -325,8 +325,8 @@
   "cours_cloture": 2190.0,
   "variation_pct": -0.45,
   "valeur_echangee_jour": 12557460.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107628+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572393+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SIBC": {
@@ -335,8 +335,8 @@
   "cours_cloture": 8760.0,
   "variation_pct": 0.69,
   "valeur_echangee_jour": 203267040.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107646+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572416+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SICC": {
@@ -345,8 +345,8 @@
   "cours_cloture": 5300.0,
   "variation_pct": 6.11,
   "valeur_echangee_jour": 1060000.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107663+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572439+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SIVC": {
@@ -355,8 +355,8 @@
   "cours_cloture": 2400.0,
   "variation_pct": 2.35,
   "valeur_echangee_jour": 40420800.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107680+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572462+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SLBC": {
@@ -365,8 +365,8 @@
   "cours_cloture": 39155.0,
   "variation_pct": 0.1,
   "valeur_echangee_jour": 5794940.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107697+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572484+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SMBC": {
@@ -375,8 +375,8 @@
   "cours_cloture": 15195.0,
   "variation_pct": -3.83,
   "valeur_echangee_jour": 54458880.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107715+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572528+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SNTS": {
@@ -385,8 +385,8 @@
   "cours_cloture": 32000.0,
   "variation_pct": 0.0,
   "valeur_echangee_jour": 62208000.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107732+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572555+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SOGC": {
@@ -395,8 +395,8 @@
   "cours_cloture": 8010.0,
   "variation_pct": 0.12,
   "valeur_echangee_jour": 6968700.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107750+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572579+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "SPHC": {
@@ -405,8 +405,8 @@
   "cours_cloture": 7500.0,
   "variation_pct": 0.07,
   "valeur_echangee_jour": 2317500.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107767+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572601+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "STAC": {
@@ -415,8 +415,8 @@
   "cours_cloture": 3185.0,
   "variation_pct": -0.31,
   "valeur_echangee_jour": 18546255.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107788+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572630+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "STBC": {
@@ -425,8 +425,8 @@
   "cours_cloture": 23900.0,
   "variation_pct": 7.49,
   "valeur_echangee_jour": 76742900.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107805+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572656+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "TTLC": {
@@ -435,8 +435,8 @@
   "cours_cloture": 2900.0,
   "variation_pct": 0.0,
   "valeur_echangee_jour": 12330800.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107823+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572681+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "TTLS": {
@@ -445,8 +445,8 @@
   "cours_cloture": 3995.0,
   "variation_pct": -2.2,
   "valeur_echangee_jour": 14266145.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107840+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572705+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "UNLC": {
@@ -455,8 +455,8 @@
   "cours_cloture": 54495.0,
   "variation_pct": -0.92,
   "valeur_echangee_jour": 217980.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107857+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572729+00:00",
   "seance_ouverte_lors_collecte": false
  },
  "UNXC": {
@@ -465,8 +465,8 @@
   "cours_cloture": 1845.0,
   "variation_pct": 3.65,
   "valeur_echangee_jour": 74344275.0,
-  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 18:04",
-  "collecte_le": "2026-07-17T18:09:01.107875+00:00",
+  "date_maj_brvm": "Dernière mise à jour : Vendredi, 17 juillet, 2026 - 22:45",
+  "collecte_le": "2026-07-18T21:06:03.572752+00:00",
   "seance_ouverte_lors_collecte": false
  }
 }
