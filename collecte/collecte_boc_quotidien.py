@@ -76,7 +76,8 @@ def telecharger_boc(jour):
         f.write(resp.content)
         f.close()
         return f.name
-    except requests.RequestException:
+    except requests.RequestException as e:
+        print(f"  {aaaammjj} : ECHEC requete ({type(e).__name__}: {e}) -- ignore")
         return None
 
 
@@ -209,6 +210,9 @@ def main():
     chemin_pdf, date_bulletin = None, None
     for delta in range(MAX_JOURS_EN_ARRIERE):
         jour = aujourd_hui - timedelta(days=delta)
+        if jour.weekday() >= 5:  # 5=samedi, 6=dimanche -- la BRVM cote du lundi au vendredi
+            print(f"  {jour.isoformat()} : week-end, jour non ouvre -- ignore sans requete")
+            continue
         chemin = telecharger_boc(jour)
         if chemin:
             db_, lignes = extraire_boc(chemin)
