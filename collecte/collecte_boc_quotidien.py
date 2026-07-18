@@ -220,6 +220,8 @@ def main():
                 chemin_pdf, date_bulletin, boc_lignes = chemin, db_, lignes
                 print(f"BOC trouve pour {jour.isoformat()} ({len(lignes)} titres)")
                 break
+            print(f"  {jour.strftime('%Y%m%d')} : telechargement reussi mais extraction "
+                  f"vide (date_bulletin={db_!r}, {len(lignes)} ligne(s)) -- ignore")
             Path(chemin).unlink(missing_ok=True)
 
     if not chemin_pdf:
