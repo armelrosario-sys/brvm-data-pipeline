@@ -464,6 +464,16 @@ ETATS = [
     # avec classement de pages + OCR haute resolution cible.
     # ETIT (Ecobank Transnational Incorporated Togo) : aucun document trouve.
     # Synthetiques : profil clairement degrade (exclusion attendue) et profil limite (vigilance attendue)
+    # Integration des propositions d'extraction automatique (17/07/2026) :
+    # 4 candidats retenus apres correction de 2 bugs reels (annee inversee,
+    # garde-fou dettes/capitaux propres) et exclusion de tout ce qui restait
+    # ambigu -- voir collecte/preparer_integration.py. Statut PROBABLE
+    # systematique (aucune 2e source independante pour l'instant).
+    ("BNBC", 2021, 1598.214, 629.845, None, None, None, 1332.999, None, None, "NATIF", "PROBABLE", '2022-05-03'),  # dc78d1ae_20220503_-_etats_financiers_exercice_2021_-_bernabe_ci.pdf
+    ("BNBC", 2022, 1809.0, 1598.0, None, None, None, 1477.0, None, None, "NATIF", "PROBABLE", '2023-08-01'),  # 4669c4fc_20230801_-_etats_financiers_certifies_et_approuves_-_exercice_2022_-_bernabe_ci.pdf
+    ("BNBC", 2023, 36.0, 1809.0, None, None, 3.0, 649.0, None, None, "NATIF", "PROBABLE", '2024-05-07'),  # 9e3e6104_20240507_-_etats_financiers_de_synthese_-_bernabe_ci.pdf
+    ("CIEC", 2022, 9819.0, 9757.0, None, None, None, 56665.0, None, None, "NATIF", "PROBABLE", '2023-04-27'),  # 4627aac3_20230427_-_etats_financiers_syscohada_exercice_2022_-_cie_ci.pdf
+
     ("TEST_EXCLU", 2025, -320, -410, 1200, 1200, -150, 900, 1.45, None, "NATIF", "VALIDE", "2026-05-01"),
     ("TEST_EXCLU", 2024, -410, -180, 1500, 1500, 180, 950, 1.60, None, "NATIF", "VALIDE", "2025-05-01"),
     ("TEST_VIGIL", 2025, 850, 1150, 9000, 9000, 4200, 2000, 0.85, None, "NATIF", "VALIDE", "2026-05-01"),
