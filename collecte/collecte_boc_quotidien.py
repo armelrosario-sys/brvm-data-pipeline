@@ -72,7 +72,7 @@ def telecharger_boc(jour):
         if resp.status_code != 200 or len(resp.content) < 1000:
             print(f"  {aaaammjj} : statut {resp.status_code}, {len(resp.content)} octets -- ignore")
             return None
-        f = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+        f = tempfile.NamedTemporaryFile(suffix=f"_boc_{aaaammjj}_2.pdf", delete=False)
         f.write(resp.content)
         f.close()
         return f.name
