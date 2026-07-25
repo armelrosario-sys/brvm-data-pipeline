@@ -34,7 +34,7 @@ from extracteur_boc import extraire_boc
 ETAT = "collecte/etat_backfill_quotidien.json"
 CSV_QUOTIDIEN = "collecte/cours_quotidien_boc.csv"
 COLONNES_CSV = ["ticker", "date_bulletin", "cours", "per", "rendement"]
-FENETRE_MOIS_DEFAUT = 24
+FENETRE_MOIS_DEFAUT = 999  # illimite en pratique : mois_fenetre() s'arrete a 2018-01 de toute facon
 BUDGET_DEFAUT = 200  # sous les 220 de collecteur.py : partage prudent du meme site
 
 
@@ -54,6 +54,8 @@ def mois_fenetre(n_mois):
     liste = []
     for _ in range(n_mois):
         liste.append((y, m))
+        if (y, m) == (2018, 1):
+            break  # borne : pas de BOC archive avant janvier 2018
         m -= 1
         if m == 0:
             y, m = y - 1, 12
