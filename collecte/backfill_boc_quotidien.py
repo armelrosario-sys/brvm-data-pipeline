@@ -30,12 +30,27 @@ from datetime import date, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from collecteur import get, charger_manifeste, ajouter_manifeste, BASE  # reprend le meme throttling
 from extracteur_boc import extraire_boc
+import checkpoint
 
 ETAT = "collecte/etat_backfill_quotidien.json"
 CSV_QUOTIDIEN = "collecte/cours_quotidien_boc.csv"
 COLONNES_CSV = ["ticker", "date_bulletin", "cours", "per", "rendement"]
 FENETRE_MOIS_DEFAUT = 999  # illimite en pratique : mois_fenetre() s'arrete a 2018-01 de toute facon
 BUDGET_DEFAUT = 200  # sous les 220 de collecteur.py : partage prudent du meme site
+
+
+def ecrire_lignes_csv(chemin, fieldnames, lignes):
+    if not lignes:
+        return
+    existe = os.path.exists(chemin)
+    os.makedirs(os.path.dirname(chemin) or ".", exist_ok=True)
+    with open(chemin, "a", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fieldnames)
+        if not existe:
+            w.writeheader()
+        w.writerows(lignes)
+        f.flush()
+        os.fsync(f.fileno())
 
 
 def jours_ouvres_du_mois(y, m):
@@ -88,6 +103,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fenetre-mois", type=int, default=FENETRE_MOIS_DEFAUT)
     ap.add_argument("--budget", type=int, default=BUDGET_DEFAUT)
+    ap.add_argument("--checkpoint-secondes", type=int, default=600)
     args = ap.parse_args()
 
     etat = charger_etat()
@@ -95,8 +111,7 @@ def main():
     manifeste = charger_manifeste()
     deja_en_base = dates_deja_en_base()
 
-    nouveaux_manifeste, nouvelles_lignes_csv = [], []
-    requetes = 0
+    total_boc, total_lignes, requetes = 0, 0, 0
 
     for y, m in mois_fenetre(args.fenetre_mois):
         for d in jours_ouvres_du_mois(y, m):
@@ -132,43 +147,40 @@ def main():
                         f.write(contenu)
                     with open("a_uploader.txt", "a", encoding="utf-8") as f:
                         f.write(f"{tag}\t{chemin}\n")
-                    nouveaux_manifeste.append({
+                    ajouter_manifeste([{
                         "sha256": sha, "type": "boc", "periode": f"{y}-{m:02d}",
                         "url": url, "nom_fichier": os.path.basename(chemin),
                         "taille_octets": len(contenu),
                         "date_collecte_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                         "release_tag": tag,
-                    })
+                    }])
+                    manifeste[url] = {"sha256": sha}  # evite un doublon si le meme jour revient dans cette boucle
+                    total_boc += 1
                     date_bulletin, lignes = extraire_boc(chemin)
                     if lignes:
-                        for ligne in lignes:
-                            nouvelles_lignes_csv.append({
-                                "ticker": ligne["ticker"],
-                                "date_bulletin": iso,
-                                "cours": ligne.get("cours", ""),
-                                "per": ligne.get("per", ""),
-                                "rendement": ligne.get("rendement", ""),
-                            })
+                        nouvelles_lignes_csv = [{
+                            "ticker": ligne["ticker"], "date_bulletin": iso,
+                            "cours": ligne.get("cours", ""),
+                            "per": ligne.get("per", ""),
+                            "rendement": ligne.get("rendement", ""),
+                        } for ligne in lignes]
+                        ecrire_lignes_csv(CSV_QUOTIDIEN, COLONNES_CSV, nouvelles_lignes_csv)
+                        total_lignes += len(nouvelles_lignes_csv)
                     trouve = True
                     break
             etat["jours_tentes"].append(iso)
             (etat["jours_trouves"] if trouve else etat["jours_absents"]).append(iso)
+            sauver_etat(etat)  # sur disque immediatement (cout local negligeable)
+
+            checkpoint.sauvegarder(f"Backfill BOC quotidien : {total_boc} nouveau(x) jour(s) (auto)",
+                                    intervalle=args.checkpoint_secondes)
         if requetes >= args.budget:
             break
 
-    if nouveaux_manifeste:
-        ajouter_manifeste(nouveaux_manifeste)
-    if nouvelles_lignes_csv:
-        existe = os.path.exists(CSV_QUOTIDIEN)
-        os.makedirs("collecte", exist_ok=True)
-        with open(CSV_QUOTIDIEN, "a", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=COLONNES_CSV)
-            if not existe:
-                w.writeheader()
-            w.writerows(nouvelles_lignes_csv)
-    sauver_etat(etat)
-    print(f"Run termine : {len(nouveaux_manifeste)} nouveau(x) BOC, "
-          f"{len(nouvelles_lignes_csv)} ligne(s) de cours ajoutees, "
+    checkpoint.sauvegarder(f"Backfill BOC quotidien : run termine, {total_boc} nouveau(x) jour(s) (auto)",
+                            force=True)
+    print(f"Run termine : {total_boc} nouveau(x) BOC, "
+          f"{total_lignes} ligne(s) de cours ajoutees, "
           f"{requetes} requetes ({args.budget} autorisees). "
           f"Lancer collecte/verifier_continuite.py pour la verification de "
           f"continuite (recalculee separement, en ordre chronologique correct).")
