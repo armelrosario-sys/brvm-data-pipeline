@@ -96,10 +96,26 @@ jobs:
         run: |
           if [ -f a_uploader.txt ]; then
             while IFS=$'\t' read -r tag chemin; do
+              if [ -z "$tag" ]; then continue; fi
+              if [ ! -f "$chemin" ]; then
+                echo "::warning::deja traite ou absent (run precedent) : $chemin -- ignore"
+                continue
+              fi
               gh release upload "$tag" "$chemin" --clobber || \
               gh release create "$tag" "$chemin" --title "$tag" --notes "Backfill auto P8"
             done < a_uploader.txt
+            # Vide le fichier une fois tout traite : sans ca, chaque ligne
+            # reste pour toujours et les prochains runs retentent d'uploader
+            # des fichiers qui n'existent plus sur leur machine vierge.
+            > a_uploader.txt
           fi
+
+      - name: Commit du nettoyage de a_uploader.txt
+        run: |
+          git add -A -- . ':!data'
+          git diff --cached --quiet || git commit -m "a_uploader.txt vide apres upload (auto)"
+          git pull --rebase origin main
+          git push origin main
 
   liquidite:
     name: "Piste C — historique de liquidite (deja archive, volume/valeur)"
