@@ -21,15 +21,29 @@ Usage : python3 collecte/verifier_continuite.py
 """
 import csv
 import json
+import os
 from collections import defaultdict
 from datetime import date
 
 CSV_QUOTIDIEN = "collecte/cours_quotidien_boc.csv"
+OPERATIONS = "collecte/operations_sur_titre.csv"
 SORTIE = "collecte/continuite_suspecte.jsonl"
 SEUIL = 0.20
 
 
+def charger_operations_connues():
+    """Sauts deja expliques (dividendes, DPS, splits...) -> ne plus les
+    re-signaler a chaque run. Retourne un set de (ticker, date_iso)."""
+    connues = set()
+    if os.path.exists(OPERATIONS):
+        with open(OPERATIONS, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                connues.add((row["ticker"], row["date"]))
+    return connues
+
+
 def main():
+    connues = charger_operations_connues()
     par_ticker = defaultdict(list)
     with open(CSV_QUOTIDIEN, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -42,7 +56,7 @@ def main():
                 continue
             par_ticker[row["ticker"]].append((d, cours))
 
-    suspects = []
+    suspects, expliques = [], 0
     for ticker, points in par_ticker.items():
         points.sort(key=lambda p: p[0])  # ordre chronologique reel, garanti
         for (d_prec, c_prec), (d_actuel, c_actuel) in zip(points, points[1:]):
@@ -50,6 +64,9 @@ def main():
                 continue
             variation = abs(c_actuel - c_prec) / c_prec
             if variation > SEUIL:
+                if (ticker, d_actuel.isoformat()) in connues:
+                    expliques += 1
+                    continue
                 suspects.append({
                     "ticker": ticker,
                     "date_precedente": d_prec.isoformat(),
@@ -63,8 +80,8 @@ def main():
         for s in sorted(suspects, key=lambda x: x["date"]):
             f.write(json.dumps(s, ensure_ascii=False) + "\n")
 
-    print(f"{len(suspects)} saut(s) reellement suspect(s) (seuil {SEUIL:.0%}), "
-          f"recalcules en ordre chronologique correct sur {len(par_ticker)} tickers.")
+    print(f"{len(suspects)} saut(s) a verifier, {expliques} deja explique(s) "
+          f"(operations_sur_titre.csv), sur {len(par_ticker)} tickers.")
 
 
 if __name__ == "__main__":
