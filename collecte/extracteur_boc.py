@@ -58,6 +58,14 @@ def parser_ligne(row):
     montant_div = to_float(row[-4]) if len(row) >= 4 else None
     var_annee = to_float(row[-5]) if len(row) >= 5 else None
     cours_ref = to_float(row[-6]) if len(row) >= 6 else None
+    # Ajout 25/07/2026 : volume et valeur echangee du jour, presents dans le
+    # BOC depuis toujours mais jamais extraits jusqu'ici (colonnes "Seance
+    # de cotation : Volume Valeur", ancrees comme le reste depuis la droite
+    # -- verifie sur boc_20251113_2.pdf, colonnes 16 : row[-8]=volume,
+    # row[-7]=valeur). C'est ce qui alimente desormais l'historique de
+    # liquidite SANS collecte live supplementaire (backfill_liquidite.py).
+    volume_echange = to_float(row[-8]) if len(row) >= 8 else None
+    valeur_echangee = to_float(row[-7]) if len(row) >= 7 else None
 
     if cours_ref is None and per is None:
         return None  # ligne vide/illisible : rien d'exploitable
@@ -66,6 +74,7 @@ def parser_ligne(row):
         "ticker": ticker, "cours": cours_ref, "per": per,
         "rendement": rendement, "variation_annee": var_annee,
         "dividende_montant": montant_div, "dividende_date": date_div,
+        "volume_echange": volume_echange, "valeur_echangee": valeur_echangee,
     }
 
 
