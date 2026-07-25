@@ -51,6 +51,9 @@ from datetime import datetime, timezone
 
 import requests
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import checkpoint
+
 MANIFESTE = "MANIFESTE.csv"
 TRAITES = "collecte/fondamentaux_traites.json"
 SORTIE = "collecte/fondamentaux_extraits.csv"
@@ -326,10 +329,41 @@ def sauver_json(chemin, data):
         json.dump(data, f, ensure_ascii=False, indent=1)
 
 
+FIELDNAMES_SORTIE = ["sha256", "ticker", "exercice", "resultat_net", "resultat_net_n1",
+                     "total_actif", "total_passif", "capitaux_propres", "source_type",
+                     "statut_donnee", "strategie", "unite", "note", "source_url",
+                     "date_extraction_utc"]
+FIELDNAMES_NON_ID = ["sha256", "nom_fichier", "url", "periode"]
+
+
+def ecrire_ligne_csv(chemin, fieldnames, ligne):
+    """Ecrit UNE ligne immediatement (pas d'accumulation en memoire) --
+    c'est ce qui rend le checkpoint Git utile : sans ca, rien de nouveau
+    n'apparaitrait sur disque entre deux sauvegardes intermediaires."""
+    existe = os.path.exists(chemin)
+    os.makedirs(os.path.dirname(chemin), exist_ok=True)
+    with open(chemin, "a", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fieldnames)
+        if not existe:
+            w.writeheader()
+        w.writerow(ligne)
+        f.flush()
+        os.fsync(f.fileno())
+
+
+def ecrire_echec(ligne):
+    os.makedirs("collecte", exist_ok=True)
+    with open(ECHECS, "a", encoding="utf-8") as f:
+        f.write(json.dumps(ligne, ensure_ascii=False) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-minutes", type=int, default=320)
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--checkpoint-secondes", type=int, default=600)
     args = ap.parse_args()
 
     t0 = time.time()
@@ -352,8 +386,7 @@ def main():
     session = requests.Session()
     session.headers.update(API_HEADERS)
 
-    resultats, non_identifies, echecs = [], [], []
-    traites_ce_run = 0
+    n_resultats, n_non_id, n_echecs, traites_ce_run = 0, 0, 0, 0
 
     for row in lignes_manifeste:
         if time.time() - t0 > limite_s:
@@ -367,13 +400,19 @@ def main():
         cat = categorie_fichier(row["nom_fichier"])
         if cat == "ecarte":
             traites.add(sha)  # jamais retraite, mais ne consomme pas de temps d'extraction
+            sauver_json(TRAITES, sorted(traites))
             continue
 
         ticker = identifier_ticker(row["nom_fichier"], index_societes)
         if not ticker:
-            non_identifies.append({"sha256": sha, "nom_fichier": row["nom_fichier"],
-                                    "url": row["url"], "periode": row["periode"]})
+            ecrire_ligne_csv(NON_IDENTIFIES, FIELDNAMES_NON_ID,
+                              {"sha256": sha, "nom_fichier": row["nom_fichier"],
+                               "url": row["url"], "periode": row["periode"]})
+            n_non_id += 1
             traites.add(sha)
+            sauver_json(TRAITES, sorted(traites))
+            checkpoint.sauvegarder(f"Backfill fondamentaux : {traites_ce_run} traites (auto)",
+                                    intervalle=args.checkpoint_secondes)
             continue
 
         # Telechargement de l'asset : release GitHub identifiee par tag +
@@ -381,18 +420,21 @@ def main():
         rel = session.get(
             f"https://api.github.com/repos/{REPO}/releases/tags/{row['release_tag']}", timeout=30)
         if rel.status_code != 200:
-            echecs.append({"sha256": sha, "raison": f"release introuvable HTTP {rel.status_code}"})
+            ecrire_echec({"sha256": sha, "raison": f"release introuvable HTTP {rel.status_code}"})
+            n_echecs += 1
             continue
         asset = next((a for a in rel.json().get("assets", [])
                       if a["name"] == row["nom_fichier"]), None)
         if not asset:
-            echecs.append({"sha256": sha, "raison": "asset absent de la release"})
+            ecrire_echec({"sha256": sha, "raison": "asset absent de la release"})
+            n_echecs += 1
             continue
         pdf_resp = session.get(asset["url"],
                                 headers={**API_HEADERS, "Accept": "application/octet-stream"},
                                 timeout=60)
         if pdf_resp.status_code != 200:
-            echecs.append({"sha256": sha, "raison": f"telechargement asset HTTP {pdf_resp.status_code}"})
+            ecrire_echec({"sha256": sha, "raison": f"telechargement asset HTTP {pdf_resp.status_code}"})
+            n_echecs += 1
             continue
 
         os.makedirs("/tmp/fondamentaux", exist_ok=True)
@@ -417,7 +459,7 @@ def main():
             # mais on continue d'essayer les strategies suivantes
 
         if statut in ("VALIDE", "PROBABLE"):
-            resultats.append({
+            ecrire_ligne_csv(SORTIE, FIELDNAMES_SORTIE, {
                 "sha256": sha, "ticker": ticker,
                 "exercice": champs.get("exercice", ""),
                 "resultat_net": champs.get("resultat_net", ""),
@@ -433,49 +475,34 @@ def main():
                 "source_url": row["url"],
                 "date_extraction_utc": datetime.now(timezone.utc).isoformat(),
             })
+            n_resultats += 1
         else:
-            echecs.append({"sha256": sha, "ticker": ticker, "nom_fichier": row["nom_fichier"],
-                            "raison": note or "aucune strategie n'a produit de resultat exploitable"})
+            ecrire_echec({"sha256": sha, "ticker": ticker, "nom_fichier": row["nom_fichier"],
+                          "raison": note or "aucune strategie n'a produit de resultat exploitable"})
+            n_echecs += 1
 
         traites.add(sha)
         traites_ce_run += 1
+        sauver_json(TRAITES, sorted(traites))  # sur disque immediatement (cout local negligeable)
         try:
             os.remove(chemin_local)
         except OSError:
             pass
 
+        checkpoint.sauvegarder(f"Backfill fondamentaux : {traites_ce_run} traites ce run (auto)",
+                                intervalle=args.checkpoint_secondes)
+
         if traites_ce_run % 25 == 0:
             print(f"[{traites_ce_run} documents traites, "
                   f"{int(time.time()-t0)}s ecoules]", file=sys.stderr)
 
-    # ---- ecriture des sorties (append-only, jamais d'ecrasement) ----
-    if resultats:
-        existe = os.path.exists(SORTIE)
-        os.makedirs("collecte", exist_ok=True)
-        with open(SORTIE, "a", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=list(resultats[0].keys()))
-            if not existe:
-                w.writeheader()
-            w.writerows(resultats)
+    # sauvegarde finale forcee, meme si rien n'est arrive au dernier intervalle
+    checkpoint.sauvegarder(f"Backfill fondamentaux : run termine, {traites_ce_run} document(s) traites (auto)",
+                            force=True)
 
-    if non_identifies:
-        existe = os.path.exists(NON_IDENTIFIES)
-        with open(NON_IDENTIFIES, "a", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=list(non_identifies[0].keys()))
-            if not existe:
-                w.writeheader()
-            w.writerows(non_identifies)
-
-    if echecs:
-        with open(ECHECS, "a", encoding="utf-8") as f:
-            for e in echecs:
-                f.write(json.dumps(e, ensure_ascii=False) + "\n")
-
-    sauver_json(TRAITES, sorted(traites))
-
-    print(f"Run termine : {len(resultats)} ligne(s) extraite(s) et validees, "
-          f"{len(non_identifies)} societe(s) non identifiee(s), "
-          f"{len(echecs)} echec(s), {traites_ce_run} document(s) traites en tout, "
+    print(f"Run termine : {n_resultats} ligne(s) extraite(s) et validees, "
+          f"{n_non_id} societe(s) non identifiee(s), "
+          f"{n_echecs} echec(s), {traites_ce_run} document(s) traites en tout, "
           f"{int(time.time()-t0)}s.")
 
 
