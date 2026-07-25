@@ -50,10 +50,7 @@ jobs:
 
       - name: Commit et push des resultats
         run: |
-          git add collecte/fondamentaux_extraits.csv \
-                   collecte/fondamentaux_traites.json \
-                   collecte/rapports_non_identifies.csv \
-                   collecte/fondamentaux_echecs.jsonl 2>/dev/null || true
+          git add -A -- . ':!data'
           git diff --cached --quiet || git commit -m "Backfill Piste A : extraction rapports deja archives (auto)"
           git pull --rebase origin main
           git push origin main
@@ -88,11 +85,7 @@ jobs:
 
       - name: Commit et push des resultats
         run: |
-          git add MANIFESTE.csv \
-                   collecte/cours_quotidien_boc.csv \
-                   collecte/etat_backfill_quotidien.json \
-                   collecte/continuite_suspecte.jsonl \
-                   a_uploader.txt 2>/dev/null || true
+          git add -A -- . ':!data'
           git diff --cached --quiet || git commit -m "Backfill Piste B : cours quotidiens elargis (auto)"
           git pull --rebase origin main
           git push origin main
@@ -140,9 +133,7 @@ jobs:
 
       - name: Commit et push
         run: |
-          git add collecte/liquidite_quotidienne_historique.csv \
-                   collecte/liquidite_traites.json \
-                   collecte/continuite_suspecte.jsonl 2>/dev/null || true
+          git add -A -- . ':!data'
           git diff --cached --quiet || git commit -m "Backfill Piste C : historique liquidite (auto)"
           git pull --rebase origin main
           git push origin main
