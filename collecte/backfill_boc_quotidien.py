@@ -82,21 +82,6 @@ def dates_deja_en_base():
     return dates
 
 
-def continuite_plausible(lignes_jour, dernier_cours):
-    """Marque les sauts >20% sans reference connue -- ne bloque jamais
-    l'ecriture (integrite avant couverture ne veut pas dire silence sur les
-    jours suspects, mais ne pas les jeter non plus) ; retourne l'ensemble
-    des tickers a signaler."""
-    suspects = set()
-    for ligne in lignes_jour:
-        prec = dernier_cours.get(ligne["ticker"])
-        if prec and ligne.get("cours"):
-            variation = abs(ligne["cours"] - prec) / prec
-            if variation > 0.20:
-                suspects.add(ligne["ticker"])
-    return suspects
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fenetre-mois", type=int, default=FENETRE_MOIS_DEFAUT)
@@ -107,9 +92,8 @@ def main():
     deja_tentes = set(etat["jours_tentes"])
     manifeste = charger_manifeste()
     deja_en_base = dates_deja_en_base()
-    dernier_cours = {}  # ticker -> dernier cours vu, pour le controle de continuite
 
-    nouveaux_manifeste, nouvelles_lignes_csv, suspects_total = [], [], []
+    nouveaux_manifeste, nouvelles_lignes_csv = [], []
     requetes = 0
 
     for y, m in mois_fenetre(args.fenetre_mois):
@@ -155,9 +139,6 @@ def main():
                     })
                     date_bulletin, lignes = extraire_boc(chemin)
                     if lignes:
-                        suspects = continuite_plausible(lignes, dernier_cours)
-                        suspects_total.extend(
-                            {"date": iso, "ticker": t} for t in suspects)
                         for ligne in lignes:
                             nouvelles_lignes_csv.append({
                                 "ticker": ligne["ticker"],
@@ -166,8 +147,6 @@ def main():
                                 "per": ligne.get("per", ""),
                                 "rendement": ligne.get("rendement", ""),
                             })
-                            if ligne.get("cours"):
-                                dernier_cours[ligne["ticker"]] = ligne["cours"]
                     trouve = True
                     break
             etat["jours_tentes"].append(iso)
@@ -185,16 +164,12 @@ def main():
             if not existe:
                 w.writeheader()
             w.writerows(nouvelles_lignes_csv)
-    if suspects_total:
-        with open("collecte/continuite_suspecte.jsonl", "a", encoding="utf-8") as f:
-            for s in suspects_total:
-                f.write(json.dumps(s, ensure_ascii=False) + "\n")
-
     sauver_etat(etat)
     print(f"Run termine : {len(nouveaux_manifeste)} nouveau(x) BOC, "
           f"{len(nouvelles_lignes_csv)} ligne(s) de cours ajoutees, "
-          f"{len(suspects_total)} saut(s) suspect(s) signale(s), "
-          f"{requetes} requetes ({args.budget} autorisees).")
+          f"{requetes} requetes ({args.budget} autorisees). "
+          f"Lancer collecte/verifier_continuite.py pour la verification de "
+          f"continuite (recalculee separement, en ordre chronologique correct).")
 
 
 if __name__ == "__main__":
