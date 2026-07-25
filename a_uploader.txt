@@ -433,3 +433,11 @@ boc-2024	data/boc-2024/boc_20240925_2.pdf
 boc-2024	data/boc-2024/boc_20240926_2.pdf
 boc-2024	data/boc-2024/boc_20240927_2.pdf
 boc-2024	data/boc-2024/boc_20240801.pdf
+boc-2024	data/boc-2024/boc_20240802.pdf
+boc-2024	data/boc-2024/boc_20240805.pdf
+boc-2024	data/boc-2024/boc_20240806.pdf
+boc-2024	data/boc-2024/boc_20240808.pdf
+boc-2024	data/boc-2024/boc_20240809.pdf
+boc-2024	data/boc-2024/boc_20240812.pdf
+boc-2024	data/boc-2024/boc_20240813.pdf
+boc-2024	data/boc-2024/boc_20240814.pdf
