@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""collecte/verifier_continuite.py — Correctif (25/07/2026).
+
+Remplace le controle de continuite fait EN DIRECT dans
+backfill_boc_quotidien.py, qui etait biaise : ce dernier traite les mois du
+plus recent au plus ancien, donc le "dernier cours vu" au debut de chaque
+mois plus ancien etait en realite celui d'un mois PLUS RECENT deja traite --
+d'ou 87 des 88 alertes du premier run tombant exactement sur le 1er jour de
+bourse de chaque mois (artefact d'ordre de traitement, pas un vrai
+mouvement de marche). Constate en verifiant les resultats du run du
+25/07/2026, corrige avant que le fichier ne soit utilise pour autre chose.
+
+Ce script relit l'INTEGRALITE de cours_quotidien_boc.csv, trie chaque
+ticker par date reellement croissante, et ne compare que des jours
+consecutifs dans le bon ordre. Fichier de sortie recalcule en entier
+(ecrase, contrairement aux fichiers d'evenements append-only du reste du
+pipeline -- celui-ci est un rapport derive, jamais une source primaire).
+
+Usage : python3 collecte/verifier_continuite.py
+"""
+import csv
+import json
+from collections import defaultdict
+from datetime import date
+
+CSV_QUOTIDIEN = "collecte/cours_quotidien_boc.csv"
+SORTIE = "collecte/continuite_suspecte.jsonl"
+SEUIL = 0.20
+
+
+def main():
+    par_ticker = defaultdict(list)
+    with open(CSV_QUOTIDIEN, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if not row.get("cours"):
+                continue
+            try:
+                d = date.fromisoformat(row["date_bulletin"])
+                cours = float(row["cours"])
+            except (ValueError, TypeError):
+                continue
+            par_ticker[row["ticker"]].append((d, cours))
+
+    suspects = []
+    for ticker, points in par_ticker.items():
+        points.sort(key=lambda p: p[0])  # ordre chronologique reel, garanti
+        for (d_prec, c_prec), (d_actuel, c_actuel) in zip(points, points[1:]):
+            if c_prec == 0:
+                continue
+            variation = abs(c_actuel - c_prec) / c_prec
+            if variation > SEUIL:
+                suspects.append({
+                    "ticker": ticker,
+                    "date_precedente": d_prec.isoformat(),
+                    "cours_precedent": c_prec,
+                    "date": d_actuel.isoformat(),
+                    "cours": c_actuel,
+                    "variation": round(variation, 4),
+                })
+
+    with open(SORTIE, "w", encoding="utf-8") as f:
+        for s in sorted(suspects, key=lambda x: x["date"]):
+            f.write(json.dumps(s, ensure_ascii=False) + "\n")
+
+    print(f"{len(suspects)} saut(s) reellement suspect(s) (seuil {SEUIL:.0%}), "
+          f"recalcules en ordre chronologique correct sur {len(par_ticker)} tickers.")
+
+
+if __name__ == "__main__":
+    main()
