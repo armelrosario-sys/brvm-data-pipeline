@@ -7,8 +7,8 @@ on:
         description: "Budget temps Piste A (minutes)"
         default: "300"
       fenetre_mois_boc:
-        description: "Piste B : nb de mois glissants a couvrir"
-        default: "24"
+        description: "Piste B : nb de mois a couvrir (999 = jusqu'a 2018)"
+        default: "999"
 
 permissions:
   contents: write
@@ -107,3 +107,42 @@ jobs:
               gh release create "$tag" "$chemin" --title "$tag" --notes "Backfill auto P8"
             done < a_uploader.txt
           fi
+
+  liquidite:
+    name: "Piste C — historique de liquidite (deja archive, volume/valeur)"
+    needs: boc_quotidien
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Dependances Python
+        run: pip install --quiet pdfplumber requests
+
+      - name: Git identite
+        run: |
+          git config user.name "brvm-backfill-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Reconstruction liquidite (Piste C)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 collecte/backfill_liquidite.py
+
+      - name: Verification continuite (recalcul complet)
+        run: python3 collecte/verifier_continuite.py
+
+      - name: Commit et push
+        run: |
+          git add collecte/liquidite_quotidienne_historique.csv \
+                   collecte/liquidite_traites.json \
+                   collecte/continuite_suspecte.jsonl 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Backfill Piste C : historique liquidite (auto)"
+          git pull --rebase origin main
+          git push origin main
