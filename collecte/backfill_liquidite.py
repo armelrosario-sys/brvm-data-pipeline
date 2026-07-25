@@ -14,15 +14,18 @@ resumable via collecte/liquidite_traites.json).
 
 Usage : python3 collecte/backfill_liquidite.py
 """
+import argparse
 import csv
 import json
 import os
+import re
 import sys
 
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from extracteur_boc import extraire_boc
+import checkpoint
 
 MANIFESTE = "MANIFESTE.csv"
 SORTIE = "collecte/liquidite_quotidienne_historique.csv"
@@ -38,7 +41,31 @@ def charger_json(chemin, defaut):
     return defaut
 
 
+def sauver_json(chemin, data):
+    os.makedirs(os.path.dirname(chemin) or ".", exist_ok=True)
+    with open(chemin, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+
+
+def ecrire_lignes_csv(chemin, fieldnames, lignes):
+    if not lignes:
+        return
+    existe = os.path.exists(chemin)
+    os.makedirs(os.path.dirname(chemin) or ".", exist_ok=True)
+    with open(chemin, "a", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fieldnames)
+        if not existe:
+            w.writeheader()
+        w.writerows(lignes)
+        f.flush()
+        os.fsync(f.fileno())
+
+
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--checkpoint-secondes", type=int, default=600)
+    args = ap.parse_args()
+
     traites = set(charger_json(TRAITES, []))
     session = requests.Session()
     token = os.environ.get("GITHUB_TOKEN", "")
@@ -53,7 +80,7 @@ def main():
             if row["type"] == "boc":
                 lignes_boc.append(row)
 
-    resultats, echecs = [], 0
+    n_resultats, echecs, traites_ce_run = 0, 0, 0
     for row in lignes_boc:
         sha = row["sha256"]
         if sha in traites:
@@ -74,38 +101,32 @@ def main():
         with open(chemin_local, "wb") as f:
             f.write(pdf.content)
         # date reelle depuis le nom de fichier archive (contient boc_AAAAMMJJ)
-        import re
         m = re.search(r"(\d{8})", row["nom_fichier"])
         date_iso = f"{m.group(1)[:4]}-{m.group(1)[4:6]}-{m.group(1)[6:]}" if m else None
         _, lignes = extraire_boc(chemin_local)
         if lignes and date_iso:
-            for l in lignes:
-                if l.get("volume_echange") is not None:
-                    resultats.append({
-                        "ticker": l["ticker"], "date_bulletin": date_iso,
-                        "volume_echange": l["volume_echange"],
-                        "valeur_echangee": l.get("valeur_echangee", ""),
-                    })
+            nouvelles_lignes = [{
+                "ticker": l["ticker"], "date_bulletin": date_iso,
+                "volume_echange": l["volume_echange"],
+                "valeur_echangee": l.get("valeur_echangee", ""),
+            } for l in lignes if l.get("volume_echange") is not None]
+            ecrire_lignes_csv(SORTIE, COLONNES, nouvelles_lignes)
+            n_resultats += len(nouvelles_lignes)
+
         traites.add(sha)
+        traites_ce_run += 1
+        sauver_json(TRAITES, sorted(traites))  # sur disque immediatement
         try:
             os.remove(chemin_local)
         except OSError:
             pass
 
-    if resultats:
-        existe = os.path.exists(SORTIE)
-        os.makedirs("collecte", exist_ok=True)
-        with open(SORTIE, "a", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=COLONNES)
-            if not existe:
-                w.writeheader()
-            w.writerows(resultats)
+        checkpoint.sauvegarder(f"Backfill liquidite : {traites_ce_run} BOC traites ce run (auto)",
+                                intervalle=args.checkpoint_secondes)
 
-    os.makedirs("collecte", exist_ok=True)
-    with open(TRAITES, "w", encoding="utf-8") as f:
-        json.dump(sorted(traites), f, ensure_ascii=False, indent=1)
-
-    print(f"{len(resultats)} ligne(s) de liquidite ajoutees, {echecs} echec(s) de telechargement, "
+    checkpoint.sauvegarder(f"Backfill liquidite : run termine, {traites_ce_run} BOC traites (auto)",
+                            force=True)
+    print(f"{n_resultats} ligne(s) de liquidite ajoutees, {echecs} echec(s) de telechargement, "
           f"{len(traites)} BOC traites au total.")
 
 
