@@ -441,3 +441,4 @@ boc-2024	data/boc-2024/boc_20240809.pdf
 boc-2024	data/boc-2024/boc_20240812.pdf
 boc-2024	data/boc-2024/boc_20240813.pdf
 boc-2024	data/boc-2024/boc_20240814.pdf
+boc-2024	data/boc-2024/boc_20240819.pdf
