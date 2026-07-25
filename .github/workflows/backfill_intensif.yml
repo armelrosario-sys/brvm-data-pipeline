@@ -1,0 +1,109 @@
+name: Backfill intensif (Piste A + Piste B, P8 25/07/2026)
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_minutes_fondamentaux:
+        description: "Budget temps Piste A (minutes)"
+        default: "300"
+      fenetre_mois_boc:
+        description: "Piste B : nb de mois glissants a couvrir"
+        default: "24"
+
+permissions:
+  contents: write
+
+jobs:
+  fondamentaux:
+    name: "Piste A — extraction des rapports deja archives"
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Dependances systeme (Camelot + OCR)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ghostscript python3-tk tesseract-ocr tesseract-ocr-fra
+
+      - name: Dependances Python
+        run: |
+          pip install --quiet pdfplumber requests "camelot-py[cv]" pytesseract pdf2image
+
+      - name: Git identite (pour commits intermediaires)
+        run: |
+          git config user.name "brvm-backfill-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Extraction (Piste A)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 collecte/backfill_fondamentaux.py \
+            --max-minutes ${{ github.event.inputs.max_minutes_fondamentaux }}
+
+      - name: Commit et push des resultats
+        run: |
+          git add collecte/fondamentaux_extraits.csv \
+                   collecte/fondamentaux_traites.json \
+                   collecte/rapports_non_identifies.csv \
+                   collecte/fondamentaux_echecs.jsonl 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Backfill Piste A : extraction rapports deja archives (auto)"
+          git pull --rebase origin main
+          git push origin main
+
+  boc_quotidien:
+    name: "Piste B — elargissement BOC quotidien"
+    needs: fondamentaux
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Dependances Python
+        run: |
+          pip install --quiet pdfplumber requests beautifulsoup4
+
+      - name: Git identite
+        run: |
+          git config user.name "brvm-backfill-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Backfill BOC quotidien (Piste B)
+        run: |
+          python3 collecte/backfill_boc_quotidien.py \
+            --fenetre-mois ${{ github.event.inputs.fenetre_mois_boc }}
+
+      - name: Commit et push des resultats
+        run: |
+          git add MANIFESTE.csv \
+                   collecte/cours_quotidien_boc.csv \
+                   collecte/etat_backfill_quotidien.json \
+                   collecte/continuite_suspecte.jsonl \
+                   a_uploader.txt 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Backfill Piste B : cours quotidiens elargis (auto)"
+          git pull --rebase origin main
+          git push origin main
+
+      - name: Upload des PDF vers les Releases (comme collecte.yml existant)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f a_uploader.txt ]; then
+            while IFS=$'\t' read -r tag chemin; do
+              gh release upload "$tag" "$chemin" --clobber || \
+              gh release create "$tag" "$chemin" --title "$tag" --notes "Backfill auto P8"
+            done < a_uploader.txt
+          fi
