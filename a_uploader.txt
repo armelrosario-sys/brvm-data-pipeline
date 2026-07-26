@@ -102,3 +102,16 @@ boc-2023	data/boc-2023/boc_20230816.pdf
 boc-2023	data/boc-2023/boc_20230817.pdf
 boc-2023	data/boc-2023/boc_20230818.pdf
 boc-2023	data/boc-2023/boc_20230821.pdf
+boc-2023	data/boc-2023/boc_20230822.pdf
+boc-2023	data/boc-2023/boc_20230823.pdf
+boc-2023	data/boc-2023/boc_20230824.pdf
+boc-2023	data/boc-2023/boc_20230825.pdf
+boc-2023	data/boc-2023/boc_20230828.pdf
+boc-2023	data/boc-2023/boc_20230829.pdf
+boc-2023	data/boc-2023/boc_20230830.pdf
+boc-2023	data/boc-2023/boc_20230703_2.pdf
+boc-2023	data/boc-2023/boc_20230704_2.pdf
+boc-2023	data/boc-2023/boc_20230705_2.pdf
+boc-2023	data/boc-2023/boc_20230706_2.pdf
+boc-2023	data/boc-2023/boc_20230707_2.pdf
+boc-2023	data/boc-2023/boc_20230710_2.pdf
