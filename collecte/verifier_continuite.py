@@ -27,6 +27,7 @@ from datetime import date
 
 CSV_QUOTIDIEN = "collecte/cours_quotidien_boc.csv"
 OPERATIONS = "collecte/operations_sur_titre.csv"
+EVENEMENTS_MARCHE = "collecte/evenements_marche.csv"
 SORTIE = "collecte/continuite_suspecte.jsonl"
 SEUIL = 0.20
 
@@ -42,8 +43,21 @@ def charger_operations_connues():
     return connues
 
 
+def charger_evenements_marche():
+    """Evenements globaux (revision d'indice, etc.) -> une date suffit,
+    s'applique a TOUS les titres ce jour-la (contrairement a
+    operations_sur_titre.csv qui est specifique a un titre)."""
+    dates = set()
+    if os.path.exists(EVENEMENTS_MARCHE):
+        with open(EVENEMENTS_MARCHE, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                dates.add(row["date"])
+    return dates
+
+
 def main():
     connues = charger_operations_connues()
+    dates_evenement = charger_evenements_marche()
     par_ticker = defaultdict(list)
     with open(CSV_QUOTIDIEN, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -64,7 +78,7 @@ def main():
                 continue
             variation = abs(c_actuel - c_prec) / c_prec
             if variation > SEUIL:
-                if (ticker, d_actuel.isoformat()) in connues:
+                if (ticker, d_actuel.isoformat()) in connues or d_actuel.isoformat() in dates_evenement:
                     expliques += 1
                     continue
                 suspects.append({
@@ -81,7 +95,7 @@ def main():
             f.write(json.dumps(s, ensure_ascii=False) + "\n")
 
     print(f"{len(suspects)} saut(s) a verifier, {expliques} deja explique(s) "
-          f"(operations_sur_titre.csv), sur {len(par_ticker)} tickers.")
+          f"(operations_sur_titre.csv + evenements_marche.csv), sur {len(par_ticker)} tickers.")
 
 
 if __name__ == "__main__":
