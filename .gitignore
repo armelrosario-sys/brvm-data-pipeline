@@ -13,3 +13,4 @@ __pycache__/
 # Garde-fou technique en plus de la doctrine : meme en cas d'oubli, git
 # refusera de suivre ce fichier tant qu'il porte ce nom exact.
 config/portefeuille.yaml
+data/
