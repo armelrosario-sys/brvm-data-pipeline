@@ -34,7 +34,7 @@ def sauvegarder(message="Checkpoint automatique (auto)", intervalle=INTERVALLE_D
     if not force and (maintenant - _dernier["t"]) < intervalle:
         return False
     try:
-        subprocess.run(["git", "add", "-A", "--", ".", ":!data"], check=True, capture_output=True, timeout=30)
+        subprocess.run(["git", "add", "-A"], check=True, capture_output=True, timeout=30)
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], capture_output=True)
         if diff.returncode == 0:
             _dernier["t"] = maintenant
