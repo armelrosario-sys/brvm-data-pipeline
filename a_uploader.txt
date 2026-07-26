@@ -22,3 +22,8 @@ boc-2021	data/boc-2021/boc_20211124_2.pdf
 boc-2021	data/boc-2021/boc_20211125_2.pdf
 boc-2021	data/boc-2021/boc_20211126_2.pdf
 boc-2021	data/boc-2021/boc_20211129_2.pdf
+boc-2021	data/boc-2021/boc_20211005.pdf
+boc-2021	data/boc-2021/boc_20211006.pdf
+boc-2021	data/boc-2021/boc_20211012.pdf
+boc-2021	data/boc-2021/boc_20211020.pdf
+boc-2021	data/boc-2021/boc_20211021.pdf
