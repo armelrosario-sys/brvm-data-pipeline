@@ -1,0 +1,34 @@
+name: Nettoyage Git — purge historique (une fois)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historique complet necessaire pour la reecriture
+
+      - name: Git identite
+        run: |
+          git config user.name "brvm-backfill-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Installer git-filter-repo
+        run: pip install --quiet git-filter-repo
+
+      - name: "Purger data/ de tout l'historique (teste localement : 111M -> 3M)"
+        run: git filter-repo --path data/ --invert-paths --force
+
+      - name: Remettre le remote (filter-repo le retire par securite)
+        run: git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Pousser l'historique reecrit (force, necessaire apres reecriture)
+        run: |
+          git push origin main --force
+          git push origin --tags --force 2>/dev/null || true
