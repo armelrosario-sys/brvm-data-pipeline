@@ -8,3 +8,6 @@ boc-2021	data/boc-2021/boc_20210727.pdf
 boc-2021	data/boc-2021/boc_20210728.pdf
 boc-2021	data/boc-2021/boc_20210729.pdf
 boc-2021	data/boc-2021/boc_20210503.pdf
+boc-2021	data/boc-2021/boc_20210504.pdf
+boc-2021	data/boc-2021/boc_20210505.pdf
+boc-2021	data/boc-2021/boc_20210506.pdf
