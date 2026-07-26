@@ -50,7 +50,7 @@ jobs:
 
       - name: Commit et push des resultats
         run: |
-          git add -A -- . ':!data'
+          git add -A
           git diff --cached --quiet || git commit -m "Backfill Piste A : extraction rapports deja archives (auto)"
           git pull --rebase origin main
           git push origin main
@@ -85,7 +85,7 @@ jobs:
 
       - name: Commit et push des resultats
         run: |
-          git add -A -- . ':!data'
+          git add -A
           git diff --cached --quiet || git commit -m "Backfill Piste B : cours quotidiens elargis (auto)"
           git pull --rebase origin main
           git push origin main
@@ -112,7 +112,7 @@ jobs:
 
       - name: Commit du nettoyage de a_uploader.txt
         run: |
-          git add -A -- . ':!data'
+          git add -A
           git diff --cached --quiet || git commit -m "a_uploader.txt vide apres upload (auto)"
           git pull --rebase origin main
           git push origin main
@@ -149,7 +149,7 @@ jobs:
 
       - name: Commit et push
         run: |
-          git add -A -- . ':!data'
+          git add -A
           git diff --cached --quiet || git commit -m "Backfill Piste C : historique liquidite (auto)"
           git pull --rebase origin main
           git push origin main
