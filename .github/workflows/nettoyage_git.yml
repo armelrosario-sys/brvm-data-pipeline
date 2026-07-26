@@ -33,7 +33,7 @@ jobs:
 
       - name: Commit et push
         run: |
-          git add -A -- . ':!data'
+          git add -A
           git diff --cached --quiet || git commit -m "Nettoyage : data/ retire du suivi Git (PDF -> Releases uniquement)"
           git pull --rebase origin main
           git push origin main
