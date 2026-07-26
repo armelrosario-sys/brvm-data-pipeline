@@ -1,3 +1,7 @@
-date,description,source
-2025-01-02,Revision annuelle composition indices BRVM Prestige et BRVM 30,Avis BRVM N 001-2025 et N 002-2025/BRVM/DG
-2025-01-03,Effets de la revision annuelle des indices (lendemain),Avis BRVM N 001-2025 et N 002-2025/BRVM/DG
+date,description,source,statut
+2025-01-02,Revision annuelle composition indices BRVM Prestige et BRVM 30,Avis BRVM N 001-2025 et N 002-2025/BRVM/DG,CONFIRME
+2025-01-03,Effets de la revision annuelle des indices (lendemain),Avis BRVM N 001-2025 et N 002-2025/BRVM/DG,CONFIRME
+2022-01-12,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve (bulletin mensuel janvier 2022 consulte sans resultat),PROBABLE_NON_CONFIRME
+2022-01-13,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve (bulletin mensuel janvier 2022 consulte sans resultat),PROBABLE_NON_CONFIRME
+2023-06-02,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve,PROBABLE_NON_CONFIRME
+2023-06-05,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve,PROBABLE_NON_CONFIRME
