@@ -1,0 +1,39 @@
+name: Nettoyage Git (retrait data/ du suivi, une fois)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  nettoyage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Git identite
+        run: |
+          git config user.name "brvm-backfill-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Retirer data/ du suivi (garde les fichiers en local, juste plus dans Git)
+        run: |
+          if git ls-files data/ | grep -q .; then
+            git rm -r --cached data/ -q
+          else
+            echo "rien a nettoyer (deja fait)"
+          fi
+
+      - name: Verrouiller avec .gitignore (empeche toute recidive)
+        run: |
+          grep -qxF 'data/' .gitignore || echo 'data/' >> .gitignore
+
+      - name: Commit et push
+        run: |
+          git add -A -- . ':!data'
+          git diff --cached --quiet || git commit -m "Nettoyage : data/ retire du suivi Git (PDF -> Releases uniquement)"
+          git pull --rebase origin main
+          git push origin main
