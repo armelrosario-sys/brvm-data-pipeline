@@ -477,6 +477,66 @@ ETATS = [
     ("TEST_EXCLU", 2025, -320, -410, 1200, 1200, -150, 900, 1.45, None, "NATIF", "VALIDE", "2026-05-01"),
     ("TEST_EXCLU", 2024, -410, -180, 1500, 1500, 180, 950, 1.60, None, "NATIF", "VALIDE", "2025-05-01"),
     ("TEST_VIGIL", 2025, 850, 1150, 9000, 9000, 4200, 2000, 0.85, None, "NATIF", "VALIDE", "2026-05-01"),
+    # --- Fusion automatique Piste A (27/07/2026) : dettes financieres, 
+    # payout et solvabilite bancaire absents de l'extraction automatique -> 
+    # None (jamais devine). A relire au meme titre que le reste. ---
+    ("SIVC", 2020, -2462719856.0, -26523307.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2021-04-28'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("SEMC", 2020, 736547004.0, 690339770.0, 18107897642.0, 18107897642.0, None, None, None, None,
+     "NATIF", "PROBABLE", '2021-09-07'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- bilan equilibre ; unite non confirmee dans le texte
+    ("SEMC", 2019, 690339770.0, -74527864.0, 20201693883.0, 20201693883.0, None, None, None, None,
+     "NATIF", "PROBABLE", '2020-12-11'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- bilan equilibre ; unite non confirmee dans le texte
+    ("SEMC", 2018, 2136176.0, 1427961.0, 20186276.0, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2019-06-05'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("ETIT", 2024, 3.331752022862878e+23, None, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2025-03-28'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("ETIT", 2023, 287824286430.0, None, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2024-05-02'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("ETIT", 2021, 16553336.0, None, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2022-03-30'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("SICC", 2017, 100567494.0, 200831393.0, 3576424374.0, 3576424374.0, None, None, None, None,
+     "NATIF", "PROBABLE", None),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- bilan equilibre ; unite non confirmee dans le texte
+    ("SICC", 2015, 434869656.0, 68237394.0, 1627179217.0, 1627179217.0, None, None, None, None,
+     "NATIF", "PROBABLE", '2017-09-05'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- bilan equilibre ; unite non confirmee dans le texte
+    ("SICC", 2016, 200831393.0, 434869656.0, 1521953318.0, 1521953318.0, None, None, None, None,
+     "NATIF", "PROBABLE", '2017-09-05'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- bilan equilibre ; unite non confirmee dans le texte
+    ("BNBC", 2024, -157025644.0, -31575815.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2025-10-31'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("BICC", 2024, 12061.0, 18172.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2024-11-28'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("SEMC", 2022, 855653665.0, 620437050.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", None),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("ECOC", 2022, 28386.0, 24389.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2022-11-02'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("LNBB", 2021, 201.0, -136.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2022-10-11'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("PALC", 2026, 1594480.0, 11562398.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2026-04-29'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("PALC", 2022, 41419739.0, 36390491.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2022-10-31'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("SOGC", 2021, 11929470475.0, 11238738441.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2022-11-03'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("SOGC", 2020, 11238738441.0, 4835923203.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2021-10-25'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("TTLS", 2022, 6559.0, 5003.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2023-10-30'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("UNLC", 2022, -6382600.0, 175.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2023-05-03'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("UNLC", 2019, -13476458.0, -4077214.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", None),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("UNXC", 2025, 8142912424.0, -2165166944.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2025-10-31'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("BOABF", 2026, 357509.0, 349869.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2026-03-18'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("ECOC", 2023, 48071.0, 44598.0, None, 1953299.0, None, None, None, None,
+     "NATIF", "PROBABLE", '2024-03-28'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("SICC", 2012, -401184579.0, -443008402.0, 2086886373.0, 2086886373.0, None, None, None, None,
+     "NATIF", "PROBABLE", '2014-04-07'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- bilan equilibre ; unite non confirmee dans le texte
+    ("SNTS", 2022, 278912.0, 252459.0, None, 2063844.0, 821250.0, None, None, None,
+     "NATIF", "PROBABLE", None),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    ("UNLC", 2018, -4.877, -3.528, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", None),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+
 ]
 
 DIVIDENDES = [
