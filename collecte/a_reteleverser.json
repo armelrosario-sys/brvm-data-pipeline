@@ -1,1 +1,919 @@
-[]
+[
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241202_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241202_2.pdf",
+    "sha256_attendu": "57da979cfe83d96e8eafb9cf566d40139f71624262987929a1ff5ed48e4839b4",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241203_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241203_2.pdf",
+    "sha256_attendu": "bfb3e9277feed930daae41aaace0ce33bdc70c54712f6baf96ea2162bab86205",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241204_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241204_2.pdf",
+    "sha256_attendu": "56b573bcc483ca420d622324493f39ff9deb0b20316af69ee4401746b52ca8f7",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241205_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241205_2.pdf",
+    "sha256_attendu": "521830274daa066efa030384b29ea4d9fb8b0be0fa234f3c1b6dfeed3214cdaa",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241206_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241206_2.pdf",
+    "sha256_attendu": "32d65b9760c9a1012a7e78bbd8371ee076794b81cf5e21e95e9a05a9a04f09dd",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241209_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241209_2.pdf",
+    "sha256_attendu": "5f1839e876bd740a2f44531a2d85ba4862209e71b3acbf44bd0852e5bec0399c",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241210_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241210_2.pdf",
+    "sha256_attendu": "67dfc43e5e5fffc1ad2bc90e77d79b7e0a6e424ba7672882da8ce1bca74ac7fb",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241212_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241212_2.pdf",
+    "sha256_attendu": "835700de2b762b18353e096c1c902f84d4e7a2df86c2da62dd9095e7ec8aebc0",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241213_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241213_2.pdf",
+    "sha256_attendu": "b70eb46dbabb96144264010cc27ec8c9fb352e32f5718724c72ce963b8ca5089",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241216_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241216_2.pdf",
+    "sha256_attendu": "ce1943ca9119f9e27c2d46e9c8cb07ec9b471d7e6c31a62f4b75ae3434969618",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241217_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241217_2.pdf",
+    "sha256_attendu": "2c2496540305b66dc7324c368639313e117966ef8d9bed72d71d6e39fed86026",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241218_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241218_2.pdf",
+    "sha256_attendu": "533f27af18a14b30eb9c0c1314251c506b36fdf8333433b2927550e8eb4718c1",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241219_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241219_2.pdf",
+    "sha256_attendu": "91f1e3e047d43acb625eef7076d7a77d81e431dd145bca04a0f934097e2f21aa",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241220_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241220_2.pdf",
+    "sha256_attendu": "ba6ec5ea25f7c80d7d8ac2bc3634109514c3febdb001f3f03bf8ba392c6f6147",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241223_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241223_2.pdf",
+    "sha256_attendu": "45dfc7e455d189445efcbab51f14b3748ace5b2c58056f9ac33b7b6f5e73457b",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241224_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241224_2.pdf",
+    "sha256_attendu": "91130283201dbbd3f93fd58ff7d263715704dc11f08469adb843f9e7f170139d",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241226_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241226_2.pdf",
+    "sha256_attendu": "999a68e449f0528756ff0aacf3d384765013884bb3b90428c21c98c52985e522",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241227.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241227.pdf",
+    "sha256_attendu": "4193d1b22150fff3ffb42e803165473776edb6353709452ca4f73dbdaf142621",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241230_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241230_2.pdf",
+    "sha256_attendu": "8a7e78164d2c459431185cb8c66b68488b8be80227c8fb92ad831d9d442d0d82",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241104_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241104_2.pdf",
+    "sha256_attendu": "85276ba822ca08cc9f80ede63e36fd7cbcede5c403fb40801ef1323ac8b8bdf0",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241105_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241105_2.pdf",
+    "sha256_attendu": "987c2488ac7aca4197403910d071ded00435a353d75c28b904c03c3edb216514",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241106_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241106_2.pdf",
+    "sha256_attendu": "ea2a1bc7c3bc972a6b15927c0b95e4a291690f890894e99628e6be6ab1a265d0",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241107_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241107_2.pdf",
+    "sha256_attendu": "82b134f73361d23d0c311ab513e95801fefe157af3997cba5cd45f7cd0e397bb",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241108_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241108_2.pdf",
+    "sha256_attendu": "1347cd1f0372588e7697dff0431a608867cc954a0f6924aeb2fe55d94cb607aa",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241112_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241112_2.pdf",
+    "sha256_attendu": "75195f004e3242d70df043a4021437444868da40a5de47e20d2a1fb3cb83a633",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241113_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241113_2.pdf",
+    "sha256_attendu": "0015efc9431b6b81646b6b5279cb1be5c362fa5bedfb04d609ec4c88b16edfb4",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241114_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241114_2.pdf",
+    "sha256_attendu": "4e8744be09332c616e5cfdd39c00e3ead28de0f886e488f2833af1560da0657a",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241118_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241118_2.pdf",
+    "sha256_attendu": "42d375fc8b1dfcf51a9978b1ab3eb1710461dcc938e8a9c11efb777c8618f60c",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241119_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241119_2.pdf",
+    "sha256_attendu": "9d0ce76e73be03473b2d288648d2d9bf40d0d44467888a731c7b3cf513a40813",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241120_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241120_2.pdf",
+    "sha256_attendu": "0270b2a992025a4adb815e97e2d70cbd4542a0c51dd3da06942dc9c49d17ea29",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241121_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241121_2.pdf",
+    "sha256_attendu": "7ada76944c2718c2b212b7409f09294e4039f843979ffb1ae0766679aac99b0c",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241122_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241122_2.pdf",
+    "sha256_attendu": "eb36bd36bc74074970cfa9ed71bfb4d2d6553c08cc14807106cd7c69645e3b73",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241125_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241125_2.pdf",
+    "sha256_attendu": "04368c0bb903f3d9b93abfc5b59e05dc0d869abfaaeab2215c916a2e2764ee99",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241126_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241126_2.pdf",
+    "sha256_attendu": "2cf8ecc1bdd4281b7ea0c53ef38c026422fb2498efab63d1ca8ca12d4e85d2da",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241127_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241127_2.pdf",
+    "sha256_attendu": "9dc4b4751f6602717afcb65104717c7fc997a449499092f0e19a88fca3699b7b",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241128.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241128.pdf",
+    "sha256_attendu": "1aef045ded289d7ad3c2509d038bdf5488f759642bbf0a33790f5689d447c38c",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241001_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241001_2.pdf",
+    "sha256_attendu": "b494f0afaa78b58b6f3cc78c10b0ead71a19b471f2dbd608498c5431fd8945b4",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241002_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241002_2.pdf",
+    "sha256_attendu": "b6f94b73e95984ec4d8eda9df844a60fbc125d68de4ec51675d78a5d5bc620dd",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241003.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241003.pdf",
+    "sha256_attendu": "931cc0ab5a87ab88f60c5fb9f7b21252b32c491ffb0b36299b5cf6d1377f7d80",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241004_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241004_2.pdf",
+    "sha256_attendu": "e69702e0782fe2c2fb0a10d56f0214b80b053e8da00770d15180872fc2134cc9",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241007_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241007_2.pdf",
+    "sha256_attendu": "fc5b045501e943f0f82f0d7db6ce6ad3359d23c6f34c53af5cb629831eb2087e",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241008_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241008_2.pdf",
+    "sha256_attendu": "e5b096d34b216ce18ec801f892e12a208485100d060e05fba31f5d40705a8d73",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241009_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241009_2.pdf",
+    "sha256_attendu": "a9c6890c2f028ddae0e9ebd86bc9acf9704a20e6f4524825c861b82061164e16",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241010_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241010_2.pdf",
+    "sha256_attendu": "66b315f7ec62ac9ec241edac24c000525b9c36c40b506b8ebfdffbbbb859a9cc",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241011_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241011_2.pdf",
+    "sha256_attendu": "460a1ce136c380f364254a3205a43411b06cd1d1e67695561e0580036c5697eb",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241014_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241014_2.pdf",
+    "sha256_attendu": "ad4f1a72d73da6c4b452194bffa4f96fcc5bd2fad50be4268a9e32b4d42db592",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241015_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241015_2.pdf",
+    "sha256_attendu": "f75d12b01dbf211850eeaed86ebdda7b04e88567b13262192635403fd38fdf6c",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241016_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241016_2.pdf",
+    "sha256_attendu": "bb35060629d86a65649ec076a9f7970ddc91364732c7ae5353dfd52033630a9a",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241017_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241017_2.pdf",
+    "sha256_attendu": "e4350d7c21d8af2a19935c58c6e7bda51e6b5b0990832183d61e5ef5ea56b98c",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241018_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241018_2.pdf",
+    "sha256_attendu": "b31d92a947a3b7391befb35eb0cc5156693adcfdac75858fba6427f49bd255ef",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241022_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241022_2.pdf",
+    "sha256_attendu": "3f1e449eb74ac92b0d1d907cf28d68fd362f9bf0973e6ad751f1cf2043e71af3",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241023_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241023_2.pdf",
+    "sha256_attendu": "6f28216729f198b31e3aec649ea642edf52314d01cf47b050ce2d78fdcdd7ffe",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241024_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241024_2.pdf",
+    "sha256_attendu": "617f4a0e0e197a6a74a82e09e859cad242bca0373638a0593b99413a11a5ed01",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241025_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241025_2.pdf",
+    "sha256_attendu": "cc8078ff931b552504abda963e2841684c0b4642e947be0d1b79c91b1b7496ff",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241028_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241028_2.pdf",
+    "sha256_attendu": "23c56b530d03e213afa6456d806b40bbe9bd4a19e83c2a9edba5c954eccb996e",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241029_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241029_2.pdf",
+    "sha256_attendu": "dc9745b2e0e3a37182ab7b17287fd880130dc64c6fff6b22efe3c35bacff4063",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20241030_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20241030_2.pdf",
+    "sha256_attendu": "14564f242bda23d5d61f428ee88fe1060ddd869cdefca12835fd36fb596eb7be",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240902_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240902_2.pdf",
+    "sha256_attendu": "b5684e6fc0fcbd185379fe809e03c0ff03bf560c6865ba07849f1cf02b104f87",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240903_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240903_2.pdf",
+    "sha256_attendu": "561057b5c417cc4f7af3f25d05a06ad345b4f1733d53795c3dba8877504c9a31",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240904_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240904_2.pdf",
+    "sha256_attendu": "15fc03b83f6ca71ba74420f4caab3b77ba2bd981922f64367ef84c9c9c2e9b01",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240905_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240905_2.pdf",
+    "sha256_attendu": "05772a50d0429a52927d84cb988cc5acca5c95ac5a17140b908553dd18314236",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240906_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240906_2.pdf",
+    "sha256_attendu": "1258c576f67c20fdbe16c1c274644970fef578f2eba56049907906f5932753b5",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240909_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240909_2.pdf",
+    "sha256_attendu": "05fdf60ace20fdf27bc8a7c372b67cac7c05d157df7f88023f38700ac39be8f8",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240910_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240910_2.pdf",
+    "sha256_attendu": "e2869182022acf8399867e7f35f2c8ca2d19eccf8d8941b1088941df83384217",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240911_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240911_2.pdf",
+    "sha256_attendu": "05189381779bef848f1fc84b814e54ebfebb5e81a3653d13b2996c4213bb737a",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240912_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240912_2.pdf",
+    "sha256_attendu": "720535c86aeb00ddba567cf01bb6d211b0fd0b7b9e171d161ae4b9f190ccdd42",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240916_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240916_2.pdf",
+    "sha256_attendu": "757ab1fedf164dfe5950112ac12dce9afb4cdaf093632b6562933ba42cb36ac5",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240917_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240917_2.pdf",
+    "sha256_attendu": "99ed06c2368fb12973c2638eb66f515d7b08795cc79050890c6b18d6715ad99d",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240918_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240918_2.pdf",
+    "sha256_attendu": "5f524201a7a721dc09b7bbdfeed8cb8ac678545d18c77687ec3f619f4e9eefd4",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240919_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240919_2.pdf",
+    "sha256_attendu": "5fb61155996d5ef2ce304f2d42e71214495692ca3e13579acb4825c0f67dcbf7",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240920_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240920_2.pdf",
+    "sha256_attendu": "71c4977dd57a154835c2deb3979f8cad089df45e06c5c74f5f04710e01f5bc88",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240923_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240923_2.pdf",
+    "sha256_attendu": "3e4e51f3a2436fa2df47c3424136ce5d208f13f2c672d77ee3d1a6117b1e65c4",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240924_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240924_2.pdf",
+    "sha256_attendu": "e7401baa7d306556082ba4a3a8b66ac50aa58eefc4ba44e8baa0b443b270e9f8",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240925_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240925_2.pdf",
+    "sha256_attendu": "3f26413f3c406739cb705c2515419a50288c31591220b0e000829875d77292a2",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240926_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240926_2.pdf",
+    "sha256_attendu": "78f8b7c9927b54c081c818f2e785e97ebf27a284d26af876b9552785f68160b0",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240927_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240927_2.pdf",
+    "sha256_attendu": "69ed173e37acba3a57cc05606d37daae1b193ca257e56402e093ba7a10a719c6",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240801.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240801.pdf",
+    "sha256_attendu": "0e7601a08d36456dcdd9dbebdb9cedf9abeecaa6e6bfd98e3387a5923ade0400",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240802.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240802.pdf",
+    "sha256_attendu": "0bd6b905576310da2a14ea310b5dea1fcda2e9c3d6eac72425104fd2584f35cf",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240805.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240805.pdf",
+    "sha256_attendu": "9366381ec05f80d85ae47bd9a5f26d7716942614d1023242d4a74037e23512a7",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240806.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240806.pdf",
+    "sha256_attendu": "c5ee704d14dc3f96dbb51261c562ecabc9689d1e4b3e3ba7752eee6c2868222f",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240808.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240808.pdf",
+    "sha256_attendu": "a84e9e9f18f67ed10edbb8030a5b4a611d1f780eb70b24c73a9881f97479c026",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240809.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240809.pdf",
+    "sha256_attendu": "aa3038de2829f1e5fcb434e67f06a28a6426501b10e19347258c5c9c29b0ff63",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240812.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240812.pdf",
+    "sha256_attendu": "c53c5d67c331c2c31b28da98136f46b77ea1d2f4365b092821977cc283401173",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240813.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240813.pdf",
+    "sha256_attendu": "179f495b319558551c85f28b69ba2ce55a5b8695008ed1077972b52693150612",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2024",
+    "fichier": "boc_20240814.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20240814.pdf",
+    "sha256_attendu": "14f4d34857bbb0f1692efde19497c2d89065fb6756e269e10a1c4d1c6a56b24e",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250318_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250318_2.pdf",
+    "sha256_attendu": "25e7652bf89d67f90556e583bf962aa96ae117e2c0b6635d3abd5c8257455747",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250319_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250319_2.pdf",
+    "sha256_attendu": "5e9e1c82631be09cfc9ffbdc6ec3bb265476f72045f7e17ec61bdba2360d657a",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250320_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250320_2.pdf",
+    "sha256_attendu": "53b2af5784e5d347b93a9069a41535fbc15fde2f82efac55fa730f3fed8173c3",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250324_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250324_2.pdf",
+    "sha256_attendu": "fe9988f255065ab76af41b59325efa4f6ea80dd4568322d73c0fd932a031cefc",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250325_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250325_2.pdf",
+    "sha256_attendu": "60174eb92c6163345c5582ee2ffa504d4bd9defc6e63175d179fa501ce6919b9",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250326_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250326_2.pdf",
+    "sha256_attendu": "4d3a48e5319c53cb1efbfb9ba5e477384045fe4933de29a7293f7a44c3b752b3",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250203_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250203_2.pdf",
+    "sha256_attendu": "e56470fc2a8da1b407407d72e6a872d0c381e8e5531271eca7edec5f863ebb3c",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250204_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250204_2.pdf",
+    "sha256_attendu": "a68a21fefae8d366cf33360dc2133312997463491edda716036e2648502b5a7f",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250205_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250205_2.pdf",
+    "sha256_attendu": "82fd2ae74f219b5e29017d9e951291008140a76a945a5c8aa6ce553ae4e73d2e",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250206_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250206_2.pdf",
+    "sha256_attendu": "327f4288557448520932ce721ee9665527ac64e40e8efc64f585450d34f5c9dd",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250207_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250207_2.pdf",
+    "sha256_attendu": "aa604b4deb4297db972c3ccbe0779de50a0d8471e1c2dee9d333adc373122361",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250210_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250210_2.pdf",
+    "sha256_attendu": "3945bcf67a50b25be5d0f97f3759ce58887ae9fa787da1594fa254f7ae6ed22f",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250211_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250211_2.pdf",
+    "sha256_attendu": "1111f069623b2aa8f9aae31c9807b37777db778a2c291912551c158aab6451fd",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250212_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250212_2.pdf",
+    "sha256_attendu": "a57fb387419d766ff36658275459018229a57c988d7c8aa966dca1603886e979",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250213_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250213_2.pdf",
+    "sha256_attendu": "b2b8dba6bb763755fef5c54910c69988be8280a5304a2144415b5800e7da55ae",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250214_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250214_2.pdf",
+    "sha256_attendu": "af72cfdde320724b72026a42e89c2df401c855fd3eae524e134582d4892986e9",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250217_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250217_2.pdf",
+    "sha256_attendu": "4b3e31e6053e30df3d8ed8133815b3e6b44b411936bd29bbe314ab85969ac64d",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250218_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250218_2.pdf",
+    "sha256_attendu": "736525de2252c66470c8d91a659e917cf191e14ddb7042500940d74ac170745f",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250219_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250219_2.pdf",
+    "sha256_attendu": "9d3d0a327f6c10b3726b29a329487d3836a58051a08033a2bf6bdce8c062f0e5",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250220_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250220_2.pdf",
+    "sha256_attendu": "d557c38d9a000c2831bb9cd2048c623c2f884c274fd5dbed57074cbfaa91cac7",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250221_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250221_2.pdf",
+    "sha256_attendu": "16c472a1bab60feaddb7fdce0c0380cfe33cade74466dfc07f175e4632ea1531",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250224_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250224_2.pdf",
+    "sha256_attendu": "317b425187c32f6cbc9eb74c1bef2ecccc11dd7c655d19817e36c889329f522d",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250225_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250225_2.pdf",
+    "sha256_attendu": "cd3d6c236f85e84ca8226fd190c881fb7c2a74e984ed9c7a94b4adb352019d17",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250226_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250226_2.pdf",
+    "sha256_attendu": "f998bfa1f2ed2b7de24367dfa48767b2ef1444f9120394022b378a0029a06028",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250227_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250227_2.pdf",
+    "sha256_attendu": "0535957d65c0ee847a300e29a4482a0712c2602a06a3024c7e7542ef45418b08",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250102_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250102_2.pdf",
+    "sha256_attendu": "be1bb0cb4c2cfef54234bb0bbab20ad3473688122c231bce99dd2476ab57752f",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250103_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250103_2.pdf",
+    "sha256_attendu": "29cdcb7d25285b1c7efd2f1da1b46b01de63f6fdf74bc7dea423bc76b9ddaaca",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250106_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250106_2.pdf",
+    "sha256_attendu": "896850d2420a0b526120a1fd27fadcbe81261ae4d35913616665a30a9659b3f5",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250107_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250107_2.pdf",
+    "sha256_attendu": "534c6f6557a2df29fd870745814515205285dea150701455842c71b8f653009a",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250108_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250108_2.pdf",
+    "sha256_attendu": "91be1b139fdb9a765acfd817c3505b3f8c8642c933def574df6bc8df54372d4e",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250109_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250109_2.pdf",
+    "sha256_attendu": "1dbf7596a84c0168e0becafc7d1e6182bd7fca20f108865b9581cbaf4c8673e8",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250110_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250110_2.pdf",
+    "sha256_attendu": "45aa91a074cad4129530e1f421884fc54f39d4554501aa307c6b92d70387abd3",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250113_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250113_2.pdf",
+    "sha256_attendu": "a98ce38cdbe108cc941f870f69197d91b1c6e1e73e4ef1af6ebb93f616f37fa7",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250114_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250114_2.pdf",
+    "sha256_attendu": "995c1da3cca0f19d593484dbf777056e8bcbebc38cc9a2991646e234cdf02802",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250115_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250115_2.pdf",
+    "sha256_attendu": "4525eedd045de86773b743e2aa68582f313eefe7a4f7266e0aaf027941b79253",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250116_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250116_2.pdf",
+    "sha256_attendu": "3d81bc37dd68772b67dade910c498b98687e8a406490063b43ad720eeaa61600",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250117_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250117_2.pdf",
+    "sha256_attendu": "179fb962c6292f1a74975e7e605447d90e8e0a3e5e2413b17f19546e1c43b4ca",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250120_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250120_2.pdf",
+    "sha256_attendu": "a84d66de9f392ecb05c547bff041f017fce05d56018c5aeff41a7e5701d8b7d9",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250121_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250121_2.pdf",
+    "sha256_attendu": "aa16c0f0fedbd57cb0389b4371407884bcf98d8b8c77c092437aa696f3f41ef5",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250122_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250122_2.pdf",
+    "sha256_attendu": "9576cd92e50474d368d76dab497b3b0bca6a38ce957dfdd39fc8c7ff51630fcb",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250123_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250123_2.pdf",
+    "sha256_attendu": "02c647fc8b2f08af515b0274f81207ab40de2e16d4feedc6a21732b337594a28",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250124.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250124.pdf",
+    "sha256_attendu": "326f5f98352739deb847378c40c6f081197891020268660861d14e4ef414a0a3",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250127_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250127_2.pdf",
+    "sha256_attendu": "5ae18a9ed6461e2b2c6798069288bf27b61b1a8c966b74d1ed0938bb11ad1cc1",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250128_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250128_2.pdf",
+    "sha256_attendu": "cf85dc8665e400b36f0acf4f2d05258d3e31270a2d463a5e19e4e2b5ae07d041",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250129_2.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250129_2.pdf",
+    "sha256_attendu": "72c10f6e0499c3ccc79220bf4a7ba9b852b008e441a62e09b6fc075f75196331",
+    "raison": "asset absent"
+  },
+  {
+    "tag": "boc-2025",
+    "fichier": "boc_20250130.pdf",
+    "url": "https://www.brvm.org/sites/default/files/boc_20250130.pdf",
+    "sha256_attendu": "2d62188f4ab764bc9a31ffb9ee9ae5180c2704403ba73ae075017ebddbb5f07e",
+    "raison": "asset absent"
+  }
+]
