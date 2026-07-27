@@ -15,3 +15,4 @@ boc-2019	data/boc-2019/boc_20191029.pdf
 boc-2019	data/boc-2019/boc_20191030.pdf
 boc-2019	data/boc-2019/boc_20190902.pdf
 boc-2019	data/boc-2019/boc_20190903.pdf
+boc-2019	data/boc-2019/boc_20190904.pdf
