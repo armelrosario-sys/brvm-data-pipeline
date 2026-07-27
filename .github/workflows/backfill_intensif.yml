@@ -153,3 +153,40 @@ jobs:
           git diff --cached --quiet || git commit -m "Backfill Piste C : historique liquidite (auto)"
           git pull --rebase origin main
           git push origin main
+
+  fusion_dividendes:
+    name: "Piste D — fusion fondamentaux + historique dividendes"
+    needs: liquidite
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Dependances Python
+        run: pip install --quiet pdfplumber requests
+
+      - name: Git identite
+        run: |
+          git config user.name "brvm-backfill-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Fusion fondamentaux -> ETATS (ajout seul, jamais d'ecrasement)
+        run: python3 moteur/fusionner_fondamentaux.py
+
+      - name: Backfill dividendes (Piste D)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 collecte/backfill_dividendes.py
+
+      - name: Commit et push
+        run: |
+          git add -A
+          git diff --cached --quiet || git commit -m "Piste D : fusion fondamentaux + historique dividendes (auto)"
+          git pull --rebase origin main
+          git push origin main
