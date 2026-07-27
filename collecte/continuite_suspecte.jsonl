@@ -1,10 +1,9 @@
-{"ticker": "ABJC", "date_precedente": "2020-01-06", "cours_precedent": 1250.0, "date": "2020-02-03", "cours": 1520.0, "variation": 0.216}
-{"ticker": "FTSC", "date_precedente": "2020-01-06", "cours_precedent": 1600.0, "date": "2020-02-03", "cours": 1200.0, "variation": 0.25}
-{"ticker": "NTLC", "date_precedente": "2020-01-06", "cours_precedent": 395.0, "date": "2020-02-03", "cours": 300.0, "variation": 0.2405}
-{"ticker": "PALC", "date_precedente": "2020-01-06", "cours_precedent": 1675.0, "date": "2020-02-03", "cours": 2450.0, "variation": 0.4627}
-{"ticker": "SDSC", "date_precedente": "2020-01-06", "cours_precedent": 1495.0, "date": "2020-02-03", "cours": 1915.0, "variation": 0.2809}
-{"ticker": "SMBC", "date_precedente": "2020-01-06", "cours_precedent": 2500.0, "date": "2020-02-03", "cours": 3500.0, "variation": 0.4}
-{"ticker": "SPHC", "date_precedente": "2020-01-06", "cours_precedent": 1370.0, "date": "2020-02-03", "cours": 1650.0, "variation": 0.2044}
+{"ticker": "BNBC", "date_precedente": "2019-10-08", "cours_precedent": 1200.0, "date": "2019-11-04", "cours": 895.0, "variation": 0.2542}
+{"ticker": "NEIC", "date_precedente": "2019-10-08", "cours_precedent": 240.0, "date": "2019-11-04", "cours": 160.0, "variation": 0.3333}
+{"ticker": "NTLC", "date_precedente": "2019-10-08", "cours_precedent": 590.0, "date": "2019-11-04", "cours": 460.0, "variation": 0.2203}
+{"ticker": "PRSC", "date_precedente": "2019-10-08", "cours_precedent": 123000.0, "date": "2019-11-04", "cours": 2025.0, "variation": 0.9835}
+{"ticker": "UNLC", "date_precedente": "2019-11-06", "cours_precedent": 2500.0, "date": "2019-11-07", "cours": 3500.0, "variation": 0.4}
+{"ticker": "UNLC", "date_precedente": "2019-11-07", "cours_precedent": 3500.0, "date": "2019-11-08", "cours": 2500.0, "variation": 0.2857}
 {"ticker": "ABJC", "date_precedente": "2020-02-11", "cours_precedent": 1465.0, "date": "2020-02-12", "cours": 1.465, "variation": 0.999}
 {"ticker": "BICC", "date_precedente": "2020-02-11", "cours_precedent": 5500.0, "date": "2020-02-12", "cours": 5.5, "variation": 0.999}
 {"ticker": "BOAB", "date_precedente": "2020-02-11", "cours_precedent": 3830.0, "date": "2020-02-12", "cours": 3.78, "variation": 0.999}
