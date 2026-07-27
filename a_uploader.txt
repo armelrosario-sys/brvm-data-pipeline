@@ -29,3 +29,7 @@ boc-2020	data/boc-2020/boc_20200908.pdf
 boc-2020	data/boc-2020/boc_20200909.pdf
 boc-2020	data/boc-2020/boc_20200910.pdf
 boc-2020	data/boc-2020/boc_20200911.pdf
+boc-2020	data/boc-2020/boc_20200914.pdf
+boc-2020	data/boc-2020/boc_20200915.pdf
+boc-2020	data/boc-2020/boc_20200916.pdf
+boc-2020	data/boc-2020/boc_20200917.pdf
