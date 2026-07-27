@@ -15,3 +15,17 @@ boc-2020	data/boc-2020/boc_20200422.pdf
 boc-2020	data/boc-2020/boc_20200423.pdf
 boc-2020	data/boc-2020/boc_20200424.pdf
 boc-2020	data/boc-2020/boc_20200427.pdf
+boc-2020	data/boc-2020/boc_20200428.pdf
+boc-2020	data/boc-2020/boc_20200429.pdf
+boc-2020	data/boc-2020/boc_20200302.pdf
+boc-2020	data/boc-2020/boc_20200303.pdf
+boc-2020	data/boc-2020/boc_20200304.pdf
+boc-2020	data/boc-2020/boc_20200305.pdf
+boc-2020	data/boc-2020/boc_20200306.pdf
+boc-2020	data/boc-2020/boc_20200309.pdf
+boc-2020	data/boc-2020/boc_20200310.pdf
+boc-2020	data/boc-2020/boc_20200311.pdf
+boc-2020	data/boc-2020/boc_20200312.pdf
+boc-2020	data/boc-2020/boc_20200313.pdf
+boc-2020	data/boc-2020/boc_20200316.pdf
+boc-2020	data/boc-2020/boc_20200317.pdf
