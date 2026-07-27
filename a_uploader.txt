@@ -44,3 +44,6 @@ boc-2020	data/boc-2020/boc_20200803.pdf
 boc-2020	data/boc-2020/boc_20200804.pdf
 boc-2020	data/boc-2020/boc_20200805.pdf
 boc-2020	data/boc-2020/boc_20200806.pdf
+boc-2020	data/boc-2020/boc_20200810.pdf
+boc-2020	data/boc-2020/boc_20200811.pdf
+boc-2020	data/boc-2020/boc_20200812.pdf
