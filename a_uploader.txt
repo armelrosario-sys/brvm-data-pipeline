@@ -33,3 +33,17 @@ boc-2019	data/boc-2019/boc_20190924.pdf
 boc-2019	data/boc-2019/boc_20190925.pdf
 boc-2019	data/boc-2019/boc_20190926.pdf
 boc-2019	data/boc-2019/boc_20190927.pdf
+boc-2019	data/boc-2019/boc_20190801.pdf
+boc-2019	data/boc-2019/boc_20190802.pdf
+boc-2019	data/boc-2019/boc_20190805.pdf
+boc-2019	data/boc-2019/boc_20190806.pdf
+boc-2019	data/boc-2019/boc_20190808.pdf
+boc-2019	data/boc-2019/boc_20190809.pdf
+boc-2019	data/boc-2019/boc_20190813.pdf
+boc-2019	data/boc-2019/boc_20190814.pdf
+boc-2019	data/boc-2019/boc_20190816.pdf
+boc-2019	data/boc-2019/boc_20190819.pdf
+boc-2019	data/boc-2019/boc_20190820.pdf
+boc-2019	data/boc-2019/boc_20190821.pdf
+boc-2019	data/boc-2019/boc_20190822.pdf
+boc-2019	data/boc-2019/boc_20190823.pdf
