@@ -1,4 +1,5 @@
-{"ticker": "NTLC", "date_precedente": "2021-02-16", "cours_precedent": 555.0, "date": "2021-03-01", "cours": 725.0, "variation": 0.3063}
+{"ticker": "SGBC", "date_precedente": "2020-11-23", "cours_precedent": 7450.0, "date": "2020-12-01", "cours": 9000.0, "variation": 0.2081}
+{"ticker": "BICC", "date_precedente": "2021-01-27", "cours_precedent": 4900.0, "date": "2021-02-01", "cours": 6000.0, "variation": 0.2245}
 {"ticker": "BNBC", "date_precedente": "2021-05-06", "cours_precedent": 795.0, "date": "2021-07-07", "cours": 1825.0, "variation": 1.2956}
 {"ticker": "CFAC", "date_precedente": "2021-05-06", "cours_precedent": 430.0, "date": "2021-07-07", "cours": 650.0, "variation": 0.5116}
 {"ticker": "NEIC", "date_precedente": "2021-05-06", "cours_precedent": 295.0, "date": "2021-07-07", "cours": 370.0, "variation": 0.2542}
