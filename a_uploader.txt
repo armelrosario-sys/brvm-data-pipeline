@@ -1,1 +1,10 @@
 boc-2020	data/boc-2020/boc_20201125.pdf
+boc-2020	data/boc-2020/boc_20201126.pdf
+boc-2020	data/boc-2020/boc_20201127.pdf
+boc-2020	data/boc-2020/boc_20201001.pdf
+boc-2020	data/boc-2020/boc_20201002.pdf
+boc-2020	data/boc-2020/boc_20201005.pdf
+boc-2020	data/boc-2020/boc_20201006.pdf
+boc-2020	data/boc-2020/boc_20201007.pdf
+boc-2020	data/boc-2020/boc_20201008.pdf
+boc-2020	data/boc-2020/boc_20201009.pdf
