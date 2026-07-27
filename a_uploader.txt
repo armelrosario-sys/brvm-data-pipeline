@@ -1,1 +1,17 @@
 boc-2019	data/boc-2019/boc_20191010.pdf
+boc-2019	data/boc-2019/boc_20191011.pdf
+boc-2019	data/boc-2019/boc_20191014.pdf
+boc-2019	data/boc-2019/boc_20191015.pdf
+boc-2019	data/boc-2019/boc_20191016.pdf
+boc-2019	data/boc-2019/boc_20191017.pdf
+boc-2019	data/boc-2019/boc_20191018.pdf
+boc-2019	data/boc-2019/boc_20191021.pdf
+boc-2019	data/boc-2019/boc_20191022.pdf
+boc-2019	data/boc-2019/boc_20191023.pdf
+boc-2019	data/boc-2019/boc_20191024.pdf
+boc-2019	data/boc-2019/boc_20191025.pdf
+boc-2019	data/boc-2019/boc_20191028.pdf
+boc-2019	data/boc-2019/boc_20191029.pdf
+boc-2019	data/boc-2019/boc_20191030.pdf
+boc-2019	data/boc-2019/boc_20190902.pdf
+boc-2019	data/boc-2019/boc_20190903.pdf
