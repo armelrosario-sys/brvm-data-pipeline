@@ -526,8 +526,6 @@ ETATS = [
      "NATIF", "PROBABLE", None),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
     ("UNXC", 2025, -624.0, -2165.166944, None, None, None, None, None, None,
      "NATIF", "PROBABLE", '2025-10-31'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
-    ("BOABF", 2026, 357509.0, 349869.0, None, None, None, None, None, None,
-     "NATIF", "PROBABLE", '2026-03-18'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
     ("ECOC", 2023, 48071.0, 44598.0, None, 1953299.0, None, None, None, None,
      "NATIF", "PROBABLE", '2024-03-28'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
     ("SICC", 2012, None, None, None, None, None, None, None, None,
