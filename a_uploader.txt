@@ -24,3 +24,16 @@ boc-2019	data/boc-2019/boc_20190214.pdf
 boc-2019	data/boc-2019/boc_20190215.pdf
 boc-2019	data/boc-2019/boc_20190218.pdf
 boc-2019	data/boc-2019/boc_20190219.pdf
+boc-2019	data/boc-2019/boc_20190220.pdf
+boc-2019	data/boc-2019/boc_20190221.pdf
+boc-2019	data/boc-2019/boc_20190222.pdf
+boc-2019	data/boc-2019/boc_20190225.pdf
+boc-2019	data/boc-2019/boc_20190226.pdf
+boc-2019	data/boc-2019/boc_20190227.pdf
+boc-2019	data/boc-2019/boc_20190102.pdf
+boc-2019	data/boc-2019/boc_20190103.pdf
+boc-2019	data/boc-2019/boc_20190104.pdf
+boc-2019	data/boc-2019/boc_20190107.pdf
+boc-2019	data/boc-2019/boc_20190108.pdf
+boc-2019	data/boc-2019/boc_20190109.pdf
+boc-2019	data/boc-2019/boc_20190110.pdf
