@@ -1,1 +1,11 @@
 boc-2018	data/boc-2018/boc_20180919.pdf
+boc-2018	data/boc-2018/boc_20180920.pdf
+boc-2018	data/boc-2018/boc_20180921.pdf
+boc-2018	data/boc-2018/boc_20180924.pdf
+boc-2018	data/boc-2018/boc_20180925.pdf
+boc-2018	data/boc-2018/boc_20180926.pdf
+boc-2018	data/boc-2018/boc_20180927.pdf
+boc-2018	data/boc-2018/boc_20180801.pdf
+boc-2018	data/boc-2018/boc_20180802.pdf
+boc-2018	data/boc-2018/boc_20180803.pdf
+boc-2018	data/boc-2018/boc_20180808.pdf
