@@ -538,8 +538,6 @@ ETATS = [
     # --- Fusion automatique Piste A (27/07/2026) : dettes financieres, 
     # payout et solvabilite bancaire absents de l'extraction automatique -> 
     # None (jamais devine). A relire au meme titre que le reste. ---
-    ("BOABF", 2026, 357509.0, 349869.0, None, None, None, None, None, None,
-     "NATIF", "PROBABLE", '2026-03-18'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
 
 ]
 
@@ -662,6 +660,19 @@ RAO = [
 ]
 
 SOURCE_URLS = [  # Etape B du plan (10/07/2026) : reconstruit depuis MANIFESTE.csv
+    ("BBGCI", 2021, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
+    ("BBGCI", 2022, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
+    ("BBGCI", 2023, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
+    ("BBGCI", 2024, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
+    ("BBGCI", 2025, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
+    ("BOAB", 2021, "https://www.brvm.org/sites/default/files/20220322_-_etats_financiers_exercice_2021_-_boa_bn.pdf"),
+    ("BOAC", 2025, "https://www.brvm.org/sites/default/files/20260612_-_rapport_des_commissaires_aux_comptes_et_etats_financiers_annuels_-_exercice_2025_-_boa_ci.pdf"),
+    ("PALC", 2026, "https://www.brvm.org/sites/default/files/20260323_-_etats_financiers_-_exercice_2025_-_palm_ci.pdf"),
+    ("SDCC", 2021, "https://www.brvm.org/sites/default/files/20220426_-_etats_financiers_individuels_syscohada_exercice_2021_-_sodeci.pdf"),
+    ("SDCC", 2025, "https://www.brvm.org/sites/default/files/20260427_-_etats_financiers_-_exercice_2025_-_sodeci.pdf"),
+    ("SICC", 2017, "https://www.brvm.org/sites/default/files/sicor_-_etats_financiers_2017.pdf"),
+    ("TTLC", 2023, "https://www.brvm.org/sites/default/files/20240910_-_etats_financiers_definitifs_2023_-_totalenergies_marketing_ci.pdf"),
+    ("SNTS", 2022, "https://www.brvm.org/fr/sonatel-senegal-resultats-financiers-exercice-2022"),
     ("BICB", 2025, "https://www.brvm.org/sites/default/files/20260619_-_rapport_dactivites_annuel_et_etats_financiers_ifrs_-_exercice_2025_-_biic.pdf"),
     ("BICC", 2024, "https://www.brvm.org/sites/default/files/20250328_-_etats_financiers_-_exercice_2024_-_bici_ci.pdf"),
     ("BNBC", 2021, "https://www.brvm.org/sites/default/files/20220503_-_etats_financiers_exercice_2021_-_bernabe_ci.pdf"),
