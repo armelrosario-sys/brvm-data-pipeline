@@ -7,3 +7,7 @@ boc-2019	data/boc-2019/boc_20190318.pdf
 boc-2019	data/boc-2019/boc_20190319.pdf
 boc-2019	data/boc-2019/boc_20190320.pdf
 boc-2019	data/boc-2019/boc_20190321.pdf
+boc-2019	data/boc-2019/boc_20190322.pdf
+boc-2019	data/boc-2019/boc_20190325.pdf
+boc-2019	data/boc-2019/boc_20190326.pdf
+boc-2019	data/boc-2019/boc_20190327.pdf
