@@ -1,0 +1,14 @@
+boc-2019	data/boc-2019/boc_20190611.pdf
+boc-2019	data/boc-2019/boc_20190612.pdf
+boc-2019	data/boc-2019/boc_20190613.pdf
+boc-2019	data/boc-2019/boc_20190614.pdf
+boc-2019	data/boc-2019/boc_20190617.pdf
+boc-2019	data/boc-2019/boc_20190618.pdf
+boc-2019	data/boc-2019/boc_20190619.pdf
+boc-2019	data/boc-2019/boc_20190620.pdf
+boc-2019	data/boc-2019/boc_20190621.pdf
+boc-2019	data/boc-2019/boc_20190624.pdf
+boc-2019	data/boc-2019/boc_20190625.pdf
+boc-2019	data/boc-2019/boc_20190626.pdf
+boc-2019	data/boc-2019/boc_20190627.pdf
+boc-2019	data/boc-2019/boc_20190502.pdf
