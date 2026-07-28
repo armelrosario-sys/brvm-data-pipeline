@@ -45,3 +45,13 @@ boc-2019	data/boc-2019/boc_20190416.pdf
 boc-2019	data/boc-2019/boc_20190417.pdf
 boc-2019	data/boc-2019/boc_20190418.pdf
 boc-2019	data/boc-2019/boc_20190419.pdf
+boc-2019	data/boc-2019/boc_20190423.pdf
+boc-2019	data/boc-2019/boc_20190424.pdf
+boc-2019	data/boc-2019/boc_20190425.pdf
+boc-2019	data/boc-2019/boc_20190426.pdf
+boc-2019	data/boc-2019/boc_20190429.pdf
+boc-2019	data/boc-2019/boc_20190301.pdf
+boc-2019	data/boc-2019/boc_20190304.pdf
+boc-2019	data/boc-2019/boc_20190305.pdf
+boc-2019	data/boc-2019/boc_20190306.pdf
+boc-2019	data/boc-2019/boc_20190307.pdf
