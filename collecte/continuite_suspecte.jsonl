@@ -1,5 +1,6 @@
+{"ticker": "NEIC", "date_precedente": "2018-03-23", "cours_precedent": 185.0, "date": "2018-04-03", "cours": 250.0, "variation": 0.3514}
+{"ticker": "STAC", "date_precedente": "2018-03-23", "cours_precedent": 490.0, "date": "2018-04-03", "cours": 375.0, "variation": 0.2347}
 {"ticker": "SIBC", "date_precedente": "2018-06-13", "cours_precedent": 16750.0, "date": "2018-06-15", "cours": 3600.0, "variation": 0.7851}
-{"ticker": "CFAC", "date_precedente": "2018-06-20", "cours_precedent": 590.0, "date": "2018-07-02", "cours": 750.0, "variation": 0.2712}
 {"ticker": "STBC", "date_precedente": "2018-07-11", "cours_precedent": 44995.0, "date": "2018-07-12", "cours": 11315.0, "variation": 0.7485}
 {"ticker": "STBC", "date_precedente": "2018-07-12", "cours_precedent": 11315.0, "date": "2018-07-13", "cours": 44995.0, "variation": 2.9766}
 {"ticker": "STBC", "date_precedente": "2018-07-26", "cours_precedent": 40000.0, "date": "2018-07-27", "cours": 2000.0, "variation": 0.95}
