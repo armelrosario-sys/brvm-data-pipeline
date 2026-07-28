@@ -1,7 +1,7 @@
 date,description,source,statut
 2025-01-02,Revision annuelle composition indices BRVM Prestige et BRVM 30,Avis BRVM N 001-2025 et N 002-2025/BRVM/DG,CONFIRME
 2025-01-03,Effets de la revision annuelle des indices (lendemain),Avis BRVM N 001-2025 et N 002-2025/BRVM/DG,CONFIRME
-2022-01-12,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve (bulletin mensuel janvier 2022 consulte sans resultat),PROBABLE_NON_CONFIRME
-2022-01-13,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve (bulletin mensuel janvier 2022 consulte sans resultat),PROBABLE_NON_CONFIRME
-2023-06-02,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve,PROBABLE_NON_CONFIRME
-2023-06-05,Motif identique a un evenement de marche global (36 titres) mais aucun avis retrouve malgre recherche,Non trouve,PROBABLE_NON_CONFIRME
+2022-01-12,PAS un evenement de marche : bug de format numerique dans le BOC ce jour-la (point utilise comme separateur de milliers). Valeurs corrigees (mises a vide) le 28/07/2026.,Diagnostic interne 28/07/2026,BUG_FORMAT_CORRIGE
+2023-06-02,PAS un evenement de marche : meme bug de format numerique. Valeurs corrigees (mises a vide) le 28/07/2026.,Diagnostic interne 28/07/2026,BUG_FORMAT_CORRIGE
+2020-02-12,Meme bug de format numerique detecte retroactivement. Valeurs corrigees (mises a vide) le 28/07/2026.,Diagnostic interne 28/07/2026,BUG_FORMAT_CORRIGE
+2020-04-27,Meme bug de format numerique detecte retroactivement. Valeurs corrigees (mises a vide) le 28/07/2026.,Diagnostic interne 28/07/2026,BUG_FORMAT_CORRIGE
