@@ -52,3 +52,10 @@ boc-2019	data/boc-2019/boc_20190128.pdf
 boc-2019	data/boc-2019/boc_20190129.pdf
 boc-2019	data/boc-2019/boc_20190130.pdf
 boc-2018	data/boc-2018/boc_20181203.pdf
+boc-2018	data/boc-2018/boc_20181204.pdf
+boc-2018	data/boc-2018/boc_20181205.pdf
+boc-2018	data/boc-2018/boc_20181210.pdf
+boc-2018	data/boc-2018/boc_20181211.pdf
+boc-2018	data/boc-2018/boc_20181212.pdf
+boc-2018	data/boc-2018/boc_20181213.pdf
+boc-2018	data/boc-2018/boc_20181214.pdf
