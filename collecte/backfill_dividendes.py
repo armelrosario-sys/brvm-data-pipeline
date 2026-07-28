@@ -121,7 +121,7 @@ def main():
     # ---- derivation des evenements distincts a partir des observations ----
     evenements = []
     for ticker, obs in observations.items():
-        obs_triees = sorted(set(obs), key=lambda o: o[0])  # chronologique, dedoublonne
+        obs_triees = sorted(set(tuple(o) for o in obs), key=lambda o: o[0])  # chronologique, dedoublonne
         dernier = None
         for date_obs, montant, date_paiement in obs_triees:
             cle = (montant, date_paiement)
