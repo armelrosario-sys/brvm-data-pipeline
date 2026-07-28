@@ -53,3 +53,6 @@ boc-2018	data/boc-2018/boc_20180608.pdf
 boc-2018	data/boc-2018/boc_20180612.pdf
 boc-2018	data/boc-2018/boc_20180613.pdf
 boc-2018	data/boc-2018/boc_20180615.pdf
+boc-2018	data/boc-2018/boc_20180618.pdf
+boc-2018	data/boc-2018/boc_20180619.pdf
+boc-2018	data/boc-2018/boc_20180620.pdf
