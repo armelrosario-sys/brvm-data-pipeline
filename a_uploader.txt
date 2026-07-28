@@ -43,3 +43,16 @@ boc-2018	data/boc-2018/boc_20180427.pdf
 boc-2018	data/boc-2018/boc_20180301.pdf
 boc-2018	data/boc-2018/boc_20180302.pdf
 boc-2018	data/boc-2018/boc_20180305.pdf
+boc-2018	data/boc-2018/boc_20180306.pdf
+boc-2018	data/boc-2018/boc_20180308.pdf
+boc-2018	data/boc-2018/boc_20180309.pdf
+boc-2018	data/boc-2018/boc_20180312.pdf
+boc-2018	data/boc-2018/boc_20180313.pdf
+boc-2018	data/boc-2018/boc_20180314.pdf
+boc-2018	data/boc-2018/boc_20180315.pdf
+boc-2018	data/boc-2018/boc_20180316.pdf
+boc-2018	data/boc-2018/boc_20180319.pdf
+boc-2018	data/boc-2018/boc_20180320.pdf
+boc-2018	data/boc-2018/boc_20180321.pdf
+boc-2018	data/boc-2018/boc_20180322.pdf
+boc-2018	data/boc-2018/boc_20180323.pdf
