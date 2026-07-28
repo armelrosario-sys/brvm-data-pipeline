@@ -101,10 +101,26 @@ def main():
         _, lignes = extraire_boc(chemin_local)
         if lignes and date_iso:
             for l in lignes:
-                if l.get("dividende_montant") is None:
+                montant = l.get("dividende_montant")
+                if montant is None:
+                    continue
+                date_paiement = l.get("dividende_date")
+                # Garde-fou (28/07/2026) : force des types simples et hashables.
+                # Si un champ est anormal (liste, dict -- cause jamais identifiee
+                # avec certitude d'un crash "unhashable type: list"), on ignore
+                # cette seule observation et on le signale, plutot que de
+                # planter tout le run.
+                try:
+                    montant = float(montant)
+                    date_paiement = str(date_paiement) if date_paiement is not None else None
+                    hash((date_iso, montant, date_paiement))
+                except (TypeError, ValueError) as e:
+                    print(f"[avertissement] observation ignoree (type anormal) : "
+                          f"{l.get('ticker')} {date_iso} montant={montant!r} "
+                          f"date_paiement={date_paiement!r} -- {e}", file=sys.stderr)
                     continue
                 observations.setdefault(l["ticker"], []).append(
-                    (date_iso, l["dividende_montant"], l.get("dividende_date")))
+                    (date_iso, montant, date_paiement))
 
         traites.add(sha)
         traites_ce_run += 1
@@ -121,7 +137,16 @@ def main():
     # ---- derivation des evenements distincts a partir des observations ----
     evenements = []
     for ticker, obs in observations.items():
-        obs_triees = sorted(set(tuple(o) for o in obs), key=lambda o: o[0])  # chronologique, dedoublonne
+        obs_propres = []
+        for o in obs:
+            try:
+                t = tuple(o)
+                hash(t)
+                obs_propres.append(t)
+            except TypeError:
+                print(f"[avertissement] observation existante ignoree (non hashable) : "
+                      f"{ticker} {o!r}", file=sys.stderr)
+        obs_triees = sorted(set(obs_propres), key=lambda o: o[0])  # chronologique, dedoublonne
         dernier = None
         for date_obs, montant, date_paiement in obs_triees:
             cle = (montant, date_paiement)
