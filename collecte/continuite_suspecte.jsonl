@@ -1,3 +1,9 @@
+{"ticker": "SIBC", "date_precedente": "2018-06-13", "cours_precedent": 16750.0, "date": "2018-06-15", "cours": 3600.0, "variation": 0.7851}
+{"ticker": "CFAC", "date_precedente": "2018-06-20", "cours_precedent": 590.0, "date": "2018-07-02", "cours": 750.0, "variation": 0.2712}
+{"ticker": "STBC", "date_precedente": "2018-07-11", "cours_precedent": 44995.0, "date": "2018-07-12", "cours": 11315.0, "variation": 0.7485}
+{"ticker": "STBC", "date_precedente": "2018-07-12", "cours_precedent": 11315.0, "date": "2018-07-13", "cours": 44995.0, "variation": 2.9766}
+{"ticker": "STBC", "date_precedente": "2018-07-26", "cours_precedent": 40000.0, "date": "2018-07-27", "cours": 2000.0, "variation": 0.95}
+{"ticker": "ONTBF", "date_precedente": "2018-08-28", "cours_precedent": 7950.0, "date": "2018-08-29", "cours": 4250.0, "variation": 0.4654}
 {"ticker": "SGBC", "date_precedente": "2018-12-05", "cours_precedent": 7155.0, "date": "2018-12-10", "cours": 8800.0, "variation": 0.2299}
 {"ticker": "SEMC", "date_precedente": "2018-12-18", "cours_precedent": 11565.0, "date": "2018-12-19", "cours": 290.0, "variation": 0.9749}
 {"ticker": "SAFC", "date_precedente": "2018-12-20", "cours_precedent": 5300.0, "date": "2018-12-21", "cours": 215.0, "variation": 0.9594}
