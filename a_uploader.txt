@@ -29,3 +29,15 @@ boc-2018	data/boc-2018/boc_20180109.pdf
 boc-2018	data/boc-2018/boc_20180110.pdf
 boc-2018	data/boc-2018/boc_20180111.pdf
 boc-2018	data/boc-2018/boc_20180112.pdf
+boc-2018	data/boc-2018/boc_20180115.pdf
+boc-2018	data/boc-2018/boc_20180116.pdf
+boc-2018	data/boc-2018/boc_20180117.pdf
+boc-2018	data/boc-2018/boc_20180118.pdf
+boc-2018	data/boc-2018/boc_20180119.pdf
+boc-2018	data/boc-2018/boc_20180122.pdf
+boc-2018	data/boc-2018/boc_20180123.pdf
+boc-2018	data/boc-2018/boc_20180124.pdf
+boc-2018	data/boc-2018/boc_20180125.pdf
+boc-2018	data/boc-2018/boc_20180126.pdf
+boc-2018	data/boc-2018/boc_20180129.pdf
+boc-2018	data/boc-2018/boc_20180130.pdf
