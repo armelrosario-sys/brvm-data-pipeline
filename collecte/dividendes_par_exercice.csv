@@ -152,9 +152,9 @@ ETIT,2021,0.9,20-juin-22,ELEVEE,paiement en saison normale d'AGM (avril-decembre
 ETIT,2021,0.9,20 Jun 22,ELEVEE,paiement en saison normale d'AGM (avril-decembre)
 ETIT,2022,0.6,8-juin-23,ELEVEE,paiement en saison normale d'AGM (avril-decembre)
 ETIT,2025,0.92,30-juin-26,ELEVEE,paiement en saison normale d'AGM (avril-decembre)
-FTSC,2016,261.0,9-janv.-18,A_VERIFIER,"paiement de janvier : trop tot pour l'exercice N-1 selon le calendrier AGM habituel -- probable paiement retarde de l'exercice N-2, jamais confirme par un document (3 cas seulement dans tout l'historique)"
-FTSC,2016,561.0,9-janv.-18,A_VERIFIER,"paiement de janvier : trop tot pour l'exercice N-1 selon le calendrier AGM habituel -- probable paiement retarde de l'exercice N-2, jamais confirme par un document (3 cas seulement dans tout l'historique)"
-FTSC,2016,561.25,9-janv.-18,A_VERIFIER,"paiement de janvier : trop tot pour l'exercice N-1 selon le calendrier AGM habituel -- probable paiement retarde de l'exercice N-2, jamais confirme par un document (3 cas seulement dans tout l'historique)"
+FTSC,,261.0,9-janv.-18,MANQUANT,"paiement de janvier : la regle -2 est explicitement contredite pour FTSC par l'avis BRVM N 072-2017/DC/BR/DG (exercice 2016 confirme paye le 31/07/2017, pas en janvier) -- non devine, a verifier au cas par cas"
+FTSC,,561.0,9-janv.-18,MANQUANT,"paiement de janvier : la regle -2 est explicitement contredite pour FTSC par l'avis BRVM N 072-2017/DC/BR/DG (exercice 2016 confirme paye le 31/07/2017, pas en janvier) -- non devine, a verifier au cas par cas"
+FTSC,,561.25,9-janv.-18,MANQUANT,"paiement de janvier : la regle -2 est explicitement contredite pour FTSC par l'avis BRVM N 072-2017/DC/BR/DG (exercice 2016 confirme paye le 31/07/2017, pas en janvier) -- non devine, a verifier au cas par cas"
 FTSC,2017,161.27,16-août-18,ELEVEE,paiement en saison normale d'AGM (avril-decembre)
 FTSC,2018,110.0,31-juil.-19,ELEVEE,paiement en saison normale d'AGM (avril-decembre)
 FTSC,2019,125.0,6-août-20,ELEVEE,paiement en saison normale d'AGM (avril-decembre)
