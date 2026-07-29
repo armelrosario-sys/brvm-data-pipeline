@@ -462,6 +462,7 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
                 f'<span aria-hidden="true">{symb}</span></span>')
 
     blocs_secteurs = ""
+    legende_secteurs_affichee = False
     for s, d in sorted(secteurs.items()):
         lignes_titres = ""
         for t in d["titres"]:
@@ -471,39 +472,46 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
               <td><b>{t['ticker']}</b>{statut_txt}</td>
               <td>{_rendre_profil_secteur(t)}</td>
               <td>{t['score'] if t['score'] is not None else '—'}</td>
-              <td>{cellule_couleur(t['per'], t['per_pos'], t['per_symb'])}</td>
-              <td>{cellule_couleur(t['roe'], t['roe_pos'], t['roe_symb'], '%')}</td>
-              <td>{formater_fcfa(t['liq_gen_abs'])}{f" <span class='alertes'>(≈{t['liq_gen_ratio']}% Sonatel, {t['liq_gen_nmois']}m)</span>" if t.get('liq_gen_ratio') else ''}</td>
-              <td>{fmt_valeur(t['liq_flottant'], t['liq_flottant_interp'])}</td>
+              <td class="col-analytique">{cellule_couleur(t['per'], t['per_pos'], t['per_symb'])}</td>
+              <td class="col-analytique">{cellule_couleur(t['roe'], t['roe_pos'], t['roe_symb'], '%')}</td>
+              <td class="col-analytique">{formater_fcfa(t['liq_gen_abs'])}{f" <span class='alertes'>(≈{t['liq_gen_ratio']}% Sonatel, {t['liq_gen_nmois']}m)</span>" if t.get('liq_gen_ratio') else ''}</td>
+              <td class="col-analytique">{fmt_valeur(t['liq_flottant'], t['liq_flottant_interp'])}</td>
             </tr>"""
         lignes_titres += f"""
             <tr style="background:var(--surface-3, #172033);font-weight:600">
               <td>Mediane du secteur <span style="font-weight:400;color:var(--muted);font-size:0.75em">(titres eligibles seulement, n={d['nb_eligibles_ds_calcul']})</span></td><td>—</td><td>—</td>
-              <td>{d['per_median'] if d['per_median'] else '—'}</td>
-              <td>{d['roe_median'] if d['roe_median'] else '—'}%</td><td>—</td>
+              <td class="col-analytique">{d['per_median'] if d['per_median'] else '—'}</td>
+              <td class="col-analytique">{d['roe_median'] if d['roe_median'] else '—'}%</td><td class="col-analytique">—</td>
             </tr>"""
         note_couverture = (f'<div style="font-size:0.75em;color:#c1502e;margin-top:6px">'
                            f'⚠️ Couverture ROE incomplete pour ce secteur ({d["nb_eligibles_ds_calcul"]} titre(s) '
                            f'seulement avec capitaux propres connus) — classement a interpreter avec prudence</div>'
                            if d['roe_median'] is None or d['nb_eligibles_ds_calcul'] < d['nb_titres'] // 2 else '')
-        blocs_secteurs += f"""
-        <div class="carte">
-          <h2>{libelle_secteur(s)} — {d['nb_titres']} titres
-            <span style="font-weight:400;color:var(--muted);font-size:0.75em">
-              (mediane PER {d['per_median'] if d['per_median'] else '—'} · score moyen {d['score_moyen'] if d['score_moyen'] else '—'})
-            </span></h2>
-          <div class="scroll"><table>
-            <thead><tr><th>Titre</th><th>Profil</th><th>{terme_glossaire('Score')}</th><th>{terme_glossaire('PER')}</th>
-              <th>{terme_glossaire('ROE')}</th><th>Liquidite generale</th><th>Flottant</th></tr></thead>
-            <tbody>{lignes_titres}</tbody>
-          </table></div>
-          <div style="font-size:0.75em;color:var(--muted);margin-top:8px">
+        # Legende affichee UNE SEULE fois (29/07/2026), plus jamais repetee a chaque carte
+        legende_une_fois = ""
+        if not legende_secteurs_affichee:
+            legende_une_fois = """
+          <div style="font-size:0.8em;color:var(--muted);margin-bottom:14px;padding:8px 12px;
+                      background:var(--card,#1e293b);border:1px solid var(--border,#334155);border-radius:8px">
             ▼ vert = plus favorable que la mediane du secteur (PER bas ou ROE eleve) ·
             ● orange = proche de la mediane (±15%) · ▲ rouge = moins favorable ·
             les titres EXCLUS ne comptent pas dans le calcul de la mediane
-          </div>
+          </div>"""
+            legende_secteurs_affichee = True
+        blocs_secteurs += f"""
+        {legende_une_fois}
+        <details class="carte">
+          <summary style="cursor:pointer"><h2 style="display:inline">{libelle_secteur(s)} — {d['nb_titres']} titres
+            <span style="font-weight:400;color:var(--muted);font-size:0.75em">
+              (mediane PER {d['per_median'] if d['per_median'] else '—'} · score moyen {d['score_moyen'] if d['score_moyen'] else '—'})
+            </span></h2></summary>
+          <div class="scroll"><table>
+            <thead><tr><th>Titre</th><th>Profil</th><th>{terme_glossaire('Score')}</th><th class="col-analytique">{terme_glossaire('PER')}</th>
+              <th class="col-analytique">{terme_glossaire('ROE')}</th><th class="col-analytique">Liquidite generale</th><th class="col-analytique">Flottant</th></tr></thead>
+            <tbody>{lignes_titres}</tbody>
+          </table></div>
           {note_couverture}
-        </div>"""
+        </details>"""
 
     # Classements inter-sectoriels (mediane, titres eligibles uniquement)
     secteurs_par_per = sorted([(libelle_secteur(s), d["per_median"]) for s, d in secteurs.items() if d["per_median"]],
@@ -581,6 +589,14 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   .chip-garp {{ background:#3f2e17; color:#fbbf24; }}
   .chip-na {{ background:#334155; color:#94a3b8; }}
   .col-analytique {{ color: var(--muted, #94a3b8); font-size: 0.93em; }}
+  /* Mode simple (29/07/2026) : masque les colonnes analytiques detaillees
+     partout (synthese + secteurs) sans jamais supprimer la donnee -- juste
+     un clic pour tout revoir. Rien de perdu, juste replie par defaut. */
+  body.mode-simple .col-analytique {{ display: none; }}
+  .bascule-mode {{ display: inline-flex; align-items: center; gap: 8px; background: var(--card,#1e293b);
+                    border: 1px solid var(--border,#334155); border-radius: 8px; padding: 8px 12px;
+                    margin-bottom: 12px; font-size: 0.88em; cursor: pointer; user-select: none; }}
+  .bascule-mode input {{ cursor: pointer; }}
   .legende-globale {{ margin: 10px 0 16px; font-size: 0.85em; color: var(--muted, #94a3b8); }}
   .legende-globale summary {{ cursor: pointer; }}
   /* Profil : mini-graphique en barres (14/07/2026, 2e iteration ergonomie) */
@@ -661,17 +677,22 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
     trois notes (Rentabilité / Solidité / Valorisation) et les alertes à connaître. Les autres onglets
     (Secteurs, Comparaison...) sont pour aller plus loin — pas obligatoires pour une première lecture.
   </div>
-  <div class="avertissement">
-    ⚠️ Cette watchlist ne sert a AUCUNE decision d'investissement seule — seuils non valides
-    empiriquement (backtest en cours), voir document de reference du projet.
-  </div>
-  <div class="avertissement" style="background:#78350f;color:#fdba74">
-    📊 SCORE COMPOSITE SUSPENDU comme critere de decision principal (10/07/2026) — le signal
-    decote-vs-secteur n'est pas statistiquement significatif une fois la correlation des donnees
-    prise en compte (test en blocs par titre, IC 95% incluant zero). Le score reste affiche a
-    titre observationnel ; se referer aux 3 sous-scores (Rentabilite / Solidite / Valorisation)
-    individuellement pour toute lecture.
-  </div>
+  <label class="bascule-mode">
+    <input type="checkbox" id="case-mode-simple" onchange="basculerMode()">
+    Vue simple (masque les détails Rentabilité/Solidité/Valorisation/ROE — tout reste disponible en décochant)
+  </label>
+  <details class="avertissement" style="cursor:pointer">
+    <summary>⚠️ À lire avant toute décision (seuils non validés, score observationnel) — cliquer pour déplier</summary>
+    <div style="margin-top:8px">
+      Cette watchlist ne sert à AUCUNE décision d'investissement seule — seuils non validés
+      empiriquement (backtest en cours), voir document de référence du projet.<br><br>
+      📊 SCORE COMPOSITE SUSPENDU comme critère de décision principal (10/07/2026) — le signal
+      décote-vs-secteur n'est pas statistiquement significatif une fois la corrélation des données
+      prise en compte (test en blocs par titre, IC 95% incluant zéro). Le score reste affiché à
+      titre observationnel ; se référer aux 3 sous-scores (Rentabilité / Solidité / Valorisation)
+      individuellement pour toute lecture.
+    </div>
+  </details>
 
   <details class="legende-globale">
     <summary>Légende des couleurs et symboles (cliquer pour déplier)</summary>
@@ -825,6 +846,22 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
   <div class="footer">Généré depuis brvm-data-pipeline — régénéré à chaque mise à jour du moteur</div>
 </div>
 <script>
+// Mode simple/detaille (29/07/2026) : masque/affiche les colonnes
+// analytiques partout (synthese + secteurs), memorise dans ce navigateur
+// (aucune donnee envoyee nulle part, meme principe que "Mon portefeuille").
+function basculerMode() {{
+  const actif = document.getElementById('case-mode-simple').checked;
+  document.body.classList.toggle('mode-simple', actif);
+  localStorage.setItem('brvm-mode-simple', actif ? '1' : '0');
+}}
+(function initModeSimple() {{
+  const memorise = localStorage.getItem('brvm-mode-simple');
+  const actif = memorise === null ? true : memorise === '1';  // simple par defaut pour un premier visiteur
+  document.addEventListener('DOMContentLoaded', () => {{
+    document.getElementById('case-mode-simple').checked = actif;
+    document.body.classList.toggle('mode-simple', actif);
+  }});
+}})();
 const SERIES = {json.dumps(series)};
 const FONDAMENTAUX = {json.dumps(fondamentaux)};
 const AVIS = {json.dumps(avis)};
