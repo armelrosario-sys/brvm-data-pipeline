@@ -546,6 +546,12 @@ ETATS = [
     # d'ici a 3 reprises (25, 27 et 28/07/2026) -- si elle reapparait encore,
     # verifier qu'un ancien fichier local n'est pas reuploade par erreur.
 
+    # --- Fusion automatique Piste A (27/07/2026) : dettes financieres, 
+    # payout et solvabilite bancaire absents de l'extraction automatique -> 
+    # None (jamais devine). A relire au meme titre que le reste. ---
+    ("BOABF", 2026, 357509.0, 349869.0, None, None, None, None, None, None,
+     "NATIF", "PROBABLE", '2026-03-18'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+
 ]
 
 DIVIDENDES = [
