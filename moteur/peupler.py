@@ -542,8 +542,9 @@ ETATS = [
     # --- Fusion automatique Piste A (27/07/2026) : dettes financieres, 
     # payout et solvabilite bancaire absents de l'extraction automatique -> 
     # None (jamais devine). A relire au meme titre que le reste. ---
-    ("BOABF", 2026, 357509.0, 349869.0, None, None, None, None, None, None,
-     "NATIF", "PROBABLE", '2026-03-18'),  # Fusion auto 27/07/2026 (Piste A, strategie=pdfplumber) -- resultat net trouve, bilan complet non localise
+    # NOTE (28/07/2026) : une entree BOABF/2026 non sourcee a ete retiree
+    # d'ici a 3 reprises (25, 27 et 28/07/2026) -- si elle reapparait encore,
+    # verifier qu'un ancien fichier local n'est pas reuploade par erreur.
 
 ]
 
@@ -666,6 +667,9 @@ RAO = [
 ]
 
 SOURCE_URLS = [  # Etape B du plan (10/07/2026) : reconstruit depuis MANIFESTE.csv
+    ("BNBC", 2023, "https://www.brvm.org/sites/default/files/20240507_-_etats_financiers_de_synthese_-_bernabe_ci.pdf"),
+    ("SDSC", 2020, "https://www.brvm.org/sites/default/files/20210428_-_etats_financiers_-_exercice_2020_-_bollore_transport_logistics_ci.pdf"),
+    ("SOGC", 2020, "https://www.brvm.org/sites/default/files/20210413_-_etats_financiers_-_exercice_2020_-_sogb_ci.pdf"),
     ("BBGCI", 2021, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
     ("BBGCI", 2022, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
     ("BBGCI", 2023, "https://www.richbourse.com/common/actualite/afficher-fichier/08-07-2026-note-dinformation-offre-publique-de-vente-des-actions-de-bridge-bank-group-ci"),
