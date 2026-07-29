@@ -58,6 +58,20 @@ CREATE TABLE IF NOT EXISTS cours_quotidien_boc (
     PRIMARY KEY (ticker, date_bulletin)
 );
 
+-- Historique complet de liquidite (28/07/2026) : distinct et independant de
+-- collecte/historique_liquidite.json (qui reste volontairement purge a 60
+-- jours glissants par collecte_liquidite_jour.py -- usage temps reel, pas
+-- touche ici). Cette table accumule TOUT l'historique reconstitue (Piste C,
+-- 1791 jours au 28/07/2026) pour l'analyse de long terme (tests
+-- statistiques, tendances), sans jamais rien ecraser.
+CREATE TABLE IF NOT EXISTS liquidite_quotidienne (
+    ticker TEXT NOT NULL REFERENCES societes(ticker),
+    date_bulletin TEXT NOT NULL,     -- 'AAAA-MM-JJ'
+    volume_echange REAL,
+    valeur_echangee REAL,
+    PRIMARY KEY (ticker, date_bulletin)
+);
+
 CREATE TABLE IF NOT EXISTS dividendes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticker TEXT NOT NULL REFERENCES societes(ticker),
