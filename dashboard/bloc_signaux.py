@@ -274,16 +274,18 @@ def generer_blocs():
     nb_def = sum(1 for a in actifs if a[2] == "DEFAVORABLE")
     nb_titres_actifs = len(par_ticker)
     bloc2 = f"""
-<div class="sig-carte">
-  <h2>Signaux actifs — marche <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
+<details class="sig-carte">
+  <summary style="cursor:pointer">
+    <h2 style="display:inline">Signaux actifs — marche <span style="font-weight:400;color:var(--muted,#94a3b8);font-size:0.78em">
       ({nb_titres_actifs} titres concernes, {len(actifs)} signaux dont {nb_def} defavorables
-      — cycle de vie date, distinct des scores)</span></h2>
+      — cliquer pour deplier, detail technique)</span></h2>
+  </summary>
   <button class="sig-toggle" onclick="sigToggleColonnes('tbl-marche', this)">Afficher les dates et sources</button>
   <table class="sig-table" id="tbl-marche">
     {en_tete_marche}
     <tbody>{''.join(lignes2)}</tbody>
   </table>
-</div>"""
+</details>"""
 
     # ---- Bloc 3 : introductions et cotations a venir ----
     intro = cur.execute(
