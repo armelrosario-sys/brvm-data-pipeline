@@ -67,11 +67,16 @@ def deduire_exercice(annee_paiement, mois_paiement):
         return (annee_paiement - 1, "ELEVEE",
                 "paiement en saison normale d'AGM (avril-decembre)")
     if mois_paiement == 1:
-        return (annee_paiement - 2, "A_VERIFIER",
-                "paiement de janvier : trop tot pour l'exercice N-1 selon "
-                "le calendrier AGM habituel -- probable paiement retarde de "
-                "l'exercice N-2, jamais confirme par un document (3 cas "
-                "seulement dans tout l'historique)")
+        # CAS FTSC verifie le 28/07/2026 (Avis BRVM N 072-2017/DC/BR/DG) :
+        # le dividende de l'exercice 2016 a ete paye le 31 juillet 2017, PAS
+        # en janvier -- la regle generique "-2" ci-dessous est donc
+        # explicitement contredite pour ce ticker. Ne pas deviner un autre
+        # exercice : MANQUANT tant qu'aucun document ne confirme le bon.
+        return (None, "MANQUANT",
+                "paiement de janvier : la regle -2 est explicitement "
+                "contredite pour FTSC par l'avis BRVM N 072-2017/DC/BR/DG "
+                "(exercice 2016 confirme paye le 31/07/2017, pas en janvier) "
+                "-- non devine, a verifier au cas par cas")
     # fevrier/mars : aucun cas observe pour calibrer une regle fiable
     return (None, "MANQUANT",
             "mois de paiement (fevrier/mars) sans precedent observe pour "
