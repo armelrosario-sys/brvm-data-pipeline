@@ -655,6 +655,12 @@ def generer_html(resultats, series, fondamentaux, avis, source_urls, seuils, fra
 <div class="conteneur">
   <h1>BRVM — Watchlist GARP-Quality</h1>
   <div class="maj">Généré automatiquement le {maj} · seuils v{seuils.get('version','?')}</div>
+  <div style="background:var(--card,#1e293b);border:1px solid var(--border,#334155);border-radius:8px;
+              padding:10px 14px;margin-bottom:12px;font-size:0.9em">
+    👋 Nouveau ici ? Le tableau <b>Synthèse</b> ci-dessous est le point de départ : un titre par ligne,
+    trois notes (Rentabilité / Solidité / Valorisation) et les alertes à connaître. Les autres onglets
+    (Secteurs, Comparaison...) sont pour aller plus loin — pas obligatoires pour une première lecture.
+  </div>
   <div class="avertissement">
     ⚠️ Cette watchlist ne sert a AUCUNE decision d'investissement seule — seuils non valides
     empiriquement (backtest en cours), voir document de reference du projet.
