@@ -785,6 +785,20 @@ verifie(len(violations) == 0,
         f"statut maximal sans 2e source est {plafond_ocr} — violations : {violations}")
 conn_audit.close()
 
+print("\n=== Verification (28/07/2026) : pas de retour de l'entree fantome BOABF/2026 ===")
+# BOABF/2026 a ete retiree PAR ERREUR 4 fois de suite (25, 27, 28 x2/07/2026),
+# probablement par reupload d'une copie locale perimee de peupler.py. Source
+# jamais identifiee, valeurs non verifiables (voir historique du fichier).
+# Ce test echoue explicitement si elle revient, plutot que de compter sur
+# une relecture manuelle a chaque fois.
+conn_audit2 = sqlite3.connect(DB)
+fantome = conn_audit2.execute(
+    "SELECT ticker, exercice FROM etats_financiers WHERE ticker='BOABF' AND exercice=2026").fetchall()
+verifie(len(fantome) == 0,
+        f"BOABF/2026 (entree fantome, source jamais identifiee) absente de la base "
+        f"— trouve : {fantome}")
+conn_audit2.close()
+
 # Restauration du vrai fichier collecte/liquidite_jour.json (production,
 # alimente par P9) apres tous les tests -- symetrique de la sauvegarde en
 # tete de fichier. Sans cette etape, chaque execution locale de tester.py
