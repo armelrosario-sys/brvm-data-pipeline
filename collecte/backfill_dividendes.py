@@ -132,7 +132,7 @@ def main():
             pass
 
         checkpoint.sauvegarder(f"Backfill dividendes : {traites_ce_run} BOC traites ce run (auto)",
-                                intervalle=600)
+                                intervalle=600, exclure=["collecte/_dividendes_observations.json"])
 
     # ---- derivation des evenements distincts a partir des observations ----
     evenements = []
