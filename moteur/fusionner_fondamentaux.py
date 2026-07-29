@@ -20,6 +20,12 @@ import re
 
 PEUPLER = "moteur/peupler.py"
 SOURCE = "collecte/fondamentaux_extraits.csv"
+# Garde-fou (28/07/2026, suite a l'incident BOABF/2026 -- document mal
+# identifie, ticker et exercice tous deux faux, jamais filtre avant d'entrer
+# dans ETATS malgre une valeur x1000 au-dela du plausible). Meme plafond que
+# le test golden "plafond de plausibilite" (seuils.yaml), applique ICI, a la
+# fusion, pas seulement a la verification a posteriori.
+PLAFOND_RN_M_FCFA = 1_000_000
 
 
 def couples_existants(contenu):
@@ -61,6 +67,14 @@ def main():
                 continue  # ne remplace jamais une entree deja presente
             rn = to_num(row["resultat_net"])
             rn1 = to_num(row["resultat_net_n1"])
+            if (rn is not None and abs(rn) > PLAFOND_RN_M_FCFA) or \
+               (rn1 is not None and abs(rn1) > PLAFOND_RN_M_FCFA):
+                print(f"[ecarte] {row['ticker']}/{row['exercice']} : resultat net "
+                      f"({rn}) ou N-1 ({rn1}) au-dela du plafond de plausibilite "
+                      f"({PLAFOND_RN_M_FCFA} M FCFA) -- jamais fusionne, a verifier "
+                      f"manuellement (source : {row['source_url']})")
+                existants.add(cle)  # ne plus jamais retenter cette ligne precise
+                continue
             actif = to_num(row["total_actif"])
             passif = to_num(row["total_passif"])
             cp = to_num(row["capitaux_propres"])
