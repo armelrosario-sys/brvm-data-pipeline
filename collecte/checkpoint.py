@@ -29,18 +29,33 @@ INTERVALLE_DEFAUT = 600  # 10 min
 _dernier = {"t": 0.0}
 
 
-def sauvegarder(message="Checkpoint automatique (auto)", intervalle=INTERVALLE_DEFAUT, force=False):
+def sauvegarder(message="Checkpoint automatique (auto)", intervalle=INTERVALLE_DEFAUT,
+                 force=False, exclure=None):
+    """exclure : liste de chemins a NE PAS committer sauf si force=True --
+    utile pour un gros fichier qui change a chaque item traite (ex.
+    collecte/_dividendes_observations.json) : le committer a CHAQUE
+    checkpoint intermediaire (toutes les 10 min) gonfle l'historique Git de
+    plusieurs Mo par commit inutilement. Avec exclure=[...], ce fichier
+    n'est committe qu'au checkpoint final (force=True), une seule fois par
+    run au lieu d'une dizaine de fois."""
     maintenant = time.time()
     if not force and (maintenant - _dernier["t"]) < intervalle:
         return False
     try:
-        subprocess.run(["git", "add", "-A"], check=True, capture_output=True, timeout=30)
+        if exclure and not force:
+            pathspec = ["--"] + ["."] + [f":!{p}" for p in exclure]
+            subprocess.run(["git", "add", "-A"] + pathspec, check=True, capture_output=True, timeout=30)
+        else:
+            subprocess.run(["git", "add", "-A"], check=True, capture_output=True, timeout=30)
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], capture_output=True)
         if diff.returncode == 0:
             _dernier["t"] = maintenant
             return False  # rien de nouveau depuis le dernier checkpoint
         subprocess.run(["git", "commit", "-m", message], check=True, capture_output=True, timeout=30)
-        subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=True, capture_output=True, timeout=90)
+        if not exclure or force:
+            # pull --rebase seulement si rien ne reste volontairement non
+            # commite (sinon git le refuse : "unstaged changes")
+            subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=True, capture_output=True, timeout=90)
         subprocess.run(["git", "push", "origin", "main"], check=True, capture_output=True, timeout=90)
         _dernier["t"] = maintenant
         print(f"[checkpoint] sauvegarde poussee : {message}")
