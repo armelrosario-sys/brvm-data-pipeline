@@ -141,7 +141,7 @@ ETATS = [
     # diverge legerement de la ligne 2024 deja en base (RN=44730.358142, TA=94359.747890) — plusieurs
     # versions "annule et remplace" existent pour ce document, ligne 2024 existante non ecrasee
     ("NSBC", 2025, 40712, 38112, 3073062, 3073062, 233300, None, None, None, "DEUX_SOURCE", "VALIDE", "2026-05-13"),
-    ("SMBC", 2025, 13075, 8698, 180003, 180003, None, None, None, None, "NATIF", "VALIDE", "2026-05-12"),
+    ("SMBC", 2025, 13075, 8698, 180003, 180003, 42913, None, None, None, "NATIF", "VALIDE", "2026-05-12"),
     ("SAFC", 2025, 701, -165, 79555, 79555, 5916, None, None, None, "NATIF", "VALIDE", "2026-06-09"),
     ("SAFC", 2024, -165, -603, 74195, 74195, 5215, None, None, None,
      "NATIF", "VALIDE", "2025-07-03"),  # en millions FCFA (mention explicite du document)
@@ -288,7 +288,7 @@ ETATS = [
      "NATIF", "VALIDE", "2023-04-28"),
     ("UNXC", 2021, 1400.692889, 231.265060, 37292.681535, 37292.681535, None, None, None, None,
      "NATIF", "VALIDE", "2022-06-13"),
-    ("SIVC", 2025, 179.293282, 376.956818, 14611.080094, 14611.080094, None, None, None, None,
+    ("SIVC", 2025, 179.293282, 376.956818, 14611.080094, 14611.080094, 2526.541669, None, None, None,
      "DEUX_SOURCE", "VALIDE", "2026-06-26"),  # Erium CI (ex Air Liquide) ; teste en P3
     # SDSC (Africa Global Logistics) et SEMC (Eviosys) : donnees insuffisantes
     # dans les documents collectes (SDSC = rapport CAC sans bilan chiffre lisible,
@@ -323,7 +323,7 @@ ETATS = [
      "NATIF", "VALIDE", "2023-04-24"),  # payout >100% cet exercice (dividende 17855 vs RN 16627, isole)
     ("PALC", 2025, 15508.655, 15861.643, 199116.293, 199116.293, None, None, None, None,
      "NATIF", "VALIDE", "2026-03-23"),  # Palm CI, identite exacte (unite : milliers FCFA supposee)
-    ("SPHC", 2025, 24972.070150, 18790.217905, 225842.735644, 225842.735644, None, None, None, None,
+    ("SPHC", 2025, 24972.070150, 18790.217905, 225842.735644, 225842.735644, 137936.908394, None, None, None,
      "NATIF", "VALIDE", "2026-03-18"),  # Saph CI, identite exacte, forte croissance
     ("SCRC", 2025, -7953.932, 2473.760, 156426.278, 156426.278, -17243.172, None, None, None,
      "NATIF", "VALIDE", "2026-05-18"),  # Sucrivoire ; CAPITAUX PROPRES NEGATIFS -> exclusion attendue
@@ -348,7 +348,7 @@ ETATS = [
      "NATIF", "VALIDE", "2019-04-05"),  # 2019 manquant (document non disponible), serie discontinue mais fiable
     ("SOGC", 2025, 12492.623, 13110.790, 90288.082, 90288.082, None, None, None, None,
      "NATIF", "VALIDE", "2026-04-22"),  # SOGB CI, identite exacte (unite : milliers FCFA supposee)
-    ("UNLC", 2023, 640.334855, -6908.362002, 23009.562675, 23009.562675, None, None, None, None,
+    ("UNLC", 2023, 640.334855, -6908.362002, 23009.562675, 23009.562675, -10658.856096, None, None, None,
      "NATIF", "VALIDE", "2024-09-04"),  # Unilever CI ; exercice 2023 seul disponible (donnee datee)
     ("UNLC", 2021, 6090.755732, None, 48697.419272, 48697.419272, None, None, None, None,
      "NATIF", "PROBABLE", "2022-05-20"),  # lecture propre annee propre uniquement ; N-1(2020) ecarte,
@@ -375,7 +375,7 @@ ETATS = [
     ("SHEC", 2025, 6028.125958, 5353.993378, 193561.278972, 193561.278972, None, None, None, None,
      "NATIF", "VALIDE", "2026-06-03"),  # Vivo Energy CI, identite exacte
     # --- R6 lot 5 : Services financiers (partiel) + Telecommunications ---
-    ("BICC", 2025, 36520, 26226, 1126270, 1126270, None, None, None, None,
+    ("BICC", 2025, 36520, 26226, 1126270, 1126270, 120570, None, None, None,
      "DEUX_SOURCE", "VALIDE", "2026-04-17"),  # BICI CI ; INVERSION DE COLONNES CORRIGEE (2e source :
     # BPA 1574->2191 FCFA +39%, actif "1,13 trillion" = 1 126 270 M confirme — meme
     # type d'erreur que BOABF, detectee ici uniquement grace a la 2e source
@@ -385,7 +385,7 @@ ETATS = [
      "NATIF", "VALIDE", "2022-04-06"),
     ("ECOC", 2025, 57477, 63482, None, None, None, None, None, None,
      "NATIF", "VALIDE", "2026-04-14"),  # Ecobank CI, bilan non recoupe
-    ("SIBC", 2025, 55623, 50234, 1881733, 1685249, None, None, None, None,
+    ("SIBC", 2025, 55623, 50234, 1881733, 1685249, 204765, None, None, None,
      "NATIF", "VALIDE", "2026-04-21"),  # Societe Ivoirienne de Banque, croissance +11% confirmee par le document
     ("ORAC", 2025, 167800, 158200, 2554100, 2554100, 616300, None, None, None,
      "NATIF", "VALIDE", "2026-06-08"),
@@ -401,7 +401,7 @@ ETATS = [
      "OCR", "PROBABLE", "2022-03-22"),  # 1er succes OCR sur ce titre (tentative precedente sans OCR avait echoue)
     ("BOAS", 2025, 19984, 21906, None, None, None, None, None, None,
      "OCR", "PROBABLE", "2026-03-17"),  # BOA Senegal, bilan illisible a l'OCR
-    ("ONTBF", 2025, 15886.921152, 21471.148928, 324902.379845, 324902.379845, None, None, None, None,
+    ("ONTBF", 2025, 15886.921152, 21471.148928, 324902.379845, 324902.379845, 57541.603762, None, None, None,
      "NATIF", "VALIDE", "2026-06-11"),  # Onatel BF, identite exacte, recul -26%
     ("CIEC", 2025, 13100, 10100, None, None, None, None, 1.0, None,
      "DEUX_SOURCE", "VALIDE", "2026-05-22"),  # CIE CI ; 5+ sources convergentes, payout 100% confirme
