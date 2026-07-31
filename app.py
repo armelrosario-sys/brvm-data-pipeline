@@ -101,7 +101,8 @@ def charger():
             pegy=v.get("pegy"), payout=v.get("payout"), roe=v.get("roe"),
             cherte_pctl=v.get("cherte_pctl"), croissance_pctl=v.get("croissance_pctl"),
             reference=v.get("reference_axes"), drapeaux=", ".join(v.get("drapeaux") or []),
-            confiance=v.get("confiance"), gate=v.get("gate")))
+            confiance=v.get("confiance"), gate=v.get("gate"),
+            motif=v.get("motif"), payout_source=v.get("payout_source")))
     return pd.DataFrame(lignes), profils, cours, etats
 
 
@@ -162,6 +163,78 @@ if f_secteur:
 
 st.title("Profilage fondamental — BRVM")
 
+GLOSSAIRE = {
+    "GARP": ("Croissance a prix raisonnable.",
+             "Croissance entre 8 et 30 %/an, PEGY <= 1,5, distribution couverte.",
+             "L'histoire : une croissance reelle que le prix n'a pas encore integree.",
+             "Piege classique : une croissance passee tiree par un rebond ponctuel — "
+             "les drapeaux 'rattrapage' signalent ce cas."),
+    "VALUE": ("Decote sur benefices etablis.",
+              "Cherte dans le tercile superieur (decote), croissance faible ou nulle, "
+              "distribution couverte.",
+              "L'histoire : la revalorisation, pas l'expansion.",
+              "Piege classique : la value trap — une decote peut etre meritee. "
+              "Sans catalyseur, le marche peut maintenir ce prix indefiniment."),
+    "GROWTH": ("Expansion reguliere.",
+               "Croissance dans le tercile superieur, positive chaque annee, reguliere.",
+               "L'histoire : l'expansion ; la valorisation peut etre pleine.",
+               "Piege classique : aucune marge de securite — une seule deception "
+               "se paie immediatement sur le multiple."),
+    "RENDEMENT": ("Revenu regulier, croissance nulle.",
+                  "Rendement >= 4,8 %, payout <= 100 %, croissance quasi nulle.",
+                  "L'histoire : le revenu — une quasi-obligation actions, profil "
+                  "pleinement legitime sur la BRVM.",
+                  "Piege classique : un payout qui derive au-dela de 100 %, ou une "
+                  "remontee du taux souverain UEMOA qui rend le rendement banal."),
+    "AUCUN_PROFIL": ("Coeur de cote correctement paye.",
+                     "Aucune signature ne se declenche : ni decote, ni croissance "
+                     "distinctive, ni rendement superieur.",
+                     "Ce n'est pas un echec d'analyse : c'est un diagnostic. Le marche "
+                     "price ce titre correctement, sans anomalie exploitable.",
+                     "Attention : ce groupe recouvre cinq causes tres differentes "
+                     "(croissance artefactuelle, croissance sous la fenetre, croissance "
+                     "deja payee, distribution non couverte, croissance non calculable). "
+                     "Le motif de chaque titre les distingue — le lire avant de conclure."),
+    "VIGILANCE_CONTRACTION": ("Benefices en contraction.",
+                              "Contraction superieure a 10 %/an, sans decote suffisante "
+                              "pour la compenser.",
+                              "L'histoire : le rendement affiche remunere un risque de "
+                              "degradation, pas une valeur.",
+                              "Une seule publication en inflexion positive reclasserait "
+                              "le titre : a surveiller, pas a ecarter definitivement."),
+    "RETOURNEMENT": ("Hors perimetre du profilage.",
+                     "Pertes ou sortie de pertes avec un catalyseur public, date et "
+                     "verifiable (config/faits_qualitatifs.yaml).",
+                     "Ces dossiers relevent d'un outil distinct, qualitatif, a construire.",
+                     "Taux de base mesures sur 2018-2026 pour ce compartiment : 33 % "
+                     "d'explosion a 24 mois, 43 % de perte superieure a 30 %, "
+                     "mediane -20 %. Le profilage ne les evalue pas."),
+    "MUTATION": ("Historique non predictif.",
+                 "Un evenement a change la nature economique de la societe (cession "
+                 "transformante, changement de controle).",
+                 "L'histoire est a reecrire : l'analyse reprend sur la nouvelle entite.",
+                 "Deux exercices publies sur le nouveau perimetre sont necessaires "
+                 "avant tout profil."),
+    "NON_ANALYSABLE": ("Donnees insuffisantes.",
+                       "PER absent ou benefices residuels, ou historique trop court.",
+                       "Constat honnete, pas un jugement de valeur.",
+                       "Indiquer ce qui manque et quand ce sera disponible : la plupart "
+                       "de ces titres seront reclassables apres le backfill des bilans."),
+}
+
+with st.expander("Comprendre les profils — definitions, signatures et pieges", expanded=False):
+    for prof in ORDRE:
+        if prof not in GLOSSAIRE:
+            continue
+        titre, signature, histoire, piege = GLOSSAIRE[prof]
+        st.markdown(f"{puce(prof)} &nbsp; **{titre}**", unsafe_allow_html=True)
+        st.markdown(f"<div class='reserve'><b>Signature</b> — {signature}<br>"
+                    f"<b>Lecture</b> — {histoire}<br>"
+                    f"<b>A savoir</b> — {piege}</div>", unsafe_allow_html=True)
+    st.caption("Les profils ne sont pas des cases exclusives : un titre peut porter un "
+               "profil principal et un profil secondaire. Aucune superiorite de style "
+               "n'est demontree sur la BRVM.")
+
 o1, o2, o3, o4 = st.tabs(["Vue d'ensemble", "Explorer", "Fiche titre",
                           "Qualite des donnees & methode"])
 
@@ -191,6 +264,8 @@ with o1:
         c3.info(lecture)
 
     st.markdown("#### Repartition des profils")
+    st.caption("Cliquer sur un groupe pour afficher les societes qui le composent, "
+               "avec le motif de chaque classement.")
     comptes = df.profil.value_counts().reindex(ORDRE).dropna()
     cols = st.columns(len(comptes)) if len(comptes) <= 5 else st.columns(5)
     for i, (prof, n) in enumerate(comptes.items()):
@@ -198,6 +273,29 @@ with o1:
             st.markdown(f"{puce(prof)}<br><span style='font-size:1.6rem;font-weight:700'>{int(n)}</span>",
                         unsafe_allow_html=True)
             st.caption(LIBELLES[prof].split("—")[1].strip() if "—" in LIBELLES[prof] else "")
+            if st.button(f"Voir les {int(n)}", key=f"grp_{prof}", width='stretch'):
+                st.session_state["groupe_ouvert"] = (
+                    None if st.session_state.get("groupe_ouvert") == prof else prof)
+
+    ouvert = st.session_state.get("groupe_ouvert")
+    if ouvert:
+        titre, signature, histoire, piege = GLOSSAIRE.get(ouvert, ("", "", "", ""))
+        st.markdown("---")
+        st.markdown(f"{puce(ouvert)} &nbsp; **{titre}** &nbsp; "
+                    f"<span style='color:#666;font-size:.85rem'>{signature}</span>",
+                    unsafe_allow_html=True)
+        if piege:
+            st.caption(piege)
+        grp = df[df.profil == ouvert][
+            ["ticker", "nom", "secteur", "grade", "per", "dy", "croissance", "motif"]].copy()
+        grp.columns = ["Ticker", "Societe", "Secteur", "Grade", "PER", "Rdt %",
+                       "Croiss. %/an", "Motif du classement"]
+        st.dataframe(grp.sort_values(["Grade", "Ticker"]), hide_index=True, width='stretch',
+                     column_config={
+                         "PER": st.column_config.NumberColumn(format="%.1f"),
+                         "Rdt %": st.column_config.NumberColumn(format="%.1f"),
+                         "Croiss. %/an": st.column_config.NumberColumn(format="%.1f"),
+                         "Motif du classement": st.column_config.TextColumn(width="large")})
 
     st.markdown("---")
     st.markdown("#### Plan cherte × croissance")
@@ -236,19 +334,20 @@ with o2:
                "**A** source certifiee et etiquette stable · **B** solide, reserve nommee · "
                "**C** travail complementaire requis avant tout usage.")
     aff = vue[["ticker", "nom", "secteur", "profil", "secondaire", "grade", "per", "dy",
-               "croissance", "source", "pegy", "payout", "drapeaux"]].copy()
+               "croissance", "source", "pegy", "payout", "drapeaux", "motif"]].copy()
     aff.columns = ["Ticker", "Societe", "Secteur", "Profil", "Secondaire", "Grade",
-                   "PER", "Rdt brut %", "Croiss. %/an", "Source croissance", "PEGY",
-                   "Payout", "Drapeaux"]
+                   "PER", "Rdt %", "Croiss. %/an", "Source croissance", "PEGY",
+                   "Payout", "Drapeaux", "Motif"]
     st.dataframe(
         aff.sort_values(["Grade", "Profil", "Ticker"]), hide_index=True,
         width='stretch', height=560,
         column_config={
             "PER": st.column_config.NumberColumn(format="%.1f"),
-            "Rdt brut %": st.column_config.NumberColumn(format="%.1f"),
+            "Rdt %": st.column_config.NumberColumn(format="%.1f"),
             "Croiss. %/an": st.column_config.NumberColumn(format="%.1f"),
             "PEGY": st.column_config.NumberColumn(format="%.2f"),
             "Payout": st.column_config.NumberColumn(format="%.2f"),
+            "Motif": st.column_config.TextColumn(width="large"),
         })
     st.download_button("Telecharger (CSV)", aff.to_csv(index=False).encode("utf-8"),
                        "profilage_brvm.csv", "text/csv")
@@ -271,16 +370,55 @@ with o3:
             + " &nbsp; " + badge_grade(v.get("grade", "C")), unsafe_allow_html=True)
         st.caption(LIBELLES.get(v.get("profil"), ""))
     with g2:
-        st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d")
-        st.metric("Rendement brut", f"{r.dy:.1f} %" if pd.notna(r.dy) else "n/d")
+        cmp_haut = v.get("comparaisons") or {}
+        def _ctx(cle, unite=""):
+            c = cmp_haut.get(cle)
+            if not c:
+                return None
+            ms = f"{c['mediane_secteur']:.2f}{unite}" if c["mediane_secteur"] is not None else "n/d"
+            mm = f"{c['mediane_marche']:.2f}{unite}" if c["mediane_marche"] is not None else "n/d"
+            return (f"Mediane du secteur {r.secteur} : {ms} (n={c['n_secteur']})"
+                    + ("  — secteur trop etroit pour etre significatif"
+                       if c["n_secteur"] < 8 else "")
+                    + f"\n\nMediane du marche analysable : {mm} (n={c['n_marche']})")
+        st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d", help=_ctx("per"))
+        st.metric("Rendement", f"{r.dy:.1f} %" if pd.notna(r.dy) else "n/d",
+                  help=(_ctx("dy", " %") or "") + "\n\nConvention brut/net du champ "
+                       "rendement du BOC : chantier de verification ouvert.")
+
+    if v.get("motif"):
+        st.info(f"**Pourquoi ce profil** — {v['motif']}")
+
+    comp = v.get("comparaisons") or {}
+
+    def contexte(cle, unite="", pct=False):
+        """Infobulle : valeur du titre replacee dans son secteur et dans le marche."""
+        c = comp.get(cle)
+        if not c:
+            return "Comparaison sectorielle indisponible pour ce titre."
+        def fmt(x):
+            if x is None:
+                return "n/d"
+            return f"{x*100:.0f} %" if pct else f"{x:.2f}{unite}"
+        return (f"Ce titre : {fmt(c['titre'])}\n\n"
+                f"Mediane du secteur {r.secteur} : {fmt(c['mediane_secteur'])} "
+                f"(n={c['n_secteur']})"
+                + ("  — secteur trop etroit pour etre significatif"
+                   if c["n_secteur"] < 8 else "")
+                + f"\n\nMediane du marche analysable : {fmt(c['mediane_marche'])} "
+                  f"(n={c['n_marche']})")
 
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Croissance", f"{r.croissance:+.1f} %/an" if pd.notna(r.croissance) else "n/d",
-              help=f"Source : {r.source}")
+              help=f"Source : {r.source}\n\n" + contexte("g", " %"))
     m2.metric("PEGY", f"{r.pegy:.2f}" if pd.notna(r.pegy) else "n/d",
-              help="PER / (croissance % + rendement %). Lynch 1989 ; fondement Easton 2004.")
-    m3.metric("Payout", f"{r.payout:.0%}" if pd.notna(r.payout) else "non disponible")
-    m4.metric("ROE", f"{r.roe:.1f} %" if pd.notna(r.roe) else "non disponible")
+              help="PER / (croissance % + rendement %). Lynch 1989 ; fondement Easton 2004. "
+                   "Sous 0,25 : protocole de revue obligatoire.")
+    m3.metric("Payout", f"{r.payout:.0%}" if pd.notna(r.payout) else "non disponible",
+              help=(f"Source : {r.payout_source}\n\n" if pd.notna(r.payout_source) else "")
+                   + contexte("payout", pct=True))
+    m4.metric("ROE", f"{r.roe:.1f} %" if pd.notna(r.roe) else "non disponible",
+              help=contexte("roe", " %"))
 
     if pd.notna(r.cherte_pctl):
         st.markdown(f"**Positionnement** — cherte P{int(r.cherte_pctl)} · "
