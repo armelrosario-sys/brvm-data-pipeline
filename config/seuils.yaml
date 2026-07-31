@@ -33,22 +33,38 @@ signaux:
   expiration_b1_bulletins: 2      # bulletins mensuels sans nouveau record -> extinction B1
   fenetre_heritage_retroactif_seances: 15   # heritage des signaux B a la qualification A (non encore implemente)
 
-# Registre des seuils PROFILS (rapatries le 14/07/2026, memes raisons)
+# Registre des seuils PROFILS v2 (refonte 31/07/2026 — "profilage par signature").
+# Remplace les seuils de score de style (seuil_mixite_pts, alerte_peg_plausibilite_max)
+# devenus sans objet : le score 0-100 par style est SUPPRIME. Raison : objectif du
+# cadre revise (profilage, pas classement). Diagnostic mesure sur la v1 : 29 titres
+# sur 43 ressortaient VALUE par simple disponibilite de donnees, pas par economie.
+# Statut de tous les seuils ci-dessous : PROVISOIRES, calibres en echantillon.
 profils:
-  fenetre_exercices_max: 4        # nombre max d'exercices beneficiaires consecutifs regardes
-  seuil_mixite_pts: 20            # ecart de points sous lequel un profil est dit "mixte"
-  confiance_haute_min_exercices: 4
+  fenetre_exercices_max: 4          # inchange v1
+  confiance_haute_min_exercices: 4  # inchange v1
   confiance_moyenne_min_exercices: 2
-  alerte_peg_plausibilite_max: 0.20   # PEG sous ce seuil -> alerte de plausibilite (effet de base)
-
-# ------------------------------------------------------------------
-# Etat d'application des regles ci-dessous (audit du 14/07/2026) :
-# 4 cles etaient documentees ici sans etre lues par AUCUN script
-# (securite theatrale). Deux sont maintenant appliquees (voir moteur/tester.py,
-# fonctions verifier_plausibilite / verifier_statut_ocr). Les autres sont
-# explicitement marquees PREVU_NON_IMPLEMENTE ci-dessous : elles decrivent
-# une intention de conception, pas un comportement actif du systeme.
-
+  # --- gardes anti-artefact (v2 ; decouvertes par test, cas SLBC et CABC) ---
+  pic_yoy_max: 3.5                  # rupture d'echelle annuelle -> serie tronquee au pic
+  base_ecrasee_min: 0.30            # 1er exercice < 30 % de la mediane de serie -> drapeau
+  croissance_cap: 0.60              # plafond de croissance annualisee
+  rattrapage_min: 0.25              # au-dela : drapeau rattrapage (Lynch 1989 ; Chan 2003)
+  rattrapage_bloquant: 0.30         # au-dela : croissance non exploitable pour GARP/GROWTH
+  # --- sources de croissance ---
+  bpa_implicite_annees: 3           # CAGR du BPA implicite (repli, statut PROBABLE)
+  # --- axes (double lecture secteur/marche) ---
+  n_secteur_min: 8                  # sous ce seuil : percentile MARCHE (secteur non significatif)
+  value_pctl_min: 67                # tercile superieur de cherte
+  growth_pctl_min: 67               # tercile superieur de croissance
+  # --- signatures ---
+  garp_g_min: 0.08                  # fenetre de croissance soutenable (Lynch 1989)
+  garp_g_max: 0.30                  # borne haute portee a 0,30 apres arbitrage (cas NEIC)
+  garp_pegy_max: 1.5                # PEGY (Lynch ; fondement theorique Easton 2004)
+  growth_g_min: 0.05
+  rendement_dy_min: 0.048           # rendement brut plancher du profil RENDEMENT
+  contraction_seuil: 0.10           # au-dela : VIGILANCE_CONTRACTION
+  payout_max: 1.00                  # veto SI connu ; jamais un veto si non disponible
+  per_max_analysable: 50            # au-dela : benefices residuels -> hors axes
+  alerte_pegy_max: 0.25             # protocole de revue obligatoire (jurisprudence SLBC + ETIT)
 # ------------------------------------------------------------------
 # Registre CALENDRIER (chantier D4 automatique, 14/07/2026)
 # Detection de retard par ecart a l'intervalle historique typique entre
