@@ -116,10 +116,24 @@ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap):
     Doctrine conservee : exercices CONSECUTIVEMENT beneficiaires uniquement.
     Gardes v2 : troncature au pic, base ecrasee, plafond.
     """
-    lignes = cur.execute(
-        "SELECT exercice, resultat_net, statut_donnee FROM etats_financiers "
-        "WHERE ticker=? AND resultat_net IS NOT NULL ORDER BY exercice DESC",
-        (ticker,)).fetchall()
+    # Serie enrichie : le comparatif N-1 d'un document certifie est lui-meme
+    # certifie (pratique deja appliquee dans la base, cf. SDSC colonne 2023).
+    # Mesure du 31/07/2026 : 53 exercices dormaient dans resultat_net_n1 sans
+    # ligne d'exercice correspondante (ORAC 2024, SNTS 2021, SGBC 2024...).
+    serie_dict = {}
+    for ex, rn, rn1, st in cur.execute(
+            "SELECT exercice, resultat_net, resultat_net_n1, statut_donnee "
+            "FROM etats_financiers WHERE ticker=? ORDER BY exercice", (ticker,)):
+        if rn1 is not None and (ex - 1) not in serie_dict:
+            serie_dict[ex - 1] = (rn1, st, "COMPARATIF")
+        if rn is not None:
+            anc = serie_dict.get(ex)
+            if anc and anc[2] == "COMPARATIF" and abs(anc[0] - rn) > 0.01 * max(abs(rn), 1):
+                serie_dict[ex] = (rn, st, "CONFLIT")  # ligne prioritaire, conflit signale
+            else:
+                serie_dict[ex] = (rn, st, "LIGNE")
+    lignes = [(ex, v[0], v[1]) for ex, v in sorted(serie_dict.items(), reverse=True)]
+    origines = {ex: v[2] for ex, v in serie_dict.items()}
     serie = []
     for exercice, rn, statut in lignes:
         if rn is None or rn <= 0:
@@ -156,6 +170,10 @@ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap):
         g = cap
 
     statut = "VERIFIE" if all(x[2] == "VALIDE" for x in chrono) else "PROBABLE"
+    if any(origines.get(x[0]) == "COMPARATIF" for x in chrono):
+        drapeaux.append("SERIE_COMPLETEE_N1")
+    if any(origines.get(x[0]) == "CONFLIT" for x in chrono):
+        drapeaux.append("CONFLIT_N1")
     return g, statut, len(chrono), drapeaux
 
 
@@ -210,11 +228,21 @@ def ingredients(cur, ticker, seuils, sp):
         if rn is not None and cp:
             roe = 100.0 * rn / cp
             break
-    payout = None
+    payout, payout_source = None, None
     for _e, _rn, _cp, p in etats:
         if p is not None:
-            payout = p
+            payout, payout_source = p, "ETATS_FINANCIERS"
             break
+    if payout is None and per and dy is not None:
+        # Identite comptable : DPA/BPA = (DPA/cours) x (cours/BPA) = rendement x PER.
+        # CHANTIER OUVERT (31/07/2026) : la convention brut/net du champ rendement
+        # du BOC n'est PAS tranchee. Test sur 11 titres a payout certifie :
+        # 8 se comportent comme BRUT (CBIBF 0,440 vs 0,440 ; SDSC 0,237 vs 0,238 ;
+        # SGBC 0,505 vs 0,513), 3 comme NET (dont ORAC : 800 F brut sur 16 000 =
+        # 5,0 %, alors que le BOC affiche 4,40 % = exactement le net personnes
+        # physiques). Tant que ce n'est pas tranche, le payout implicite est
+        # affiche avec sa source et n'est jamais promu au rang de donnee certifiee.
+        payout, payout_source = dy * per, "IMPLICITE(rendement x PER)"
 
     rn_dispo = [(e, rn) for e, rn, _c, _p in etats if rn is not None]
     dernier_rn = rn_dispo[0][1] if rn_dispo else None
@@ -237,6 +265,7 @@ def ingredients(cur, ticker, seuils, sp):
     pegy = per / base_pegy if (per and base_pegy and base_pegy > 0) else None
 
     return dict(per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
+                payout_source=payout_source,
                 roe=roe, g=100.0 * g if g is not None else None, source_croissance=source_g,
                 drapeaux=drapeaux, n_exercices=len(rn_dispo), dernier_rn=dernier_rn,
                 peg=round(peg, 2) if peg else None,
@@ -290,6 +319,76 @@ def profil_par_signature(ing, cherte, croissance, sp):
     if not retenus:
         return "AUCUN_PROFIL", None, notes
     return retenus[0], (retenus[1] if len(retenus) > 1 else None), notes
+
+
+def motif_du_profil(profil, ing, cherte, croissance, sp):
+    """Phrase en clair : pourquoi CE profil, ou pourquoi aucun.
+    Repond au constat d'usage : 'AUCUN PROFIL' sans motif est illisible, alors
+    qu'il recouvre au moins cinq causes distinctes (croissance artefactuelle,
+    croissance sous la fenetre, croissance deja payee, distribution non
+    couverte, croissance non calculable)."""
+    g, dy, payout, pegy = ing["g"], ing["dy"], ing["payout"], ing["pegy"]
+    dra = ing["drapeaux"]
+    gmin, gmax = sp["garp_g_min"] * 100, sp["garp_g_max"] * 100
+
+    if profil == "GARP":
+        return ("croissance de %.1f %%/an dans la fenetre soutenable (%.0f-%.0f %%), "
+                "payee PEGY %.2f — la croissance n'est pas encore dans le prix"
+                % (g, gmin, gmax, pegy))
+    if profil == "GROWTH":
+        return "croissance de %.1f %%/an dans le tercile superieur (P%s), reguliere" % (
+            g, croissance)
+    if profil == "VALUE":
+        return ("decote marquee (cherte P%s) sur des benefices etablis%s — "
+                "l'histoire est la revalorisation, pas l'expansion"
+                % (cherte, "" if g is None else ", croissance de %.1f %%/an" % g))
+    if profil == "RENDEMENT":
+        return ("rendement de %.1f %% avec une distribution couverte (payout %.0f %%) "
+                "et une croissance quasi nulle (%.1f %%/an) : profil de revenu"
+                % (dy, (payout or 0) * 100, g))
+    if profil == "VIGILANCE_CONTRACTION":
+        return ("benefices en contraction de %.1f %%/an sans decote suffisante "
+                "pour la compenser" % g)
+    if profil == "RETOURNEMENT":
+        return "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage"
+    if profil == "MUTATION":
+        return "la nature economique de la societe a change : l'historique n'est plus predictif"
+    if profil == "NON_ANALYSABLE":
+        return "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)"
+
+    # --- AUCUN_PROFIL : identifier la cause reelle ---
+    if g is None:
+        return ("croissance non calculable (historique trop court ou series absentes) : "
+                "l'axe croissance manque, ce n'est pas un diagnostic mais une lacune")
+    if "BASE_ECRASEE" in dra or any(d.startswith("CAP_") for d in dra) or g > sp["rattrapage_bloquant"] * 100:
+        return ("croissance de %.1f %%/an issue d'un rattrapage depuis un creux : "
+                "non extrapolable, et decote insuffisante par ailleurs (cherte P%s)"
+                % (g, cherte))
+    if payout is not None and payout > sp["payout_max"]:
+        return ("distribution non couverte (payout %.0f %%) : le rendement de %.1f %% "
+                "ne qualifie pas un profil de revenu" % (payout * 100, dy or 0))
+    if gmin <= g <= gmax and pegy is not None and pegy > sp["garp_pegy_max"]:
+        return ("croissance reelle de %.1f %%/an mais deja payee (PEGY %.2f, au-dela "
+                "de %.1f)" % (g, pegy, sp["garp_pegy_max"]))
+    if 0 < g < gmin:
+        ecart = gmin - g
+        proximite = (" — a %.1f point de la fenetre, a revoir a la prochaine publication"
+                     % ecart) if ecart <= 1.5 else ""
+        return ("croissance de %.1f %%/an sous la fenetre GARP (%.0f %%)%s, sans decote "
+                "(cherte P%s) ni rendement distinctifs" % (g, gmin, proximite, cherte))
+    return ("ni decote (cherte P%s), ni croissance dans le tercile superieur (P%s), "
+            "ni rendement superieur : coeur de cote correctement paye"
+            % (cherte, croissance))
+
+
+def sensible_brut_net(profil, ing, sp):
+    """Le profil bascule-t-il selon la convention brut/net du rendement ?
+    Chantier non tranche : 8 titres se comportent comme BRUT, 3 comme NET."""
+    dy = ing["dy"]
+    if dy is None:
+        return False
+    seuil = sp["rendement_dy_min"] * 100
+    return bool(dy < seuil <= dy / 0.88)
 
 
 def grade_confiance(profil, ing, faits_titre):
@@ -403,6 +502,31 @@ def calculer():
         cherte = round(sum(dispo) / len(dispo)) if dispo else None
         return cherte, p_g, ref
 
+    # --- Medianes de reference (secteur et marche) pour la mise en contexte ---
+    # Un PER de 14 ne dit rien seul ; "14,0 contre 13,2 en mediane bancaire et
+    # 15,1 sur le marche" se lit immediatement.
+    INDICS = ["per", "dy", "g", "payout", "roe"]
+    med_marche = {k: _mediane([v[k] for v in analysables.values()]) for k in INDICS}
+    n_marche = {k: len([1 for v in analysables.values() if v[k] is not None]) for k in INDICS}
+    med_secteur, n_sect = {}, {}
+    for sec in {v["secteur"] for v in analysables.values()}:
+        grp = [v for v in analysables.values() if v["secteur"] == sec]
+        med_secteur[sec] = {k: _mediane([v[k] for v in grp]) for k in INDICS}
+        n_sect[sec] = {k: len([1 for v in grp if v[k] is not None]) for k in INDICS}
+
+    def comparaisons(v):
+        sec = v["secteur"]
+        out = {}
+        for k in INDICS:
+            ms = (med_secteur.get(sec) or {}).get(k)
+            out[k] = {
+                "titre": round(v[k], 2) if v[k] is not None else None,
+                "mediane_secteur": round(ms, 2) if ms is not None else None,
+                "n_secteur": (n_sect.get(sec) or {}).get(k, 0),
+                "mediane_marche": round(med_marche[k], 2) if med_marche[k] is not None else None,
+                "n_marche": n_marche[k]}
+        return out
+
     profils = {}
     for t, v in brut.items():
         fait = faits.get(t) or {}
@@ -420,6 +544,12 @@ def calculer():
             cherte, croissance, ref = axes(t, v)
             principal, secondaire, notes = profil_par_signature(v, cherte, croissance, sp)
 
+        motif = motif_du_profil(principal, v, cherte, croissance, sp)
+        if sensible_brut_net(principal, v, sp):
+            notes = notes + [
+                "profil SENSIBLE a la convention brut/net du rendement : avec un "
+                "rendement brut, le seuil du profil RENDEMENT serait franchi. "
+                "Chantier de verification ouvert — aucune correction appliquee."]
         grade, reserves = grade_confiance(principal, v, fait)
         if fait.get("note"):
             notes = notes + [fait["note"]]
@@ -443,6 +573,9 @@ def calculer():
             "confiance": confiance,
             # --- v2 ---
             "profil": principal,
+            "motif": motif,
+            "comparaisons": comparaisons(v) if v["analysable"] else None,
+            "payout_source": v["payout_source"],
             "secondaire": secondaire,
             "grade": grade,
             "notes": notes,
