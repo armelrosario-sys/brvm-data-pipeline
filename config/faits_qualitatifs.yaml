@@ -1,0 +1,97 @@
+# config/faits_qualitatifs.yaml — v0.1 (31/07/2026)
+# Faits STRUCTURELS dates et sources qui rendent l'historique chiffre non
+# predictif. Aucun fait en dur dans le moteur : tout vit ici, versionne.
+# Regle : un titre n'entre ici QUE si le fait est public, date et verifiable.
+# Un profil RETOURNEMENT ou MUTATION sans source ci-dessous reste grade C.
+#
+# profil admis : RETOURNEMENT | MUTATION
+#   RETOURNEMENT = pertes ou sortie de pertes avec catalyseur identifiable
+#   MUTATION     = la nature economique de la societe a change ; historique
+#                  non predictif tant que 2 exercices ne sont pas publies
+#                  sur le nouveau perimetre.
+# Ces deux profils sont HORS PERIMETRE du profilage : ils relevent de l'outil
+# de pari (a construire), pas du cadre de profilage.
+
+FTSC:
+  profil: MUTATION
+  note: >-
+    Cession 2024 des filiales cotonnieres (Ivoire Coton, Chimtec, Cofisac),
+    environ 80 % du CA consolide. RN 2024 de 18,6 Mds essentiellement
+    plus-value de cession (HAO), suivi d'un dividende exceptionnel :
+    rendement facial non recurrent. RN 2025 retombe a 466 M. Catalyseur
+    CONSOMME. Historique non predictif jusqu'a 2 exercices sur le nouveau
+    perimetre emballages.
+  source: "Avis BRVM n°230/BRVM/DG du 16/09/2025 (paiement dividendes exercice 2024 ET dividendes exceptionnels) ; etats financiers 2024 et 2025"
+  date_fait: "2024-12-31"
+
+SIVC:
+  profil: MUTATION
+  note: >-
+    Changement de controle : Air Liquide CI devenue Erium CI. Pertes
+    historiques, PER non significatif, payout facial aberrant. Deux exercices
+    publies sur le nouveau perimetre sont necessaires avant tout profil.
+  source: "Denomination BOC (ERIUM CI ex-AIR LIQUIDE CI) ; bulletins officiels de la cote 2025-2026"
+  date_fait: "2025-12-31"
+
+SCRC:
+  profil: RETOURNEMENT
+  note: >-
+    Perte nette 2025 de 6,1 Mds FCFA (comptes sociaux) / 7,95 Mds
+    (consolide), apres un benefice en 2024. Dette totale portee de 24,1 a
+    64,5 Mds en un an pour financer la rehabilitation des usines et
+    l'extension des plantations ; emprunt obligataire convertible emis en
+    octobre 2025. Catalyseur : montee en capacite industrielle.
+    Risque dominant : le levier, si la production ne suit pas.
+  source: "Resolutions AGO exercice 2025 ; presse specialisee (Sikafinance, Dabafinance, Financial Afrik) 05/2026"
+  date_fait: "2025-12-31"
+
+STAC:
+  profil: RETOURNEMENT
+  note: >-
+    Pertes 2025 reduites de 72 %, rebond d'activite porte par les travaux
+    preliminaires de rehabilitation de l'aeroport international d'Abidjan.
+    Toujours en perte : le retour a une rentabilite durable n'est pas
+    confirme. Adossement Bouygues Batiment International.
+  source: "Resultats annuels provisoires 2025 ; Sikafinance 20/04/2026"
+  date_fait: "2025-12-31"
+
+UNXC:
+  profil: RETOURNEMENT
+  note: >-
+    Perte nette 2025 de 624,1 M FCFA, en amelioration de 71,5 % sur les
+    2 189 M de 2024. Les benefices trimestriels 2025 (8,2 Mds annonces au T1)
+    provenaient d'une plus-value de cession de terrain finalement PROVISIONNEE
+    et non incorporee au resultat distribuable : le redressement est
+    operationnel mais inacheve. Changement d'actionnaire en cours.
+  source: "Resolutions AGO du 16/07/2026 ; Financial Afrik 06/07/2026"
+  date_fait: "2025-12-31"
+
+UNLC:
+  profil: RETOURNEMENT
+  note: >-
+    Benefices residuels (PER non significatif), payout facial sans
+    signification. Aucun catalyseur public date identifie a ce jour.
+    Flottant tres etroit : les mouvements de cours relevent de la mecanique
+    de raret e plus que de l'information — non analysable.
+  source: "Bulletins officiels de la cote 2025-2026 (PER > 500)"
+  date_fait: "2025-12-31"
+
+BNBC:
+  profil: RETOURNEMENT
+  note: >-
+    Benefices residuels et serie erratique. Aucun catalyseur public date.
+    Negoce cyclique : un exercice BTP favorable peut modifier le dossier,
+    mais rien d'observable aujourd'hui.
+  source: "Bulletins officiels de la cote 2025-2026"
+  date_fait: "2025-12-31"
+
+BOAN:
+  profil: RETOURNEMENT
+  note: >-
+    Benefices ecrases, payout facial tres superieur au resultat (distribution
+    sur reserves). Le facteur dominant est le risque souverain nigerien, non
+    la gestion de la filiale. Catalyseur eventuel (normalisation politique)
+    ni datable ni verifiable : le dossier ne repond pas aux criteres d'un
+    pari analysable.
+  source: "Bulletins officiels de la cote 2025-2026 ; contexte souverain Niger"
+  date_fait: "2025-12-31"
