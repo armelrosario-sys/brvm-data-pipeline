@@ -46,6 +46,12 @@ profils:
   # --- gardes anti-artefact (v2 ; decouvertes par test, cas SLBC et CABC) ---
   pic_yoy_max: 3.5                  # rupture d'echelle annuelle -> serie tronquee au pic
   base_ecrasee_min: 0.30            # 1er exercice < 30 % de la mediane de serie -> drapeau
+  base_gonflee_max: 1.5             # v3 : 1er exercice > 1,5x la mediane des suivants -> pic
+                                    # initial. Cas PRSC : fenetre 2022-2025 partant du pic
+                                    # 2022 donnait -12,7 %/an ; serie complete 2018-2025 :
+                                    # +2,1 %/an. Sans cette garde, un titre stable etait
+                                    # classe "contraction" avec un grade A.
+  fenetre_exercices_etendue: 8      # v3 : fenetre de repli quand la base est gonflee
   croissance_cap: 0.60              # plafond de croissance annualisee
   rattrapage_min: 0.25              # au-dela : drapeau rattrapage (Lynch 1989 ; Chan 2003)
   rattrapage_bloquant: 0.30         # au-dela : croissance non exploitable pour GARP/GROWTH
