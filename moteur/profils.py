@@ -109,7 +109,8 @@ def charger_faits():
 # ----------------------------------------------------------------------
 
 
-def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap):
+def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap,
+                  base_gonflee_max=1.5, fenetre_max=8):
     """Croissance annualisee sur les RN transcrits en base.
 
     Retourne (g, statut, n_exercices, drapeaux). g=None si non calculable.
@@ -158,6 +159,35 @@ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap):
     med = _mediane([x[1] for x in chrono])
     if med and chrono[0][1] < base_min * med:
         drapeaux.append("BASE_ECRASEE")
+
+    # Garde 2bis (v3, 31/07/2026) : base GONFLEE — symetrique de la precedente.
+    # Cas mesure PRSC : fenetre 2022-2025 demarrant sur le pic 2022 -> -12,7 %/an,
+    # alors que la serie complete 2018-2025 donne +2,1 %/an et que le niveau
+    # 2023-2025 depasse celui de 2018-2020. Sans cette garde, un titre STABLE
+    # etait classe "benefices en contraction" avec un grade A.
+    # Remede : elargir la fenetre quand des exercices anterieurs existent,
+    # plutot que d'invalider la mesure.
+    med_suivants = _mediane([x[1] for x in chrono[1:]])
+    if med_suivants and chrono[0][1] > base_gonflee_max * med_suivants:
+        if len(serie) > len(chrono) or len(lignes) > fenetre:
+            serie_longue = []
+            for exercice, rn, statut in lignes:
+                if rn is None or rn <= 0:
+                    break
+                serie_longue.append((exercice, rn, statut))
+            serie_longue = serie_longue[:fenetre_max][::-1]
+            if len(serie_longue) > len(chrono):
+                chrono = serie_longue
+                drapeaux.append("FENETRE_ELARGIE")
+            else:
+                drapeaux.append("BASE_GONFLEE")
+        else:
+            drapeaux.append("BASE_GONFLEE")
+
+    # Garde 4 : serie a trous (le CAGR relie deux bornes sans les points du milieu)
+    span = chrono[-1][0] - chrono[0][0] + 1
+    if span > len(chrono):
+        drapeaux.append("SERIE_TROUEE")
 
     n = chrono[-1][0] - chrono[0][0]
     if n <= 0:
@@ -249,13 +279,37 @@ def ingredients(cur, ticker, seuils, sp):
 
     g, statut_g, n_ex, drapeaux = croissance_rn(
         cur, ticker, sp["fenetre_exercices_max"], sp["pic_yoy_max"],
-        sp["base_ecrasee_min"], sp["croissance_cap"])
+        sp["base_ecrasee_min"], sp["croissance_cap"],
+        sp["base_gonflee_max"], sp["fenetre_exercices_etendue"])
     if g is not None:
         source_g = "RN_%s(%dex)" % (statut_g, n_ex)
     else:
         g, drapeaux = croissance_bpa_implicite(
             cur, ticker, sp["bpa_implicite_annees"], sp["croissance_cap"])
         source_g = "BPA_IMPLICITE" if g is not None else "AUCUNE"
+        # Controle de coherence : meme trop courte pour servir de source, une serie
+        # de RN peut CONTREDIRE le BPA implicite. Cas mesure SIBC : RN 2024->2025
+        # en hausse de 10,7 %, BPA implicite a -11,5 %/an. On ne peut pas trancher
+        # (2 exercices < 3), mais on ne peut pas non plus se taire.
+        # serie enrichie du comparatif N-1 (sinon SIBC, dont le RN 2024 vit dans le
+        # comparatif de la ligne 2025, echappe au controle)
+        enrichie = {}
+        for ex, rn, rn1 in cur.execute(
+                "SELECT exercice, resultat_net, resultat_net_n1 FROM etats_financiers "
+                "WHERE ticker=? ORDER BY exercice", (ticker,)):
+            if rn1 is not None and (ex - 1) not in enrichie:
+                enrichie[ex - 1] = rn1
+            if rn is not None:
+                enrichie[ex] = rn
+        rn_dispo_ord = sorted(enrichie.items())
+        if g is not None and len(rn_dispo_ord) >= 2:
+            recents = sorted(rn_dispo_ord)[-2:]
+            if recents[0][1] > 0 and recents[1][1] > 0:
+                g_rn_court = recents[1][1] / recents[0][1] - 1
+                if g_rn_court * g < 0 and abs(g_rn_court) > 0.05:
+                    drapeaux = drapeaux + ["CONTRADICTION_RN_BPA"]
+        if g is not None and not rn_dispo_ord:
+            drapeaux = drapeaux + ["AUCUN_RN_EN_BASE"]
 
     if g is not None and g > sp["rattrapage_min"] and "RATTRAPAGE" not in drapeaux:
         drapeaux = drapeaux + ["RATTRAPAGE"]
@@ -400,9 +454,31 @@ def grade_confiance(profil, ing, faits_titre):
                         "validation croisee faite sur NSBC uniquement)")
     if source == "AUCUNE":
         reserves.append("aucune source de croissance exploitable")
-    if ing["drapeaux"]:
-        reserves.append("gardes anti-artefact en jeu (%s) — seuils calibres en echantillon"
-                        % ", ".join(ing["drapeaux"]))
+    EXPLICATIONS = {
+        "CONTRADICTION_RN_BPA": "les resultats nets en base et le BPA implicite evoluent "
+                                "en sens OPPOSE — la croissance affichee n'est pas fiable, "
+                                "trancher avant tout usage",
+        "AUCUN_RN_EN_BASE": "aucun resultat net transcrit : la croissance repose "
+                            "integralement sur le BPA implicite, invérifiable en l'etat",
+        "BASE_GONFLEE": "la fenetre demarre sur un exercice exceptionnellement eleve : "
+                        "la contraction mesuree peut n'etre qu'un retour a la normale",
+        "FENETRE_ELARGIE": "fenetre etendue au-dela de 4 exercices car elle demarrait sur "
+                           "un pic — la tendance de fond remplace l'effet de base",
+        "SERIE_TROUEE": "des exercices manquent entre les bornes : le taux relie deux "
+                        "points sans les annees intermediaires",
+        "SERIE_COMPLETEE_N1": "serie completee par le comparatif N-1 d'un document certifie",
+        "CONFLIT_N1": "une ligne d'exercice contredit un comparatif N-1 — ligne retenue, "
+                      "ecart a arbitrer",
+        "PIC_YOY": "rupture d'echelle annuelle : serie tronquee au pic",
+        "BASE_ECRASEE": "la fenetre demarre sur un creux non representatif",
+        "RATTRAPAGE": "croissance de rattrapage, non extrapolable",
+    }
+    for d in ing["drapeaux"]:
+        base = d.split("_")[0] if d.startswith("CAP_") else d
+        if base in EXPLICATIONS:
+            reserves.append("%s : %s" % (d, EXPLICATIONS[base]))
+        elif d.startswith("CAP_"):
+            reserves.append("%s : croissance plafonnee" % d)
     if ing["payout"] is None:
         reserves.append("payout non disponible — soutenabilite du dividende non verifiee")
     if ing["payout"] is not None and ing["payout"] > 1.0:
@@ -413,6 +489,9 @@ def grade_confiance(profil, ing, faits_titre):
         reserves.insert(0, "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)")
         return ("B" if faits_titre else "C"), reserves
     if profil == "NON_ANALYSABLE":
+        return "C", reserves
+    critiques = {"CONTRADICTION_RN_BPA", "AUCUN_RN_EN_BASE", "BASE_GONFLEE", "CONFLIT_N1"}
+    if critiques & set(ing["drapeaux"]):
         return "C", reserves
     if profil in ("VALUE", "RENDEMENT") and ing["payout"] is None:
         return "B", reserves
@@ -440,6 +519,7 @@ def calculer():
         fenetre_exercices_max=4, pic_yoy_max=3.5, base_ecrasee_min=0.30,
         croissance_cap=0.60, bpa_implicite_annees=3, rattrapage_min=0.25,
         rattrapage_bloquant=0.30, payout_max=1.0, per_max_analysable=50,
+        base_gonflee_max=1.5, fenetre_exercices_etendue=8,
         n_secteur_min=8, value_pctl_min=67, growth_pctl_min=67,
         garp_g_min=0.08, garp_g_max=0.30, garp_pegy_max=1.5, growth_g_min=0.05,
         rendement_dy_min=0.048, contraction_seuil=0.10, alerte_pegy_max=0.25,
