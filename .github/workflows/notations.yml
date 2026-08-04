@@ -45,7 +45,13 @@ jobs:
 
       - run: pip install requests==2.32.3 pdfplumber==0.11.4
 
+      # Le garde-fou signale une derive de format AVANT d'ecrire des donnees.
+      # continue-on-error : un echec du test ne doit pas empecher la collecte
+      # (le CSV produit reste inspectable), mais il est reporte dans le resume
+      # et la couleur du job. C'est un avertissement fort, pas un verrou.
       - name: Garde-fou — analyseurs sur echantillons (sans reseau)
+        id: autotest
+        continue-on-error: true
         run: python3 collecte/notations.py --test
 
       - name: Collecte des notations
@@ -76,6 +82,10 @@ jobs:
         if: always()
         run: |
           echo "### Notations collectees" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.autotest.outcome }}" != "success" ]; then
+            echo "- ⚠️ **Garde-fou en echec** : le format de la source a peut-etre" \
+                 "change. Verifier les donnees avant de les exploiter." >> $GITHUB_STEP_SUMMARY
+          fi
           python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
           import csv, json, pathlib
           p = pathlib.Path("collecte/notations_financieres.csv")
