@@ -132,8 +132,17 @@ RE_VALIDITE = re.compile(
     r"[Vv]alidit[ée]\s*:?\s*([A-Za-zéûî]+\s*\d{4})\s*[-–]\s*([A-Za-zéûî]+\s*\d{4})")
 RE_PERSPECTIVE = re.compile(
     r"perspective[^.]{0,40}?\b(stable|positive|n[ée]gative|en d[ée]veloppement)\b", re.I)
+# ACTION : premier run reel -> 6 titres marques "degradation" alors que leur
+# perspective etait stable. Cause : le motif attrapait le mot dans les sections
+# de methodologie ("facteurs de degradation possibles de la note"). Correctif :
+# ne reconnaitre que des FORMES CONJUGUEES d'une action effectivement realisee,
+# et exiger la proximite du mot "note".
 RE_ACTION = re.compile(
-    r"\b(rehauss|relev|abaiss|d[ée]grad|affirm|confirm|attribu|assign|retir)\w*", re.I)
+    r"\b(?:a\s+|ont\s+)?"
+    r"(rehauss[ée]e?s?|rel[eè]v[ée]e?s?|abaiss[ée]e?s?|d[ée]grad[ée]e?s?|"
+    r"affirm[ée]e?s?|confirm[ée]e?s?|maintenue?s?|attribu[ée]e?s?|retir[ée]e?s?)"
+    r"(?:\s+(?:la|les|ses)?\s*notes?)?", re.I)
+RE_ACTION_CONTEXTE = re.compile(r"note", re.I)
 RE_CA = re.compile(
     r"(\d[\d\s.,]{1,9})\s*milliards?\s*(?:de\s*)?(?:FCFA|F\s?CFA|XOF)", re.I)
 RE_MARGE_NETTE = re.compile(r"marge\s+nette[^.\d]{0,30}(\d{1,2})\s*%", re.I)
@@ -211,6 +220,19 @@ Informations financières de base En millions de FCFA 2023 2024
 """
 
 
+# Pieges reels rencontres au 2e run (04/08/2026), figes ici pour non-regression :
+#  - le mot "degradation" dans une phrase de METHODOLOGIE (6 faux positifs)
+#  - une note court terme coupee par un saut de ligne PDF : "A1+\n(WU)"
+#  - une variation de +4 crans issue d'une lecture parasite du tableau
+ECHANTILLON_PIEGES = """
+GCR a affirme la note d'emetteur de long terme A+(WU) de la societe.
+La perspective est stable. Note d'emetteur de court terme : A1+
+(WU).
+Facteurs de degradation possibles de la note : une deterioration durable des
+marges ou une hausse du levier pourraient entrainer une degradation.
+"""
+
+
 def reduire(nom):
     """Forme comparable : minuscules, sans accents ni ponctuation."""
     s = (nom or "").lower().strip()
@@ -235,6 +257,14 @@ def ticker_depuis(nom_societe, titre_annonce, url):
             if len(cle) >= 4 and cle in red:
                 return tick
     return None
+
+
+def _variation(nouvelle, ancienne):
+    rn, ra = rang(nouvelle), rang(ancienne)
+    if rn is None or ra is None:
+        return None
+    ecart = rn - ra
+    return ecart if abs(ecart) <= 3 else None
 
 
 def rang(note):
@@ -371,8 +401,9 @@ def _analyser_texte(txt):
 
     validite = RE_VALIDITE.search(plat)
     # note court terme : premiere occurrence de type A1/A2/B/C sur echelle WU
-    m_ct = re.search(r"\b(A1\+?|A1|A2|A3|B|C|D)\s*\(\s*WU\s*\)", txt, re.I)
-    note_ct = m_ct.group(0).replace(" ", "").upper() if m_ct else note_ct_bloom
+    # \s* et non " " : le saut de ligne d'un PDF coupe "A1+\n(WU)"
+    m_ct = re.search(r"\b(A1\+|A1|A2|A3|B|C|D)\s*\(\s*WU\s*\)", txt, re.I | re.S)
+    note_ct = (re.sub(r"\s+", "", m_ct.group(0)).upper() if m_ct else note_ct_bloom)
 
     persp = RE_PERSPECTIVE.search(plat)
     if persp is None:
@@ -389,7 +420,16 @@ def _analyser_texte(txt):
                     def group(self, _n):
                         return self._v
                 persp = _P(m_p.group(1))
-    action = RE_ACTION.search(plat)
+    action = None
+    for m in RE_ACTION.finditer(plat):
+        fenetre = plat[max(0, m.start() - 90):m.end() + 90]
+        # une action reelle parle de LA note ; les sections de methodologie
+        # evoquent des facteurs "possibles" ou "susceptibles de"
+        if RE_ACTION_CONTEXTE.search(fenetre) and not re.search(
+                r"possibl|susceptibl|pourrait|facteurs?\s+de|en\s+cas\s+de|"
+                r"peut\s+(?:etre|être)", fenetre, re.I):
+            action = m
+            break
     agence = RE_AGENCE.search(plat)
     mn = RE_MARGE_NETTE.search(plat)
     mb = RE_MARGE_BRUTE.search(plat)
@@ -405,7 +445,7 @@ def _analyser_texte(txt):
         agence=agence.group(1) if agence else None,
         note_lt=note_lt, note_ct=note_ct,
         perspective=(persp.group(1).lower() if persp else None),
-        action=(action.group(0).lower() if action else None),
+        action=(re.sub(r"\s+", " ", action.group(1)).lower() if action else None),
         marge_nette=_nombre(mn.group(1)) if mn else None,
         marge_brute=_nombre(mb.group(1)) if mb else None,
         score_risque_pays=_nombre(sp.group(1)) if sp else None,
@@ -413,9 +453,11 @@ def _analyser_texte(txt):
         score_total=_nombre(stot.group(1)) if stot else None,
         note_ancienne=note_ancienne,
         validite=("%s a %s" % (validite.group(1), validite.group(2))) if validite else None,
-        variation_crans=((rang(note_lt) - rang(note_ancienne))
-                         if (rang(note_lt) is not None and rang(note_ancienne) is not None)
-                         else None),
+        # Variation plafonnee a +/-3 crans : au-dela, c'est presque toujours une
+        # lecture erronee du tableau (cas STBC : "A -> AA+" soit +4 crans, en
+        # realite une capture parasite). Une agence bouge rarement de plus de
+        # deux crans en une revue.
+        variation_crans=_variation(note_lt, note_ancienne),
         ca_mds=";".join(str(c) for c in ca[:6]) if ca else None,
         annees_citees=";".join(sorted(set(annees))[:6]) if annees else None,
         nb_notes_trouvees=len(notes))
@@ -476,13 +518,20 @@ def autotest():
         if b.get(cle) != attendu:
             echecs.append("bloomfield %s : %r au lieu de %r" % (cle, b.get(cle), attendu))
 
+    # --- Pieges de non-regression ---
+    pg = _analyser_texte(ECHANTILLON_PIEGES)
+    for cle, attendu in (("action", "affirme"), ("note_ct", "A1+(WU)"),
+                         ("note_lt", "A+(WU)")):
+        if pg.get(cle) != attendu:
+            echecs.append("pieges %s : %r au lieu de %r" % (cle, pg.get(cle), attendu))
+
     if echecs:
         print("AUTOTEST : %d ECHEC(S)" % len(echecs))
         for e in echecs:
             print("  - %s" % e)
         return 1
     print("AUTOTEST : tous les analyseurs passent (index 15/15, 14 tickers, "
-          "PDF GCR 10/10, PDF Bloomfield 6/6)")
+          "PDF GCR 10/10, Bloomfield 6/6, pieges 3/3)")
     return 0
 
 
