@@ -102,9 +102,34 @@ RANGS = ["D", "C", "CC", "CCC-", "CCC", "CCC+", "B-", "B", "B+", "BB-", "BB",
 RE_LIGNE = re.compile(
     r"\|\s*(\d{2}/\d{2}/\d{4})\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*"
     r"\[T[ée]l[ée]charger\]\((https://[^\)]+\.pdf)\)")
+# GCR suffixe ses notes de l'echelle regionale : A+(WU). Bloomfield, seconde
+# agence agreee UEMOA, utilise les MEMES lettres SANS suffixe : AAA, AA+, BBB+.
+# Erreur mesuree au premier run reel (04/08/2026) : 22 PDF Bloomfield lus mais
+# classes SANS_NOTE, dont SGBC, ORAC, SDSC, NTLC, SIBC — soit la moitie de la
+# couverture utile. Les deux echelles sont regionales UEMOA/CEMAC et NON
+# comparables a une echelle internationale (Bloomfield indique que les
+# meilleures signatures de la zone valent BBB- sur echelle mondiale).
 RE_NOTE = re.compile(
     r"\b(AAA|AA[+-]?|A[+-]?|BBB[+-]?|BB[+-]?|B[+-]?|CCC[+-]?|CC|C|D)\s*\("
     r"\s*(WU|WR|WA|wu)\s*\)", re.I)
+# ATTENTION a l'ordre : en regex, l'alternance est evaluee de gauche a droite.
+# "AA|AA+" capture "AA" et laisse le "+" -> note fausse d'un cran. Les variantes
+# suffixees passent donc AVANT. Defaut capture par l'autotest (AA au lieu de AA+).
+# Deux pieges cumules, tous deux captures par l'autotest :
+#  1. ordre d'alternance : "AA|AA+" capture "AA" et laisse le "+" -> note fausse
+#     d'un cran. Les variantes suffixees passent AVANT.
+#  2. frontiere GAUCHE : le mot "CFA" (colonne Monnaie des fiches Bloomfield)
+#     se termine par un A, capture comme une note "A". D'ou (?<![\w+-]).
+RE_NOTE_NUE = re.compile(
+    r"(?<![\w+-])(?:AAA|AA[+-]|AA|A[+-]|BBB[+-]|BBB|BB[+-]|BB|B[+-]|CCC[+-]|CCC|CC|A|B|D)"
+    r"(?![\w+-])")
+# Tableau Bloomfield : "Long Terme | Monnaie locale | CFA | AAA | AA+ | 31/05/2026 | Stable"
+RE_BLOOM_LT = re.compile(
+    r"Long\s*Terme[^\n]{0,120}", re.I)
+RE_BLOOM_CT = re.compile(
+    r"Court\s*Terme[^\n]{0,120}", re.I)
+RE_VALIDITE = re.compile(
+    r"[Vv]alidit[ée]\s*:?\s*([A-Za-zéûî]+\s*\d{4})\s*[-–]\s*([A-Za-zéûî]+\s*\d{4})")
 RE_PERSPECTIVE = re.compile(
     r"perspective[^.]{0,40}?\b(stable|positive|n[ée]gative|en d[ée]veloppement)\b", re.I)
 RE_ACTION = re.compile(
@@ -116,7 +141,9 @@ RE_MARGE_BRUTE = re.compile(r"marge\s+brute[^.\d]{0,30}(\d{1,2})\s*%", re.I)
 RE_SCORE_PAYS = re.compile(r"score\s+de\s+risque[- ]pays\s*\|?\s*([\d,\.]+)", re.I)
 RE_SCORE_SECT = re.compile(r"score\s+de\s+risque\s+sectoriel\s*\|?\s*([\d,\.]+)", re.I)
 RE_SCORE_TOTAL = re.compile(r"score\s+total\s*\|?\s*([\d,\.]+)", re.I)
-RE_AGENCE = re.compile(r"\b(GCR Ratings|GCR|WARA|Bloomfield|Moody'?s|Fitch|S&P)\b")
+RE_AGENCE = re.compile(
+    r"\b(GCR Ratings|GCR|WARA|Bloomfield Investment Corporation|Bloomfield|"
+    r"Moody'?s|Fitch|S&P)\b")
 
 
 # ----------------------------------------------------------------------
@@ -169,6 +196,21 @@ Score Total 8,75
 """
 
 
+# Fiche Bloomfield (seconde agence agreee UEMOA) : echelle SANS suffixe, mise
+# en page en tableau. Ajoutee apres le premier run reel, ou 22 PDF Bloomfield
+# avaient ete lus mais classes SANS_NOTE.
+ECHANTILLON_PDF_BLOOMFIELD = """
+Fiche de Notation Financière
+Validité : Juin 2025-Mai 2026
+Catégorie De valeurs Échelle de notation Monnaie Note actu. Note préc. Date d'exp. Perspective
+Long Terme Monnaie locale CFA AAA AA+ 31/05/2026 Stable
+Court Terme Monnaie locale CFA A1+ A1+ 31/05/2026 Stable
+Bloomfield Investment Corporation
+Sur le long terme : Qualité de crédit la plus élevée. Les facteurs de risques sont négligeables.
+Informations financières de base En millions de FCFA 2023 2024
+"""
+
+
 def reduire(nom):
     """Forme comparable : minuscules, sans accents ni ponctuation."""
     s = (nom or "").lower().strip()
@@ -196,6 +238,9 @@ def ticker_depuis(nom_societe, titre_annonce, url):
 
 
 def rang(note):
+    """Rang commun aux deux echelles regionales (GCR suffixee, Bloomfield nue).
+    Sert UNIQUEMENT a mesurer une variation d'une revue a l'autre chez la MEME
+    agence — jamais a comparer deux titres notes par des agences differentes."""
     base = (note or "").split("(")[0].strip().upper()
     return RANGS.index(base) if base in RANGS else None
 
@@ -290,17 +335,60 @@ def _analyser_texte(txt):
     if note_lt is None and notes:
         note_lt = "%s(%s)" % (notes[0][0].upper(), notes[0][1].upper())
 
+    # --- Voie Bloomfield (echelle sans suffixe) ---
+    note_ct_bloom = None
+    if note_lt is None:
+        m_lt = RE_BLOOM_LT.search(txt)
+        if m_lt:
+            trouvees = RE_NOTE_NUE.findall(m_lt.group(0))
+            if trouvees:
+                note_lt = trouvees[0]                       # colonne "Note actu."
+        m_ct = RE_BLOOM_CT.search(txt)
+        if m_ct:
+            ct = re.findall(r"(A1\+|A1|A2|A3|B|C|D)(?![\w+])", m_ct.group(0))
+            note_ct_bloom = ct[0] if ct else None
+        if note_lt is None:
+            # tournure redactionnelle : "la note de long terme A (note d'investissement)"
+            m_txt = re.search(r"(?:note\s+(?:de\s+)?long\s*terme|long\s*terme[,:]?)\s*"
+                              r"(?:de\s+|demeure\s+|est\s+)?" + RE_NOTE_NUE.pattern,
+                              plat, re.I)
+            if m_txt:
+                note_lt = m_txt.group(1)
+
     # note precedente (si le communique la mentionne) -> variation en crans
     note_ancienne = None
     m_de_a = re.search(r"\bde\s+" + RE_NOTE.pattern + r"\s*(?:a|à)\s*" + RE_NOTE.pattern,
                        txt, re.I)
     if m_de_a:
         note_ancienne = "%s(%s)" % (m_de_a.group(1).upper(), m_de_a.group(2).upper())
+    elif note_lt and "(" not in note_lt:
+        # Bloomfield : la colonne "Note prec." suit la note actuelle dans le tableau
+        m_lt = RE_BLOOM_LT.search(txt)
+        if m_lt:
+            trouvees = RE_NOTE_NUE.findall(m_lt.group(0))
+            if len(trouvees) > 1 and trouvees[1] != trouvees[0]:
+                note_ancienne = trouvees[1]
+
+    validite = RE_VALIDITE.search(plat)
     # note court terme : premiere occurrence de type A1/A2/B/C sur echelle WU
     m_ct = re.search(r"\b(A1\+?|A1|A2|A3|B|C|D)\s*\(\s*WU\s*\)", txt, re.I)
-    note_ct = m_ct.group(0).replace(" ", "").upper() if m_ct else None
+    note_ct = m_ct.group(0).replace(" ", "").upper() if m_ct else note_ct_bloom
 
     persp = RE_PERSPECTIVE.search(plat)
+    if persp is None:
+        # Bloomfield : la perspective est la derniere colonne du tableau,
+        # sans le mot "perspective" devant.
+        m_pl = RE_BLOOM_LT.search(txt)
+        if m_pl:
+            m_p = re.search(r"\b(stable|positive|n[ée]gative|en d[ée]veloppement|"
+                            r"en [ée]volution)\b", m_pl.group(0), re.I)
+            if m_p:
+                class _P:
+                    def __init__(self, v):
+                        self._v = v
+                    def group(self, _n):
+                        return self._v
+                persp = _P(m_p.group(1))
     action = RE_ACTION.search(plat)
     agence = RE_AGENCE.search(plat)
     mn = RE_MARGE_NETTE.search(plat)
@@ -324,6 +412,7 @@ def _analyser_texte(txt):
         score_risque_secteur=_nombre(ss.group(1)) if ss else None,
         score_total=_nombre(stot.group(1)) if stot else None,
         note_ancienne=note_ancienne,
+        validite=("%s a %s" % (validite.group(1), validite.group(2))) if validite else None,
         variation_crans=((rang(note_lt) - rang(note_ancienne))
                          if (rang(note_lt) is not None and rang(note_ancienne) is not None)
                          else None),
@@ -339,7 +428,7 @@ def journaliser(obj):
 
 
 COLONNES = ["ticker", "societe_brvm", "date_annonce", "agence", "note_lt", "rang_lt",
-            "note_ancienne", "variation_crans", "note_ct", "perspective", "action", "marge_nette", "marge_brute",
+            "note_ancienne", "variation_crans", "note_ct", "perspective", "validite", "action", "marge_nette", "marge_brute",
             "ca_mds", "annees_citees", "score_risque_pays", "score_risque_secteur",
             "score_total", "statut_extraction", "url_pdf", "date_collecte"]
 
@@ -378,13 +467,22 @@ def autotest():
         if d.get(cle) != attendu:
             echecs.append("pdf %s : %r au lieu de %r" % (cle, d.get(cle), attendu))
 
+    # --- Voie Bloomfield ---
+    b = _analyser_texte(ECHANTILLON_PDF_BLOOMFIELD)
+    for cle, attendu in (("note_lt", "AAA"), ("note_ancienne", "AA+"),
+                         ("note_ct", "A1+"), ("perspective", "stable"),
+                         ("agence", "Bloomfield Investment Corporation"),
+                         ("validite", "Juin 2025 a Mai 2026")):
+        if b.get(cle) != attendu:
+            echecs.append("bloomfield %s : %r au lieu de %r" % (cle, b.get(cle), attendu))
+
     if echecs:
         print("AUTOTEST : %d ECHEC(S)" % len(echecs))
         for e in echecs:
             print("  - %s" % e)
         return 1
     print("AUTOTEST : tous les analyseurs passent (index 15/15, 14 tickers, "
-          "PDF 10/10 champs)")
+          "PDF GCR 10/10, PDF Bloomfield 6/6)")
     return 0
 
 
