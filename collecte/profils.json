@@ -79,6 +79,7 @@
    "note_precedente": "",
    "perspective": "stable",
    "date": "2025-12-30",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "12.467",
    "url": "https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_servair_abidjan_ci.pdf"
@@ -283,11 +284,12 @@
   "n_secteur": 4,
   "source_fait": "Bulletins officiels de la cote 2025-2026",
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A+",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-08-22",
+   "validite": "Juillet 2025 a Juin 2026",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_bernabe_ci.pdf"
@@ -521,11 +523,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A+",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-07-05",
+   "validite": "Mai 2026 a Avril 2027",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260703_-_notation_financiere_-_boa_ci.pdf"
@@ -651,11 +654,12 @@
   "n_secteur": 14,
   "source_fait": "Bulletins officiels de la cote 2025-2026 ; contexte souverain Niger",
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A-",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-11-18",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20251117_-_notation_financiere_-_boa_ng.pdf"
@@ -734,11 +738,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-10-23",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_boa_sn.pdf"
@@ -821,6 +826,7 @@
    "note_precedente": "",
    "perspective": "stable",
    "date": "2025-11-26",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "19.1",
    "url": "https://www.brvm.org/sites/default/files/20251126_-_notation_financiere_-_sicable_ci.pdf"
@@ -903,11 +909,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-09-15",
+   "validite": "Juin 2025 a Mai 2026",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_coris_bank_international_bf.pdf"
@@ -1029,11 +1036,12 @@
   "n_secteur": 2,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA+",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-01-08",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260108_-_notation_financiere_-_cie_ci.pdf"
@@ -1119,11 +1127,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-10-28",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_ecobank_ci.pdf"
@@ -1323,11 +1332,12 @@
   "n_secteur": 4,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A+",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-08-28",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20250828_-_notation_financiere_-_lnb_bn.pdf"
@@ -1406,11 +1416,12 @@
   "n_secteur": 4,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A-",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-03-03",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_nei_ceda_ci.pdf"
@@ -1488,11 +1499,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA-",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-10-28",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_nsia_banque_ci.pdf"
@@ -1572,11 +1584,12 @@
   "n_secteur": 6,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A+",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-06-07",
+   "validite": "Novembre 2025 a octobre 2026",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260605_-_notation_financiere_-_nestle_ci.pdf"
@@ -1660,6 +1673,7 @@
    "note_precedente": "",
    "perspective": "stable",
    "date": "2025-12-30",
+   "validite": "",
    "marge_nette": "15.0",
    "ca_mds": "142.0;139.0;146.0;155.0;157.0;533.0",
    "url": "https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_onatel_bf.pdf"
@@ -1742,11 +1756,12 @@
   "n_secteur": 3,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AAA",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-02-02",
+   "validite": "Septembre 2025 a Août 2026",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260202_-_notation_financiere_-_orange_ci.pdf"
@@ -1825,11 +1840,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-05-05",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/fiche_de_notation_-_oragroup_sa_-_2025.pdf"
@@ -2024,11 +2040,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "BBB+",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-03-03",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_safca_ci.pdf"
@@ -2079,6 +2096,7 @@
    "note_precedente": "",
    "perspective": "stable",
    "date": "2025-12-30",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "87.2;20.3;4.6;36.0",
    "url": "https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_sucrivoire_ci.pdf"
@@ -2161,11 +2179,12 @@
   "n_secteur": 2,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-01-27",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260127_-_notation_financiere_-_sode_ci.pdf"
@@ -2243,11 +2262,12 @@
   "n_secteur": 3,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-06-24",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260623_-_notation_financiere_-_africa_global_logistics_ci.pdf"
@@ -2407,11 +2427,12 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AAA",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-09-15",
+   "validite": "Juillet 2025 a Juin 2026",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_societe_generale_ci.pdf"
@@ -2543,7 +2564,9 @@
   "payout_source": "IMPLICITE(rendement x PER)",
   "secondaire": null,
   "grade": "C",
-  "notes": [],
+  "notes": [
+   "CONTRADICTION_NOTATION : l'agence Bloomfield Investment Corporation affiche une perspective positive (note AA-, perspective positive, 2026-04-22) alors que le profilage conclut a une degradation — la source du profil (BPA_IMPLICITE) doit etre verifiee avant tout usage"
+  ],
   "reserves": [
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "CONTRADICTION_RN_BPA : les resultats nets en base et le BPA implicite evoluent en sens OPPOSE — la croissance affichee n'est pas fiable, trancher avant tout usage",
@@ -2566,16 +2589,17 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA-",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "positive",
    "date": "2026-04-22",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20260421_-_notation_financiere_-_sib_ci.pdf"
   },
-  "contradiction_notation": false
+  "contradiction_notation": true
  },
  "SICC": {
   "dominant": "NON_ANALYSABLE",
@@ -2661,11 +2685,12 @@
   "n_secteur": 3,
   "source_fait": "Denomination BOC (ERIUM CI ex-AIR LIQUIDE CI) ; bulletins officiels de la cote 2025-2026",
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "BBB",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2026-05-05",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/fiche_de_notation-_erium_ci_-_2025.pdf"
@@ -2826,11 +2851,12 @@
   "n_secteur": 4,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A+",
    "note_precedente": "",
-   "perspective": "",
+   "perspective": "stable",
    "date": "2025-12-09",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20251209_-_notation_financiere_-_smb_ci.pdf"
@@ -2913,6 +2939,7 @@
    "note_precedente": "",
    "perspective": "stable",
    "date": "2026-07-01",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "100.0;100.0",
    "url": "https://www.brvm.org/sites/default/files/20260630_-_notation_financiere_-_sonatel_sn.pdf"
@@ -3069,6 +3096,7 @@
    "note_precedente": "",
    "perspective": "stable",
    "date": "2025-10-16",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/20251016_-_notation_financiere_-_saph_ci.pdf"
@@ -3196,11 +3224,12 @@
   "n_secteur": 6,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield",
-   "note": "",
-   "note_precedente": "",
-   "perspective": "",
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA+",
+   "note_precedente": "A",
+   "perspective": "stable",
    "date": "2026-05-05",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "",
    "url": "https://www.brvm.org/sites/default/files/fiche_de_notation_-_sitab_2025.pdf"
@@ -3284,6 +3313,7 @@
    "note_precedente": "",
    "perspective": "stable",
    "date": "2025-12-30",
+   "validite": "",
    "marge_nette": "",
    "ca_mds": "621.0",
    "url": "https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_totalenergies_marketing_ci.pdf"
