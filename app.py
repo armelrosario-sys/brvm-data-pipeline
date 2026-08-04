@@ -307,10 +307,11 @@ with o1:
 
     st.markdown("---")
     st.markdown("#### Plan cherte × croissance")
-    st.caption("Percentiles au sein du secteur si celui-ci compte au moins 8 titres, "
-               "sinon au sein du marche (reference indiquee dans la fiche titre). "
-               "Des rangs voisins ne sont pas significativement differents : "
-               "lire des zones, pas des positions.")
+    n_plan = int((vue.cherte_pctl.notna() & vue.croissance_pctl.notna()).sum())
+    st.caption(f"**{n_plan} titres sur {len(vue)} positionnes.** Percentiles au sein du "
+               "secteur si celui-ci compte au moins 8 titres, sinon au sein du marche "
+               "(reference indiquee dans la fiche titre). Des rangs voisins ne sont pas "
+               "significativement differents : lire des zones, pas des positions.")
     plan = vue.dropna(subset=["cherte_pctl", "croissance_pctl"])
     if len(plan):
         base = alt.Chart(plan).mark_circle(size=220, opacity=.85).encode(
@@ -330,6 +331,30 @@ with o1:
                    .encode(y="v:Q"))
         st.altair_chart((base + texte + regles + regles2).properties(height=460),
                         width='stretch')
+
+        # Les titres hors axes ne doivent pas DISPARAITRE du tableau de bord :
+        # un plan qui n'affiche que 34 titres sur 47 laisse croire que les 13
+        # autres n'existent pas, alors qu'ils portent un diagnostic explicite.
+        hors = vue[vue.cherte_pctl.isna() | vue.croissance_pctl.isna()]
+        if len(hors):
+            with st.expander(f"{len(hors)} titre(s) hors du plan — pourquoi",
+                             expanded=False):
+                st.caption("Un titre n'apparait sur le plan que s'il a une position "
+                           "sur les DEUX axes. Les profils Retournement, Mutation et "
+                           "Non analysable sont hors perimetre par construction ; "
+                           "les autres ont un axe manquant, ce qui est une lacune de "
+                           "donnees et non un diagnostic.")
+                h = hors[["ticker", "nom", "profil", "grade", "cherte_pctl",
+                          "croissance_pctl", "motif"]].copy()
+                h["Axe manquant"] = h.apply(
+                    lambda r: "les deux" if pd.isna(r.cherte_pctl) and pd.isna(r.croissance_pctl)
+                    else ("croissance" if pd.isna(r.croissance_pctl) else "cherte"), axis=1)
+                h = h[["ticker", "nom", "profil", "grade", "Axe manquant", "motif"]]
+                h.columns = ["Ticker", "Societe", "Profil", "Grade", "Axe manquant",
+                             "Motif"]
+                st.dataframe(h.sort_values(["Profil", "Ticker"]), hide_index=True,
+                             width='stretch',
+                             column_config={"Motif": st.column_config.TextColumn(width="large")})
     else:
         st.info("Aucun titre positionnable avec les filtres actuels "
                 "(les profils hors axes n'ont pas de percentile).")
