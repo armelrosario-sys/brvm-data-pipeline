@@ -1,0 +1,92 @@
+name: P12 - Collecte des notations financieres
+
+# Source : brvm.org > Annonces emetteurs > Notations financieres (~30 pages).
+# Frequence MENSUELLE : les agences revoient les emetteurs une fois par an, une
+# collecte plus frequente n'apporterait rien et solliciterait le serveur BRVM
+# pour rien. Le declenchement manuel reste possible apres une annonce reperee.
+#
+# Ce workflow tourne sur GitHub Actions et non en local : l'acces a brvm.org
+# y est ouvert. Le mode --test (analyseurs rejoues sur echantillons, sans
+# reseau) sert de garde-fou AVANT la collecte : si la BRVM change le format de
+# sa page ou GCR la mise en page de ses communiques, le job echoue ici plutot
+# que d'ecrire des donnees fausses.
+
+on:
+  schedule:
+    - cron: "17 6 3 * *"   # le 3 de chaque mois, 06h17 UTC
+  workflow_dispatch:
+    inputs:
+      nb_pdf:
+        description: "Nombre de PDF a extraire (0 = index seul)"
+        required: false
+        default: "30"
+      pages:
+        description: "Pages d'index a parcourir"
+        required: false
+        default: "40"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: notations
+  cancel-in-progress: false
+
+jobs:
+  collecter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests==2.32.3 pdfplumber==0.11.4
+
+      - name: Garde-fou — analyseurs sur echantillons (sans reseau)
+        run: python3 collecte/notations.py --test
+
+      - name: Collecte des notations
+        run: |
+          python3 collecte/notations.py \
+            --pdf "${{ github.event.inputs.nb_pdf || 30 }}" \
+            --pages "${{ github.event.inputs.pages || 40 }}"
+
+      - name: Recalcul des profils (detection des contradictions)
+        run: |
+          python3 moteur/peupler.py
+          python3 collecte/charger_cours.py
+          python3 moteur/profils.py
+
+      - name: Golden tests
+        run: python3 moteur/tester.py
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add collecte/notations_financieres.csv collecte/notations_echecs.jsonl \
+                  collecte/profils.json || true
+          git commit -m "Notations financieres $(date -u +%F)" || echo "rien a committer"
+          git push || echo "push impossible"
+
+      - name: Resume
+        if: always()
+        run: |
+          echo "### Notations collectees" >> $GITHUB_STEP_SUMMARY
+          python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import csv, json, pathlib
+          p = pathlib.Path("collecte/notations_financieres.csv")
+          if p.exists():
+              lignes = list(csv.DictReader(p.open(encoding="utf-8")))
+              ok = [l for l in lignes if l["statut_extraction"] == "OK"]
+              print(f"- {len(lignes)} annonces, {len(ok)} avec note extraite")
+              print(f"- {len({l['ticker'] for l in ok if l['ticker']})} tickers couverts")
+          pr = pathlib.Path("collecte/profils.json")
+          if pr.exists():
+              d = json.loads(pr.read_text(encoding="utf-8"))
+              c = [t for t, v in d.items() if v.get("contradiction_notation")]
+              print(f"- **{len(c)} contradiction(s) profil / notation** : {', '.join(c) or 'aucune'}")
+          PY
