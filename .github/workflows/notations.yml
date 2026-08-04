@@ -43,7 +43,9 @@ jobs:
         with:
           python-version: "3.11"
 
-      - run: pip install requests==2.32.3 pdfplumber==0.11.4
+      # pyyaml : requis par moteur/peupler.py et moteur/profils.py
+      # (config/seuils.yaml, config/faits_qualitatifs.yaml)
+      - run: pip install requests==2.32.3 pdfplumber==0.11.4 pyyaml==6.0.2
 
       # Le garde-fou signale une derive de format AVANT d'ecrire des donnees.
       # continue-on-error : un echec du test ne doit pas empecher la collecte
@@ -60,13 +62,20 @@ jobs:
             --pdf "${{ github.event.inputs.nb_pdf || 30 }}" \
             --pages "${{ github.event.inputs.pages || 40 }}"
 
+      # Le recalcul est un BONUS : si le moteur echoue, les notations collectees
+      # a l'etape precedente doivent quand meme etre commitees. La detection des
+      # contradictions se fera au prochain run de profils.py.
       - name: Recalcul des profils (detection des contradictions)
+        id: profils
+        continue-on-error: true
         run: |
           python3 moteur/peupler.py
           python3 collecte/charger_cours.py
           python3 moteur/profils.py
 
       - name: Golden tests
+        if: steps.profils.outcome == 'success'
+        continue-on-error: true
         run: python3 moteur/tester.py
 
       - name: Commit
@@ -82,6 +91,10 @@ jobs:
         if: always()
         run: |
           echo "### Notations collectees" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.profils.outcome }}" != "success" ]; then
+            echo "- ⚠️ Recalcul des profils en echec : les notations sont collectees," \
+                 "les contradictions seront detectees au prochain run." >> $GITHUB_STEP_SUMMARY
+          fi
           if [ "${{ steps.autotest.outcome }}" != "success" ]; then
             echo "- ⚠️ **Garde-fou en echec** : le format de la source a peut-etre" \
                  "change. Verifier les donnees avant de les exploiter." >> $GITHUB_STEP_SUMMARY
