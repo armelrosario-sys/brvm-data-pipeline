@@ -102,7 +102,12 @@ def charger():
             cherte_pctl=v.get("cherte_pctl"), croissance_pctl=v.get("croissance_pctl"),
             reference=v.get("reference_axes"), drapeaux=", ".join(v.get("drapeaux") or []),
             confiance=v.get("confiance"), gate=v.get("gate"),
-            motif=v.get("motif"), payout_source=v.get("payout_source")))
+            motif=v.get("motif"), payout_source=v.get("payout_source"),
+            notation=(v.get("notation") or {}).get("note"),
+            notation_agence=(v.get("notation") or {}).get("agence"),
+            notation_perspective=(v.get("notation") or {}).get("perspective"),
+            notation_date=(v.get("notation") or {}).get("date"),
+            contradiction=bool(v.get("contradiction_notation"))))
     return pd.DataFrame(lignes), profils, cours, etats
 
 
@@ -145,6 +150,7 @@ with st.sidebar:
     f_profil = st.multiselect("Profil", ORDRE, default=[])
     f_grade = st.multiselect("Grade de confiance", ["A", "B", "C"], default=[])
     f_secteur = st.multiselect("Secteur", sorted(df.secteur.dropna().unique()), default=[])
+    f_contra = st.checkbox("Uniquement les contradictions avec une agence de notation")
     st.markdown("---")
     st.markdown("""<div class='bloc-verite'><b>Ce que cet outil n'est pas</b><br>
     • Il ne cherche pas les hausses explosives : il en est structurellement l'anti-outil.<br>
@@ -160,6 +166,8 @@ if f_grade:
     vue = vue[vue.grade.isin(f_grade)]
 if f_secteur:
     vue = vue[vue.secteur.isin(f_secteur)]
+if f_contra:
+    vue = vue[vue.contradiction]
 
 st.title("Profilage fondamental — BRVM")
 
@@ -334,10 +342,11 @@ with o2:
                "**A** source certifiee et etiquette stable · **B** solide, reserve nommee · "
                "**C** travail complementaire requis avant tout usage.")
     aff = vue[["ticker", "nom", "secteur", "profil", "secondaire", "grade", "per", "dy",
-               "croissance", "source", "pegy", "payout", "drapeaux", "motif"]].copy()
+               "croissance", "source", "pegy", "payout", "drapeaux",
+               "notation", "contradiction", "motif"]].copy()
     aff.columns = ["Ticker", "Societe", "Secteur", "Profil", "Secondaire", "Grade",
                    "PER", "Rdt %", "Croiss. %/an", "Source croissance", "PEGY",
-                   "Payout", "Drapeaux", "Motif"]
+                   "Payout", "Drapeaux", "Notation", "Contradiction", "Motif"]
     st.dataframe(
         aff.sort_values(["Grade", "Profil", "Ticker"]), hide_index=True,
         width='stretch', height=560,
@@ -388,6 +397,24 @@ with o3:
 
     if v.get("motif"):
         st.info(f"**Pourquoi ce profil** — {v['motif']}")
+
+    notation = v.get("notation")
+    if notation and notation.get("note"):
+        n_prec = notation.get("note_precedente")
+        sens = ""
+        if n_prec and n_prec != notation["note"]:
+            sens = f" (precedemment {n_prec})"
+        ligne = (f"**Notation {notation.get('agence') or 'agence'}** : "
+                 f"{notation['note']}{sens} · perspective "
+                 f"{notation.get('perspective') or 'n/d'} · {notation.get('date')}")
+        if v.get("contradiction_notation"):
+            st.warning(ligne + "\n\n**Cette opinion contredit le profil ci-dessus.** "
+                       "Le profilage n'a pas ete modifie : c'est a l'analyste de "
+                       "trancher, en verifiant d'abord la source de croissance.")
+        else:
+            st.caption(ligne)
+        st.caption("Une notation mesure le risque de CREDIT, pas l'attractivite "
+                   "actionnaire : une note elevee n'est jamais un profil GARP.")
 
     comp = v.get("comparaisons") or {}
 
@@ -482,6 +509,21 @@ with o4:
                "il vient de la BRVM elle-meme. Validation croisee faite sur NSBC "
                "uniquement (1 646,5 implicite contre 1 646 certifie). "
                "Chantier de validation 8-10 titres non clos.")
+
+    st.markdown("#### Verification externe : notations d'agences")
+    n_notes = int(df.notation.notna().sum())
+    n_contra = int(df.contradiction.sum())
+    v1, v2 = st.columns(2)
+    v1.metric("Titres avec une notation collectee", n_notes,
+              help="Source : brvm.org > Annonces emetteurs > Notations financieres")
+    v2.metric("Contradictions signalees", n_contra,
+              help="Le profil et l'opinion de l'agence divergent : a trancher par l'analyste")
+    st.caption("C'est la premiere source reellement independante du pipeline : jusqu'ici, "
+               "tout recoupement passait par la BRVM elle-meme ou par la presse, qui "
+               "reprend les memes communiques. Reserves : une notation mesure le risque "
+               "de credit et non l'attractivite actionnaire ; elle est sollicitee et "
+               "remuneree par l'emetteur ; sa frequence est annuelle et sa couverture "
+               "partielle.")
 
     st.markdown("#### Couverture par titre")
     cov = df.groupby("source").size().rename("titres").reset_index()
