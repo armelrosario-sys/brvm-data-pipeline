@@ -67,6 +67,7 @@ DB = Path(__file__).resolve().parent / "brvm.db"
 RACINE = Path(__file__).resolve().parent.parent
 SORTIE = RACINE / "collecte" / "profils.json"
 FAITS = RACINE / "config" / "faits_qualitatifs.yaml"
+NOTATIONS = RACINE / "collecte" / "notations_financieres.csv"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scoring import charger_seuils, charger_marche, appliquer_gate  # noqa: E402
@@ -90,6 +91,35 @@ def pctl(vals, x, inverse=False):
     if x is None or not v:
         return None
     return round(100 * sum(1 for val in v if (val >= x if inverse else val <= x)) / len(v))
+
+
+def charger_notations():
+    """Notations d'agences (GCR, WARA...) collectees depuis brvm.org.
+
+    PREMIERE SOURCE REELLEMENT INDEPENDANTE du pipeline : jusqu'ici tout
+    recoupement passait par la BRVM (BOC) ou par la presse, qui reprend les
+    memes communiques. Une agence a acces aux comptes et aux entretiens de
+    direction : elle peut CONTREDIRE un profil.
+
+    RAPPEL IMPERATIF : une notation mesure le RISQUE DE CREDIT, pas
+    l'attractivite actionnaire (GCR l'ecrit explicitement : ses notations ne
+    couvrent ni le risque de liquidite, ni le risque de marche, et ne sont pas
+    des recommandations). Une note A+ n'est JAMAIS un profil GARP. Elle sert
+    ici a VERIFIER, jamais a CLASSER.
+    """
+    if not NOTATIONS.exists():
+        return {}
+    import csv as _csv
+    recentes = {}
+    with NOTATIONS.open(encoding="utf-8") as f:
+        for ligne in _csv.DictReader(f):
+            t = (ligne.get("ticker") or "").strip()
+            if not t or ligne.get("statut_extraction") not in ("OK", "SANS_NOTE"):
+                continue
+            anc = recentes.get(t)
+            if anc is None or ligne["date_annonce"] > anc["date_annonce"]:
+                recentes[t] = ligne
+    return recentes
 
 
 def charger_faits():
@@ -514,6 +544,7 @@ def calculer():
     cur = conn.cursor()
     seuils, marche = charger_seuils(), charger_marche()
     faits = charger_faits()
+    notations = charger_notations()
 
     par_defaut = dict(
         fenetre_exercices_max=4, pic_yoy_max=3.5, base_ecrasee_min=0.30,
@@ -630,7 +661,44 @@ def calculer():
                 "profil SENSIBLE a la convention brut/net du rendement : avec un "
                 "rendement brut, le seuil du profil RENDEMENT serait franchi. "
                 "Chantier de verification ouvert — aucune correction appliquee."]
+        # --- Confrontation a l'opinion d'une agence de notation ---
+        # On ne modifie JAMAIS le profil : on signale la divergence pour que
+        # l'analyste tranche. Cas fondateur ONTBF : profile
+        # VIGILANCE_CONTRACTION (-13,4 %/an, BPA implicite sur 2 points) alors
+        # que GCR rehaussait sa note de A(WU) a A+(WU) le 19/12/2025 en citant
+        # une rentabilite solide. Les chiffres du communique (CA 142 Mds en
+        # 2024 apres 139 en 2023, marge nette 15 %) donnaient un RN implicite
+        # de 21,3 Mds, identique a notre base : le -13,4 % etait un artefact.
+        note = notations.get(t)
+        contradiction = None
+        if note:
+            var = note.get("variation_crans")
+            var = int(var) if (var or "").lstrip("-").isdigit() else None
+            persp = (note.get("perspective") or "").lower()
+            defavorable = principal in ("VIGILANCE_CONTRACTION", "RETOURNEMENT")
+            favorable = principal in ("GARP", "GROWTH")
+            if defavorable and ((var is not None and var > 0) or persp == "positive"):
+                contradiction = (
+                    "l'agence %s %s (note %s, perspective %s, %s) alors que le "
+                    "profilage conclut a une degradation — la source du profil "
+                    "(%s) doit etre verifiee avant tout usage"
+                    % (note.get("agence") or "de notation",
+                       "a rehausse la note" if (var or 0) > 0 else "affiche une perspective positive",
+                       note.get("note_lt"), persp or "n/d", note.get("date_annonce"),
+                       v["source_croissance"]))
+            elif favorable and ((var is not None and var < 0) or persp in ("negative", "négative")):
+                contradiction = (
+                    "l'agence %s %s (note %s, perspective %s, %s) alors que le "
+                    "profilage conclut a une dynamique favorable"
+                    % (note.get("agence") or "de notation",
+                       "a abaisse la note" if (var or 0) < 0 else "affiche une perspective negative",
+                       note.get("note_lt"), persp or "n/d", note.get("date_annonce")))
+            if contradiction:
+                notes = notes + ["CONTRADICTION_NOTATION : " + contradiction]
+
         grade, reserves = grade_confiance(principal, v, fait)
+        if contradiction and grade == "A":
+            grade = "B"  # une contradiction externe interdit le grade maximal
         if fait.get("note"):
             notes = notes + [fait["note"]]
         alerte_peg = bool(v["pegy"] is not None and v["pegy"] < sp["alerte_pegy_max"])
@@ -674,6 +742,14 @@ def calculer():
             "secteur": v["secteur"],
             "n_secteur": len(par_secteur.get(v["secteur"], {"ep": []})["ep"]),
             "source_fait": fait.get("source"),
+            "notation": ({"agence": note.get("agence"), "note": note.get("note_lt"),
+                          "note_precedente": note.get("note_ancienne"),
+                          "perspective": note.get("perspective"),
+                          "date": note.get("date_annonce"),
+                          "marge_nette": note.get("marge_nette"),
+                          "ca_mds": note.get("ca_mds"),
+                          "url": note.get("url_pdf")} if note else None),
+            "contradiction_notation": bool(contradiction),
         }
 
     SORTIE.write_text(json.dumps(profils, ensure_ascii=False, indent=1), encoding="utf-8")
