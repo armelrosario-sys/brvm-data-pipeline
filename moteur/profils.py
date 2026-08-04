@@ -674,6 +674,12 @@ def calculer():
         if note:
             var = note.get("variation_crans")
             var = int(var) if (var or "").lstrip("-").isdigit() else None
+            # Deux agences agreees UEMOA coexistent : GCR (notes suffixees WU)
+            # et Bloomfield (notes nues). Leurs echelles sont toutes deux
+            # REGIONALES et NON comparables entre elles ni a une echelle
+            # internationale. On ne compare donc JAMAIS deux titres notes par
+            # des agences differentes : seule la VARIATION d'une revue a
+            # l'autre, chez la meme agence, est exploitee.
             persp = (note.get("perspective") or "").lower()
             defavorable = principal in ("VIGILANCE_CONTRACTION", "RETOURNEMENT")
             favorable = principal in ("GARP", "GROWTH")
@@ -746,6 +752,7 @@ def calculer():
                           "note_precedente": note.get("note_ancienne"),
                           "perspective": note.get("perspective"),
                           "date": note.get("date_annonce"),
+                          "validite": note.get("validite"),
                           "marge_nette": note.get("marge_nette"),
                           "ca_mds": note.get("ca_mds"),
                           "url": note.get("url_pdf")} if note else None),
