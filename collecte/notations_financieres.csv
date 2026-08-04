@@ -1,0 +1,379 @@
+ticker,societe_brvm,date_annonce,agence,note_lt,rang_lt,note_ancienne,variation_crans,note_ct,perspective,action,marge_nette,marge_brute,ca_mds,annees_citees,score_risque_pays,score_risque_secteur,score_total,statut_extraction,url_pdf,date_collecte
+UNLC,UNILEVER CI,2025-04-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250415_-_notation_financiere_-_unilever_ci.pdf,2026-08-04
+UNLC,UNILEVER CI,2024-07-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240710_-_notation_financiere_-_unilever_ci.pdf,2026-08-04
+UNLC,UNILEVER CI,2023-07-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230718_-_fiche_de_notation_-unilever_ci.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2025-12-30,,,,,,,,,,,,,,,,ECHEC,https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_totalenergies_marketing_sn.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2023-12-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231226_-_notation_financiere_-_total_sn.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2022-12-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221212_-_notation_financiere_-_totalenergies_marketing_senegal.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2021-12-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20211229_-_notation_financiere_-_total_sn.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2021-02-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210208_-_notation_financiere_-_total_senegal.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2019-12-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191211_-_notation_financiere_-_total_senegal_2019_0.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2018-10-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20181008_-_total_senegal_-_notation_financiere.pdf,2026-08-04
+TTLS,TOTAL SENEGAL S.A.,2017-10-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20171016-notation_financiere-_total_sn_2017.pdf,2026-08-04
+TTLC,TOTAL,2025-12-30,GCR,A+(WU),17,,,,stable,affirme,,,621.0,2019;2020;2021;2022;2023,4.5,3.5,8.75,OK,https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_totalenergies_marketing_ci.pdf,2026-08-04
+TTLC,TOTAL,2024-08-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240808_-_notation_financiere_-_totalenergies_marketing_ci.pdf,2026-08-04
+TTLC,TOTAL,2023-10-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231011_-_notation_financiere_-_totalenergies_marketing_cote_divoire.pdf,2026-08-04
+TTLC,TOTAL,2022-12-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221222_-_notation_financiere_-_totalenergies_marketing_cote_divoire.pdf,2026-08-04
+TTLC,TOTAL,2022-01-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220111_-_notation_financiere_-_total_ci.pdf,2026-08-04
+TTLC,TOTAL,2021-01-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_total_cote_divoire_-_2020.pdf,2026-08-04
+TTLC,TOTAL,2020-07-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200713_-_fiche_de_notation_-_total_cote_divoire_-_2019.pdf,2026-08-04
+TTLC,TOTAL,2019-03-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190318_-_notation_financiere_-_total_ci_0.pdf,2026-08-04
+TTLC,,2015-11-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151118_-_nf_wara_-_total_sn_-_novembre_2015_version_anglaise.pdf,2026-08-04
+TTLC,,2015-11-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151116_-_nf_wara_-_total_sn_-_novembre_2015.pdf,2026-08-04
+STBC,SITAB,2026-05-05,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/fiche_de_notation_-_sitab_2025.pdf,2026-08-04
+STBC,SITAB,2025-03-24,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250324_-_notation_financiere_-_sitab_ci.pdf,2026-08-04
+STBC,SITAB,2024-12-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241206_-_notation_financiere_-_sitab_ci.pdf,2026-08-04
+STBC,SITAB,2023-12-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231213_-_notation_financiere_-_sitab_ci.pdf,2026-08-04
+STBC,SITAB,2022-12-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221216_-_notation_financiere_-_sitab_ci.pdf,2026-08-04
+STBC,SITAB,2022-05-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220504_-_notation_financiere_-_sitab_ci.pdf,2026-08-04
+STBC,SITAB,2019-04-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190408-notation_financiere_-_sitab_ci.pdf,2026-08-04
+STBC,SITAB,2018-01-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180115-_notation_financiere_-_sitab_ci_version_anglaise_0.pdf,2026-08-04
+STBC,SITAB,2018-01-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180108-_notation_financiere_-_sitab_ci.pdf,2026-08-04
+SPHC,SAPH CI,2025-10-16,GCR,BBB+(WU),14,,,,stable,affirme,,,,2021;2022;2023;2024,3.5,2.75,8.75,OK,https://www.brvm.org/sites/default/files/20251016_-_notation_financiere_-_saph_ci.pdf,2026-08-04
+SPHC,SAPH CI,2024-09-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240930_-_notation_financiere_-_saph_ci.pdf,2026-08-04
+SPHC,SAPH CI,2023-09-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_saph_ci.pdf,2026-08-04
+SPHC,SAPH CI,2022-12-23,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221223_-_notation_financiere_-_saph_ci.pdf,2026-08-04
+SPHC,SAPH CI,2021-05-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210527_-_notation_financiere_-_saph_ci.pdf,2026-08-04
+SPHC,SAPH CI,2019-06-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190626-_notation_financiere_-_saph_ci.pdf,2026-08-04
+SPHC,SAPH CI,2018-05-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180517_-_notation_financiere_-_saph_communique_de_presse_mai_2018.pdf,2026-08-04
+SPHC,SAPH CI,2017-06-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170609-_notation_financiere_-_saph_ci.pdf,2026-08-04
+SPHC,SAPH CI,2016-06-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160610_-_nf_wara_-_saph_ci_-_juin_2016_version_anglaise.pdf,2026-08-04
+SPHC,SAPH CI,2016-06-07,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160607_-_nf_wara_-_saph_ci_-_juin_2016.pdf,2026-08-04
+SPHC,SAPH CI,2015-08-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150803_-_nf_wara_-_saph_ci_-_aout_2015_version_anglaise.pdf,2026-08-04
+SPHC,SAPH CI,2013-04-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130429_-_nf_wara_-_saph_ci_-_mai_2014_version_anglaise.pdf,2026-08-04
+SPHC,SAPH CI,2013-03-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130327_-_nf_wara_-_saph_ci_-_mai_2014.pdf,2026-08-04
+SNTS,SONATEL,2026-07-01,GCR,AA-(WU),18,,,"A1+
+(WU)",stable,rehausse,,,100.0;100.0,2024,2.75,3.0,11.75,OK,https://www.brvm.org/sites/default/files/20260630_-_notation_financiere_-_sonatel_sn.pdf,2026-08-04
+SNTS,SONATEL,2025-07-01,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250701_-_notation_financiere_-_sonatel_sn.pdf,2026-08-04
+SNTS,SONATEL,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_sonatel_sn.pdf,2026-08-04
+SNTS,SONATEL,2023-08-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/gcr-communique_de_presse_-_sonatel_08_aout_2023_vf.pdf,2026-08-04
+SNTS,SONATEL,2022-10-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221011_-_notation_financiere_-_sonatel_sn.pdf,2026-08-04
+SNTS,SONATEL,2021-08-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210810_-_notation_financiere_-_emission_obligataire_-_sonatel.pdf,2026-08-04
+SNTS,SONATEL,2021-08-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210810_-_notation_financiere_-_sonatel.pdf,2026-08-04
+SNTS,SONATEL,2019-10-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191011_-_notation_financiere_-_sonatel_sn.pdf,2026-08-04
+SMBC,,2025-12-09,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20251209_-_notation_financiere_-_smb_ci.pdf,2026-08-04
+SMBC,SMB,2024-10-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241017_-_notation_financiere_-_smb_ci.pdf,2026-08-04
+SMBC,SMB,2024-01-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240129_-_notation_financiere_-_smb.pdf,2026-08-04
+SMBC,SMB,2022-12-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221221_-_notation_financiere_-_smb_ci.pdf,2026-08-04
+SIVC,AIR LIQUIDE CI,2026-05-05,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/fiche_de_notation-_erium_ci_-_2025.pdf,2026-08-04
+SIVC,AIR LIQUIDE CI,2025-03-19,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250319_-_notation_financiere_-_air_liquide_ci.pdf,2026-08-04
+SIVC,AIR LIQUIDE CI,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_air_liquide_ci.pdf,2026-08-04
+SIVC,AIR LIQUIDE CI,2023-07-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230712_-_fiche_de_notation_-_air_liquide_ci_-_2022.pdf,2026-08-04
+SIBC,SIB,2026-04-22,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260421_-_notation_financiere_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2026-01-08,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260108_-_notation_financiere_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2025-01-14,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250114_-_notation_financiere_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2025-01-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250102_-_notation_financiere_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2023-09-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230921_-_notation_financiere_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2023-02-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230215_-_notation_financiere_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2023-01-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230106_-_notation_financiere_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2022-01-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220117_-_notation_financiere_-_sib_2021.pdf,2026-08-04
+SIBC,SIB,2021-01-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_sib_2020.pdf,2026-08-04
+SIBC,SIB,2019-09-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190930_-_fiche_de_notation_-_sib_ci.pdf,2026-08-04
+SIBC,SIB,2018-06-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_sib_ci_2018_0.pdf,2026-08-04
+SHEC,VIVO ENERGY CI,2021-02-01,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210201_-_notation_financiere_-_palmci_2020.pdf,2026-08-04
+SGBC,SGCI,2025-09-15,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_societe_generale_ci.pdf,2026-08-04
+SGBC,SGCI,2024-10-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241017_-_notation_financiere_-_societe_generale_ci.pdf,2026-08-04
+SGBC,SGCI,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_societe_generale_ci.pdf,2026-08-04
+SGBC,SGCI,2023-12-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231213_-_notation_financiere_-_societe_generale_cote_divoire.pdf,2026-08-04
+SGBC,SGCI,2023-08-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230816_-_notation_financiere_-_societe_generale_cote_divoire.pdf,2026-08-04
+SGBC,SGCI,2022-09-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220928_-_notation_financiere_-_societe_generale_ci.pdf,2026-08-04
+SGBC,SGCI,2022-07-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220718_-_notation_financiere_-_societe_generale_ci.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2025-04-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250415_-_notation_financiere_-_eviosys_packaging_siem_ci.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_eviosys_packaging_siem.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2022-12-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221222_-_notation_financiere_-_eviosys_packaging_siem.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2021-01-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_crown_siem_2020.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2019-12-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_crown_siem_2019.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2018-09-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_crown_siem_2018_-_pdf_0.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2017-09-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170915-fiche_de_notation_-notation_financiere_-_crown_siem_2017.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2015-08-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150821_-_nf_bloomfield_-_crown_siem_ci_-_aout_2015_version_anglaise.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2015-08-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150818_-_nf_bloomfield_-_crown_siem_ci_-_aout_2015.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2014-10-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20141009_-_nf_bloomfield_-_crown_siem_ci_-_septembre_2014_version_anglaise.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2014-10-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20141008_-_nf_bloomfield_-_crown_siem_ci_-_septembre_2014.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2013-10-31,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131031_-_nf_bloomfield_-_crown_siem_ci_-_septembre_2013_version_anglaise.pdf,2026-08-04
+SEMC,CROWN SIEM CI,2013-10-24,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131024_-_nf_bloomfield_-_crown_siem_ci_-_septembre_2013.pdf,2026-08-04
+SDSC,BOLLORE TRANSPORT & LOGISTICS,2026-06-24,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260623_-_notation_financiere_-_africa_global_logistics_ci.pdf,2026-08-04
+SDSC,BOLLORE TRANSPORT & LOGISTICS,2025-03-19,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250319_-_notation_financiere_-_africa_global_logistics_ci.pdf,2026-08-04
+SDSC,BOLLORE TRANSPORT & LOGISTICS,2023-02-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230208_-_notation_financiere_-_bollore_transport_logistics_ci.pdf,2026-08-04
+SDSC,BOLLORE TRANSPORT & LOGISTICS,2022-12-23,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221223_-_notation_financiere_-_bollore_transport_logistics_ci.pdf,2026-08-04
+SDSC,BOLLORE TRANSPORT & LOGISTICS,2022-01-07,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220107_-_notation_financiere_-_bollore_transport_logistics.pdf,2026-08-04
+SDSC,BOLLORE TRANSPORT & LOGISTICS,2021-02-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210208_-_notation_financiere_-_bollore_transport_logistics_ci.pdf,2026-08-04
+SDSC,BOLLORE TRANSPORT & LOGISTICS,2020-02-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200206_-_notation_financiere_-_bollore_transport_logistics_ci.pdf,2026-08-04
+SDCC,SODECI,2026-01-27,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260127_-_notation_financiere_-_sode_ci.pdf,2026-08-04
+SDCC,SODECI,2024-11-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241106_-_notation_financiere_-_sode_ci.pdf,2026-08-04
+SDCC,SODECI,2024-01-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240129_-_notation_financiere_-_sode_ci.pdf,2026-08-04
+SDCC,SODECI,2022-12-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221222_-_notation_financiere_-_sodeci.pdf,2026-08-04
+SDCC,SODECI,2022-01-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220117_-_notation_financiere_-_sodeci_-2021.pdf,2026-08-04
+SDCC,SODECI,2020-11-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201125_-_notation_financiere_-_sodeci.pdf,2026-08-04
+SDCC,SODECI,2019-12-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191206_-_notation_financiere_-_sodeci_2019.pdf,2026-08-04
+SDCC,SODECI,2019-01-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180110_-_fiche_de_notation-_sodeci_2018.pdf,2026-08-04
+SDCC,SODECI,2018-01-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180111_-_fiche_de_notation_-_sodeci_2017.pdf,2026-08-04
+SDCC,SODECI,2016-10-24,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20161024_-_notation_financiere_-_sodeci_0.pdf,2026-08-04
+SDCC,SODECI,2015-09-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150916_-_nf_bloomfield_-_sode_ci_-_septembre_2015_version_anglaise.pdf,2026-08-04
+SDCC,SODECI,2015-09-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150915_-_nf_bloomfield_-_sode_ci_-_septembre_2015.pdf,2026-08-04
+SDCC,SODECI,2014-09-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140930_-_nf_bloomfield_-_sode_ci_-_aout_2014_version_anglaise_0.pdf,2026-08-04
+SDCC,SODECI,2014-09-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140922_-_nf_bloomfield_-_sode_ci_-_aout_2014.pdf,2026-08-04
+SDCC,SODECI,2013-10-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131010_-_nf_bloomfield_-_sode_ci_-_septembre_2013_version_anglaise.pdf,2026-08-04
+SDCC,SODECI,2013-10-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131008_-_nf_bloomfield_-_sode_ci_-_septembre_2013.pdf,2026-08-04
+SDCC,SODECI,2013-05-02,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130502_-_nf_bloomfield_-_sode_ci_-_octobre_2012_version_anglaise.pdf,2026-08-04
+SDCC,SODECI,2013-04-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130412_-_nf_bloomfield_-_sode_ci_-_octobre_2012.pdf,2026-08-04
+SCRC,SUCRIVOIRE,2025-12-30,GCR,BBB(WU),13,,,A3(WU),stable,rehausse,,,87.2;20.3;4.6;36.0,2021;2022;2023,4.5,3.5,5.75,OK,https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_sucrivoire_ci.pdf,2026-08-04
+SCRC,SUCRIVOIRE,2024-09-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240906_-_notation_financiere_-_sucrivoire_ci.pdf,2026-08-04
+SCRC,SUCRIVOIRE,2023-09-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230920_-_notation_financiere_-_sucrivoire_ci.pdf,2026-08-04
+SCRC,SUCRIVOIRE,2022-12-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221221_-_notation_financiere_-_sucrivoire_ci.pdf,2026-08-04
+SCRC,SUCRIVOIRE,2021-07-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210706_-_notation_financiere_-_sucrivoire_ci.pdf,2026-08-04
+SAFC,SAFCA CI,2026-03-03,Bloomfield,,,,,,,dégradation,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_safca_ci.pdf,2026-08-04
+SAFC,SAFCA CI,2025-01-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250121_-_notation_financiere_-_safca_ci.pdf,2026-08-04
+SAFC,SAFCA CI,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_safca_ci.pdf,2026-08-04
+SAFC,SAFCA CI,2022-12-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221221_-_notation_financiere_-_alios_finance_ci.pdf,2026-08-04
+SAFC,SAFCA CI,2022-01-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220117_-_notation_financiere_-_alios_finance_ci_-_2021.pdf,2026-08-04
+SAFC,SAFCA CI,2021-11-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20211130_-_notation_financiere_-_safca_ci_0.pdf,2026-08-04
+SAFC,SAFCA CI,2021-02-05,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_alios_finance_ci_-_2020.pdf,2026-08-04
+SAFC,SAFCA CI,2019-12-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191205_-_notation_financiere_-_alios_finance_ci-2019_1.pdf,2026-08-04
+SAFC,SAFCA CI,2019-12-05,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191205_-_notation_financiere_-_alios_finance_ci-2019.pdf,2026-08-04
+SAFC,SAFCA CI,2019-01-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190111_-_fiche_de_notation-alios_finance_ci_2018_0.pdf,2026-08-04
+SAFC,SAFCA CI,2018-01-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180111_-_fiche_de_notation_-alios_finance_ci_2017.pdf,2026-08-04
+SAFC,SAFCA CI,2017-12-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20171204_-_fiche_de_notation_-alios_finance_ci_2017_1.pdf,2026-08-04
+SAFC,SAFCA CI,2016-10-31,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20161031_-_notation_financiere_-_alios_finance_ci.pdf,2026-08-04
+PALC,PALM CI,2025-08-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_palm_ci.pdf,2026-08-04
+PALC,PALM CI,2024-12-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241204_-_notation_financiere_-_palm_ci.pdf,2026-08-04
+PALC,PALM CI,2024-01-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240129_-_notation_financiere_-_palm_ci.pdf,2026-08-04
+PALC,PALM CI,2022-08-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_-_palmci_2022_1.pdf,2026-08-04
+PALC,PALM CI,2021-09-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210913_-_fiche_de_notation_-_palm_ci.pdf,2026-08-04
+PALC,PALM CI,2019-08-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_palmci_sa_2019.pdf,2026-08-04
+PALC,PALM CI,2018-08-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_palmci_sa_2018.pdf,2026-08-04
+PALC,PALM CI,2017-10-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20171017-fiche_de_notation_-_palmci_sa_2017.pdf,2026-08-04
+PALC,PALM CI,2015-10-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151009_-_nf_bloomfield_-_palm_ci_-_septembre_2015.pdf,2026-08-04
+PALC,PALM CI,2014-12-01,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20141201_-_nf_bloomfield_-_palm_ci_-_novembre_2014_version_anglaise.pdf,2026-08-04
+PALC,PALM CI,2014-11-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20141127_-_nf_bloomfield_-_palm_ci_-_novembre_2014.pdf,2026-08-04
+PALC,PALM CI,2013-12-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131203_-_nf_bloomfield_-_palm_ci_-_novembre_2013_version_anglaise.pdf,2026-08-04
+PALC,PALM CI,2013-11-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131129_-_nf_bloomfield_-_palm_ci_-_novembre_2013.pdf,2026-08-04
+PALC,PALM CI,2013-04-24,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130424_-_nf_bloomfield_-_palm_ci_-_avril_2013_version_anglaise.pdf,2026-08-04
+PALC,PALM CI,2013-04-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130417_-_nf_bloomfield_-_palm_ci_-_avril_2013.pdf,2026-08-04
+ORGT,ORAGROUP,2026-05-05,Bloomfield,,,,,,,dégradation,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/fiche_de_notation_-_oragroup_sa_-_2025.pdf,2026-08-04
+ORGT,ORAGROUP,2024-12-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241204_-_notation_financiere_-_oragroup_tg.pdf,2026-08-04
+ORGT,ORAGROUP,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_oragroup_tg.pdf,2026-08-04
+ORGT,ORAGROUP,2023-11-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231106_-_notation_financiere_-_orabank_7_2021-2026.pdf,2026-08-04
+ORGT,ORAGROUP,2022-12-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221221_-_notation_financiere_-_oragroup_tg.pdf,2026-08-04
+ORGT,ORAGROUP,2022-01-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220117_-_notation_financiere_-_oragroup_-_2021_0.pdf,2026-08-04
+ORGT,ORAGROUP,2020-11-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201130_-_notation_financiere_-_oragroup_ci.pdf,2026-08-04
+ORAC,ORANGE CI,2026-02-02,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260202_-_notation_financiere_-_orange_ci.pdf,2026-08-04
+ORAC,ORANGE CI,2024-12-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241204_-_notation_financiere_-_orange_ci.pdf,2026-08-04
+ORAC,ORANGE CI,2024-01-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240129_-_notation_financiere_-_orange_ci.pdf,2026-08-04
+ORAC,ORANGE CI,2023-12-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231211_-_notation_financiere_-_orange_ci.pdf,2026-08-04
+ONTBF,ONATEL BF,2025-12-30,GCR,A+(WU),17,,,,stable,rehausse,15.0,24.0,142.0;139.0;146.0;155.0;157.0;533.0,2020;2021;2022;2023,2.0,2.75,8.75,OK,https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_onatel_bf.pdf,2026-08-04
+ONTBF,ONATEL BF,2024-11-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241104_-_notation_financiere_-_onatel_bf.pdf,2026-08-04
+ONTBF,ONATEL BF,2023-10-31,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231031_-_notation_financiere_-_onatel_bf.pdf,2026-08-04
+ONTBF,ONATEL BF,2022-11-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221116_-_notation_financiere_-_onatel_bf.pdf,2026-08-04
+ONTBF,ONATEL BF,2021-10-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20211027_-_notation_financiere_-_onatel_bf.pdf,2026-08-04
+ONTBF,ONATEL BF,2020-07-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200716_-_notation_financiere_-_onatel_bf_0.pdf,2026-08-04
+ONTBF,ONATEL BF,2019-10-24,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191024_-_credit_rating_-_onatel_sa__1.pdf,2026-08-04
+ONTBF,ONATEL BF,2019-09-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/c3-onatel_communique_de_presse_-_septembre_2019.pdf,2026-08-04
+ONTBF,ONATEL BF,2018-07-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_-_onatel.pdf,2026-08-04
+ONTBF,ONATEL BF,2017-10-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20171020-fiche_de_notation_financiere-_onatel_bf.pdf,2026-08-04
+ONTBF,ONATEL BF,2016-07-14,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160714_-_nf_wara_-_onatel_bf_-_juillet_2016_version_anglaise.pdf,2026-08-04
+ONTBF,ONATEL BF,2016-07-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160712_-_nf_wara_-_onatel_bf_-_juillet_2016.pdf,2026-08-04
+ONTBF,ONATEL BF,2015-08-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150811-_nf_wara_-_onatel_bf_-_aout_2015_version_anglaise_0.pdf,2026-08-04
+ONTBF,ONATEL BF,2015-08-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150806_-_nf_wara_-_onatel_bf_-_aout_2015.pdf,2026-08-04
+ONTBF,ONATEL BF,2015-01-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150126_-_nf_wara_-_onatel_bf_-_janvier_2015.pdf,2026-08-04
+ONTBF,ONATEL BF,2014-10-31,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20141031_-_nf_wara_-_onatel_bf_-_octobre_2014.pdf,2026-08-04
+ONTBF,ONATEL BF,2014-05-02,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140502_-_nf_wara_-_onatel_bf_-_avril_2014.pdf,2026-08-04
+NTLC,NESTLE CI,2026-06-07,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260605_-_notation_financiere_-_nestle_ci.pdf,2026-08-04
+NTLC,NESTLE CI,2025-03-19,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250319_-_notation_financiere_-_nestle_ci.pdf,2026-08-04
+NTLC,NESTLE CI,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_nestle_ci.pdf,2026-08-04
+NTLC,NESTLE CI,2024-01-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240129_-_notation_financiere_-nestle_ci.pdf,2026-08-04
+NTLC,NESTLE CI,2023-07-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230718_-_fiche_de_notation_-nestle_ci.pdf,2026-08-04
+NTLC,NESTLE CI,2021-03-19,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210319_-_fiche_de_notation_-nestle_ci_2020.pdf,2026-08-04
+NTLC,NESTLE CI,2020-01-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-nestle_ci_2019.pdf,2026-08-04
+NTLC,NESTLE CI,2019-02-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-nestle_ci_2018_0.pdf,2026-08-04
+NTLC,NESTLE CI,2018-02-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_nestle_2017.pdf,2026-08-04
+NTLC,NESTLE CI,2016-12-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20161208-fiche_de_notation-nestle.pdf,2026-08-04
+NTLC,NESTLE CI,2015-12-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151211_-_nf_bloomfield_-_nestle_ci_-_octobre_2015_version_anglaise.pdf,2026-08-04
+NTLC,NESTLE CI,2015-12-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151210_-_nf_bloomfield_-_nestle_ci_-_octobre_2015.pdf,2026-08-04
+NTLC,NESTLE CI,2013-12-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131226_-_nf_bloomfield_-_nestle_ci_-_decembre_2013.pdf,2026-08-04
+NSBC,NSBC,2025-10-28,Bloomfield,,,,,,,dégradation,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_nsia_banque_ci.pdf,2026-08-04
+NSBC,NSBC,2024-12-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241204_-_notation_financiere_-_nsia_banque_ci.pdf,2026-08-04
+NSBC,NSBC,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_nsia_banque_ci.pdf,2026-08-04
+NSBC,NSBC,2023-01-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230110_-_notation_financiere_-_nsia_banque_ci.pdf,2026-08-04
+NSBC,NSBC,2021-12-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221227_-_fiche_de_notation_-_nsia_banque_ci_-_2021.pdf,2026-08-04
+NSBC,NSBC,2021-11-02,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20211102_-_notation_financiere_-_fctc_nsia_banque_7_2020-2025.pdf,2026-08-04
+NSBC,NSBC,2020-11-05,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201105-notation_financiere_-_nsia_banque_ci_-_2020.pdf,2026-08-04
+NSBC,NSBC,2020-09-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200929_-_notation_financiere_-_fctc_nsia_banque_7_2020-2025.pdf,2026-08-04
+NSBC,NSBC,2020-02-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/t2-fctc_nsia_-_communique_de_presse_-_fevrier_2020.pdf,2026-08-04
+NSBC,NSBC,2019-10-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation-_nsia_banque_ci_-_2019_0.pdf,2026-08-04
+NSBC,NSBC,2018-07-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/avis_n_071-2018-dcbr-dg-dividende_exercice_2017-sgbci_1.pdf,2026-08-04
+NEIC,NEI-CEDA CI,2026-03-03,Bloomfield,,,,,,,dégradation,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_nei_ceda_ci.pdf,2026-08-04
+NEIC,NEI-CEDA CI,2025-01-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250121_-_notation_financiere_-_nei_ceda.pdf,2026-08-04
+NEIC,NEI-CEDA CI,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_nei_ceda.pdf,2026-08-04
+NEIC,NEI-CEDA CI,2022-12-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221221_-_notation_financiere_-_nei_ceda_ci.pdf,2026-08-04
+LNBB,LNB,2025-08-28,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20250828_-_notation_financiere_-_lnb_bn.pdf,2026-08-04
+FTSC,FILTISAC CI,2021-09-23,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200922_-_notation_financiere_-_filtisac_ci.pdf,2026-08-04
+FTSC,FILTISAC CI,2020-10-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201027_-_notation_financiere_-_filtisac_ci.pdf,2026-08-04
+FTSC,FILTISAC CI,2020-06-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200630_-_notation_financiere_-_saph_ci.pdf,2026-08-04
+FTSC,FILTISAC CI,2019-10-01,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191001-notation_financiere_-_filtisac_ci.pdf,2026-08-04
+FTSC,FILTISAC CI,2018-07-19,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180719_-_filtisac_communique_de_presse_juillet_2018.pdf,2026-08-04
+FTSC,FILTISAC CI,2017-09-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170926-fiche_de_notation_financier-_filtisac_ci.pdf,2026-08-04
+FTSC,FILTISAC CI,2015-10-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151028_-_nf_wara_-_filtisac_ci_-_octobre_2015_version_anglaise.pdf,2026-08-04
+FTSC,FILTISAC CI,2015-10-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151026_-_nf_wara_-_filtisac_ci_-_octobre_2015.pdf,2026-08-04
+FTSC,FILTISAC CI,2014-09-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140917_-_nf_wara_-_filtisac_ci_-_septembret_2014_version_anglaise.pdf,2026-08-04
+FTSC,FILTISAC CI,2014-09-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140915_-_nf_wara_-_filtisac_ci_-_septembret_2014.pdf,2026-08-04
+FTSC,FILTISAC CI,2013-11-14,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131114_-_nf_wara_-_filtisac_ci_-_novembre_2013_version_anglaise.pdf,2026-08-04
+FTSC,FILTISAC CI,2013-11-07,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131107_-_nf_wara_-_filtisac_ci_-_novembre_2013.pdf,2026-08-04
+ECOC,ECOBANK CI,2025-10-28,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_ecobank_ci.pdf,2026-08-04
+ECOC,ECOBANK CI,2024-09-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240916_-_notation_financiere_-_ecobank_ci.pdf,2026-08-04
+ECOC,ECOBANK CI,2024-01-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240129_-_notation_financiere_-_ecobank_ci.pdf,2026-08-04
+ECOC,ECOBANK CI,2022-11-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221103_-_notation_financiere_-_ecobank_ci.pdf,2026-08-04
+ECOC,ECOBANK CI,2021-11-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20211111_-_notation_financiere_-_ecobank_ci.pdf,2026-08-04
+ECOC,ECOBANK CI,2020-11-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201130_-_notation_financiere_-_ecobank_ci.pdf,2026-08-04
+ECOC,ECOBANK CI,2019-10-24,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191024_-_notation_financiere_-_ecobank_ci.pdf,2026-08-04
+ECOC,ECOBANK CI,2018-05-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180516_-_fiche_de_notation_-_ecobank_ci_2018.pdf,2026-08-04
+CIEC,CIE CI,2026-01-08,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260108_-_notation_financiere_-_cie_ci.pdf,2026-08-04
+CIEC,CIE CI,2025-01-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250102_-_notation_financiere_-_cie_ci.pdf,2026-08-04
+CIEC,CIE CI,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_cie_ci.pdf,2026-08-04
+CIEC,CIE CI,2023-02-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230215_-_notation_financiere_-_cie_ci.pdf,2026-08-04
+CIEC,CIE CI,2023-01-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230106_-_notation_financiere_-_cie_ci.pdf,2026-08-04
+CIEC,CIE CI,2022-02-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220217_-_notation_financiere_-_cie_ci.pdf,2026-08-04
+CIEC,CIE CI,2020-11-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201130_-_notation_financiere_-_cie.pdf,2026-08-04
+CIEC,CIE CI,2019-11-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191121_-_notation_financiere-_cie_2019_1.pdf,2026-08-04
+CIEC,CIE CI,2019-11-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191121_-_notation_financiere-_cie_2019.pdf,2026-08-04
+CIEC,CIE CI,2018-10-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20181030_-_fiche_de_notation_financiere_-_cie_2018.pdf,2026-08-04
+CIEC,CIE CI,2018-01-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180111_-_fiche_de_notation_-cie_ci_2017.pdf,2026-08-04
+CIEC,CIE CI,2016-10-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20161025_-_notation_financiere_-_cie.pdf,2026-08-04
+CIEC,CIE CI,2014-09-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140930_-_nf_bloomfield_-_sode_ci_-_aout_2014_version_anglaise.pdf,2026-08-04
+CIEC,CIE CI,2014-09-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140922_-_nf_bloomfield_-_cie_ci_-_aout_2014.pdf,2026-08-04
+CIEC,CIE CI,2013-10-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131010_-_nf_bloomfield_-_cie_ci_-_septembre_2013_version_anglaise.pdf,2026-08-04
+CIEC,CIE CI,2013-10-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20131008_-_nf_bloomfield_-_cie_ci_-_septembre_2013.pdf,2026-08-04
+CIEC,CIE CI,2013-05-02,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130502_-_nf_bloomfield_-_cie_ci_-_octobre_2012_version_anglaise.pdf,2026-08-04
+CIEC,CIE CI,2013-04-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130412_-_nf_bloomfield_-_cie_ci_-_octobre_2012.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2023-07-27,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230727_-_notation_financiere_-_cfao_motors_ci.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2019-09-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/cfao_-_communique_de_presse_sept_19.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2019-09-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/cfao_-_communique_de_presse_emprunt_sept_19.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2018-08-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/c4-cfao_motors_ci_communique_de_presse_-_aout_2018.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2018-08-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/c4-cfao_motors_ci_emission_obligataire_cp_-_aout_2018.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2017-06-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170620-_notaion_financiere_-_emission_obligataire_cfao_ci.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2017-06-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170620-_notation_financiere_-_cfao_ci.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2016-06-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160622_-_nf_wara_-_cfao_motors_ci_-_juin_2016_1_version_anglaise.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2016-06-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160620_-_nf_wara_-_cfao_motors_ci_-_juin_2016_2.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2016-06-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160617_-_nf_wara_-_cfao_motors_ci_-_juin_2016_1.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2015-08-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150806_-_nf_wara_-_cfao_motors_ci_-_aout_2015_version_anglaise.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2015-07-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150722_-_nf_wara_-_cfao_motors_ci_-_juillet_2015.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2014-09-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140910_-_nf_wara_-_cfao_motors_ci_-_septembret_2014_versions_anglaise.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2014-09-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20140903_-_nf_wara_-_cfao_motors_ci_-_septembret_2014.pdf,2026-08-04
+CFAC,CFAO MOTORS CI,2013-09-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130918_-_nf_wara_-_cfao_motors_ci_-_septembre_2013.pdf,2026-08-04
+CBIBF,CORIS BANK INTERNATIONAL,2025-09-15,Bloomfield,,,,,,,dégradation,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_coris_bank_international_bf.pdf,2026-08-04
+CBIBF,CORIS BANK INTERNATIONAL,2024-08-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240809_-_notation_financiere_-_coris_bank_international_bf.pdf,2026-08-04
+CBIBF,CORIS BANK INTERNATIONAL,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_cbibf.pdf,2026-08-04
+CBIBF,,2022-08-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_-_coris_bank_interantional_sa_2022.pdf,2026-08-04
+CBIBF,,2021-10-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20211028_-_notation_financiere_-_coris_bank_international.pdf,2026-08-04
+CBIBF,,2021-01-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_-_coris_bank_international_ci.pdf,2026-08-04
+CBIBF,,2020-12-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201211_-_notation_financiere_-_cbi_bf.pdf,2026-08-04
+CBIBF,,2020-08-14,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/coris_bank_international_-_communiquei_de_presse_aouit_2020_-__0.pdf,2026-08-04
+CBIBF,,2019-09-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/coris_holding_-_communique_de_presse_-_septembre_2019.pdf,2026-08-04
+CBIBF,,2018-05-29,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180528_-_notation_financiere_coris_bank_international_2018.pdf,2026-08-04
+CBIBF,,2017-07-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170725-_fiche_de_notation_-_coris_bank_international.pdf,2026-08-04
+CABC,SICABLE,2025-11-26,GCR,AA-(WU),18,,,,stable,affirme,,,19.1,,4.5,2.75,9.5,OK,https://www.brvm.org/sites/default/files/20251126_-_notation_financiere_-_sicable_ci.pdf,2026-08-04
+CABC,SICABLE,2024-12-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241206_-_notation_financiere_-_sicable_ci.pdf,2026-08-04
+CABC,SICABLE,2023-11-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20231120_-_notation_financiere_-_sicable_ci.pdf,2026-08-04
+CABC,SICABLE,2022-11-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221125_-_notation_financiere_-_sicable_ci.pdf,2026-08-04
+CABC,SICABLE,2021-12-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20211215_-_notation_financiere_-_sicable_ci.pdf,2026-08-04
+CABC,SICABLE,2019-07-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190709_-_notation_financiere.pdf,2026-08-04
+CABC,SICABLE,2018-04-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/communique_de_presse_-_notation_financiere_sicable.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2025-10-23,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_boa_sn.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2024-08-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240809_-_notation_financiere_-_boa_senegal.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_boa_sn.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2022-07-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220718_-_notation_financiere_-_boa_sn.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2022-01-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220117_-_notation_financiere_-_boa_senegal_-_2021.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2020-11-05,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20201105-_notation_financiere_-_boa_senegal.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2019-10-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/bank_of_africa_senegal.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2018-07-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_senegal_2018.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2016-06-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160630_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2016.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2015-06-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150617_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2015_version_anglaise.pdf,2026-08-04
+BOAS,BANK OF AFRICA SN,2015-06-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150608_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2015.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2025-11-18,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20251117_-_notation_financiere_-_boa_ng.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2024-09-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240916_-_notation_financiere_-_boa_ng.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_boa_niger.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2022-08-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_-_boa_niger_-_2022.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2021-08-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_niger_-_2021.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2020-07-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200730_-_notation_financiere_-_boa_niger.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2018-07-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180726_-_fiche_de_notation_-_boa_niger_-_2018.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2017-06-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_niger_2017.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2016-11-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_boa_niger_-_avril_2016.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2015-06-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150615_-_nf_bloomfield_-_bank_of_africa_ng_-_mai_2015_version_anglaise.pdf,2026-08-04
+BOAN,BANK OF AFRICA NG,2015-06-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150604_-_nf_bloomfield_-_bank_of_africa_ng_-_mai_2015.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2025-07-23,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250723_-_notation_financiere_-_boa_mali.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2024-07-10,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240710_-_notation_financiere_-_boa_mali.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2023-07-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230712_-_fiche_de_notation_-_boa_mali_2023.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2023-07-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230703_-_fiche_de_notation_-_boa_mali_2023.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2022-11-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221103_-_notation_financiere_-_boa_mali.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2022-10-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221006_-_fiche_de_notation_-_boa_ml.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2021-08-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_mali_2021.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2020-07-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200708_-_notation_financiere_-_boa_ml.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2019-09-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190917_-_fiche_de_notation_-_boa_mali_2019.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2018-08-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_mali_2018.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2017-06-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_mali_2017.pdf,2026-08-04
+BOAM,BANK OF AFRICA ML,2016-06-07,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160607_-_nf_bloomfield_-_bank_of_africa_ml_-_avril_2016_version_anglaise.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2026-07-05,Bloomfield,,,,,,,dégradation,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20260703_-_notation_financiere_-_boa_ci.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2025-06-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250630_-_notation_financiere_-_boa_ci.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_boa_ci.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2023-07-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20230712_-_fiche_de_notation_-_boa_cote_divoire_-_2023.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2022-08-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere-boa_cote_divoire_-_2022.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2020-06-19,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200619_-_notation_financiere_-_boa_cote_divoire_-_2020.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2019-09-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190909_-_fiche_de_notation-boa_ci-2019_0.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2019-08-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190806_-_notation_financiere-boa_cote_divoire-2019.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2018-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation-boa_cote_divoire_2018.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2017-06-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_cote_d27ivoire_2017.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2017-06-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170615-fiche_de_notation-boa_cote-d-ivoire_2017.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2016-06-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160622_-_nf_bloomfield_-_bank_of_africa_ci_-_avril_2016.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2015-07-01,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150701_-_nf_bloomfield_-_bank_of_africa_ci_-_mai_2015_version_anglaise.pdf,2026-08-04
+BOAC,BANK OF AFRICA CI,2015-06-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150630_-_nf_bloomfield_-_bank_of_africa_ci_-_mai_2015.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2025-06-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250630_-_notation_financiere_-_boa_bf.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2024-06-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240628_-_notation_financiere_-_boa_bf.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_boa_bf.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2021-08-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_burkina_faso_-_2021.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2020-07-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200713_-_fiche_de_notation_-_boa_burkina_faso_-_2020.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2019-09-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190909_-_fiche_de_notation_boa_bf-_2019.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2018-06-21,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20180621_-_fiche_de_notation_burkina_faso_-_2018.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2017-06-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_burkina_2017.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2016-06-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160608_-_nf_bloomfield_-_bank_of_africa_bf_-_avril_2016_version_anglaise.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2016-06-06,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160606_-_nf_bloomfield_-_bank_of_africa_bf_-_avril_2016.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2015-06-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150616_-_nf_bloomfield_-_bank_of_africa_bf_-_avril_2015_version_anglaise.pdf,2026-08-04
+BOABF,BANK OF AFRICA BF,2015-06-05,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150605_-_nf_bloomfield_-_bank_of_africa_bf_-_avril_2015.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2025-07-23,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20250723_-_notation_financiere_-_boa_benin.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2024-09-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240916_-_notation_financiere_-_boa_bn.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_boa_bn.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2022-08-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere-_boa_benin_2022.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2021-08-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation-_boa_benin_2021.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2020-06-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200622_-_notation_financiere_fiche_-_boa_benin_2020.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2020-06-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20200617_-_fiche_de_notation-_boa_benin_2020.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2019-08-28,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_benin_2019.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2018-06-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_benin_2018.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2017-06-14,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_benin_2017.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2016-11-22,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/notation_financiere_boa_benin_-_avril_2016.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2015-06-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150612_-_nf_bloomfield_-_bank_of_africa_bn_-_avril_2015_version_anglaise.pdf,2026-08-04
+BOAB,BANK OF AFRICA BN,2015-06-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150603_-_nf_bloomfield_-_bank_of_africa_bn_-_avril_2015.pdf,2026-08-04
+BNBC,BERNABE CI,2025-08-22,Bloomfield,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_bernabe_ci.pdf,2026-08-04
+BNBC,BERNABE CI,2024-10-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20241017_-_notation_financiere_-_bernabe_ci.pdf,2026-08-04
+BNBC,BERNABE CI,2024-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_bernabe_ci.pdf,2026-08-04
+BNBC,BERNABE CI,2022-11-03,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20221103_-_notation_financiere_-_bernabe_ci.pdf,2026-08-04
+BNBC,BERNABE CI,2022-01-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220117_-_notation_financiere_-_bernabe_ci_2021.pdf,2026-08-04
+BNBC,BERNABE CI,2020-07-15,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_bernabe_cote_divoire_2020.pdf,2026-08-04
+BNBC,BERNABE CI,2019-11-04,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191104_-_fiche_de_notation_financiere_-_bernabe_ci_2019.pdf,2026-08-04
+BNBC,BERNABE CI,2018-08-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_-_bernabe_cote_divoire_2018.pdf,2026-08-04
+BNBC,BERNABE CI,2017-09-12,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170912-fiche_de_notation_-_notation_financiere_-_bernabe_ci_2017.pdf,2026-08-04
+BNBC,BERNABE CI,2015-12-02,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151202_-_nf_bloomfield_-_bernabe_ci_-_novembre_2015_version_anglaise.pdf,2026-08-04
+BNBC,BERNABE CI,2015-12-01,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20151201_-_nf_bloomfield_-_bernabe_ci_-_novembre_2015.pdf,2026-08-04
+BNBC,BERNABE CI,2013-05-02,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130502_-_nf_bloomfield_-_bernabe_ci_-_aout_2012_version_anglaise.pdf,2026-08-04
+BNBC,BERNABE CI,2013-04-18,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20130418_-_nf_bloomfield_-_bernabe_ci_-_aout_2012.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2025-12-30,GCR,AA+(WU),20,,,,stable,rehausse,,,12.467,2020;2021;2022;2023;2024,4.5,3.25,,OK,https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_servair_abidjan_ci.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2024-07-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20240708_-_notation_financiere_-_servair_abidjan_ci.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2023-07-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/gcr-communique_de_presse_-_servair_abidjan_-_juillet_2023.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2022-09-26,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20220926_-_notation_financiere_-_servair_abj_ci.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2021-07-30,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210730_-_notation_financiere_-_servair_abidjan_ci.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2021-02-17,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20210217_-_notation_financiere_-_servair_abidjan_ci_2021.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2019-12-09,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20191209_-_notation_financiere_-_servair_abidjan_ci.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2019-02-13,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20190213_-_servair_-_communique_de_presse_-_notation_financiere.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2018-08-16,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/fiche_de_notation_financiere_-_servair_abidjan_ci_aout_2018.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2017-09-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20170809-fiche_de_notation_financiere-_servair_abidjan_ci_2017.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2016-05-25,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160525_-_nf_wara_-_servair_abidjan_ci_-_mai_2016_version_anglaise.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2016-05-20,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20160520_-_nf_wara_-_servair_abidjan_ci_-_mai_2016.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2015-06-11,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150611_-_nf_wara_-_servair_abidjan_ci_-_juin_2015_version_anglaise.pdf,2026-08-04
+ABJC,SERVAIR ABIDJAN CI,2015-06-08,,,,,,,,,,,,,,,,NON_EXTRAIT,https://www.brvm.org/sites/default/files/20150608_-_nf_wara_-_servair_abidjan_ci_-_juin_2015.pdf,2026-08-04
