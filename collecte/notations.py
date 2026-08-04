@@ -119,6 +119,56 @@ RE_SCORE_TOTAL = re.compile(r"score\s+total\s*\|?\s*([\d,\.]+)", re.I)
 RE_AGENCE = re.compile(r"\b(GCR Ratings|GCR|WARA|Bloomfield|Moody'?s|Fitch|S&P)\b")
 
 
+# ----------------------------------------------------------------------
+# Echantillons de reference pour le mode --test
+# ----------------------------------------------------------------------
+# INTEGRES AU FICHIER (02/08/2026) plutot que stockes dans collecte/echantillons/ :
+# le premier run reel a echoue sur un FileNotFoundError parce que les fichiers
+# annexes n'avaient pas ete crees. Un garde-fou qui depend de fichiers externes
+# est fragile par construction — il doit voyager avec le code qu'il protege.
+# Contenu volontairement minimal : uniquement les motifs structurels a verifier
+# (dates, libelles de colonnes, notes, chiffres), pas le texte des communiques.
+
+ECHANTILLON_INDEX = """
+| Date       | Société            | Titre de l'annonce                              |                                                                                                                 |
+| 30/12/2025 | SERVAIR ABIDJAN CI | SERVAIR ABIDJAN CI : Notation Financière        | [Télécharger](https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_servair_abidjan_ci.pdf) |
+| 30/12/2025 | SUCRIVOIRE         | SUCRIVOIRE CI : Notation Financière             | [Télécharger](https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_sucrivoire_ci.pdf)      |
+| 30/12/2025 | TOTAL              | TOTALENERGIES MARKETING CI : Notation Financière| [Télécharger](https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_totalenergies_marketing_ci.pdf) |
+| 30/12/2025 | TOTAL SENEGAL S.A. | TOTALENERGIES MARKETING SN : Notation Financière| [Télécharger](https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_totalenergies_marketing_sn.pdf) |
+| 30/12/2025 | ONATEL BF          | ONATEL BURKINA FASO : Notation Financière       | [Télécharger](https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_onatel_bf.pdf)          |
+| 09/12/2025 |                    | SMB CI : Notation Financière                    | [Télécharger](https://www.brvm.org/sites/default/files/20251209_-_notation_financiere_-_smb_ci.pdf)             |
+| 26/11/2025 | SICABLE            | SICABLE CI : Notation Financière                | [Télécharger](https://www.brvm.org/sites/default/files/20251126_-_notation_financiere_-_sicable_ci.pdf)         |
+| 18/11/2025 | BANK OF AFRICA NG  | BOA NG : Notation Financière                    | [Télécharger](https://www.brvm.org/sites/default/files/20251117_-_notation_financiere_-_boa_ng.pdf)             |
+| 28/10/2025 | ECOBANK CI         | ECOBANK CÔTE D'IVOIRE : Notation Financière     | [Télécharger](https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_ecobank_ci.pdf)         |
+| 28/10/2025 | NSBC               | NSIA BANQUE CÔTE D'IVOIRE : Notation Financière | [Télécharger](https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_nsia_banque_ci.pdf)     |
+| 23/10/2025 | BANK OF AFRICA SN  | BOA SN : Notation Financière                    | [Télécharger](https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_boa_sn.pdf)             |
+| 23/10/2025 |                    | PETRO IVOIRE CI : Notation Financière           | [Télécharger](https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_petro_ivoire_ci.pdf)    |
+| 16/10/2025 | SAPH CI            | SAPH CÔTE D'IVOIRE : Notation financière        | [Télécharger](https://www.brvm.org/sites/default/files/20251016_-_notation_financiere_-_saph_ci.pdf)            |
+| 15/09/2025 | CORIS BANK INTERNATIONAL | CORIS BANK INTERNATIONAL BF : Notation financière | [Télécharger](https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_coris_bank_international_bf.pdf) |
+| 15/09/2025 | SGCI               | SOCIETE GENERALE CÔTE D'IVOIRE : Notation financière | [Télécharger](https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_societe_generale_ci.pdf) |
+"""
+
+# Motifs structurels d'un communique GCR (mise en page type, valeurs reelles du
+# communique ONATEL du 19/12/2025 pour que le test soit verifiable).
+ECHANTILLON_PDF = """
+GCR rehausse la note d'émetteur de long terme de A(WU) à A+(WU) de ONATEL-SA
+sur son échelle régionale de notation. La perspective est Stable.
+Dakar, le 19 décembre 2025 – GCR Ratings (GCR) a rehaussé la note d'émetteur de
+long terme de ONATEL-SA de A(WU) à A+(WU). La perspective est stable. En outre,
+la note d'émetteur de court terme de A1(WU) est affirmée.
+Emetteur Type de notation Echelle Notation Perspective
+ONATEL-SA Emetteur de long terme Régionale A+(WU) Stable
+ONATEL-SA Emetteur de court terme Régionale A1(WU) --
+Les revenus atteignent 142 milliards FCFA (2023 : 139 milliards FCFA ;
+2022 : 146 milliards FCFA ; 2021 : 155 milliards FCFA ; 2020 : 157 milliards FCFA).
+Marge brute de 24% et marge nette de 15 %.
+Carte des scores
+Score de risque-pays 2,00
+Score de risque sectoriel 2,75
+Score Total 8,75
+"""
+
+
 def reduire(nom):
     """Forme comparable : minuscules, sans accents ni ponctuation."""
     s = (nom or "").lower().strip()
@@ -302,7 +352,11 @@ def autotest():
     dossier = ICI / "echantillons"
     echecs = []
 
-    txt = (dossier / "index_notations.txt").read_text(encoding="utf-8")
+    fichier_index = dossier / "index_notations.txt"
+    txt = (fichier_index.read_text(encoding="utf-8") if fichier_index.exists()
+           else ECHANTILLON_INDEX)
+    if not fichier_index.exists():
+        print("  (echantillons integres au module — collecte/echantillons/ absent)")
     lignes = RE_LIGNE.findall(txt)
     if len(lignes) != 15:
         echecs.append("index : %d lignes reconnues au lieu de 15" % len(lignes))
@@ -312,7 +366,9 @@ def autotest():
     if obtenus != attendus:
         echecs.append("index : rattachements %s" % (attendus ^ obtenus))
 
-    pdf = (dossier / "pdf_ontbf.txt").read_text(encoding="utf-8")
+    fichier_pdf = dossier / "pdf_ontbf.txt"
+    pdf = (fichier_pdf.read_text(encoding="utf-8") if fichier_pdf.exists()
+           else ECHANTILLON_PDF)
     d = _analyser_texte(pdf)
     for cle, attendu in (("note_lt", "A+(WU)"), ("note_ancienne", "A(WU)"),
                          ("note_ct", "A1(WU)"), ("perspective", "stable"),
