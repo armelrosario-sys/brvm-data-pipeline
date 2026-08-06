@@ -104,6 +104,24 @@ SOCIETES = [
 
 # ticker, exercice, RN, RN_N1, actif, passif, CP, dettes_fin, payout, solva, source_type, statut, date_pub
 ETATS = [
+    ("SDSC", 2025, 784.970, 21068.974, 259448.239, 259448.240, 72872.106, 8230.970, 0.6935, None,
+     "NATIF", "PROBABLE", "2026-08-03"),
+    # AJOUT 06/08/2026 : "Etats financiers de synthese PROVISOIRE au 31/12/2025",
+    # publie BRVM le 03/08/2026, mention "certifies par les Commissaires aux Comptes".
+    # Statut PROBABLE et non VALIDE : le document se declare lui-meme PROVISOIRE.
+    # A repasser en VALIDE a la publication de la version definitive.
+    # RUPTURE MAJEURE : RN 784,970 M contre 21068,974 M en 2024, soit -96,3 %, alors
+    # que le CA progresse de 7,4 % (92004,268 vs 85643,038). Trois causes lisibles au
+    # compte de resultat : resultat d'exploitation NEGATIF (-2271,029 contre +941,675)
+    # sous l'effet de dotations en hausse de 41 % (capex corporel double) ; produits
+    # financiers divises par trois (7864,830 contre 22108,212) ; impots multiplies par
+    # six (3942,910 contre 677,946). Dividende propose ramene a 544,353 M contre
+    # 5008,048 M verses les deux exercices precedents (-89 %).
+    # LECON : en 2024 deja, le RN etait a 96 % d'origine FINANCIERE (RE 941,675 pour
+    # un resultat financier de 20870,055). Le profilage sur RN total avait donc valide
+    # une croissance qui n'existait pas au niveau du metier -> drapeau
+    # RESULTAT_NON_OPERATIONNEL ajoute au moteur (06/08/2026).
+    # Verification arithmetique : RN 784,970 = dividendes 544,353 + report 240,617 (exact).
     ("SDSC", 2024, 21068.974, 17138.527, 188126.016, 188126.016, 77808.004, 8324.985, 0.2377, None,
      "NATIF", "VALIDE", "2025-08-29"),  # AJOUT 14/07/2026 (relance SDSC) : PDF officiel certifie
     # "Etats financiers et rapport des CAC - Exercice 2024" (ECR International, signe
