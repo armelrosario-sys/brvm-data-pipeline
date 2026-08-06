@@ -71,6 +71,17 @@ profils:
   payout_max: 1.00                  # veto SI connu ; jamais un veto si non disponible
   per_max_analysable: 50            # au-dela : benefices residuels -> hors axes
   alerte_pegy_max: 0.25             # protocole de revue obligatoire (jurisprudence SLBC + ETIT)
+  # --- gardes v3.2 (06/08/2026) ---
+  part_operationnelle_min: 0.50     # resultat d'exploitation / resultat net. En dessous,
+                                    # le RN est majoritairement financier ou exceptionnel et
+                                    # sa croissance ne mesure pas le metier. Jurisprudence
+                                    # AGL CI : RE 941,675 M pour un RN de 21068,974 M en 2024
+                                    # (4,5 %), suivi d'un effondrement de 96 % en 2025.
+                                    # Contre-exemple SPHC 2025 : RE 38130 M > RN 24972 M.
+  inflexion_recente_max: -0.10      # variation du DERNIER exercice. En dessous, un CAGR
+                                    # positif masque un retournement : GARP/GROWTH interdits
+                                    # et grade plafonne. Jurisprudence STBC : CAGR +46,9 %/an
+                                    # mais dernier exercice a -18,5 % (hausse des accises).
 # ------------------------------------------------------------------
 # Registre CALENDRIER (chantier D4 automatique, 14/07/2026)
 # Detection de retard par ecart a l'intervalle historique typique entre
