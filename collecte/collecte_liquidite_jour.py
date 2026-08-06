@@ -56,8 +56,27 @@ def recuperer_liquidite_jour(strict=True):
     ("seance_ouverte_lors_collecte": true) pour que personne ne confonde
     un instantane partiel avec une vraie cloture -- "sans echec" ne doit
     jamais vouloir dire "sans transparence sur ce que la donnee vaut"."""
-    resp = requests.get(f"{BASE}/fr/cours-actions/0", headers=UA, timeout=30)
-    resp.raise_for_status()
+    # Durcissement 06/08/2026 (run P9 #24 tue par son timeout de 10 min alors que
+    # le script ne contient AUCUNE boucle) : timeout=30 en scalaire ne borne que
+    # le delai ENTRE deux paquets. Un serveur qui repond au compte-gouttes peut
+    # donc tenir la connexion ouverte indefiniment sans jamais declencher le
+    # timeout. Le tuple (connexion, lecture) borne les deux phases separement, et
+    # trois tentatives espacees couvrent une indisponibilite passagere de
+    # brvm.org sans jamais depasser ~2 min au total.
+    resp = None
+    for tentative in range(1, 4):
+        try:
+            resp = requests.get(f"{BASE}/fr/cours-actions/0", headers=UA,
+                                timeout=(10, 30))
+            resp.raise_for_status()
+            break
+        except requests.RequestException as e:
+            if tentative == 3:
+                raise
+            attente = 5 * tentative
+            print(f"[tentative {tentative}/3] echec ({type(e).__name__}) — "
+                  f"nouvelle tentative dans {attente}s")
+            time.sleep(attente)
     soup = BeautifulSoup(resp.text, "html.parser")
 
     # Garde-fou (16/07/2026, retour utilisateur) : la page BRVM affiche
