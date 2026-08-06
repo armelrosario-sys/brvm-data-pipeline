@@ -183,7 +183,19 @@ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap,
             chrono = chrono[i:]
             break
     if len(chrono) < 3:
-        return None, None, len(chrono), drapeaux + ["SERIE_TRONQUEE"]
+        # Correctif cyclique (06/08/2026) : chez un titre cyclique, un creux profond
+        # est une INFORMATION economique, pas un artefact. Cas mesures SPHC (creux
+        # caoutchouc 2023 a 3 635 M -> ratio 5,17) et STBC (accises 2024 -> 3,61) :
+        # la troncature ramenait la serie a 2 exercices, et le moteur basculait sur
+        # le BPA implicite alors que 4 exercices CERTIFIES existaient en base. Une
+        # donnee certifiee tronquee ne doit jamais ceder la place a une donnee
+        # probable : on restaure la serie complete, avec un drapeau explicite.
+        complete = serie[::-1]
+        if len(complete) >= 3:
+            chrono = complete
+            drapeaux.append("CYCLE_SERIE_RESTAUREE")
+        else:
+            return None, None, len(chrono), drapeaux + ["SERIE_TRONQUEE"]
 
     # Garde 2 : base ecrasee (croissance depuis un creux non representatif)
     med = _mediane([x[1] for x in chrono])
@@ -229,6 +241,15 @@ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap,
         drapeaux.append("CAP_%d" % round(cap * 100))
         g = cap
 
+    # Drapeau INFLEXION_RECENTE (06/08/2026, jurisprudence STBC) : un CAGR positif peut
+    # masquer un retournement en cours. Cas mesure STBC : serie 2022-2025 restauree
+    # donnant +46,9 %/an, alors que le DERNIER exercice recule de 18,5 % (accises).
+    # Un profil est un diagnostic DATE : la derniere variation prime sur la moyenne.
+    if len(chrono) >= 2 and chrono[-2][1] > 0:
+        var_derniere = chrono[-1][1] / chrono[-2][1] - 1
+        if var_derniere < -0.10 and chrono[-1][1] > 0:
+            drapeaux.append("INFLEXION_RECENTE")
+
     statut = "VERIFIE" if all(x[2] == "VALIDE" for x in chrono) else "PROBABLE"
     if any(origines.get(x[0]) == "COMPARATIF" for x in chrono):
         drapeaux.append("SERIE_COMPLETEE_N1")
@@ -269,7 +290,7 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
 # ----------------------------------------------------------------------
 
 
-def ingredients(cur, ticker, seuils, sp):
+def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50):
     per_row = cur.execute(
         "SELECT per FROM cours_mensuels WHERE ticker=? AND per IS NOT NULL "
         "ORDER BY fin_mois DESC LIMIT 1", (ticker,)).fetchone()
@@ -303,6 +324,26 @@ def ingredients(cur, ticker, seuils, sp):
         # physiques). Tant que ce n'est pas tranche, le payout implicite est
         # affiche avec sa source et n'est jamais promu au rang de donnee certifiee.
         payout, payout_source = dy * per, "IMPLICITE(rendement x PER)"
+
+    # Drapeau RESULTAT_NON_OPERATIONNEL (06/08/2026, jurisprudence AGL CI) : quand le
+    # resultat net provient majoritairement du financier ou de l'exceptionnel, une
+    # croissance du RN ne mesure PAS la dynamique du metier. AGL CI 2024 : resultat
+    # d'exploitation 941,675 M pour un RN de 21068,974 M (4,5 %) -> le profil GARP
+    # etait construit sur des produits financiers, et s'est effondre de 96 % en 2025.
+    # Contre-exemple SPHC 2025 : resultat d'exploitation 38130 M pour un RN de
+    # 24972 M -> croissance pleinement operationnelle, le drapeau ne se declenche pas.
+    # La colonne peut ne pas exister encore : absence = drapeau non evaluable, jamais
+    # un faux negatif silencieux.
+    part_operationnelle = None
+    try:
+        ligne = cur.execute(
+            "SELECT resultat_exploitation, resultat_net FROM etats_financiers "
+            "WHERE ticker=? AND resultat_exploitation IS NOT NULL AND resultat_net IS NOT NULL "
+            "ORDER BY exercice DESC LIMIT 1", (ticker,)).fetchone()
+        if ligne and ligne[1]:
+            part_operationnelle = ligne[0] / ligne[1]
+    except Exception:
+        part_operationnelle = None
 
     rn_dispo = [(e, rn) for e, rn, _c, _p in etats if rn is not None]
     dernier_rn = rn_dispo[0][1] if rn_dispo else None
@@ -348,8 +389,11 @@ def ingredients(cur, ticker, seuils, sp):
     base_pegy = (g + (dy or 0)) * 100 if g is not None else None
     pegy = per / base_pegy if (per and base_pegy and base_pegy > 0) else None
 
+    if part_operationnelle is not None and part_operationnelle < sp_part_min:
+        drapeaux = drapeaux + ["RESULTAT_NON_OPERATIONNEL"]
+
     return dict(per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
-                payout_source=payout_source,
+                payout_source=payout_source, part_operationnelle=part_operationnelle,
                 roe=roe, g=100.0 * g if g is not None else None, source_croissance=source_g,
                 drapeaux=drapeaux, n_exercices=len(rn_dispo), dernier_rn=dernier_rn,
                 peg=round(peg, 2) if peg else None,
@@ -371,7 +415,12 @@ def profil_par_signature(ing, cherte, croissance, sp):
     drapeaux = ing["drapeaux"]
     notes = []
 
-    bloc = ("BASE_ECRASEE" in drapeaux
+    inflexion = "INFLEXION_RECENTE" in drapeaux
+    if inflexion:
+        notes.append("dernier exercice en net recul : la croissance moyenne masque "
+                     "un retournement en cours — profil a reexaminer a la prochaine publication")
+    bloc = (inflexion
+            or "BASE_ECRASEE" in drapeaux
             or any(d.startswith("CAP_") for d in drapeaux)
             or (g is not None and g > sp["rattrapage_bloquant"] * 100))
     if "RATTRAPAGE" in drapeaux and not bloc:
@@ -502,6 +551,14 @@ def grade_confiance(profil, ing, faits_titre):
         "PIC_YOY": "rupture d'echelle annuelle : serie tronquee au pic",
         "BASE_ECRASEE": "la fenetre demarre sur un creux non representatif",
         "RATTRAPAGE": "croissance de rattrapage, non extrapolable",
+        "INFLEXION_RECENTE": "le dernier exercice recule de plus de 10 % : la croissance "
+                             "moyenne affichee masque un retournement en cours",
+        "CYCLE_SERIE_RESTAUREE": "serie certifiee restauree malgre une rupture d'echelle "
+                                 "(creux de cycle) : la croissance porte sur l'ensemble du "
+                                 "cycle, pas sur une phase",
+        "RESULTAT_NON_OPERATIONNEL": "le resultat net provient majoritairement du financier "
+                                     "ou de l'exceptionnel : la croissance affichee ne mesure "
+                                     "PAS la dynamique du metier (jurisprudence AGL CI)",
     }
     for d in ing["drapeaux"]:
         base = d.split("_")[0] if d.startswith("CAP_") else d
@@ -520,7 +577,8 @@ def grade_confiance(profil, ing, faits_titre):
         return ("B" if faits_titre else "C"), reserves
     if profil == "NON_ANALYSABLE":
         return "C", reserves
-    critiques = {"CONTRADICTION_RN_BPA", "AUCUN_RN_EN_BASE", "BASE_GONFLEE", "CONFLIT_N1"}
+    critiques = {"CONTRADICTION_RN_BPA", "AUCUN_RN_EN_BASE", "BASE_GONFLEE", "CONFLIT_N1",
+                 "RESULTAT_NON_OPERATIONNEL", "INFLEXION_RECENTE"}
     if critiques & set(ing["drapeaux"]):
         return "C", reserves
     if profil in ("VALUE", "RENDEMENT") and ing["payout"] is None:
@@ -551,6 +609,7 @@ def calculer():
         croissance_cap=0.60, bpa_implicite_annees=3, rattrapage_min=0.25,
         rattrapage_bloquant=0.30, payout_max=1.0, per_max_analysable=50,
         base_gonflee_max=1.5, fenetre_exercices_etendue=8,
+        part_operationnelle_min=0.50,
         n_secteur_min=8, value_pctl_min=67, growth_pctl_min=67,
         garp_g_min=0.08, garp_g_max=0.30, garp_pegy_max=1.5, growth_g_min=0.05,
         rendement_dy_min=0.048, contraction_seuil=0.10, alerte_pegy_max=0.25,
@@ -569,7 +628,7 @@ def calculer():
             "SELECT COUNT(*) FROM cours_mensuels WHERE ticker=?", (t,)).fetchone()[0]
         if not cote:
             continue
-        ing = ingredients(cur, t, seuils, sp)
+        ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"])
         statut_gate, _motifs = appliquer_gate(cur, t, secteurs.get(t, ""), seuils, marche)
         brut[t] = dict(ing, gate=statut_gate, secteur=secteurs.get(t, ""))
 
@@ -730,6 +789,8 @@ def calculer():
             "motif": motif,
             "comparaisons": comparaisons(v) if v["analysable"] else None,
             "payout_source": v["payout_source"],
+            "part_operationnelle": (round(v["part_operationnelle"], 2)
+                                    if v.get("part_operationnelle") is not None else None),
             "secondaire": secondaire,
             "grade": grade,
             "notes": notes,
