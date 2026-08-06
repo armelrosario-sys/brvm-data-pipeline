@@ -21,17 +21,30 @@ on:
 permissions:
   contents: write
 
+# Ajout 06/08/2026 : sans groupe de concurrence, deux executions simultanees
+# (declenchement manuel pendant un run programme, ou relance) se disputent
+# le push et l'une des deux est annulee ou echoue. cancel-in-progress: false
+# fait ATTENDRE la seconde plutot que de la tuer : aucune collecte perdue.
+concurrency:
+  group: collecte_quotidienne
+  cancel-in-progress: false
+
 jobs:
   collecte-quotidienne:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install requests beautifulsoup4
+      # Ajout 06/08/2026 : le run #24 a ete tue par le timeout de 10 min du JOB,
+      # ce qui a emporte aussi les etapes de commit. Un timeout d'ETAPE borne la
+      # seule phase reseau : si brvm.org ne repond pas, l'etape echoue proprement
+      # en 5 min et le job se termine au lieu d'etre tue en cours de route.
       - name: Collecter les cours du jour (brvm.org/fr/cours-actions/0)
+        timeout-minutes: 5
         env:
           # Actif UNIQUEMENT sur declenchement manuel explicite avec la case
           # cochee (16/07/2026) -- jamais sur le declenchement programme,
@@ -59,5 +72,5 @@ jobs:
           [ -f collecte/liquidite_jour.json ] && git add collecte/liquidite_jour.json
           [ -f collecte/historique_liquidite.json ] && git add collecte/historique_liquidite.json
           git commit -m "Cours du jour $(date -u +%F)" || echo "rien a committer"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push
