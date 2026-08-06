@@ -52,7 +52,7 @@ jobs:
         run: |
           git add -A
           git diff --cached --quiet || git commit -m "Backfill Piste A : extraction rapports deja archives (auto)"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin main
 
   boc_quotidien:
@@ -87,7 +87,7 @@ jobs:
         run: |
           git add -A
           git diff --cached --quiet || git commit -m "Backfill Piste B : cours quotidiens elargis (auto)"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin main
 
       - name: Upload des PDF vers les Releases (comme collecte.yml existant)
@@ -114,7 +114,7 @@ jobs:
         run: |
           git add -A
           git diff --cached --quiet || git commit -m "a_uploader.txt vide apres upload (auto)"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin main
 
   liquidite:
@@ -151,7 +151,7 @@ jobs:
         run: |
           git add -A
           git diff --cached --quiet || git commit -m "Backfill Piste C : historique liquidite (auto)"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin main
 
   fusion_dividendes:
@@ -188,5 +188,5 @@ jobs:
         run: |
           git add -A
           git diff --cached --quiet || git commit -m "Piste D : fusion fondamentaux + historique dividendes (auto)"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin main
