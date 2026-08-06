@@ -7,6 +7,14 @@ on:
 permissions:
   contents: write
 
+# Ajout 06/08/2026 : sans groupe de concurrence, deux executions simultanees
+# (declenchement manuel pendant un run programme, ou relance) se disputent
+# le push et l'une des deux est annulee ou echoue. cancel-in-progress: false
+# fait ATTENDRE la seconde plutot que de la tuer : aucune collecte perdue.
+concurrency:
+  group: collecte
+  cancel-in-progress: false
+
 jobs:
   collecte:
     runs-on: ubuntu-latest
@@ -46,7 +54,16 @@ jobs:
         run: |
           git config user.name "robot-collecte"
           git config user.email "robot@users.noreply.github.com"
-          git add MANIFESTE.csv collecte/etat_rapports.json collecte/a_reteleverser.json || true
+          # Correctif 06/08/2026 : a_uploader.txt est SUIVI par git et REECRIT a
+          # chaque run par collecteur.py (mode "a"), mais n'etait pas ajoute au
+          # commit. Il restait donc en modification non indexee, et le
+          # "git pull --rebase" echouait juste apres un commit reussi :
+          #   "error: cannot pull with rebase: You have unstaged changes."
+          # Le travail de collecte etait perdu alors qu'il avait abouti.
+          # Double protection : on ajoute les fichiers produits, ET le pull
+          # utilise --autostash (voir ci-dessous) pour tout residu imprevu.
+          git add MANIFESTE.csv collecte/etat_rapports.json \
+                  collecte/a_reteleverser.json a_uploader.txt echecs_upload.txt || true
           git commit -m "Collecte $(date -u +%F)" || echo "rien a committer"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push
