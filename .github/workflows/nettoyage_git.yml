@@ -35,5 +35,5 @@ jobs:
         run: |
           git add -A
           git diff --cached --quiet || git commit -m "Nettoyage : data/ retire du suivi Git (PDF -> Releases uniquement)"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin main
