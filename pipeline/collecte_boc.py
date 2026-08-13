@@ -18,7 +18,11 @@ from datetime import date, timedelta
 import requests
 
 URL = "https://www.brvm.org/sites/default/files/boc_{aaaammjj}_{n}.pdf"
+PAGE_LISTE = "https://www.brvm.org/fr/bulletins-officiels-de-la-cote"
 SUFFIXES = (2, 1, 3)          # le suffixe observé est _2 ; on essaie les variantes
+RECUL_MAX = 12                # jours de repli si la page de publication est injoignable
+# boc_20260811_2.pdf — le motif exclut les éditions anglaises boc_eng_AAAAMMJJ_N.pdf
+RE_LIEN_BOC = re.compile(r"/sites/default/files/boc_(\d{8})_(\d)\.pdf")
 DOSSIER = "donnees"
 
 MOIS = {"janv": 1, "févr": 2, "fevr": 2, "mars": 3, "avr": 4, "mai": 5, "juin": 6,
@@ -56,22 +60,76 @@ def date_div(txt):
     return f"{an:04d}-{mo:02d}-{j:02d}"
 
 
-def telecharge(jour):
-    """Renvoie le contenu du PDF du BOC pour la séance demandée."""
-    aaaammjj = jour.strftime("%Y%m%d")
+def session_http():
+    s = requests.Session()
+    s.headers["User-Agent"] = "Mozilla/5.0 (compatible; pipeline-brvm/1.0)"
+    return s
+
+
+def pdf_si_present(s, url):
+    """Renvoie le contenu si l'URL sert bien un PDF, sinon None."""
+    try:
+        r = s.get(url, timeout=45)
+    except requests.RequestException:
+        return None
+    return r.content if (r.status_code == 200 and r.content[:4] == b"%PDF") else None
+
+
+def url_dernier_publie(s):
+    """Lit la page des publications et renvoie l'URL du bulletin le plus récent.
+
+    Toutes les journées ne donnent pas lieu à une séance : jours fériés régionaux,
+    fermetures exceptionnelles. Interroger la page évite de deviner ces dates."""
+    try:
+        r = s.get(PAGE_LISTE, timeout=45)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        print(f"Page des publications injoignable ({e}) — repli sur les dates.")
+        return None
+    liens = RE_LIEN_BOC.findall(r.text)
+    if not liens:
+        print("Aucun lien de bulletin reconnu sur la page — repli sur les dates.")
+        return None
+    aaaammjj, n = max(liens)
+    return URL.format(aaaammjj=aaaammjj, n=n)
+
+
+def telecharge(jour=None):
+    """Contenu du PDF : la séance demandée, ou le dernier bulletin publié."""
+    s = session_http()
+
+    if jour is None:
+        url = url_dernier_publie(s)
+        if url:
+            contenu = pdf_si_present(s, url)
+            if contenu:
+                print(f"Dernier bulletin publié : {url}")
+                return contenu
+            print(f"{url} annoncé mais illisible — repli sur les dates.")
+        # repli : on remonte les jours ouvrés jusqu'à trouver une séance
+        essai = date.today()
+        for _ in range(RECUL_MAX):
+            if essai.weekday() < 5:
+                for n in SUFFIXES:
+                    u = URL.format(aaaammjj=essai.strftime("%Y%m%d"), n=n)
+                    contenu = pdf_si_present(s, u)
+                    if contenu:
+                        print(f"BOC trouvé en remontant : {u}")
+                        return contenu
+            essai -= timedelta(days=1)
+        raise SystemExit(f"Aucun bulletin trouvé sur les {RECUL_MAX} derniers jours.")
+
     erreurs = []
     for n in SUFFIXES:
-        url = URL.format(aaaammjj=aaaammjj, n=n)
-        try:
-            rep = requests.get(url, timeout=45,
-                               headers={"User-Agent": "Mozilla/5.0 (compatible; pipeline-brvm/1.0)"})
-            if rep.status_code == 200 and rep.content[:4] == b"%PDF":
-                print(f"BOC téléchargé : {url}")
-                return rep.content
-            erreurs.append(f"{url} -> HTTP {rep.status_code}")
-        except requests.RequestException as e:
-            erreurs.append(f"{url} -> {e}")
-    raise SystemExit("Aucun BOC pour cette date.\n  " + "\n  ".join(erreurs))
+        url = URL.format(aaaammjj=jour.strftime("%Y%m%d"), n=n)
+        contenu = pdf_si_present(s, url)
+        if contenu:
+            print(f"BOC téléchargé : {url}")
+            return contenu
+        erreurs.append(url)
+    raise SystemExit(
+        f"Aucun bulletin pour le {jour.isoformat()} : séance non tenue, ou bulletin "
+        f"pas encore publié.\n  " + "\n  ".join(erreurs))
 
 
 def texte_pdf(chemin):
@@ -210,7 +268,8 @@ def controle(valeurs, tot):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--date", help="séance au format AAAA-MM-JJ")
+    ap.add_argument("--date", help="séance précise au format AAAA-MM-JJ ; "
+                                    "sans cette option, le dernier bulletin publié")
     ap.add_argument("--pdf", help="PDF local, sans téléchargement")
     ap.add_argument("--sortie", default=os.path.join(DOSSIER, "boc.json"))
     a = ap.parse_args()
@@ -218,12 +277,8 @@ def main():
     if a.pdf:
         chemin, tmp = a.pdf, None
     else:
-        jour = date.fromisoformat(a.date) if a.date else date.today()
-        if not a.date:                                  # week-end : dernière séance ouvrée
-            while jour.weekday() > 4:
-                jour -= timedelta(days=1)
         tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
-        tmp.write(telecharge(jour)); tmp.close()
+        tmp.write(telecharge(date.fromisoformat(a.date) if a.date else None)); tmp.close()
         chemin = tmp.name
 
     txt = texte_pdf(chemin)
