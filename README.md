@@ -1,54 +1,43 @@
-# brvm-data-pipeline
+# Tableau de bord BRVM — chaîne automatisée
 
-Collecte et archivage automatisés des publications officielles de la BRVM
-(Bourse Régionale des Valeurs Mobilières — UEMOA).
+Le tableau de bord `docs/index.html` lit `docs/data_brvm.json`, régénéré par deux
+workflows GitHub Actions. Aucune intervention manuelle en régime courant, à une
+exception près : les capitaux propres (voir plus bas).
 
-## Contenu du dépôt
-- `config/` — paramètres du pipeline : registre des seuils, dictionnaire sémantique
-- `collecte/` — robot de collecte sélective (à venir, phase P2)
-- Les documents PDF collectés sont archivés dans les **Releases**, pas dans le dépôt
-- `MANIFESTE.csv` — registre SHA-256 de chaque document collecté (à venir)
+## Arborescence
 
-## Principes
-- Sources publiques uniquement (publications réglementaires brvm.org)
-- Cadence de collecte respectueuse (max 1-2 requêtes/seconde)
-- Intégrité avant couverture : aucune donnée n'est devinée
-- **Aucune donnée personnelle** (portefeuille, décisions, scores) n'est
-  stockée dans ce dépôt — infrastructure de collecte uniquement.
+    pipeline/collecte_boc.py           bulletin officiel de la cote, quotidien
+    pipeline/collecte_sikafinance.py   performances et fondamentaux, hebdomadaire
+    pipeline/construit_donnees.py      fusion et calculs dérivés
+    donnees/                           collectes brutes + capitaux propres saisis
+    docs/                              ce qui est publié sur GitHub Pages
 
-## Orchestration des workflows (documenté le 14/07/2026)
+## Mise en service
 
-Cinq workflows GitHub Actions composent le pipeline :
+1. Copier cette arborescence à la racine d'un dépôt.
+2. Settings > Pages > Source : *Deploy from a branch*, branche `main`, dossier `/docs`.
+3. Settings > Actions > General > Workflow permissions : *Read and write permissions*.
+4. Onglet Actions, lancer *BOC quotidien* à la main une première fois.
 
-| Workflow | Déclencheur | Écrit sur `main` ? |
-|---|---|---|
-| `collecte.yml` (P2b) | cron lundi/jeudi 3h UTC + manuel | Oui — `MANIFESTE.csv`, `collecte/etat_rapports.json`, `collecte/a_reteleverser.json` |
-| `inventaire.yml` (P2a) | manuel | Oui — `collecte/inventaire.json`, `collecte/rapport_inventaire.md` |
-| `reparation.yml` (P2c) | manuel | Oui — `collecte/a_reteleverser.json`, `collecte/anomalies_integrite.json` |
-| `tests.yml` (P4) | push sur `moteur/config/collecte/dashboard` | Non |
-| `pages.yml` (P5b) | push sur `moteur/config/collecte/dashboard` + cron | Non |
+Le tableau de bord est alors servi à l'adresse indiquée par Settings > Pages.
 
-**Cascade intentionnelle** : les trois premiers workflows committent des fichiers
-sous `collecte/**`, ce qui redéclenche automatiquement `tests.yml` et `pages.yml`
-(chemins surveillés). C'est voulu — chaque collecte programmée republie le site
-si les golden tests passent. Aucun risque de boucle infinie : `tests.yml` et
-`pages.yml` ne committent jamais rien.
+## Vérifier avant d'automatiser
 
-**Garde-fou de déploiement** : `pages.yml` ne dépend pas explicitement de
-`tests.yml` mais les deux exécutent `peupler.py` + `tester.py` implicitement
-dans leur propre job — un échec des golden tests dans `tests.yml` n'empêche
-*pas* mécaniquement `pages.yml` de publier une version buguée s'ils sont
-déclenchés par le même push et s'exécutent en parallèle. **Limite connue,
-non corrigée à ce jour** : faire dépendre `pages.yml` du succès de
-`tests.yml` (`needs:` ou déclenchement en chaîne) est un chantier ouvert.
+    python pipeline/collecte_boc.py --pdf un_boc.pdf     # doit afficher 7 contrôles OK
+    python pipeline/collecte_sikafinance.py SNTS CBIBF   # CA attendus 1923122 et 138986
+    python pipeline/construit_donnees.py                 # affiche la couverture
 
-## Chantier ouvert — extraction automatique (priorité longue, ouvert le 14/07/2026)
+## Capitaux propres
 
-L'essentiel des 147 lignes de `moteur/peupler.py` (table `ETATS`) est
-**transcrit à la main** depuis les PDF collectés, pas extrait automatiquement.
-`collecte/extractions_brutes.jsonl` (extraction automatisée réelle) ne couvre
-que 62 lignes. Tant que ce chantier n'est pas mené, chaque nouvelle publication
-BRVM exige une transcription manuelle avant d'entrer dans le moteur — c'est la
-cause principale de la lenteur du projet, pas l'interface. Non planifié à ce
-jour faute de temps disponible ; à reprendre en priorité une fois les
-finitions d'ergonomie du dashboard terminées.
+Sikafinance ne publie pas les capitaux propres : le ROE ne peut pas être collecté.
+Saisir la colonne `fonds_propres` de `donnees/fonds_propres.csv` depuis les rapports
+annuels, une fois par exercice. Tant qu'une ligne reste vide, la cellule ROE affiche
+un tiret et le motif au survol, plutôt qu'une valeur approchée.
+
+## Contrôles automatiques
+
+`collecte_boc.py` réconcilie les lignes extraites avec la page de synthèse du
+bulletin : volume, valeur transigée, répartition hausse/baisse/inchangé, et
+recalcul des 47 variations du jour. En cas d'écart, le script sort en erreur et le
+workflow échoue sans rien publier — un changement de format du BOC est ainsi signalé
+au lieu d'être propagé silencieusement.

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BRVM — tableau de bord comparatif · séance du 10 août 2026</title>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --encre:#10203F;--encre2:#1D3567;--or:#E4A11B;--or-clair:#F6D89B;
+  --papier:#EDEFF3;--carte:#FFF;--trait:#D3D9E3;
+  --hausse:#0B7A47;--baisse:#C02A28;--gris:#68718A;--gris-clair:#98A1B5;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --serif:'IBM Plex Serif',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--papier);color:var(--encre);font-family:var(--sans);font-size:14px;line-height:1.5}
+.enveloppe{max-width:1720px;margin:0 auto;padding:0 20px 56px}
+.bandeau{background:var(--encre);color:#fff;margin:0 -20px;padding:22px 20px 0;border-bottom:3px solid var(--or)}
+.bandeau-int{max-width:1680px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.titre-doc{font-family:var(--serif);font-weight:700;font-size:29px;letter-spacing:-.2px;margin:0;line-height:1.1}
+.titre-doc span{color:var(--or)}
+.sous-titre{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--or-clair);margin:7px 0 0}
+.seance{text-align:right;font-family:var(--mono);font-size:11.5px;line-height:1.8;color:#C9D2E4}
+.seance b{color:#fff;font-weight:500}
+.reglette{margin:18px -20px 0;background:var(--encre2);border-top:1px solid rgba(255,255,255,.12)}
+.reglette-int{max-width:1680px;margin:0 auto;display:flex;flex-wrap:wrap}
+.cran{flex:1 1 175px;padding:11px 18px;border-right:1px solid rgba(255,255,255,.10)}
+.cran:last-child{border-right:0}
+.cran-lib{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#9FB0CE}
+.cran-val{font-family:var(--mono);font-size:19px;font-weight:600;color:#fff;margin-top:3px}
+.cran-var{font-family:var(--mono);font-size:12px;font-weight:500;margin-left:8px}
+.cran-note{font-family:var(--mono);font-size:10.5px;color:#8B9BBA;margin-top:2px}
+.h{color:#4ADE80}.b{color:#FF8D85}
+.carte{background:var(--carte);border:1px solid var(--trait);margin-top:20px}
+.carte-tete{display:flex;align-items:baseline;gap:12px;padding:13px 18px;border-bottom:1px solid var(--trait);flex-wrap:wrap}
+.carte-tete h2{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin:0}
+.carte-tete .compte{font-family:var(--mono);font-size:11.5px;color:var(--gris);margin-left:auto}
+.carte-tete .compte b{color:var(--encre);font-weight:600}
+.filtres{display:flex;flex-wrap:wrap;gap:14px;padding:16px 18px;border-left:3px solid var(--or)}
+.champ{display:flex;flex-direction:column;gap:5px}
+.champ label{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--gris)}
+.champ input,.champ select{font-family:var(--sans);font-size:13.5px;color:var(--encre);background:#fff;
+  border:1px solid var(--trait);border-radius:0;padding:7px 9px;min-width:180px;height:34px}
+.champ input:focus,.champ select:focus{outline:2px solid var(--or);outline-offset:-1px;border-color:var(--or)}
+.champ--large input{min-width:250px}
+.bascule{display:flex;align-items:center;gap:8px;align-self:flex-end;height:34px;font-size:13px;cursor:pointer}
+.bascule input{width:15px;height:15px;accent-color:var(--or);cursor:pointer}
+.raz{align-self:flex-end;height:34px;padding:0 14px;background:#fff;border:1px solid var(--trait);
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);cursor:pointer}
+.raz:hover{border-color:var(--encre);color:var(--encre)}
+.vues{display:flex;gap:0;align-self:flex-end;height:34px;border:1px solid var(--trait)}
+.vues button{background:#fff;border:0;border-right:1px solid var(--trait);padding:0 15px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris)}
+.vues button:last-child{border-right:0}
+.vues button[aria-pressed="true"]{background:var(--encre);color:#fff}
+.zone-table{padding:0 18px 16px}
+table.dataTable{border-collapse:collapse!important;font-size:12.5px;width:100%!important}
+table.dataTable thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  font-weight:500;color:#DDE4F0;background:var(--encre);border:0;border-bottom:2px solid var(--or);
+  padding:9px 8px;white-space:nowrap;vertical-align:bottom}
+table.dataTable thead th:hover{color:#fff}
+table.dataTable thead .sorting:after,table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:after{color:var(--or)!important;opacity:.9}
+table.dataTable tbody td{border-top:1px solid #E7EAF1;padding:6px 8px;white-space:nowrap}
+table.dataTable tbody tr:hover td{background:#FFF9EC}
+table.dataTable tbody tr.signale td:first-child{box-shadow:inset 3px 0 0 var(--or)}
+table.dataTable tfoot th{border-top:2px solid var(--encre);padding:8px;font-family:var(--sans);
+  font-size:12.5px;text-align:right;font-weight:600;color:var(--encre);background:#F7F9FC}
+table.dataTable tfoot th:first-child{text-align:left}
+table.dataTable tfoot th:last-child{font-family:var(--mono);font-size:10.5px;color:var(--gris);
+  text-transform:uppercase;letter-spacing:.08em;font-weight:500}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.code{font-family:var(--mono);font-weight:600;font-size:12px}
+.sect{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--encre2);
+  border:1px solid var(--trait);padding:2px 5px;background:#F4F6FA}
+.comp{font-size:11px;color:var(--gris)}.comp.prestige{color:var(--encre);font-weight:600}
+.hausse{color:var(--hausse);font-weight:600}.baisse{color:var(--baisse);font-weight:600}.plat{color:var(--gris)}
+.fl{font-size:10px;margin-right:3px}
+.nd{color:var(--gris-clair);font-style:italic;font-size:11.5px}
+.ni{color:#B08528;font-size:11px;font-family:var(--mono)}
+.alerte{color:var(--or);font-family:var(--mono);font-weight:600;cursor:help;margin-left:4px}
+.z{font-family:var(--mono);font-size:11px;color:var(--gris);margin-left:5px}
+.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate{font-size:12.5px;color:var(--gris)}
+.dataTables_wrapper .dataTables_length select{border:1px solid var(--trait);padding:4px 6px;height:30px;font-family:var(--mono)}
+.dataTables_wrapper .dataTables_filter{display:none}
+.dataTables_wrapper .dataTables_paginate .paginate_button{border:1px solid transparent!important;border-radius:0!important;
+  padding:5px 11px!important;font-family:var(--mono);font-size:12px}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+  background:var(--encre)!important;color:#fff!important;border-color:var(--encre)!important}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover{background:#fff!important;color:var(--encre)!important;border-color:var(--or)!important}
+div.dt-buttons{float:right;margin-left:12px}
+button.dt-button{background:#fff!important;border:1px solid var(--trait)!important;border-radius:0!important;
+  font-family:var(--mono)!important;font-size:11px!important;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--encre)!important;padding:7px 13px!important;margin:0 0 0 6px!important}
+button.dt-button:hover:not(.disabled){background:var(--encre)!important;color:#fff!important;border-color:var(--encre)!important}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.note{padding:16px 18px;border-right:1px solid var(--trait)}
+.note:last-child{border-right:0}
+.note h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--gris);margin:0 0 9px}
+.note p,.note li{font-size:12.8px;color:#31405E;margin:0 0 8px}
+.note ul{margin:0;padding-left:17px}.note b{color:var(--encre)}
+table.ctrl{width:100%;border-collapse:collapse;font-size:12px}
+table.ctrl td{padding:4px 6px;border-bottom:1px solid #EDF0F5}
+table.ctrl td.mono{font-size:11.5px}
+.ok{color:var(--hausse);font-family:var(--mono);font-size:10.5px;text-align:right}
+.pied{margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--gris);line-height:1.9}
+.avert{background:#FFF6E3;border:1px solid var(--or-clair);border-left:3px solid var(--or);padding:12px 16px;
+  margin-top:20px;font-size:13px;color:#5A4413}
+.avert b{color:#3D2E08}
+.import{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;padding:16px 18px}
+.import input[type=file]{font-family:var(--sans);font-size:12.5px}
+.etat{font-family:var(--mono);font-size:11.5px;padding:6px 10px;border:1px solid var(--trait);background:#F7F9FC;color:var(--gris)}
+.etat.bon{border-color:var(--hausse);color:var(--hausse);background:#F1FAF5}
+.etat.mauvais{border-color:var(--baisse);color:var(--baisse);background:#FDF3F3}
+pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;font-family:var(--mono);
+  font-size:11.5px;overflow-x:auto;margin:8px 0 0;color:var(--encre2)}
+@media (max-width:760px){
+  .titre-doc{font-size:22px}.seance{text-align:left}
+  .champ{flex:1 1 100%}.champ input,.champ select{min-width:100%;width:100%}
+  .note{border-right:0;border-bottom:1px solid var(--trait)}
+}
+</style>
+</head>
+<body>
+<header class="bandeau">
+  <div class="bandeau-int">
+    <div>
+      <h1 class="titre-doc">BRVM — tableau de bord <span>comparatif</span></h1>
+      <p class="sous-titre">47 sociétés · 6 horizons de performance · benchmark sectoriel et marché</p>
+    </div>
+    <div class="seance">
+      <div>Cote de référence : <b id="kBoc">chargement…</b></div>
+      <div>Performances multi-horizons : <b id="kPerf">—</b></div>
+      <div>Fondamentaux : <b id="kFond">—</b></div>
+      <div style="margin-top:4px;font-size:10.5px;color:#8B9BBA" id="kSrc">—</div>
+    </div>
+  </div>
+  <div class="reglette"><div class="reglette-int">
+    <div class="cran"><div class="cran-lib">BRVM Composite</div><div class="cran-val">490,51<span class="cran-var h">+1,04 %</span></div><div class="cran-note">YTD +41,87 %</div></div>
+    <div class="cran"><div class="cran-lib">BRVM 30</div><div class="cran-val">233,99<span class="cran-var h">+1,20 %</span></div><div class="cran-note">YTD +40,75 %</div></div>
+    <div class="cran"><div class="cran-lib">PER médian</div><div class="cran-val" id="kPer">—</div><div class="cran-note">moyenne faussée par 7 valeurs extrêmes</div></div>
+    <div class="cran"><div class="cran-lib">Rendement médian</div><div class="cran-val" id="kRdt">—</div><div class="cran-note">dividende net / cours</div></div>
+    <div class="cran"><div class="cran-lib">Perf. médiane 5 ans</div><div class="cran-val" id="kP5">—</div><div class="cran-note">44 titres documentés</div></div>
+    <div class="cran"><div class="cran-lib">Séance</div><div class="cran-val"><span class="h">28</span> / <span class="b">13</span> / 6</div><div class="cran-note">hausse · baisse · inchangé</div></div>
+  </div></div>
+</header>
+
+<div class="enveloppe">
+
+  <section class="carte">
+    <div class="carte-tete"><h2>Filtres et mode de lecture</h2>
+      <span class="compte"><b id="compte">47</b> titres affichés sur 47</span></div>
+    <div class="filtres">
+      <div class="champ champ--large"><label for="q">Recherche globale</label>
+        <input id="q" type="search" placeholder="code, titre, secteur…" autocomplete="off"></div>
+      <div class="champ"><label for="fsect">Secteur</label>
+        <select id="fsect"><option value="">Tous les secteurs</option>
+          <option value="FIN">FIN — Services financiers (16)</option>
+          <option value="CB">CB — Consommation de base (9)</option>
+          <option value="CD">CD — Consommation discrétionnaire (7)</option>
+          <option value="IND">IND — Industriels (6)</option>
+          <option value="ENE">ENE — Énergie (4)</option>
+          <option value="TEL">TEL — Télécommunications (3)</option>
+          <option value="SPU">SPU — Services publics (2)</option></select></div>
+      <div class="champ"><label for="fcomp">Compartiment</label>
+        <select id="fcomp"><option value="">Les deux compartiments</option>
+          <option value="Prestige">Prestige (12)</option>
+          <option value="Principal">Principal (35)</option></select></div>
+      <div class="champ"><label for="fmet">Métrique comparée</label>
+        <select id="fmet">
+          <option value="per">PER</option><option value="rdt">Rendement net</option>
+          <option value="ytd">Perf. depuis le 1er janvier</option><option value="v1an">Perf. 1 an</option>
+          <option value="v3a">Perf. 3 ans</option><option value="v5a">Perf. 5 ans</option>
+          <option value="bnpa">BNPA</option></select></div>
+      <div class="champ"><label>Mode de lecture</label>
+        <div class="vues" role="group">
+          <button type="button" data-vue="brut" aria-pressed="true">Valeurs brutes</button>
+          <button type="button" data-vue="sect" aria-pressed="false">Écarts au secteur</button>
+          <button type="button" data-vue="marche" aria-pressed="false">Écarts au marché</button>
+        </div></div>
+      <label class="bascule"><input type="checkbox" id="fsig"> Titres signalés</label>
+      <button class="raz" id="raz" type="button">Réinitialiser</button>
+    </div>
+  </section>
+
+  <section class="carte">
+    <div class="carte-tete"><h2>Cote comparative</h2>
+      <span class="compte">Bouton <b>Colonnes</b> pour afficher ou masquer · <span class="alerte">▲</span> signalement au survol</span></div>
+    <div class="zone-table"><table id="cote" class="display" style="width:100%"></table></div>
+  </section>
+
+  <section class="carte">
+    <div class="carte-tete"><h2>Importer les fondamentaux</h2>
+      <span class="compte" id="etatImport"><span class="etat">—</span></span></div>
+    <div class="import">
+      <div class="champ"><label for="fic">Fichier CSV produit par le collecteur</label>
+        <input type="file" id="fic" accept=".csv,text/csv"></div>
+      <button class="raz" id="videImport" type="button">Retirer l'import</button>
+    </div>
+    <div class="notes"><div class="note" style="border-right:0">
+      <p>Les colonnes <b>CA, Croiss. CA, RN, Croiss. RN, ROE, PEG</b> se remplissent à partir d'un CSV.
+      Le collecteur <b>collecte_fondamentaux.py</b> le produit pour les 47 titres ; le séparateur est le point-virgule
+      et la première ligne porte les en-têtes. Les colonnes absentes sont ignorées, aucune valeur n'est inventée.</p>
+      <pre class="schema">symbole;exercice;ca;croissance_ca;rn;croissance_rn;bnpa;fonds_propres
+SNTS;2025;1923122;8.26;413588;5.06;4136.00;
+CBIBF;2025;138986;6.11;65495;36.63;2046.73;</pre>
+      <p style="margin-top:8px"><b>ROE</b> n'est calculé que si <code>fonds_propres</code> est renseigné : Sikafinance ne publie
+      pas les capitaux propres, il faut les saisir depuis les rapports annuels. <b>PEG</b> = PER du BOC / croissance du RN,
+      calculé uniquement lorsque la croissance est positive.</p>
+    </div></div>
+  </section>
+
+  <div class="avert">
+    <b>Trois millésimes, un seul socle.</b> Les cours, volumes, PER, rendements et dividendes viennent tous de la même
+    séance — le BOC du 10/08/2026 — et se réconcilient ligne à ligne avec ses totaux. Les performances 1 semaine à 5 ans
+    sont arrêtées au 30/06/2026 : elles situent une trajectoire, elles ne se recalculent pas depuis le cours de clôture
+    affiché. Les fondamentaux portent sur l'exercice 2025 clos. Ces trois horizons ne doivent pas être additionnés.
+  </div>
+
+  <section class="carte">
+    <div class="carte-tete"><h2>Repères sectoriels</h2>
+      <span class="compte">médiane · moyenne · effectif — métrique sélectionnée plus haut</span></div>
+    <div class="zone-table" style="padding-top:14px"><table id="secteurs" class="display" style="width:100%"></table></div>
+  </section>
+
+  <section class="carte">
+    <div class="carte-tete"><h2>Méthode et contrôles</h2></div>
+    <div class="notes">
+      <div class="note">
+        <h3>Ce qui a été vérifié</h3>
+        <table class="ctrl"><tbody>
+          <tr><td>Réconciliation BOC (volume, valeur, 28/13/6)</td><td class="ok">6 contrôles concordants</td></tr>
+          <tr><td>Effectifs des 7 indices sectoriels</td><td class="ok">7 / 7 concordants</td></tr>
+          <tr><td>Variations du jour recalculées</td><td class="ok">47 / 47 au centième</td></tr>
+          <tr><td>BNPA reconstitué vs BNPA publié</td><td class="ok">écart 0,04 % et 0,001 %</td></tr>
+          <tr><td>Nature de la colonne « année précédente »</td><td class="ok">confirmée sur 3 titres</td></tr>
+          <tr><td>Relecture visuelle des 282 pourcentages</td><td class="ok">13 corrections OCR</td></tr>
+          <tr><td>Rendement moyen recalculé vs BOC (6,01 %)</td><td class="ok">6,01 % — identique</td></tr>
+        </tbody></table>
+      </div>
+      <div class="note">
+        <h3>Deux corrections de fond</h3>
+        <p><b>La colonne « Variation de l'année précédente » du BOC est en réalité la performance depuis le
+        1<sup>er</sup> janvier.</b> En déduisant le cours du 31/12/2025 de cette colonne puis en le confrontant au cours
+        du jour publié par Sikafinance, on retombe exactement sur son YTD : ONATEL 16,90 %, Orange 19,65 %,
+        Sonatel 22,51 %. La colonne est donc renommée <b>Perf. 1<sup>er</sup> janv.</b> et le cours de clôture 2025
+        déduit est affiché.</p>
+        <p><b>Le PER moyen de 15,93 publié par le BOC n'est pas la moyenne des 43 PER cotés</b>, qui ressort à 60,45.
+        La moyenne des seuls PER inférieurs à 50 donne 15,95 : le bulletin écarte les valeurs extrêmes au-delà de la
+        seule exclusion d'Unilever mentionnée en note. Le tableau de bord compare donc aux <b>médianes</b>.</p>
+      </div>
+      <div class="note">
+        <h3>Limites à connaître</h3>
+        <ul>
+          <li><b>Z-score suspendu</b> pour TEL (3 titres), ENE (4) et SPU (2) : en dessous de cinq observations, il ne
+          mesure rien. L'écart à la médiane reste affiché, le z-score est vide.</li>
+          <li><b>ROE indisponible en ligne</b> : Sikafinance ne publie ni capitaux propres ni total bilan par exercice.
+          Sans rapport annuel, la colonne reste vide plutôt que d'être approchée.</li>
+          <li><b>PEG peu exploitable sur ce marché</b> : il exige une croissance de résultat positive et régulière.
+          Coris Bank passe de −25,39 % en 2024 à +36,63 % en 2025 — un PEG sur un seul exercice y est trompeur.</li>
+          <li><b>« Chiffre d'affaires » pour une banque</b> désigne le produit net bancaire : la comparaison de marge
+          entre une banque et un industriel n'a pas de sens.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <p class="pied">
+    Cote figée au 10/08/2026 · performances au 30/06/2026 · fondamentaux exercice 2025 · FCFA<br>
+    Restitution documentaire, sans valeur de conseil en investissement.
+  </p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+<script>
+const EMBARQUE = {"meta":{"boc_numero":149,"boc_seance":"2026-08-10","boc_reconcilie":true,"boc_controles":[{"controle":"volume","calcule":2682826,"bulletin":2682826,"concorde":true},{"controle":"valeur","calcule":2507385777,"bulletin":2507385777,"concorde":true},{"controle":"titres","calcule":47,"bulletin":47,"concorde":true},{"controle":"hausse","calcule":28,"bulletin":28,"concorde":true},{"controle":"baisse","calcule":13,"bulletin":13,"concorde":true},{"controle":"inchange","calcule":6,"bulletin":6,"concorde":true},{"controle":"variation_jour_recalculee","calcule":47,"bulletin":47,"concorde":true}],"sika_releve":"2026-08-12","sika_exercice":"2025","construit_le":"2026-08-13","couverture":{"per":43,"rdt":43,"bnpa":43,"ca":2,"rn":2,"croiRN":2,"roe":2,"peg":2,"v1s":46,"v1m":47,"ytd":47,"v1an":47,"v3a":44,"v5a":44},"total":47},"rows":[{"sym":"NTLC","titre":"NESTLE CI","sect":"CB","sectLib":"Consommation de base","comp":"Prestige","prec":16595,"ouv":16700,"clot":16615,"varJ":0.12,"vol":350,"val":5873215,"ytd":56.01,"divM":721.6,"divISO":"2025-08-18","rdt":4.34,"per":19.9,"divD":"18/08/2025","v1s":17.39,"v1m":33.58,"v1an":40.86,"v3a":104.28,"v5a":355.74,"ref31":10650,"bnpa25":null,"bnpa":834.92,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":49.51,"em_per":30.41,"zs_per":1.05,"zm_per":0.94,"es_rdt":-10.52,"em_rdt":5.85,"zs_rdt":-0.46,"zm_rdt":0.17,"es_ytd":99.75,"em_ytd":16.93,"zs_ytd":0.67,"zm_ytd":0.21,"es_v1an":3.16,"em_v1an":-42.12,"zs_v1an":0.03,"zm_v1an":-0.39,"es_v3a":-25.23,"em_v3a":-31.89,"zs_v3a":-0.15,"zm_v3a":-0.42,"es_v5a":41.24,"em_v5a":68.89,"zs_v5a":0.67,"zm_v5a":0.68,"es_bnpa":-14.5,"em_bnpa":106.83,"zs_bnpa":-0.24,"zm_bnpa":0.81,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"PALC","titre":"PALM CI","sect":"CB","sectLib":"Consommation de base","comp":"Prestige","prec":8980,"ouv":8980,"clot":9100,"varJ":1.34,"vol":2807,"val":25273880,"ytd":12.35,"divM":441.04,"divISO":"2026-06-29","rdt":4.85,"per":9.07,"divD":"29/06/2026","v1s":5.39,"v1m":11.54,"v1an":10.41,"v3a":-10.72,"v5a":104.71,"ref31":8100,"bnpa25":null,"bnpa":1003.31,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-31.86,"em_per":-40.56,"zs_per":-0.67,"zm_per":-1.26,"es_rdt":0.0,"em_rdt":18.29,"zs_rdt":0.0,"zm_rdt":0.53,"es_ytd":-55.96,"em_ytd":-74.22,"zs_ytd":-0.38,"zm_ytd":-0.92,"es_v1an":-73.72,"em_v1an":-85.25,"zs_v1an":-0.68,"zm_v1an":-0.8,"es_v3a":-107.69,"em_v3a":-107.0,"zs_v3a":-0.66,"zm_v3a":-1.42,"es_v5a":-58.43,"em_v5a":-50.29,"zs_v5a":-0.96,"zm_v5a":-0.5,"es_bnpa":2.74,"em_bnpa":148.54,"zs_bnpa":0.05,"zm_bnpa":1.13,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SPHC","titre":"SAPH CI","sect":"CB","sectLib":"Consommation de base","comp":"Prestige","prec":7600,"ouv":7600,"clot":7900,"varJ":3.95,"vol":2027,"val":15662625,"ytd":0.0,"divM":323.84,"divISO":"2025-07-17","rdt":4.1,"per":8.09,"divD":"17/07/2025","v1s":-0.58,"v1m":9.64,"v1an":18.08,"v3a":139.47,"v5a":189.62,"ref31":7900,"bnpa25":null,"bnpa":976.51,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-39.22,"em_per":-46.99,"zs_per":-0.83,"zm_per":-1.46,"es_rdt":-15.46,"em_rdt":0.0,"zs_rdt":-0.67,"zm_rdt":0.0,"es_ytd":-100.0,"em_ytd":-100.0,"zs_ytd":-0.67,"zm_ytd":-1.24,"es_v1an":-54.35,"em_v1an":-74.39,"zs_v1an":-0.5,"zm_v1an":-0.7,"es_v3a":0.0,"em_v3a":-8.91,"zs_v3a":0.0,"zm_v3a":-0.12,"es_v5a":-24.72,"em_v5a":-9.97,"zs_v5a":-0.4,"zm_v5a":-0.1,"es_bnpa":0.0,"em_bnpa":141.9,"zs_bnpa":0.0,"zm_bnpa":1.08,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SMBC","titre":"SMB CI","sect":"ENE","sectLib":"Énergie","comp":"Prestige","prec":16550,"ouv":16550,"clot":16530,"varJ":-0.12,"vol":854,"val":14116395,"ytd":74.0,"divM":616,"divISO":"2025-09-15","rdt":3.73,"per":9.86,"divD":"15/09/2025","v1s":33.05,"v1m":44.25,"v1an":94.14,"v3a":127.37,"v5a":160.81,"ref31":9500,"bnpa25":null,"bnpa":1676.47,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-48.17,"em_per":-35.39,"zs_per":null,"zm_per":-1.1,"es_rdt":-13.66,"em_rdt":-9.02,"zs_rdt":null,"zm_rdt":-0.26,"es_ytd":44.42,"em_ytd":54.49,"zs_ytd":null,"zm_ytd":0.67,"es_v1an":33.42,"em_v1an":33.36,"zs_v1an":null,"zm_v1an":0.31,"es_v3a":43.77,"em_v3a":-16.81,"zs_v3a":null,"zm_v3a":-0.22,"es_v5a":5.18,"em_v5a":-23.65,"zs_v5a":null,"zm_v5a":-0.23,"es_bnpa":851.38,"em_bnpa":315.3,"zs_bnpa":null,"zm_bnpa":2.4,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"TTLC","titre":"TOTALENERGIES MARKETING CI","sect":"ENE","sectLib":"Énergie","comp":"Prestige","prec":2805,"ouv":2900,"clot":2995,"varJ":6.77,"vol":2907,"val":8533870,"ytd":28.27,"divM":195.67,"divISO":"2025-09-03","rdt":6.53,"per":20.75,"divD":"03/09/2025","v1s":-0.69,"v1m":-4.17,"v1an":7.69,"v3a":33.49,"v5a":93.92,"ref31":2335,"bnpa25":null,"bnpa":144.34,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":9.07,"em_per":35.98,"zs_per":null,"zm_per":1.12,"es_rdt":51.16,"em_rdt":59.27,"zs_rdt":null,"zm_rdt":1.71,"es_ytd":-44.83,"em_ytd":-40.98,"zs_ytd":null,"zm_ytd":-0.51,"es_v1an":-89.1,"em_v1an":-89.11,"zs_v1an":null,"zm_v1an":-0.83,"es_v3a":-62.2,"em_v3a":-78.13,"zs_v3a":null,"zm_v3a":-1.04,"es_v5a":-38.57,"em_v5a":-55.41,"zs_v5a":null,"zm_v5a":-0.55,"es_bnpa":-18.09,"em_bnpa":-64.24,"zs_bnpa":null,"zm_bnpa":-0.49,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"TTLS","titre":"TOTALENERGIES MARKETING SN","sect":"ENE","sectLib":"Énergie","comp":"Prestige","prec":3500,"ouv":3550,"clot":3600,"varJ":2.86,"vol":1109,"val":3991440,"ytd":44.0,"divM":176.65,"divISO":"2026-07-17","rdt":4.91,"per":17.3,"divD":"17/07/2026","v1s":11.44,"v1m":28.76,"v1an":46.98,"v3a":49.81,"v5a":144.97,"ref31":2500,"bnpa25":null,"bnpa":208.09,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-9.07,"em_per":13.37,"zs_per":null,"zm_per":0.41,"es_rdt":13.66,"em_rdt":19.76,"zs_rdt":null,"zm_rdt":0.57,"es_ytd":-14.13,"em_ytd":-8.14,"zs_ytd":null,"zm_ytd":-0.1,"es_v1an":-33.42,"em_v1an":-33.45,"zs_v1an":null,"zm_v1an":-0.31,"es_v3a":-43.77,"em_v3a":-67.47,"zs_v3a":null,"zm_v3a":-0.89,"es_v5a":-5.18,"em_v5a":-31.17,"zs_v5a":null,"zm_v5a":-0.31,"es_bnpa":18.09,"em_bnpa":-48.45,"zs_bnpa":null,"zm_bnpa":-0.37,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"ECOC","titre":"ECOBANK COTE D'IVOIRE","sect":"FIN","sectLib":"Services financiers","comp":"Prestige","prec":16200,"ouv":16200,"clot":16200,"varJ":0.0,"vol":5607,"val":90896705,"ytd":1.25,"divM":781.44,"divISO":"2026-05-26","rdt":4.82,"per":14.05,"divD":"26/05/2026","v1s":1.22,"v1m":1.84,"v1an":52.57,"v3a":218.62,"v5a":386.8,"ref31":16000,"bnpa25":null,"bnpa":1153.02,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":0.54,"em_per":-7.93,"zs_per":0.03,"zm_per":-0.25,"es_rdt":19.9,"em_rdt":17.56,"zs_rdt":0.48,"zm_rdt":0.51,"es_ytd":-97.62,"em_ytd":-97.39,"zs_ytd":-2.15,"zm_ytd":-1.21,"es_v1an":-22.92,"em_v1an":-25.53,"zs_v1an":-0.65,"zm_v1an":-0.24,"es_v3a":-1.03,"em_v3a":42.78,"zs_v3a":-0.02,"zm_v3a":0.57,"es_v5a":5.22,"em_v5a":83.64,"zs_v5a":0.17,"zm_v5a":0.83,"es_bnpa":98.04,"em_bnpa":185.63,"zs_bnpa":0.96,"zm_bnpa":1.41,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SGBC","titre":"SOCIETE GENERALE COTE D'IVOIRE","sect":"FIN","sectLib":"Services financiers","comp":"Prestige","prec":38000,"ouv":38300,"clot":39000,"varJ":2.63,"vol":6734,"val":263088200,"ytd":30.46,"divM":1645.78,"divISO":"2025-08-05","rdt":4.22,"per":11.97,"divD":"05/08/2025","v1s":3.89,"v1m":11.34,"v1an":65.81,"v3a":151.31,"v5a":363.87,"ref31":29894,"bnpa25":null,"bnpa":3258.15,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-14.35,"em_per":-21.56,"zs_per":-0.72,"zm_per":-0.67,"es_rdt":4.98,"em_rdt":2.93,"zs_rdt":0.12,"zm_rdt":0.08,"es_ytd":-42.06,"em_ytd":-36.41,"zs_ytd":-0.93,"zm_ytd":-0.45,"es_v1an":-3.5,"em_v1an":-6.77,"zs_v1an":-0.1,"zm_v1an":-0.06,"es_v3a":-31.5,"em_v3a":-1.18,"zs_v3a":-0.55,"zm_v3a":-0.02,"es_v5a":-1.02,"em_v5a":72.75,"zs_v5a":-0.03,"zm_v5a":0.72,"es_bnpa":459.62,"em_bnpa":707.11,"zs_bnpa":4.5,"zm_bnpa":5.39,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SIBC","titre":"SOCIETE IVOIRIENNE DE BANQUE","sect":"FIN","sectLib":"Services financiers","comp":"Prestige","prec":9300,"ouv":9250,"clot":9320,"varJ":0.22,"vol":6439,"val":59954395,"ytd":62.09,"divM":374,"divISO":"2026-07-31","rdt":4.01,"per":16.76,"divD":"31/07/2026","v1s":-1.22,"v1m":21.78,"v1an":85.21,"v3a":250.69,"v5a":432.34,"ref31":5750,"bnpa25":null,"bnpa":556.09,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":19.93,"em_per":9.83,"zs_per":1.0,"zm_per":0.3,"es_rdt":-0.25,"em_rdt":-2.2,"zs_rdt":-0.01,"zm_rdt":-0.06,"es_ytd":18.1,"em_ytd":29.62,"zs_ytd":0.4,"zm_ytd":0.37,"es_v1an":24.94,"em_v1an":20.71,"zs_v1an":0.71,"zm_v1an":0.19,"es_v3a":13.49,"em_v3a":63.73,"zs_v3a":0.23,"zm_v3a":0.84,"es_v5a":17.61,"em_v5a":105.26,"zs_v5a":0.59,"zm_v5a":1.04,"es_bnpa":-4.49,"em_bnpa":37.76,"zs_bnpa":-0.04,"zm_bnpa":0.29,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"ONTBF","titre":"ONATEL BF","sect":"TEL","sectLib":"Télécommunications","comp":"Prestige","prec":2940,"ouv":2940,"clot":2910,"varJ":-1.02,"vol":7424,"val":21098325,"ytd":17.1,"divM":145.32,"divISO":"2026-06-15","rdt":4.99,"per":13.63,"divD":"15/06/2026","v1s":-3.61,"v1m":1.82,"v1an":4.09,"v3a":null,"v5a":-13.71,"ref31":2485,"bnpa25":null,"bnpa":213.5,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"v3a":"historique de cotation trop court","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Performance 3 ans indisponible — historique de cotation trop court"],"es_per":0.0,"em_per":-10.68,"zs_per":null,"zm_per":-0.33,"es_rdt":0.0,"em_rdt":21.71,"zs_rdt":null,"zm_rdt":0.63,"es_ytd":-11.4,"em_ytd":-64.3,"zs_ytd":null,"zm_ytd":-0.8,"es_v1an":-44.5,"em_v1an":-94.21,"zs_v1an":null,"zm_v1an":-0.88,"es_v3a":null,"em_v3a":null,"zs_v3a":null,"zm_v3a":null,"es_v5a":-129.07,"em_v5a":-106.51,"zs_v5a":null,"zm_v5a":-1.05,"es_bnpa":-80.84,"em_bnpa":-47.11,"zs_bnpa":null,"zm_bnpa":-0.36,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"ORAC","titre":"ORANGE COTE D'IVOIRE","sect":"TEL","sectLib":"Télécommunications","comp":"Prestige","prec":17175,"ouv":17175,"clot":17000,"varJ":-1.02,"vol":1635,"val":28053275,"ytd":19.3,"divM":704,"divISO":"2026-06-08","rdt":4.14,"per":15.26,"divD":"08/06/2026","v1s":0.87,"v1m":11.67,"v1an":7.37,"v3a":81.87,"v5a":null,"ref31":14250,"bnpa25":null,"bnpa":1114.02,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"v5a":"historique de cotation trop court","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Performance 5 ans indisponible — historique de cotation trop court"],"es_per":11.96,"em_per":0.0,"zs_per":null,"zm_per":0.0,"es_rdt":-17.03,"em_rdt":0.98,"zs_rdt":null,"zm_rdt":0.03,"es_ytd":0.0,"em_ytd":-59.71,"zs_ytd":null,"zm_ytd":-0.74,"es_v1an":0.0,"em_v1an":-89.56,"zs_v1an":null,"zm_v1an":-0.84,"es_v3a":-4.03,"em_v3a":-46.53,"zs_v3a":null,"zm_v3a":-0.62,"es_v5a":null,"em_v5a":null,"zs_v5a":null,"zm_v5a":null,"es_bnpa":0.0,"em_bnpa":175.97,"zs_bnpa":null,"zm_bnpa":1.34,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SNTS","titre":"SONATEL SN","sect":"TEL","sectLib":"Télécommunications","comp":"Prestige","prec":31000,"ouv":30500,"clot":32000,"varJ":3.23,"vol":13529,"val":422928115,"ytd":22.51,"divM":1740,"divISO":"2026-05-26","rdt":5.44,"per":7.74,"divD":"26/05/2026","v1s":null,"v1m":-1.55,"v1an":14.0,"v3a":88.74,"v5a":108.03,"ref31":26120,"bnpa25":4136.0,"bnpa":4134.37,"bnpa_src":"BOC (cours / PER)","ca":1923122,"croiCA":8.26,"rn":413588,"croiRN":5.06,"exercice":"2025","margeN":21.51,"roe":35.05,"roe_src":"fonds propres 2025 — Rapport annuel 2025 p. 84","peg":1.53,"motifs":{"v1s":"historique de cotation trop court"},"flags":[],"es_per":-43.21,"em_per":-49.28,"zs_per":null,"zm_per":-1.53,"es_rdt":9.02,"em_rdt":32.68,"zs_rdt":null,"zm_rdt":0.94,"es_ytd":16.63,"em_ytd":-53.01,"zs_ytd":null,"zm_ytd":-0.66,"es_v1an":89.96,"em_v1an":-80.17,"zs_v1an":null,"zm_v1an":-0.75,"es_v3a":4.03,"em_v3a":-42.04,"zs_v3a":null,"zm_v3a":-0.56,"es_v5a":129.07,"em_v5a":-48.71,"zs_v5a":null,"zm_v5a":-0.48,"es_bnpa":271.12,"em_bnpa":924.17,"zs_bnpa":null,"zm_bnpa":7.04,"es_roe":0.0,"em_roe":26.06,"zs_roe":null,"zm_roe":null,"es_croiRN":0.0,"em_croiRN":-75.73,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":0.0,"em_croiCA":14.96,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":0.0,"em_margeN":-37.32,"zs_margeN":null,"zm_margeN":null},{"sym":"SCRC","titre":"SUCRIVOIRE","sect":"CB","sectLib":"Consommation de base","comp":"Principal","prec":3550,"ouv":3550,"clot":3620,"varJ":1.97,"vol":6187,"val":22229920,"ytd":241.51,"divM":40.5,"divISO":"2021-08-20","rdt":1.12,"per":null,"divD":"20/08/2021","v1s":18.13,"v1m":34.01,"v1an":216.35,"v3a":520.75,"v5a":251.87,"ref31":1060,"bnpa25":null,"bnpa":null,"bnpa_src":null,"ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"bnpa":"ni PER au BOC ni BNPA publié","per":"BNPA indisponible","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 60 mois — rendement non représentatif"],"es_per":null,"em_per":null,"zs_per":null,"zm_per":null,"es_rdt":-76.91,"em_rdt":-72.68,"zs_rdt":-3.35,"zm_rdt":-2.09,"es_ytd":761.31,"em_ytd":404.2,"zs_ytd":5.13,"zm_ytd":5.0,"es_v1an":446.2,"em_v1an":206.49,"zs_v1an":4.09,"zm_v1an":1.93,"es_v3a":273.38,"em_v3a":240.1,"zs_v3a":1.67,"zm_v3a":3.18,"es_v5a":0.0,"em_v5a":19.58,"zs_v5a":0.0,"zm_v5a":0.19,"es_bnpa":null,"em_bnpa":null,"zs_bnpa":null,"zm_bnpa":null,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SICC","titre":"SICOR CI","sect":"CB","sectLib":"Consommation de base","comp":"Principal","prec":7085,"ouv":7615,"clot":7615,"varJ":7.48,"vol":43,"val":327445,"ytd":130.76,"divM":1919,"divISO":"2000-09-25","rdt":null,"per":null,"divD":"25/09/2000","v1s":2.45,"v1m":5.02,"v1an":39.61,"v3a":-16.29,"v5a":187.5,"ref31":3300,"bnpa25":null,"bnpa":null,"bnpa_src":null,"ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"bnpa":"ni PER au BOC ni BNPA publié","per":"BNPA indisponible","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible","rdt":"rendement non publié au BOC"},"flags":["Dernier dividende vieux de 311 mois — rendement non représentatif"],"es_per":null,"em_per":null,"zs_per":null,"zm_per":null,"es_rdt":null,"em_rdt":null,"zs_rdt":null,"zm_rdt":null,"es_ytd":366.33,"em_ytd":172.99,"zs_ytd":2.47,"zm_ytd":2.14,"es_v1an":0.0,"em_v1an":-43.89,"zs_v1an":0.0,"zm_v1an":-0.41,"es_v3a":-111.68,"em_v3a":-110.64,"zs_v3a":-0.68,"zm_v3a":-1.47,"es_v5a":-25.56,"em_v5a":-10.98,"zs_v5a":-0.42,"zm_v5a":-0.11,"es_bnpa":null,"em_bnpa":null,"zs_bnpa":null,"zm_bnpa":null,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SLBC","titre":"SOLIBRA CI","sect":"CB","sectLib":"Consommation de base","comp":"Principal","prec":37000,"ouv":37500,"clot":37005,"varJ":0.01,"vol":2294,"val":85112560,"ytd":28.04,"divM":1871.76,"divISO":"2026-07-30","rdt":5.06,"per":13.31,"divD":"30/07/2026","v1s":1.17,"v1m":2.51,"v1an":138.96,"v3a":528.23,"v5a":426.35,"ref31":28901,"bnpa25":null,"bnpa":2780.24,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":0.0,"em_per":-12.78,"zs_per":0.0,"zm_per":-0.4,"es_rdt":4.33,"em_rdt":23.41,"zs_rdt":0.19,"zm_rdt":0.67,"es_ytd":0.0,"em_ytd":-41.46,"zs_ytd":0.0,"zm_ytd":-0.51,"es_v1an":250.82,"em_v1an":96.86,"zs_v1an":2.3,"zm_v1an":0.91,"es_v3a":278.74,"em_v3a":244.99,"zs_v3a":1.7,"zm_v3a":3.25,"es_v5a":69.27,"em_v5a":102.42,"zs_v5a":1.13,"zm_v5a":1.01,"es_bnpa":184.71,"em_bnpa":588.72,"zs_bnpa":3.05,"zm_bnpa":4.49,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SOGC","titre":"SOGB CI","sect":"CB","sectLib":"Consommation de base","comp":"Principal","prec":8100,"ouv":8050,"clot":7875,"varJ":-2.78,"vol":3659,"val":29154695,"ytd":-0.32,"divM":501.6,"divISO":"2026-08-06","rdt":6.37,"per":13.62,"divD":"06/08/2026","v1s":1.08,"v1m":12.68,"v1an":10.46,"v3a":73.09,"v5a":148.01,"ref31":7900,"bnpa25":null,"bnpa":578.19,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":2.33,"em_per":-10.75,"zs_per":0.05,"zm_per":-0.33,"es_rdt":31.34,"em_rdt":55.37,"zs_rdt":1.37,"zm_rdt":1.59,"es_ytd":-101.14,"em_ytd":-100.67,"zs_ytd":-0.68,"zm_ytd":-1.25,"es_v1an":-73.59,"em_v1an":-85.18,"zs_v1an":-0.67,"zm_v1an":-0.8,"es_v3a":-47.59,"em_v3a":-52.26,"zs_v3a":-0.29,"zm_v3a":-0.69,"es_v5a":-41.24,"em_v5a":-29.73,"zs_v5a":-0.67,"zm_v5a":-0.29,"es_bnpa":-40.79,"em_bnpa":43.23,"zs_bnpa":-0.67,"zm_bnpa":0.33,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"STBC","titre":"SITAB CI","sect":"CB","sectLib":"Consommation de base","comp":"Principal","prec":24980,"ouv":24995,"clot":25000,"varJ":0.08,"vol":12559,"val":314258785,"ytd":26.39,"divM":2096,"divISO":"2025-08-29","rdt":8.38,"per":12.31,"divD":"29/08/2025","v1s":14.36,"v1m":19.05,"v1an":38.89,"v3a":293.7,"v5a":681.25,"ref31":19780,"bnpa25":null,"bnpa":2030.87,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-7.51,"em_per":-19.33,"zs_per":-0.16,"zm_per":-0.6,"es_rdt":72.78,"em_rdt":104.39,"zs_rdt":3.17,"zm_rdt":3.01,"es_ytd":-5.88,"em_ytd":-44.91,"zs_ytd":-0.04,"zm_ytd":-0.56,"es_v1an":-1.82,"em_v1an":-44.91,"zs_v1an":-0.02,"zm_v1an":-0.42,"es_v3a":110.58,"em_v3a":91.82,"zs_v3a":0.67,"zm_v3a":1.22,"es_v5a":170.48,"em_v5a":223.43,"zs_v5a":2.79,"zm_v5a":2.21,"es_bnpa":107.97,"em_bnpa":403.09,"zs_bnpa":1.79,"zm_bnpa":3.07,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"UNLC","titre":"UNILEVER CI","sect":"CB","sectLib":"Consommation de base","comp":"Principal","prec":54595,"ouv":54595,"clot":54595,"varJ":0.0,"vol":19,"val":1037305,"ytd":59.52,"divM":1233,"divISO":"2012-07-09","rdt":null,"per":782.98,"divD":"09/07/2012","v1s":-4.14,"v1m":-7.79,"v1an":332.85,"v3a":736.72,"v5a":1121.98,"ref31":34225,"bnpa25":null,"bnpa":69.73,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible","rdt":"rendement non publié au BOC"},"flags":["Dernier dividende vieux de 169 mois — rendement non représentatif","PER de 782.98 — valeur extrême, à ne pas comparer telle quelle"],"es_per":5782.64,"em_per":5030.93,"zs_per":122.44,"zm_per":155.97,"es_rdt":null,"em_rdt":null,"zs_rdt":null,"zm_rdt":null,"es_ytd":112.27,"em_ytd":24.26,"zs_ytd":0.76,"zm_ytd":0.3,"es_v1an":740.32,"em_v1an":371.53,"zs_v1an":6.79,"zm_v1an":3.48,"es_v3a":428.23,"em_v3a":381.15,"zs_v3a":2.61,"zm_v3a":5.05,"es_v5a":345.46,"em_v5a":432.68,"zs_v5a":5.65,"zm_v5a":4.27,"es_bnpa":-92.86,"em_bnpa":-82.73,"zs_bnpa":-1.54,"zm_bnpa":-0.63,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"ABJC","titre":"SERVAIR ABIDJAN CI","sect":"CD","sectLib":"Consommation discrétionnaire","comp":"Principal","prec":3010,"ouv":3020,"clot":3010,"varJ":0.0,"vol":5155,"val":15591180,"ytd":3.79,"divM":206.2,"divISO":"2024-09-30","rdt":6.85,"per":24.68,"divD":"30/09/2024","v1s":13.1,"v1m":15.09,"v1an":79.73,"v3a":173.33,"v5a":177.97,"ref31":2900,"bnpa25":null,"bnpa":121.96,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 23 mois — rendement non représentatif"],"es_per":12.36,"em_per":61.73,"zs_per":0.33,"zm_per":1.91,"es_rdt":79.32,"em_rdt":67.07,"zs_rdt":3.01,"zm_rdt":1.93,"es_ytd":-79.55,"em_ytd":-92.09,"zs_ytd":-0.6,"zm_ytd":-1.14,"es_v1an":-9.4,"em_v1an":12.95,"zs_v1an":-0.08,"zm_v1an":0.12,"es_v3a":16.62,"em_v3a":13.2,"zs_v3a":0.35,"zm_v3a":0.18,"es_v5a":94.73,"em_v5a":-15.51,"zs_v5a":0.83,"zm_v5a":-0.15,"es_bnpa":-13.34,"em_bnpa":-69.79,"zs_bnpa":-0.14,"zm_bnpa":-0.53,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BNBC","titre":"BERNABE CI","sect":"CD","sectLib":"Consommation discrétionnaire","comp":"Principal","prec":1900,"ouv":1900,"clot":1905,"varJ":0.26,"vol":4690,"val":8946850,"ytd":35.11,"divM":150,"divISO":"2023-07-24","rdt":7.87,"per":565.4,"divD":"24/07/2023","v1s":18.51,"v1m":28.48,"v1an":65.42,"v3a":1.79,"v5a":7.3,"ref31":1410,"bnpa25":null,"bnpa":3.37,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 37 mois — rendement non représentatif","PER de 565.4 — valeur extrême, à ne pas comparer telle quelle"],"es_per":2474.1,"em_per":3605.11,"zs_per":65.75,"zm_per":111.77,"es_rdt":106.02,"em_rdt":91.95,"zs_rdt":4.02,"zm_rdt":2.65,"es_ytd":89.48,"em_ytd":-26.7,"zs_ytd":0.67,"zm_ytd":-0.33,"es_v1an":-25.66,"em_v1an":-7.32,"zs_v1an":-0.22,"zm_v1an":-0.07,"es_v3a":-98.8,"em_v3a":-98.83,"zs_v3a":-2.06,"zm_v3a":-1.31,"es_v5a":-92.01,"em_v5a":-96.53,"zs_v5a":-0.81,"zm_v5a":-0.95,"es_bnpa":-97.61,"em_bnpa":-99.17,"zs_bnpa":-1.02,"zm_bnpa":-0.76,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"CFAC","titre":"CFAO MOTORS CI","sect":"CD","sectLib":"Consommation discrétionnaire","comp":"Principal","prec":1700,"ouv":1700,"clot":1695,"varJ":-0.29,"vol":4531,"val":7651535,"ytd":18.53,"divM":7.04,"divISO":"2025-08-19","rdt":0.42,"per":36.53,"divD":"19/08/2025","v1s":11.39,"v1m":18.92,"v1an":158.82,"v3a":134.67,"v5a":114.63,"ref31":1430,"bnpa25":null,"bnpa":46.4,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":66.31,"em_per":139.38,"zs_per":1.76,"zm_per":4.32,"es_rdt":-89.01,"em_rdt":-89.76,"zs_rdt":-3.37,"zm_rdt":-2.59,"es_ytd":0.0,"em_ytd":-61.32,"zs_ytd":0.0,"zm_ytd":-0.76,"es_v1an":80.48,"em_v1an":124.99,"zs_v1an":0.67,"zm_v1an":1.17,"es_v3a":-9.39,"em_v3a":-12.05,"zs_v3a":-0.2,"zm_v3a":-0.16,"es_v5a":25.42,"em_v5a":-45.58,"zs_v5a":0.22,"zm_v5a":-0.45,"es_bnpa":-67.03,"em_bnpa":-88.51,"zs_bnpa":-0.7,"zm_bnpa":-0.67,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"LNBB","titre":"LOTERIE NATIONALE DU BENIN","sect":"CD","sectLib":"Consommation discrétionnaire","comp":"Principal","prec":4300,"ouv":4300,"clot":4295,"varJ":-0.12,"vol":16471,"val":70300250,"ytd":0.0,"divM":164.17,"divISO":"2026-08-03","rdt":3.82,"per":18.58,"divD":"03/08/2026","v1s":15.93,"v1m":13.85,"v1an":-0.45,"v3a":null,"v5a":null,"ref31":4295,"bnpa25":null,"bnpa":231.16,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"v3a":"historique de cotation trop court","v5a":"historique de cotation trop court","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Performance 3 ans indisponible — historique de cotation trop court","Performance 5 ans indisponible — historique de cotation trop court"],"es_per":-15.41,"em_per":21.76,"zs_per":-0.41,"zm_per":0.67,"es_rdt":0.0,"em_rdt":-6.83,"zs_rdt":0.0,"zm_rdt":-0.2,"es_ytd":-100.0,"em_ytd":-100.0,"zs_ytd":-0.75,"zm_ytd":-1.24,"es_v1an":-100.51,"em_v1an":-100.64,"zs_v1an":-0.84,"zm_v1an":-0.94,"es_v3a":null,"em_v3a":null,"zs_v3a":null,"zm_v3a":null,"es_v5a":null,"em_v5a":null,"zs_v5a":null,"zm_v5a":null,"es_bnpa":64.25,"em_bnpa":-42.74,"zs_bnpa":0.67,"zm_bnpa":-0.33,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"NEIC","titre":"NEI-CEDA CI","sect":"CD","sectLib":"Consommation discrétionnaire","comp":"Principal","prec":2115,"ouv":2270,"clot":2265,"varJ":7.09,"vol":1702,"val":3862690,"ytd":88.75,"divM":81.78,"divISO":"2024-06-25","rdt":3.61,"per":14.2,"divD":"25/06/2024","v1s":16.79,"v1m":17.09,"v1an":312.39,"v3a":245.19,"v5a":813.73,"ref31":1200,"bnpa25":null,"bnpa":159.51,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 26 mois — rendement non représentatif"],"es_per":-35.35,"em_per":-6.95,"zs_per":-0.94,"zm_per":-0.22,"es_rdt":-5.5,"em_rdt":-11.95,"zs_rdt":-0.21,"zm_rdt":-0.34,"es_ytd":378.95,"em_ytd":85.28,"zs_ytd":2.86,"zm_ytd":1.06,"es_v1an":254.99,"em_v1an":342.54,"zs_v1an":2.14,"zm_v1an":3.21,"es_v3a":64.97,"em_v3a":60.13,"zs_v3a":1.36,"zm_v3a":0.8,"es_v5a":790.34,"em_v5a":286.33,"zs_v5a":6.95,"zm_v5a":2.83,"es_bnpa":13.34,"em_bnpa":-60.49,"zs_bnpa":0.14,"zm_bnpa":-0.46,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"PRSC","titre":"TRACTAFRIC MOTORS CI","sect":"CD","sectLib":"Consommation discrétionnaire","comp":"Principal","prec":4480,"ouv":4200,"clot":4450,"varJ":-0.67,"vol":1302,"val":5566460,"ytd":14.84,"divM":182.16,"divISO":"2025-09-30","rdt":4.09,"per":19.25,"divD":"30/09/2025","v1s":8.42,"v1m":27.2,"v1an":88.0,"v3a":77.36,"v5a":68.16,"ref31":3875,"bnpa25":null,"bnpa":231.17,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-12.36,"em_per":26.15,"zs_per":-0.33,"zm_per":0.81,"es_rdt":7.07,"em_rdt":-0.24,"zs_rdt":0.27,"zm_rdt":-0.01,"es_ytd":-19.91,"em_ytd":-69.02,"zs_ytd":-0.15,"zm_ytd":-0.85,"es_v1an":0.0,"em_v1an":24.66,"zs_v1an":0.0,"zm_v1an":0.23,"es_v3a":-47.95,"em_v3a":-49.48,"zs_v3a":-1.0,"zm_v3a":-0.66,"es_v5a":-25.42,"em_v5a":-67.64,"zs_v5a":-0.22,"zm_v5a":-0.67,"es_bnpa":64.26,"em_bnpa":-42.73,"zs_bnpa":0.67,"zm_bnpa":-0.33,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"UNXC","titre":"UNIWAX CI","sect":"CD","sectLib":"Consommation discrétionnaire","comp":"Principal","prec":1900,"ouv":1905,"clot":1935,"varJ":1.84,"vol":5238,"val":10097920,"ytd":38.21,"divM":60.75,"divISO":"2022-07-29","rdt":3.14,"per":null,"divD":"29/07/2022","v1s":-2.93,"v1m":-0.82,"v1an":234.86,"v3a":162.59,"v5a":35.19,"ref31":1400,"bnpa25":null,"bnpa":null,"bnpa_src":null,"ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"bnpa":"ni PER au BOC ni BNPA publié","per":"BNPA indisponible","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 49 mois — rendement non représentatif"],"es_per":null,"em_per":null,"zs_per":null,"zm_per":null,"es_rdt":-17.8,"em_rdt":-23.41,"zs_rdt":-0.67,"zm_rdt":-0.67,"es_ytd":106.21,"em_ytd":-20.23,"zs_ytd":0.8,"zm_ytd":-0.25,"es_v1an":166.89,"em_v1an":232.71,"zs_v1an":1.4,"zm_v1an":2.18,"es_v3a":9.39,"em_v3a":6.19,"zs_v3a":0.2,"zm_v3a":0.08,"es_v5a":-61.5,"em_v5a":-83.29,"zs_v5a":-0.54,"zm_v5a":-0.82,"es_bnpa":null,"em_bnpa":null,"zs_bnpa":null,"zm_bnpa":null,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SHEC","titre":"VIVO ENERGY CI","sect":"ENE","sectLib":"Énergie","comp":"Principal","prec":2290,"ouv":2290,"clot":2290,"varJ":0.0,"vol":7590,"val":16988245,"ytd":58.48,"divM":75.29,"divISO":"2025-10-22","rdt":3.29,"per":23.93,"divD":"22/10/2025","v1s":6.39,"v1m":8.25,"v1an":116.5,"v3a":213.77,"v5a":246.4,"ref31":1445,"bnpa25":null,"bnpa":95.7,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":25.78,"em_per":56.82,"zs_per":null,"zm_per":1.76,"es_rdt":-23.84,"em_rdt":-19.76,"zs_rdt":null,"zm_rdt":-0.57,"es_ytd":14.13,"em_ytd":22.09,"zs_ytd":null,"zm_ytd":0.27,"es_v1an":65.11,"em_v1an":65.04,"zs_v1an":null,"zm_v1an":0.61,"es_v3a":141.3,"em_v3a":39.61,"zs_v3a":null,"zm_v3a":0.53,"es_v5a":61.16,"em_v5a":16.98,"zs_v5a":null,"zm_v5a":0.17,"es_bnpa":-45.69,"em_bnpa":-76.29,"zs_bnpa":null,"zm_bnpa":-0.58,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BICB","titre":"BIIC BN","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":7595,"ouv":7500,"clot":7670,"varJ":0.99,"vol":12599,"val":95026525,"ytd":54.17,"divM":254.6,"divISO":"2026-07-31","rdt":3.32,"per":12.23,"divD":"31/07/2026","v1s":5.58,"v1m":12.79,"v1an":8.31,"v3a":null,"v5a":null,"ref31":4975,"bnpa25":null,"bnpa":627.15,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"v3a":"historique de cotation trop court","v5a":"historique de cotation trop court","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Performance 3 ans indisponible — historique de cotation trop court","Performance 5 ans indisponible — historique de cotation trop court"],"es_per":-12.49,"em_per":-19.86,"zs_per":-0.63,"zm_per":-0.62,"es_rdt":-17.41,"em_rdt":-19.02,"zs_rdt":-0.42,"zm_rdt":-0.55,"es_ytd":3.03,"em_ytd":13.09,"zs_ytd":0.07,"zm_ytd":0.16,"es_v1an":-87.82,"em_v1an":-88.23,"zs_v1an":-2.5,"zm_v1an":-0.83,"es_v3a":null,"em_v3a":null,"zs_v3a":null,"zm_v3a":null,"es_v5a":null,"em_v5a":null,"zs_v5a":null,"zm_v5a":null,"es_bnpa":7.72,"em_bnpa":55.36,"zs_bnpa":0.08,"zm_bnpa":0.42,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BICC","titre":"BICI CI","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":29100,"ouv":29100,"clot":29150,"varJ":0.17,"vol":464,"val":13512790,"ytd":49.91,"divM":1157.2,"divISO":"2026-07-06","rdt":3.97,"per":13.3,"divD":"06/07/2026","v1s":0.12,"v1m":9.64,"v1an":70.59,"v3a":320.29,"v5a":441.55,"ref31":19445,"bnpa25":null,"bnpa":2191.73,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-4.83,"em_per":-12.84,"zs_per":-0.24,"zm_per":-0.4,"es_rdt":-1.24,"em_rdt":-3.17,"zs_rdt":-0.03,"zm_rdt":-0.09,"es_ytd":-5.07,"em_ytd":4.2,"zs_ytd":-0.11,"zm_ytd":0.05,"es_v1an":3.5,"em_v1an":0.0,"zs_v1an":0.1,"zm_v1an":0.0,"es_v3a":45.0,"em_v3a":109.18,"zs_v3a":0.78,"zm_v3a":1.45,"es_v5a":20.11,"em_v5a":109.63,"zs_v5a":0.67,"zm_v5a":1.08,"es_bnpa":276.45,"em_bnpa":442.94,"zs_bnpa":2.71,"zm_bnpa":3.38,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BOAB","titre":"BANK OF AFRICA BN","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":8710,"ouv":8700,"clot":8650,"varJ":-0.69,"vol":5300,"val":46096090,"ytd":47.86,"divM":585,"divISO":"2026-05-26","rdt":6.76,"per":17.45,"divD":"26/05/2026","v1s":3.74,"v1m":-3.99,"v1an":97.92,"v3a":220.89,"v5a":367.62,"ref31":5850,"bnpa25":null,"bnpa":495.7,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":24.87,"em_per":14.35,"zs_per":1.25,"zm_per":0.44,"es_rdt":68.16,"em_rdt":64.88,"zs_rdt":1.64,"zm_rdt":1.87,"es_ytd":-8.97,"em_ytd":-0.08,"zs_ytd":-0.2,"zm_ytd":-0.0,"es_v1an":43.58,"em_v1an":38.72,"zs_v1an":1.24,"zm_v1an":0.36,"es_v3a":0.0,"em_v3a":44.26,"zs_v3a":0.0,"zm_v3a":0.59,"es_v5a":0.0,"em_v5a":74.53,"zs_v5a":0.0,"zm_v5a":0.74,"es_bnpa":-14.86,"em_bnpa":22.8,"zs_bnpa":-0.15,"zm_bnpa":0.17,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BOABF","titre":"BANK OF AFRICA BF","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":7230,"ouv":7250,"clot":7325,"varJ":1.31,"vol":11199,"val":81461670,"ytd":95.33,"divM":397,"divISO":"2026-04-23","rdt":5.42,"per":16.74,"divD":"23/04/2026","v1s":5.41,"v1m":8.33,"v1an":54.76,"v3a":98.31,"v5a":203.9,"ref31":3750,"bnpa25":null,"bnpa":437.57,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":19.79,"em_per":9.7,"zs_per":0.99,"zm_per":0.3,"es_rdt":34.83,"em_rdt":32.2,"zs_rdt":0.84,"zm_rdt":0.93,"es_ytd":81.32,"em_ytd":99.02,"zs_ytd":1.79,"zm_ytd":1.23,"es_v1an":-19.71,"em_v1an":-22.43,"zs_v1an":-0.56,"zm_v1an":-0.21,"es_v3a":-55.49,"em_v3a":-35.79,"zs_v3a":-0.97,"zm_v3a":-0.47,"es_v5a":-44.54,"em_v5a":-3.2,"zs_v5a":-1.49,"zm_v5a":-0.03,"es_bnpa":-24.84,"em_bnpa":8.4,"zs_bnpa":-0.24,"zm_bnpa":0.06,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BOAC","titre":"BANK OF AFRICA CI","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":11600,"ouv":11600,"clot":11600,"varJ":0.0,"vol":6227,"val":72220855,"ytd":61.56,"divM":597.53,"divISO":"2026-05-06","rdt":5.15,"per":13.06,"divD":"06/05/2026","v1s":6.18,"v1m":9.5,"v1an":52.67,"v3a":256.6,"v5a":425.0,"ref31":7180,"bnpa25":null,"bnpa":888.21,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-6.55,"em_per":-14.42,"zs_per":-0.33,"zm_per":-0.45,"es_rdt":28.11,"em_rdt":25.61,"zs_rdt":0.67,"zm_rdt":0.74,"es_ytd":17.09,"em_ytd":28.52,"zs_ytd":0.38,"zm_ytd":0.35,"es_v1an":-22.77,"em_v1an":-25.39,"zs_v1an":-0.65,"zm_v1an":-0.24,"es_v3a":16.17,"em_v3a":67.59,"zs_v3a":0.28,"zm_v3a":0.9,"es_v5a":15.61,"em_v5a":101.78,"zs_v5a":0.52,"zm_v5a":1.01,"es_bnpa":52.56,"em_bnpa":120.03,"zs_bnpa":0.51,"zm_bnpa":0.91,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BOAM","titre":"BANK OF AFRICA ML","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":5590,"ouv":5595,"clot":5700,"varJ":1.97,"vol":6483,"val":36634885,"ytd":42.5,"divM":305.04,"divISO":"2026-06-03","rdt":5.35,"per":14.12,"divD":"03/06/2026","v1s":6.75,"v1m":6.18,"v1an":60.9,"v3a":492.86,"v5a":433.57,"ref31":4000,"bnpa25":null,"bnpa":403.68,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":1.04,"em_per":-7.47,"zs_per":0.05,"zm_per":-0.23,"es_rdt":33.08,"em_rdt":30.49,"zs_rdt":0.79,"zm_rdt":0.88,"es_ytd":-19.16,"em_ytd":-11.27,"zs_ytd":-0.42,"zm_ytd":-0.14,"es_v1an":-10.7,"em_v1an":-13.73,"zs_v1an":-0.31,"zm_v1an":-0.13,"es_v3a":123.12,"em_v3a":221.89,"zs_v3a":2.14,"zm_v3a":2.94,"es_v5a":17.94,"em_v5a":105.84,"zs_v5a":0.6,"zm_v5a":1.05,"es_bnpa":-30.66,"em_bnpa":0.0,"zs_bnpa":-0.3,"zm_bnpa":0.0,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BOAN","titre":"BANK OF AFRICA NG","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":5200,"ouv":5205,"clot":5200,"varJ":0.0,"vol":7924,"val":40257935,"ytd":99.23,"divM":209.25,"divISO":"2025-06-03","rdt":4.02,"per":264.28,"divD":"03/06/2025","v1s":13.38,"v1m":21.77,"v1an":55.95,"v3a":14.44,"v5a":84.65,"ref31":2610,"bnpa25":null,"bnpa":19.68,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["PER de 264.28 — valeur extrême, à ne pas comparer telle quelle"],"es_per":1791.09,"em_per":1631.85,"zs_per":90.04,"zm_per":50.59,"es_rdt":0.0,"em_rdt":-1.95,"zs_rdt":0.0,"zm_rdt":-0.06,"es_ytd":88.74,"em_ytd":107.16,"zs_ytd":1.96,"zm_ytd":1.33,"es_v1an":-17.96,"em_v1an":-20.74,"zs_v1an":-0.51,"zm_v1an":-0.19,"es_v3a":-93.46,"em_v3a":-90.57,"zs_v3a":-1.63,"zm_v3a":-1.2,"es_v5a":-76.97,"em_v5a":-59.81,"zs_v5a":-2.58,"zm_v5a":-0.59,"es_bnpa":-96.62,"em_bnpa":-95.12,"zs_bnpa":-0.95,"zm_bnpa":-0.72,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"BOAS","titre":"BANK OF AFRICA SENEGAL","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":7710,"ouv":7710,"clot":7750,"varJ":0.52,"vol":10641,"val":82136225,"ytd":47.9,"divM":450,"divISO":"2026-06-01","rdt":5.81,"per":12.74,"divD":"01/06/2026","v1s":-0.13,"v1m":-2.04,"v1an":79.28,"v3a":313.33,"v5a":564.29,"ref31":5240,"bnpa25":null,"bnpa":608.32,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-8.84,"em_per":-16.51,"zs_per":-0.44,"zm_per":-0.51,"es_rdt":44.53,"em_rdt":41.71,"zs_rdt":1.07,"zm_rdt":1.2,"es_ytd":-8.89,"em_ytd":0.0,"zs_ytd":-0.2,"zm_ytd":0.0,"es_v1an":16.25,"em_v1an":12.31,"zs_v1an":0.46,"zm_v1an":0.12,"es_v3a":41.85,"em_v3a":104.64,"zs_v3a":0.73,"zm_v3a":1.39,"es_v5a":53.5,"em_v5a":167.91,"zs_v5a":1.79,"zm_v5a":1.66,"es_bnpa":4.49,"em_bnpa":50.69,"zs_bnpa":0.04,"zm_bnpa":0.39,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"CBIBF","titre":"CORIS BANK INTERNATIONAL","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":28305,"ouv":28500,"clot":28450,"varJ":0.51,"vol":1112,"val":31661720,"ytd":163.91,"divM":900,"divISO":"2026-06-19","rdt":3.16,"per":13.9,"divD":"19/06/2026","v1s":6.82,"v1m":25.67,"v1an":134.88,"v3a":193.75,"v5a":193.75,"ref31":10780,"bnpa25":2046.73,"bnpa":2046.76,"bnpa_src":"BOC (cours / PER)","ca":138986,"croiCA":6.11,"rn":65495,"croiRN":36.63,"exercice":"2025","margeN":47.12,"roe":20.56,"roe_src":"fonds propres 2025 — Rapport annuel 2025 p. 61","peg":0.38,"motifs":{},"flags":[],"es_per":-0.54,"em_per":-8.91,"zs_per":-0.03,"zm_per":-0.28,"es_rdt":-21.39,"em_rdt":-22.93,"zs_rdt":-0.51,"zm_rdt":-0.66,"es_ytd":211.76,"em_ytd":242.19,"zs_ytd":4.67,"zm_ytd":3.0,"es_v1an":97.77,"em_v1an":91.08,"zs_v1an":2.79,"zm_v1an":0.85,"es_v3a":-12.29,"em_v3a":26.54,"zs_v3a":-0.21,"zm_v3a":0.35,"es_v5a":-47.3,"em_v5a":-8.01,"zs_v5a":-1.59,"zm_v5a":-0.08,"es_bnpa":251.55,"em_bnpa":407.03,"zs_bnpa":2.46,"zm_bnpa":3.1,"es_roe":0.0,"em_roe":-26.06,"zs_roe":null,"zm_roe":null,"es_croiRN":0.0,"em_croiRN":75.73,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":0.0,"em_croiCA":-14.96,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":0.0,"em_margeN":37.32,"zs_margeN":null,"zm_margeN":null},{"sym":"ETIT","titre":"ECOBANK TRANS. INCORP. TG","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":65,"ouv":66,"clot":67,"varJ":3.08,"vol":2420394,"val":158896302,"ytd":191.3,"divM":0.92,"divISO":"2026-06-30","rdt":1.37,"per":3.51,"divD":"30/06/2026","v1s":29.03,"v1m":33.33,"v1an":122.22,"v3a":135.29,"v5a":207.69,"ref31":23,"bnpa25":null,"bnpa":19.09,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-74.88,"em_per":-77.0,"zs_per":-3.76,"zm_per":-2.39,"es_rdt":-65.92,"em_rdt":-66.59,"zs_rdt":-1.58,"zm_rdt":-1.92,"es_ytd":263.86,"em_ytd":299.37,"zs_ytd":5.81,"zm_ytd":3.71,"es_v1an":79.21,"em_v1an":73.14,"zs_v1an":2.26,"zm_v1an":0.68,"es_v3a":-38.75,"em_v3a":-11.64,"zs_v3a":-0.67,"zm_v3a":-0.15,"es_v5a":-43.5,"em_v5a":-1.4,"zs_v5a":-1.46,"zm_v5a":-0.01,"es_bnpa":-96.72,"em_bnpa":-95.27,"zs_bnpa":-0.95,"zm_bnpa":-0.73,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"NSBC","titre":"NSIA BANQUE COTE D'IVOIRE","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":23550,"ouv":23540,"clot":23650,"varJ":0.42,"vol":2698,"val":63634320,"ytd":106.64,"divM":675.98,"divISO":"2026-08-04","rdt":2.86,"per":14.37,"divD":"04/08/2026","v1s":2.61,"v1m":39.36,"v1an":123.3,"v3a":278.25,"v5a":301.02,"ref31":11445,"bnpa25":null,"bnpa":1645.79,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":2.83,"em_per":-5.83,"zs_per":0.14,"zm_per":-0.18,"es_rdt":-28.86,"em_rdt":-30.24,"zs_rdt":-0.69,"zm_rdt":-0.87,"es_ytd":102.83,"em_ytd":122.63,"zs_ytd":2.27,"zm_ytd":1.52,"es_v1an":80.79,"em_v1an":74.67,"zs_v1an":2.3,"zm_v1an":0.7,"es_v3a":25.97,"em_v3a":81.73,"zs_v3a":0.45,"zm_v3a":1.08,"es_v5a":-18.12,"em_v5a":42.91,"zs_v5a":-0.61,"zm_v5a":0.42,"es_bnpa":182.68,"em_bnpa":307.7,"zs_bnpa":1.79,"zm_bnpa":2.34,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"ORGT","titre":"ORAGROUP TOGO","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":3125,"ouv":3125,"clot":3110,"varJ":-0.48,"vol":4561,"val":14261465,"ytd":29.58,"divM":59.52,"divISO":"2020-07-17","rdt":1.91,"per":9.97,"divD":"17/07/2020","v1s":-7.24,"v1m":4.47,"v1an":51.55,"v3a":19.56,"v5a":-31.03,"ref31":2400,"bnpa25":null,"bnpa":311.94,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 73 mois — rendement non représentatif"],"es_per":-28.66,"em_per":-34.67,"zs_per":-1.44,"zm_per":-1.07,"es_rdt":-52.49,"em_rdt":-53.41,"zs_rdt":-1.26,"zm_rdt":-1.54,"es_ytd":-43.74,"em_ytd":-38.25,"zs_ytd":-0.96,"zm_ytd":-0.47,"es_v1an":-24.41,"em_v1an":-26.97,"zs_v1an":-0.7,"zm_v1an":-0.25,"es_v3a":-91.14,"em_v3a":-87.23,"zs_v3a":-1.59,"zm_v3a":-1.16,"es_v5a":-108.44,"em_v5a":-114.73,"zs_v5a":-3.64,"zm_v5a":-1.13,"es_bnpa":-46.42,"em_bnpa":-22.73,"zs_bnpa":-0.45,"zm_bnpa":-0.17,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SAFC","titre":"SAFCA CI","sect":"FIN","sectLib":"Services financiers","comp":"Principal","prec":5250,"ouv":5195,"clot":4990,"varJ":-4.95,"vol":8541,"val":43262925,"ytd":50.98,"divM":23.04,"divISO":"2011-07-29","rdt":null,"per":57.8,"divD":"29/07/2011","v1s":27.03,"v1m":17.65,"v1an":860.58,"v3a":707.36,"v5a":1956.25,"ref31":3305,"bnpa25":null,"bnpa":86.33,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible","rdt":"rendement non publié au BOC"},"flags":["Dernier dividende vieux de 181 mois — rendement non représentatif","PER de 57.8 — valeur extrême, à ne pas comparer telle quelle"],"es_per":313.6,"em_per":278.77,"zs_per":15.77,"zm_per":8.64,"es_rdt":null,"em_rdt":null,"zs_rdt":null,"zm_rdt":null,"es_ytd":-3.03,"em_ytd":6.43,"zs_ytd":-0.07,"zm_ytd":0.08,"es_v1an":1161.85,"em_v1an":1119.12,"zs_v1an":33.11,"zm_v1an":10.47,"es_v3a":220.23,"em_v3a":361.98,"zs_v3a":3.83,"zm_v3a":4.8,"es_v5a":432.14,"em_v5a":828.76,"zs_v5a":14.49,"zm_v5a":8.19,"es_bnpa":-85.17,"em_bnpa":-78.61,"zs_bnpa":-0.83,"zm_bnpa":-0.6,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"CABC","titre":"SICABLE CI","sect":"IND","sectLib":"Industriels","comp":"Principal","prec":3550,"ouv":3620,"clot":3500,"varJ":-1.41,"vol":4547,"val":15974765,"ytd":48.31,"divM":152.02,"divISO":"2026-06-01","rdt":4.34,"per":14.39,"divD":"01/06/2026","v1s":13.21,"v1m":28.57,"v1an":278.15,"v3a":347.76,"v5a":262.9,"ref31":2360,"bnpa25":null,"bnpa":243.22,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-77.73,"em_per":-5.7,"zs_per":-0.73,"zm_per":-0.18,"es_rdt":21.91,"em_rdt":5.85,"zs_rdt":0.51,"zm_rdt":0.17,"es_ytd":-18.77,"em_ytd":0.86,"zs_ytd":-0.28,"zm_ytd":0.01,"es_v1an":39.97,"em_v1an":294.04,"zs_v1an":0.32,"zm_v1an":2.75,"es_v3a":100.12,"em_v3a":127.12,"zs_v3a":1.36,"zm_v3a":1.69,"es_v5a":1.14,"em_v5a":24.82,"zs_v5a":0.01,"zm_v5a":0.25,"es_bnpa":636.14,"em_bnpa":-39.75,"zs_bnpa":11.33,"zm_bnpa":-0.3,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"FTSC","titre":"FILTISAC CI","sect":"IND","sectLib":"Industriels","comp":"Principal","prec":2000,"ouv":2100,"clot":2135,"varJ":6.75,"vol":5553,"val":11703090,"ytd":-3.83,"divM":1726.56,"divISO":"2025-09-30","rdt":80.87,"per":64.62,"divD":"30/09/2025","v1s":-17.7,"v1m":-11.11,"v1an":-65.52,"v3a":83.49,"v5a":0.25,"ref31":2220,"bnpa25":null,"bnpa":33.04,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["PER de 64.62 — valeur extrême, à ne pas comparer telle quelle","Rendement de 80.87 % — dividende exceptionnel, non récurrent"],"es_per":0.0,"em_per":323.46,"zs_per":0.0,"zm_per":10.03,"es_rdt":2171.63,"em_rdt":1872.44,"zs_rdt":50.14,"zm_rdt":53.94,"es_ytd":-106.44,"em_ytd":-108.0,"zs_ytd":-1.58,"zm_ytd":-1.34,"es_v1an":-132.97,"em_v1an":-192.82,"zs_v1an":-1.07,"zm_v1an":-1.8,"es_v3a":-51.96,"em_v3a":-45.47,"zs_v3a":-0.71,"zm_v3a":-0.6,"es_v5a":-99.9,"em_v5a":-99.88,"zs_v5a":-1.06,"zm_v5a":-0.99,"es_bnpa":0.0,"em_bnpa":-91.82,"zs_bnpa":0.0,"zm_bnpa":-0.7,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SDSC","titre":"AFRICA GLOBAL LOGISTICS CI","sect":"IND","sectLib":"Industriels","comp":"Principal","prec":2530,"ouv":2530,"clot":2585,"varJ":2.17,"vol":27622,"val":70451385,"ytd":70.63,"divM":92,"divISO":"2025-08-29","rdt":3.56,"per":179.26,"divD":"29/08/2025","v1s":20.69,"v1m":40.0,"v1an":53.13,"v3a":91.41,"v5a":44.12,"ref31":1515,"bnpa25":null,"bnpa":14.42,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["PER de 179.26 — valeur extrême, à ne pas comparer telle quelle"],"es_per":177.41,"em_per":1074.71,"zs_per":1.66,"zm_per":33.32,"es_rdt":0.0,"em_rdt":-13.17,"zs_rdt":0.0,"zm_rdt":-0.38,"es_ytd":18.77,"em_ytd":47.45,"zs_ytd":0.28,"zm_ytd":0.59,"es_v1an":-73.26,"em_v1an":-24.73,"zs_v1an":-0.59,"zm_v1an":-0.23,"es_v3a":-47.4,"em_v3a":-40.3,"zs_v3a":-0.64,"zm_v3a":-0.53,"es_v5a":-83.03,"em_v5a":-79.05,"zs_v5a":-0.88,"zm_v5a":-0.78,"es_bnpa":-56.36,"em_bnpa":-96.43,"zs_bnpa":-1.0,"zm_bnpa":-0.73,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SEMC","titre":"EVIOSYS PACKAGING SIEM CI","sect":"IND","sectLib":"Industriels","comp":"Principal","prec":1445,"ouv":1480,"clot":1500,"varJ":3.81,"vol":4368,"val":6445820,"ytd":114.29,"divM":14,"divISO":"2021-12-28","rdt":0.93,"per":37.33,"divD":"28/12/2021","v1s":-6.97,"v1m":-2.85,"v1an":119.29,"v3a":136.15,"v5a":256.98,"ref31":700,"bnpa25":null,"bnpa":40.18,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 56 mois — rendement non représentatif"],"es_per":-42.23,"em_per":144.63,"zs_per":-0.4,"zm_per":4.48,"es_rdt":-73.88,"em_rdt":-77.32,"zs_rdt":-1.71,"zm_rdt":-2.23,"es_ytd":92.18,"em_ytd":138.6,"zs_ytd":1.36,"zm_ytd":1.72,"es_v1an":-39.97,"em_v1an":68.99,"zs_v1an":-0.32,"zm_v1an":0.65,"es_v3a":-21.65,"em_v3a":-11.08,"zs_v3a":-0.29,"zm_v3a":-0.15,"es_v5a":-1.14,"em_v5a":22.01,"zs_v5a":-0.01,"zm_v5a":0.22,"es_bnpa":21.61,"em_bnpa":-90.05,"zs_bnpa":0.38,"zm_bnpa":-0.69,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SIVC","titre":"ERIUM CI (Ex AIR LIQUIDE CI)","sect":"IND","sectLib":"Industriels","comp":"Principal","prec":2125,"ouv":2195,"clot":2280,"varJ":7.29,"vol":8372,"val":18613950,"ytd":44.3,"divM":63,"divISO":"2017-09-29","rdt":null,"per":111.07,"divD":"29/09/2017","v1s":-11.66,"v1m":-12.59,"v1an":385.44,"v3a":316.67,"v5a":594.44,"ref31":1580,"bnpa25":null,"bnpa":20.53,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible","rdt":"rendement non publié au BOC"},"flags":["Dernier dividende vieux de 107 mois — rendement non représentatif","PER de 111.07 — valeur extrême, à ne pas comparer telle quelle"],"es_per":71.88,"em_per":627.85,"zs_per":0.67,"zm_per":19.46,"es_rdt":null,"em_rdt":null,"zs_rdt":null,"zm_rdt":null,"es_ytd":-25.51,"em_ytd":-7.52,"zs_ytd":-0.38,"zm_ytd":-0.09,"es_v1an":93.96,"em_v1an":446.03,"zs_v1an":0.76,"zm_v1an":4.17,"es_v3a":82.23,"em_v3a":106.82,"zs_v3a":1.12,"zm_v3a":1.42,"es_v5a":128.68,"em_v5a":182.22,"zs_v5a":1.37,"zm_v5a":1.8,"es_bnpa":-37.86,"em_bnpa":-94.91,"zs_bnpa":-0.67,"zm_bnpa":-0.72,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"STAC","titre":"SETAO CI","sect":"IND","sectLib":"Industriels","comp":"Principal","prec":2675,"ouv":2715,"clot":2630,"varJ":-1.68,"vol":6339,"val":16794415,"ytd":98.49,"divM":66.15,"divISO":"2022-07-18","rdt":2.52,"per":null,"divD":"18/07/2022","v1s":19.93,"v1m":27.01,"v1an":617.17,"v3a":211.4,"v5a":373.33,"ref31":1325,"bnpa25":null,"bnpa":null,"bnpa_src":null,"ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"bnpa":"ni PER au BOC ni BNPA publié","per":"BNPA indisponible","ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":["Dernier dividende vieux de 49 mois — rendement non représentatif"],"es_per":null,"em_per":null,"zs_per":null,"zm_per":null,"es_rdt":-29.21,"em_rdt":-38.54,"zs_rdt":-0.67,"zm_rdt":-1.11,"es_ytd":65.61,"em_ytd":105.62,"zs_ytd":0.97,"zm_ytd":1.31,"es_v1an":210.57,"em_v1an":774.3,"zs_v1an":1.7,"zm_v1an":7.25,"es_v3a":21.65,"em_v3a":38.07,"zs_v3a":0.29,"zm_v3a":0.5,"es_v5a":43.62,"em_v5a":77.24,"zs_v5a":0.46,"zm_v5a":0.76,"es_bnpa":null,"em_bnpa":null,"zs_bnpa":null,"zm_bnpa":null,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"CIEC","titre":"CIE CI","sect":"SPU","sectLib":"Services publics","comp":"Principal","prec":5020,"ouv":5020,"clot":5150,"varJ":2.59,"vol":3137,"val":15993215,"ytd":118.22,"divM":205.92,"divISO":"2026-07-28","rdt":4.0,"per":21.97,"divD":"28/07/2026","v1s":-0.09,"v1m":61.06,"v1an":121.46,"v3a":154.92,"v5a":213.57,"ref31":2360,"bnpa25":null,"bnpa":234.41,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":9.39,"em_per":43.97,"zs_per":null,"zm_per":1.36,"es_rdt":14.94,"em_rdt":-2.44,"zs_rdt":null,"zm_rdt":-0.07,"es_ytd":5.92,"em_ytd":146.81,"zs_ytd":null,"zm_ytd":1.82,"es_v1an":16.09,"em_v1an":72.06,"zs_v1an":null,"zm_v1an":0.67,"es_v3a":1.7,"em_v3a":1.18,"zs_v3a":null,"zm_v3a":0.02,"es_v5a":2.06,"em_v5a":1.4,"zs_v5a":null,"zm_v5a":0.01,"es_bnpa":-47.19,"em_bnpa":-41.93,"zs_bnpa":null,"zm_bnpa":-0.32,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null},{"sym":"SDCC","titre":"SODE CI","sect":"SPU","sectLib":"Services publics","comp":"Principal","prec":11900,"ouv":11700,"clot":11890,"varJ":-0.08,"vol":1883,"val":21749150,"ytd":105.0,"divM":352,"divISO":"2025-09-30","rdt":2.96,"per":18.2,"divD":"30/09/2025","v1s":8.11,"v1m":26.25,"v1an":87.79,"v3a":149.74,"v5a":204.96,"ref31":5800,"bnpa25":null,"bnpa":653.3,"bnpa_src":"BOC (cours / PER)","ca":null,"croiCA":null,"rn":null,"croiRN":null,"exercice":null,"margeN":null,"roe":null,"peg":null,"motifs":{"ca":"non publié par la source","croiCA":"non publié par la source","rn":"non publié par la source","croiRN":"non publié par la source","roe":"résultat net indisponible","peg":"croissance du résultat net indisponible"},"flags":[],"es_per":-9.39,"em_per":19.27,"zs_per":null,"zm_per":0.6,"es_rdt":-14.94,"em_rdt":-27.8,"zs_rdt":null,"zm_rdt":-0.8,"es_ytd":-5.92,"em_ytd":119.21,"zs_ytd":null,"zm_ytd":1.48,"es_v1an":-16.09,"em_v1an":24.37,"zs_v1an":null,"zm_v1an":0.23,"es_v3a":-1.7,"em_v3a":-2.2,"zs_v3a":null,"zm_v3a":-0.03,"es_v5a":-2.06,"em_v5a":-2.69,"zs_v5a":null,"zm_v5a":-0.03,"es_bnpa":47.19,"em_bnpa":61.84,"zs_bnpa":null,"zm_bnpa":0.47,"es_roe":null,"em_roe":null,"zs_roe":null,"zm_roe":null,"es_croiRN":null,"em_croiRN":null,"zs_croiRN":null,"zm_croiRN":null,"es_croiCA":null,"em_croiCA":null,"zs_croiCA":null,"zm_croiCA":null,"es_margeN":null,"em_margeN":null,"zs_margeN":null,"zm_margeN":null}],"bench":{"MARCHE":{"per":{"n":43,"moy":60.453,"med":15.26,"ec":145.331,"mad":3.32},"rdt":{"n":43,"moy":6.0088,"med":4.1,"ec":11.6757,"mad":0.96},"ytd":{"n":47,"moy":58.4517,"med":47.9,"ec":50.908,"mad":26.1},"v1an":{"n":47,"moy":120.2004,"med":70.59,"ec":160.7546,"mad":50.87},"v3a":{"n":44,"moy":202.7795,"med":153.115,"ec":172.4653,"mad":77.89},"v5a":{"n":44,"moy":311.5057,"med":210.63,"ec":337.8315,"mad":143.79},"bnpa":{"n":43,"moy":759.1195,"med":403.68,"ec":943.0545,"mad":357.28},"roe":{"n":2,"moy":27.805,"med":27.805,"ec":7.245,"mad":7.245},"croiRN":{"n":2,"moy":20.845,"med":20.845,"ec":15.785,"mad":15.785},"croiCA":{"n":2,"moy":7.185,"med":7.185,"ec":1.075,"mad":1.075},"margeN":{"n":2,"moy":34.315,"med":34.315,"ec":12.805,"mad":12.805}},"TEL":{"per":{"n":3,"moy":12.21,"med":13.63,"ec":3.2301,"mad":1.63},"rdt":{"n":3,"moy":4.8567,"med":4.99,"ec":0.539,"mad":0.45},"ytd":{"n":3,"moy":19.6367,"med":19.3,"ec":2.2214,"mad":2.2},"v1an":{"n":3,"moy":8.4867,"med":7.37,"ec":4.1221,"mad":3.28},"v3a":{"n":2,"moy":85.305,"med":85.305,"ec":3.435,"mad":3.435},"v5a":{"n":2,"moy":47.16,"med":47.16,"ec":60.87,"mad":60.87},"bnpa":{"n":3,"moy":1820.63,"med":1114.02,"ec":1676.8579,"mad":900.52},"roe":{"n":1,"moy":35.05,"med":35.05,"ec":0.0,"mad":0.0},"croiRN":{"n":1,"moy":5.06,"med":5.06,"ec":0.0,"mad":0.0},"croiCA":{"n":1,"moy":8.26,"med":8.26,"ec":0.0,"mad":0.0},"margeN":{"n":1,"moy":21.51,"med":21.51,"ec":0.0,"mad":0.0}},"FIN":{"per":{"n":16,"moy":31.6406,"med":13.975,"ec":61.106,"mad":1.875},"rdt":{"n":15,"moy":4.1433,"med":4.02,"ec":1.4194,"mad":1.13},"ytd":{"n":16,"moy":70.9169,"med":52.575,"ec":48.1963,"mad":16.095},"v1an":{"n":16,"moy":123.5312,"med":68.2,"ec":192.8928,"mad":16.14},"v3a":{"n":15,"moy":244.77,"med":220.89,"ec":170.6922,"mad":85.6},"v5a":{"n":15,"moy":422.0847,"med":367.62,"ec":436.7798,"mad":73.93},"bnpa":{"n":16,"moy":921.8256,"med":582.205,"ec":888.0282,"mad":400.94},"roe":{"n":1,"moy":20.56,"med":20.56,"ec":0.0,"mad":0.0},"croiRN":{"n":1,"moy":36.63,"med":36.63,"ec":0.0,"mad":0.0},"croiCA":{"n":1,"moy":6.11,"med":6.11,"ec":0.0,"mad":0.0},"margeN":{"n":1,"moy":47.12,"med":47.12,"ec":0.0,"mad":0.0}},"CD":{"per":{"n":6,"moy":113.1067,"med":21.965,"ec":202.3938,"mad":5.575},"rdt":{"n":7,"moy":4.2571,"med":3.82,"ec":2.2799,"mad":0.68},"ytd":{"n":7,"moy":28.4614,"med":18.53,"ec":27.9716,"mad":16.58},"v1an":{"n":7,"moy":134.11,"med":88.0,"ec":100.323,"mad":70.82},"v3a":{"n":6,"moy":132.4883,"med":148.63,"ec":76.8134,"mad":47.985},"v5a":{"n":6,"moy":202.83,"med":91.395,"ec":278.7075,"mad":70.15},"bnpa":{"n":6,"moy":132.2617,"med":140.735,"ec":86.0209,"mad":90.43},"roe":null,"croiRN":null,"croiCA":null,"margeN":null},"CB":{"per":{"n":7,"moy":122.7543,"med":13.31,"ec":269.5592,"mad":4.24},"rdt":{"n":7,"moy":4.8886,"med":4.85,"ec":2.0543,"mad":0.75},"ytd":{"n":9,"moy":61.5844,"med":28.04,"ec":74.2417,"mad":28.04},"v1an":{"n":9,"moy":94.0522,"med":39.61,"ec":106.7653,"mad":29.15},"v3a":{"n":9,"moy":263.2478,"med":139.47,"ec":256.3803,"mad":154.23},"v5a":{"n":9,"moy":385.2256,"med":251.87,"ec":309.6771,"mad":103.87},"bnpa":{"n":7,"moy":1181.9671,"med":976.51,"ec":851.1591,"mad":398.32},"roe":null,"croiRN":null,"croiCA":null,"margeN":null},"IND":{"per":{"n":5,"moy":81.334,"med":64.62,"ec":58.6019,"mad":46.45},"rdt":{"n":5,"moy":18.444,"med":3.56,"ec":31.2339,"mad":1.04},"ytd":{"n":6,"moy":62.0317,"med":59.47,"ec":38.675,"mad":27.095},"v1an":{"n":6,"moy":231.2767,"med":198.72,"ec":226.2899,"mad":166.155},"v3a":{"n":6,"moy":197.8133,"med":173.775,"ec":104.0748,"mad":86.325},"v5a":{"n":6,"moy":255.3367,"med":259.94,"ec":199.4388,"mad":164.605},"bnpa":{"n":5,"moy":70.278,"med":33.04,"ec":86.9442,"mad":12.51},"roe":null,"croiRN":null,"croiCA":null,"margeN":null},"ENE":{"per":{"n":4,"moy":17.96,"med":19.025,"ec":5.2314,"mad":3.315},"rdt":{"n":4,"moy":4.615,"med":4.32,"ec":1.2543,"mad":0.81},"ytd":{"n":4,"moy":51.1875,"med":51.24,"ec":16.9592,"mad":15.0},"v1an":{"n":4,"moy":66.3275,"med":70.56,"ec":42.1411,"mad":34.76},"v3a":{"n":4,"moy":106.11,"med":88.59,"ec":71.5647,"mad":46.94},"v5a":{"n":4,"moy":161.525,"med":152.89,"ec":54.8835,"mad":33.445},"bnpa":{"n":4,"moy":531.15,"med":176.215,"ec":662.4508,"mad":56.195},"roe":null,"croiRN":null,"croiCA":null,"margeN":null},"SPU":{"per":{"n":2,"moy":20.085,"med":20.085,"ec":1.885,"mad":1.885},"rdt":{"n":2,"moy":3.48,"med":3.48,"ec":0.52,"mad":0.52},"ytd":{"n":2,"moy":111.61,"med":111.61,"ec":6.61,"mad":6.61},"v1an":{"n":2,"moy":104.625,"med":104.625,"ec":16.835,"mad":16.835},"v3a":{"n":2,"moy":152.33,"med":152.33,"ec":2.59,"mad":2.59},"v5a":{"n":2,"moy":209.265,"med":209.265,"ec":4.305,"mad":4.305},"bnpa":{"n":2,"moy":443.855,"med":443.855,"ec":209.445,"mad":209.445},"roe":null,"croiRN":null,"croiCA":null,"margeN":null}}};
+let ROWS = [], BENCH = {}, META = {};
+
+const MOIS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août',
+                 'septembre','octobre','novembre','décembre'];
+function jolieDate(iso){
+  if(!iso) return 'date inconnue';
+  const [a,m,j] = iso.split('-').map(Number);
+  return j+' '+MOIS_FR[m-1]+' '+a;
+}
+function majEntete(origine){
+  const m = META;
+  $('#kBoc').text(m.boc_numero ? ('BOC n° '+m.boc_numero+' — '+jolieDate(m.boc_seance))
+                               : 'bulletin non identifié');
+  $('#kPerf').text(m.sika_releve ? ('Sikafinance — '+jolieDate(m.sika_releve)) : 'non collectées');
+  $('#kFond').text(m.sika_releve ? ('Sikafinance — exercice '+(m.sika_exercice||'?')
+                                    +', relevé du '+jolieDate(m.sika_releve))
+                                 : 'non collectés');
+  const c = m.couverture || {};
+  const total = m.total || 47;
+  const manquants = Object.entries(c).filter(([k,v]) => v < total).length;
+  $('#kSrc').text(origine + (m.boc_reconcilie === false ? ' · réconciliation BOC en échec'
+                  : (manquants ? ' · '+manquants+' colonne(s) incomplète(s)' : ' · jeu complet')));
+}
+const BAS = -1e15, ND = '<span class="nd">n.d.</span>', NI = '<span class="ni">non importé</span>';
+const NF = (v,d) => v.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const LIBM = {per:'PER',rdt:'Rendement net',ytd:'Perf. 1er janvier',v1an:'Perf. 1 an',
+              v3a:'Perf. 3 ans',v5a:'Perf. 5 ans',bnpa:'BNPA'};
+let VUE = 'brut', MET = 'per';
+
+/* --- rendus ------------------------------------------------------------- */
+function cls(v){return v>0?'hausse':(v<0?'baisse':'plat')}
+function fleche(v){return v>0?'▲':(v<0?'▼':'▬')}
+
+/* une valeur absente affiche son motif au survol : « — », ou « N/A » quand la
+   métrique est sans objet plutôt qu'indisponible */
+function manque(r,champ){
+  const m = ((r&&r.motifs)||{})[champ] || 'donnée non disponible';
+  const sansObjet = /négative ou nulle|sans objet/.test(m);
+  return '<span class="nd" title="'+m.replace(/"/g,'&quot;')+'">'+(sansObjet?'N/A':'—')+'</span>';
+}
+function num(dec,champ){                       /* nombre simple */
+  return (v,t,r)=>{
+    if(v===null||v===undefined) return t==='display'?manque(r,champ):(t==='export'?'':BAS);
+    if(t==='display') return '<span class="mono">'+NF(v,dec)+'</span>';
+    if(t==='export')  return NF(v,dec).replace(/\u202f|\u00a0|\s/g,'');
+    return v;
+  };
+}
+function perf(dec,champ){                      /* variation avec symbole de direction */
+  return (v,t,r)=>{
+    if(v===null||v===undefined) return t==='display'?manque(r,champ):(t==='export'?'':BAS);
+    if(t==='export')  return NF(v,dec).replace(/\u202f|\u00a0|\s/g,'');
+    if(t!=='display') return v;
+    const s=v>0?'+':'';
+    return '<span class="mono '+cls(v)+'"><span class="fl">'+fleche(v)+'</span>'+s+NF(v,dec)+' %</span>';
+  };
+}
+/* PEG : vert sous 1, rouge au-delà de 2 */
+function peg(v,t,r){
+  if(v===null||v===undefined) return t==='display'?manque(r,'peg'):(t==='export'?'':BAS);
+  if(t==='export') return NF(v,2).replace(/\s/g,'');
+  if(t!=='display') return v;
+  const c = v<1?'hausse':(v>2?'baisse':'plat');
+  return '<span class="mono '+c+'">'+NF(v,2)+'</span>';
+}
+/* colonnes de benchmark : dépendent de la métrique choisie */
+function bmk(prefixe){
+  return (v,t,r)=>{
+    const e = r[prefixe+'_'+MET];
+    if(e===null||e===undefined) return t==='display'?ND:(t==='export'?'':BAS);
+    if(t==='export') return NF(e,2).replace(/\s/g,'');
+    if(t!=='display') return e;
+    const z = r[(prefixe==='es'?'zs':'zm')+'_'+MET];
+    const s = e>0?'+':'';
+    let h='<span class="mono '+cls(e)+'">'+s+NF(e,2)+' %</span>';
+    if(z!==null&&z!==undefined) h+='<span class="z" title="z-score robuste (médiane / MAD)">z '+NF(z,2)+'</span>';
+    return h;
+  };
+}
+
+const COLS = [
+ {title:'Code',data:'sym',className:'code',
+  render:(v,t,r)=>t==='display'?v+(r.flags.length?'<span class="alerte" title="'+r.flags.join(' — ').replace(/"/g,'&quot;')+'">▲</span>':''):v},
+ {title:'Sect.',data:'sect',render:(v,t,r)=>t==='display'?'<span class="sect" title="'+r.sectLib+'">'+v+'</span>':v},
+ {title:'Titre',data:'titre'},
+ {title:'Comp.',data:'comp',render:(v,t)=>t==='display'?'<span class="comp '+v.toLowerCase()+'">'+v+'</span>':v},
+ {title:'Cours clôt.',data:'clot',className:'mono',render:num(0,'clot')},
+ {title:'Clôt. exerc. préc.',data:'ref31',className:'mono',visible:false,render:num(0,'ref31')},
+ {title:'1 jour',data:'varJ',className:'mono',render:perf(2,'varJ')},
+ {title:'1 sem.',data:'v1s',className:'mono',render:perf(2,'v1s')},
+ {title:'1 mois',data:'v1m',className:'mono',render:perf(2,'v1m')},
+ {title:'1er janv.',data:'ytd',className:'mono',render:perf(2,'ytd')},
+ {title:'1 an',data:'v1an',className:'mono',render:perf(2,'v1an')},
+ {title:'3 ans',data:'v3a',className:'mono',render:perf(2,'v3a')},
+ {title:'5 ans',data:'v5a',className:'mono',render:perf(2,'v5a')},
+ {title:'CA (M FCFA)',data:'ca',className:'mono',render:num(0,'ca')},
+ {title:'Croiss. CA',data:'croiCA',className:'mono',render:perf(2,'croiCA')},
+ {title:'RN (M FCFA)',data:'rn',className:'mono',render:num(0,'rn')},
+ {title:'Croiss. RN',data:'croiRN',className:'mono',render:perf(2,'croiRN')},
+ {title:'BNPA',data:'bnpa',className:'mono',render:num(2,'bnpa')},
+ {title:'ROE',data:'roe',className:'mono',render:perf(2,'roe')},
+ {title:'PER',data:'per',className:'mono',render:num(2,'per')},
+ {title:'PEG',data:'peg',className:'mono',render:peg},
+ {title:'Rdt net',data:'rdt',className:'mono',render:perf(2,'rdt')},
+ {title:'Div. montant',data:'divM',className:'mono',render:num(2,'divM')},
+ {title:'Div. date',data:'divD',className:'mono',visible:false,
+  render:(v,t,r)=>(t==='sort'||t==='type')?r.divISO:v},
+ {title:'Écart secteur',data:null,className:'mono',render:bmk('es')},
+ {title:'Écart marché',data:null,className:'mono',render:bmk('em')}
+];
+
+const LANG={lengthMenu:'Afficher _MENU_ lignes',info:'_START_ à _END_ sur _TOTAL_ titres',
+ infoEmpty:'Aucun titre',infoFiltered:'(filtré à partir de _MAX_)',
+ zeroRecords:'Aucun titre ne correspond à ces filtres. Élargir la recherche ou réinitialiser.',
+ paginate:{first:'Début',last:'Fin',next:'Suivant',previous:'Précédent'},buttons:{colvis:'Colonnes'}};
+
+function demarre(P, origine){
+ROWS = P.rows || []; BENCH = P.bench || {}; META = P.meta || {};
+majEntete(origine);
+
+const table = $('#cote').DataTable({
+  data:ROWS, columns:COLS, language:LANG, order:[[9,'desc']],
+  lengthMenu:[[10,25,50,-1],[10,25,50,'Tout']], pageLength:25,
+  scrollX:true, autoWidth:false, dom:'<"haut"lB>rtip',
+  buttons:[
+    {extend:'csvHtml5',text:'CSV',title:'BRVM_comparatif_2026-08-10',fieldSeparator:';',bom:true,
+     exportOptions:{orthogonal:'export'}},
+    {extend:'excelHtml5',text:'Excel',title:'BRVM_comparatif_2026-08-10',exportOptions:{orthogonal:'export'}},
+    {extend:'colvis',text:'Colonnes'}
+  ],
+  createdRow:(tr,d)=>{if(d.flags.length)tr.classList.add('signale')}
+});
+
+/* --- repères sectoriels -------------------------------------------------- */
+const SLIB={FIN:'Services financiers',CB:'Consommation de base',CD:'Consommation discrétionnaire',
+ IND:'Industriels',ENE:'Énergie',TEL:'Télécommunications',SPU:'Services publics'};
+const tSect = $('#secteurs').DataTable({
+  columns:[{title:'Secteur'},{title:'Effectif',className:'mono'},{title:'Médiane',className:'mono'},
+           {title:'Moyenne',className:'mono'},{title:'Écart-type',className:'mono'},{title:'Z-score'}],
+  language:LANG, paging:false, searching:false, info:false, order:[[2,'desc']], autoWidth:false
+});
+/* la ligne « marché » vit dans le pied de tableau : elle ne participe pas au tri */
+$('#secteurs').append('<tfoot><tr>'+'<th></th>'.repeat(6)+'</tr></tfoot>');
+function majSecteurs(){
+  const l=[];
+  for(const s of Object.keys(SLIB)){
+    const b=BENCH[s][MET];
+    if(!b){l.push([SLIB[s]+' ('+s+')','—','—','—','—','—']);continue}
+    l.push([SLIB[s]+' ('+s+')',b.n,
+      '<span class="mono">'+NF(b.med,2)+'</span>','<span class="mono">'+NF(b.moy,2)+'</span>',
+      '<span class="mono">'+NF(b.ec,2)+'</span>',
+      b.n>=5?'<span class="ok" style="text-align:left">actif</span>'
+            :'<span class="nd">suspendu (n&lt;5)</span>']);
+  }
+  tSect.clear().rows.add(l).draw();
+  const m=BENCH.MARCHE[MET];
+  const pied=['Ensemble du marché BRVM',m.n,NF(m.med,2),NF(m.moy,2),NF(m.ec,2),'référence'];
+  $('#secteurs tfoot th').each(function(i){
+    $(this).html(i===0?'<b>'+pied[0]+'</b>':'<b class="mono">'+pied[i]+'</b>');
+  });
+}
+
+/* --- indicateurs d'en-tête ---------------------------------------------- */
+function majCrans(){
+  $('#kPer').text(NF(BENCH.MARCHE.per.med,2));
+  $('#kRdt').text(NF(BENCH.MARCHE.rdt.med,2)+' %');
+  $('#kP5').text('+'+NF(BENCH.MARCHE.v5a.med,1)+' %');
+}
+
+/* --- groupes de colonnes par vue ---------------------------------------- */
+const G_PERF=[6,7,8,9,10,11,12], G_FOND=[13,14,15,16,17,18], G_VAL=[19,20,21,22], G_BMK=[24,25];
+function appliqueVue(){
+  const v=VUE;
+  table.columns(G_PERF).visible(v==='brut',false);
+  table.columns(G_FOND).visible(v==='brut',false);
+  table.columns(G_VAL).visible(true,false);
+  table.columns(G_BMK).visible(v!=='brut',false);
+  table.columns.adjust().draw(false);
+  const t=v==='brut'?'Cote comparative'
+    :(v==='sect'?'Écarts à la médiane sectorielle — '+LIBM[MET]
+                :'Écarts à la médiane du marché — '+LIBM[MET]);
+  $('#cote').closest('.carte').find('h2').text(t);
+}
+
+/* --- filtres ------------------------------------------------------------- */
+const $q=$('#q'),$s=$('#fsect'),$c=$('#fcomp'),$f=$('#fsig'),$m=$('#fmet');
+$.fn.dataTable.ext.search.push(function(st,d,i){
+  if(st.nTable.id!=='cote') return true;
+  const r=table.row(i).data();
+  if($s.val()&&r.sect!==$s.val()) return false;
+  if($c.val()&&r.comp!==$c.val()) return false;
+  if($f.prop('checked')&&!r.flags.length) return false;
+  return true;
+});
+function maj(){table.draw();$('#compte').text(table.rows({search:'applied'}).count())}
+$q.on('input',()=>{table.search($q.val());maj()});
+$s.on('change',maj);$c.on('change',maj);$f.on('change',maj);
+$m.on('change',()=>{MET=$m.val();majSecteurs();appliqueVue();table.draw(false)});
+$('.vues button').on('click',function(){
+  $('.vues button').attr('aria-pressed','false');
+  $(this).attr('aria-pressed','true');
+  VUE=$(this).data('vue');appliqueVue();
+});
+$('#raz').on('click',()=>{
+  $q.val('');$s.val('');$c.val('');$f.prop('checked',false);$m.val('per');MET='per';
+  VUE='brut';$('.vues button').attr('aria-pressed','false').first().attr('aria-pressed','true');
+  table.search('').order([[9,'desc']]);majSecteurs();appliqueVue();maj();
+});
+table.on('draw',()=>$('#compte').text(table.rows({search:'applied'}).count()));
+
+/* --- import CSV des fondamentaux ---------------------------------------- */
+function nb(x){
+  if(x===undefined||x===null) return null;
+  const s=String(x).trim().replace(/\s|\u202f|\u00a0/g,'').replace(',','.');
+  if(s==='') return null;
+  const v=parseFloat(s);
+  return isNaN(v)?null:v;
+}
+function etat(txt,cl){$('#etatImport').html('<span class="etat '+(cl||'')+'">'+txt+'</span>')}
+function recalc(r){
+  r.peg = (r.per && r.croiRN && r.croiRN>0) ? Math.round(r.per/r.croiRN*100)/100 : null;
+  r.roe = (r.rn!==null && r.fondsPropres) ? Math.round(r.rn/r.fondsPropres*1e4)/100 : null;
+}
+ROWS.forEach(recalc);
+
+$('#fic').on('change',function(e){
+  const f=e.target.files[0]; if(!f) return;
+  const fr=new FileReader();
+  fr.onload=ev=>{
+    try{
+      const lignes=ev.target.result.replace(/\r/g,'').split('\n').filter(l=>l.trim()!=='');
+      if(lignes.length<2){etat('Fichier vide ou sans ligne de données','mauvais');return}
+      const sep=lignes[0].split(';').length>1?';':',';
+      const ent=lignes[0].split(sep).map(x=>x.trim().toLowerCase());
+      const iSym=ent.indexOf('symbole');
+      if(iSym<0){etat("Colonne « symbole » absente de l'en-tête",'mauvais');return}
+      const carte={ca:'ca',croissance_ca:'croiCA',rn:'rn',croissance_rn:'croiRN',
+                   bnpa:'bnpa25',fonds_propres:'fondsPropres',exercice:'exercice'};
+      const index={}; ROWS.forEach(r=>index[r.sym]=r);
+      let ok=0, inconnus=[];
+      for(let i=1;i<lignes.length;i++){
+        const c=lignes[i].split(sep);
+        const sym=(c[iSym]||'').trim().toUpperCase();
+        const r=index[sym];
+        if(!r){if(sym)inconnus.push(sym);continue}
+        for(const [col,champ] of Object.entries(carte)){
+          const j=ent.indexOf(col);
+          if(j>=0 && c[j]!==undefined){
+            const v=nb(c[j]);
+            if(v!==null) r[champ]= (champ==='exercice')? String(c[j]).trim() : v;
+          }
+        }
+        recalc(r); r.importe=true; ok++;
+      }
+      const n=ROWS.filter(r=>r.ca!==null&&r.ca!==undefined).length;
+      etat(n+' / 47 sociétés documentées'+(inconnus.length?' · '+inconnus.length+' symbole(s) hors cote ignoré(s)':''),
+           n===47?'bon':'');
+      table.rows().invalidate().draw(false);
+    }catch(err){etat('Lecture impossible : '+err.message,'mauvais')}
+  };
+  fr.onerror=()=>etat('Lecture du fichier impossible','mauvais');
+  fr.readAsText(f,'UTF-8');
+});
+$('#videImport').on('click',()=>{
+  ROWS.forEach(r=>{
+    if(r.srcF) return;                       /* on conserve les 2 relevés vérifiés */
+    ['ca','croiCA','rn','croiRN','bnpa25','fondsPropres','roe','peg'].forEach(k=>r[k]=null);
+  });
+  $('#fic').val('');
+  etat(ROWS.filter(r=>r.ca!==null&&r.ca!==undefined).length+' / 47 sociétés documentées');
+  table.rows().invalidate().draw(false);
+});
+
+etat((META.couverture&&META.couverture.ca||0)+' / '+(META.total||ROWS.length)+' sociétés documentées');
+majCrans(); majSecteurs(); appliqueVue(); maj();
+$(window).on('resize',()=>table.columns.adjust());
+}
+
+/* Le fichier de données régénéré par la chaîne d'automatisation est prioritaire.
+   Ouvert depuis le disque (protocole file://), le navigateur refuse cette lecture :
+   on retombe alors sur l'instantané embarqué à la génération du fichier. */
+fetch('data_brvm.json', {cache:'no-store'})
+  .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status)))
+  .then(P => demarre(P, 'données du '+(P.meta&&P.meta.construit_le||'?')+' · data_brvm.json'))
+  .catch(() => demarre(EMBARQUE, 'instantané embarqué · data_brvm.json non lu'));
+</script>
+</body>
+</html>
