@@ -242,6 +242,14 @@ def totaux(txt):
         rendement_moyen=cherche(r"Taux de rendement moyen du marché\s+([\d,]+)"))
 
 
+# Contrôles bloquants : une divergence signale une extraction fausse.
+# Le dénombrement hausse/baisse/inchangé est seulement indicatif — la BRVM le
+# calcule sur le cours de référence, ajusté les jours de détachement de dividende
+# ou d'opération sur titres, alors que la colonne « Variation jour » du bulletin
+# se rapporte au cours précédent. Les deux bases divergent alors d'un titre ou deux.
+BLOQUANTS = ("volume", "valeur", "titres", "variation_jour_recalculee")
+
+
 def controle(valeurs, tot):
     """Réconcilie les lignes extraites avec la page de synthèse du bulletin."""
     calc = dict(volume=sum(v["volume"] for v in valeurs),
@@ -250,20 +258,21 @@ def controle(valeurs, tot):
                 hausse=sum(1 for v in valeurs if v["variation_jour"] > 0),
                 baisse=sum(1 for v in valeurs if v["variation_jour"] < 0),
                 inchange=sum(1 for v in valeurs if v["variation_jour"] == 0))
-    rapport, ok = [], True
+    rapport = []
     for cle, attendu in tot.items():
         if cle not in calc or attendu is None:
             continue
-        concorde = calc[cle] == attendu
-        ok &= concorde
-        rapport.append(dict(controle=cle, calcule=calc[cle], bulletin=attendu, concorde=concorde))
+        rapport.append(dict(controle=cle, calcule=calc[cle], bulletin=attendu,
+                            concorde=calc[cle] == attendu, bloquant=cle in BLOQUANTS))
     # variations du jour recalculées depuis le cours précédent
     ecarts = [v["symbole"] for v in valeurs
               if abs((v["cloture"] - v["cours_precedent"]) / v["cours_precedent"] * 100
                      - v["variation_jour"]) > 0.05]
     rapport.append(dict(controle="variation_jour_recalculee", calcule=len(valeurs) - len(ecarts),
-                        bulletin=len(valeurs), concorde=not ecarts))
-    return rapport, ok and not ecarts
+                        bulletin=len(valeurs), concorde=not ecarts, bloquant=True,
+                        titres_en_ecart=ecarts))
+    ok = all(r["concorde"] for r in rapport if r["bloquant"])
+    return rapport, ok
 
 
 def main():
@@ -289,8 +298,18 @@ def main():
 
     print(f"BOC n° {numero} — séance du {jour_iso} — {len(valeurs)} valeurs extraites")
     for r in rapport:
-        print(f"  {'OK   ' if r['concorde'] else 'ECART'} {r['controle']:28s} "
+        if r["concorde"]:
+            marque = "OK   "
+        else:
+            marque = "ECART" if r["bloquant"] else "note "
+        print(f"  {marque} {r['controle']:28s} "
               f"{r['calcule']:>15,} / {r['bulletin']:>15,}".replace(",", " "))
+    indic = [r for r in rapport if not r["bloquant"] and not r["concorde"]]
+    if indic:
+        print("  note  Le dénombrement hausse/baisse du bulletin se rapporte au cours de")
+        print("        référence, ajusté les jours de détachement de dividende ou")
+        print("        d'opération sur titres. L'écart est attendu ces jours-là et")
+        print("        n'affecte ni les cours ni les volumes extraits.")
 
     os.makedirs(os.path.dirname(a.sortie) or ".", exist_ok=True)
     json.dump(dict(numero=numero, seance=jour_iso, source="brvm.org",
@@ -300,7 +319,9 @@ def main():
     if tmp:
         os.unlink(tmp.name)
     if not ok:
-        sys.exit("Réconciliation en échec : le BOC a probablement changé de format.")
+        rates = [r["controle"] for r in rapport if r["bloquant"] and not r["concorde"]]
+        sys.exit("Réconciliation en échec sur : " + ", ".join(rates)
+                 + "\nLe format du bulletin a probablement changé ; rien n'a été publié.")
 
 
 if __name__ == "__main__":
