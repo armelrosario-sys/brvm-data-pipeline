@@ -31,6 +31,13 @@ jobs:
       - name: Installer les dépendances
         run: pip install requests beautifulsoup4
 
+      - name: S'assurer qu'un bulletin est disponible
+        run: |
+          if [ ! -f donnees/boc.json ]; then
+            echo "Aucune collecte BOC préalable : on récupère le dernier bulletin publié."
+            python pipeline/collecte_boc.py
+          fi
+
       - name: Collecter performances et fondamentaux
         run: python pipeline/collecte_sikafinance.py ${{ github.event.inputs.symboles }}
 
@@ -41,7 +48,7 @@ jobs:
         run: |
           git config user.name  "pipeline-brvm"
           git config user.email "actions@users.noreply.github.com"
-          git add donnees/sikafinance.json docs/data_brvm.json
+          git add donnees/sikafinance.json donnees/boc.json docs/data_brvm.json
           if git diff --cached --quiet; then
             echo "Aucun changement."
           else
