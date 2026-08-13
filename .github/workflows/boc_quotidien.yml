@@ -1,0 +1,57 @@
+name: BOC quotidien
+
+on:
+  schedule:
+    # 18h00 UTC, du lundi au vendredi. La BRVM publie le bulletin en fin de séance ;
+    # l'horaire des exécutions planifiées GitHub dérive souvent de plusieurs minutes.
+    - cron: '0 18 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: donnees-brvm
+  cancel-in-progress: false
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dépendances
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          pip install requests beautifulsoup4
+
+      - name: Collecter le bulletin du jour
+        run: python pipeline/collecte_boc.py
+
+      - name: Reconstruire le fichier de données
+        run: python pipeline/construit_donnees.py
+
+      - name: Publier si le contenu a changé
+        run: |
+          git config user.name  "pipeline-brvm"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/boc.json docs/data_brvm.json
+          if git diff --cached --quiet; then
+            echo "Aucun changement : pas de séance ou bulletin identique."
+          else
+            SEANCE=$(python -c "import json;print(json.load(open('donnees/boc.json'))['seance'])")
+            git commit -m "BOC séance du $SEANCE"
+            git push
+          fi
+
+      - name: Conserver la trace en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostic-boc
+          path: donnees/
+          if-no-files-found: ignore
