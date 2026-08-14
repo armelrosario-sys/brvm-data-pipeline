@@ -19,6 +19,12 @@ import csv, json, os, statistics as st
 from datetime import date
 
 SORTIE = os.path.join("docs", "data_brvm.json")
+# Un titre peu liquide peut ne pas être coté d'une séance à l'autre : le bulletin
+# ne lui consacre alors aucune ligne. Le laisser disparaître retirerait aussi ses
+# fondamentaux et son historique, et déplacerait la médiane de son secteur — donc
+# tous les écarts calculés pour ses voisins. On le reporte avec son dernier cours
+# connu, volume nul, tant que cette cotation n'est pas trop ancienne.
+REPORT_MAX_JOURS = 30
 SECTEURS = {"TEL": "Télécommunications", "FIN": "Services financiers",
             "CD": "Consommation discrétionnaire", "CB": "Consommation de base",
             "IND": "Industriels", "ENE": "Énergie", "SPU": "Services publics"}
@@ -50,6 +56,45 @@ def fonds_propres():
                 except ValueError:
                     pass
     return table
+
+
+def reporter_absents(lignes, seance):
+    """Réintègre les titres cotés précédemment mais absents du bulletin du jour."""
+    if not os.path.exists(SORTIE) or not seance:
+        return lignes, []
+    try:
+        ancien = json.load(open(SORTIE, encoding="utf-8"))
+    except (ValueError, OSError):
+        return lignes, []
+
+    presents = {r["sym"] for r in lignes}
+    jour = date.fromisoformat(seance)
+    reportes, perimes = [], []
+
+    for a in ancien.get("rows", []):
+        if a["sym"] in presents:
+            continue
+        derniere = a.get("seance_cotation") or (ancien.get("meta") or {}).get("boc_seance")
+        if not derniere:
+            continue
+        age = (jour - date.fromisoformat(derniere)).days
+        if age > REPORT_MAX_JOURS:
+            perimes.append((a["sym"], age))
+            continue
+        r = dict(a)
+        r["varJ"], r["vol"], r["val"] = None, 0, 0
+        r["seance_cotation"], r["hors_seance"] = derniere, age
+        r.setdefault("motifs", {})["varJ"] = (
+            f"titre non coté lors de la séance du {seance} — "
+            f"cours de clôture du {derniere} conservé, {age} j")
+        r["flags"] = [f["flags"] for f in [a]][0] + [
+            f"Non coté depuis le {derniere} ({age} j) — cours et ratios inchangés, volume nul"]
+        lignes.append(r)
+        reportes.append((a["sym"], derniere, age))
+
+    for sym, age in perimes:
+        print(f"  retiré : {sym} sans cotation depuis {age} jours (seuil {REPORT_MAX_JOURS})")
+    return lignes, reportes
 
 
 def stats(vals):
@@ -155,9 +200,13 @@ def main():
             motifs["rdt"] = ("aucun dividende récent" if not r["divISO"]
                              else "rendement non publié au BOC")
 
+        r["seance_cotation"] = boc.get("seance")
+        r["hors_seance"] = 0
         r["motifs"] = motifs
         r["flags"] = signalements(r)
         lignes.append(r)
+
+    lignes, reportes = reporter_absents(lignes, boc.get("seance"))
 
     # --- repères sectoriels et de marché
     bench = {"MARCHE": {m: stats([x[m] for x in lignes]) for m in METRIQUES}}
@@ -176,6 +225,7 @@ def main():
         boc_reconcilie=boc.get("reconcilie"), boc_controles=boc.get("controles"),
         sika_releve=sika.get("releve_le"), sika_exercice=sika.get("exercice"),
         construit_le=date.today().isoformat(),
+        hors_seance=[dict(symbole=s, derniere_cotation=d, jours=j) for s, d, j in reportes],
         couverture={c: sum(1 for r in lignes if r[c] is not None)
                     for c in ("per", "rdt", "bnpa", "ca", "rn", "croiRN", "roe", "peg",
                               "v1s", "v1m", "ytd", "v1an", "v3a", "v5a")},
@@ -187,6 +237,10 @@ def main():
 
     print(f"\n{SORTIE} écrit — BOC n° {meta['boc_numero']} du {meta['boc_seance']}, "
           f"{meta['total']} valeurs")
+    if reportes:
+        print("Titres non cotés lors de cette séance, reportés au dernier cours connu :")
+        for sym, d, j in reportes:
+            print(f"  {sym:6s} clôture du {d} ({j} j)")
     print("Couverture :")
     for c, n in meta["couverture"].items():
         etat = "" if n == meta["total"] else "   <-- incomplet"
