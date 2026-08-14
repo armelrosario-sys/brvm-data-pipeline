@@ -15,7 +15,7 @@ on:
   # workflow_run n'est PAS soumis a cette restriction : il se declenche
   # quel que soit le jeton utilise par le workflow surveille.
   workflow_run:
-    workflows: ["P9 - Collecte quotidienne des cours", "P11 - Collecte quotidienne du BOC (PER a jour)"]
+    workflows: ["P9 - Collecte quotidienne des cours", "P11 - Collecte quotidienne du BOC (PER a jour)", "BOC quotidien", "Sikafinance hebdomadaire"]
     types: [completed]
   schedule:
     - cron: "30 3 * * 1,4"   # juste apres la collecte BOC (lundi/jeudi)
@@ -79,6 +79,28 @@ jobs:
         run: python3 dashboard/bloc_signaux.py
       - name: Generer le poste de decision
         run: python3 dashboard/generer_poste_decision.py
+      # Ajoute le 14/08/2026 : deux tableaux de bord cohabitent desormais.
+      # Le comparatif (docs/index.html, alimente par construit_donnees.py) passe
+      # a la racine ; la watchlist GARP, generee juste au-dessus dans
+      # docs_site/index.html, est deplacee dans /watchlist/ avec son poste de
+      # decision pour que leurs liens relatifs continuent de fonctionner.
+      # Aucun fichier n'est duplique dans git : la copie a lieu au deploiement.
+      - name: Repartir les deux tableaux de bord
+        run: |
+          mkdir -p docs_site/watchlist
+          for f in index.html poste_decision.html; do
+            [ -f "docs_site/$f" ] && mv "docs_site/$f" "docs_site/watchlist/$f"
+          done
+          if [ -f docs/index.html ] && [ -f docs/data_brvm.json ]; then
+            cp docs/index.html      docs_site/index.html
+            cp docs/data_brvm.json  docs_site/data_brvm.json
+            echo "Racine = tableau comparatif ; watchlist GARP sous /watchlist/"
+          else
+            echo "::error::docs/index.html ou docs/data_brvm.json manquant - rien n'est publie a la racine."
+            exit 1
+          fi
+          ls -R docs_site
+
       - name: Configurer Pages
         uses: actions/configure-pages@v5
       - name: Preparer l'artefact
