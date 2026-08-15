@@ -199,9 +199,21 @@ def main():
 
         # --- ROE : impossible sans capitaux propres
         e = fp.get(sym)
-        if e and r["rn"] is not None:
+        r["cp"] = e["montant"] if e else None
+        r["cp_exercice"] = e["exercice"] if e else None
+        if e and e["montant"] <= 0:
+            # Rapporter un bénéfice à des capitaux propres négatifs inverse le signe :
+            # une société rentable afficherait un ROE négatif. La mesure n'a pas de sens.
+            r["roe"] = None
+            motifs["roe"] = (f"capitaux propres négatifs ({e['montant']:,.0f} M FCFA)".replace(",", " ")
+                             + " — le ROE n'a pas de signification")
+        elif e and r["rn"] is not None:
             r["roe"] = round(r["rn"] / e["montant"] * 100, 2)
-            r["roe_src"] = f"fonds propres {e['exercice']} — {e['source'] or 'saisie manuelle'}"
+            r["roe_src"] = (f"résultat net {ch.get('exercice') or '?'} rapporté aux capitaux propres "
+                            f"{e['exercice'] or 'd\'exercice non identifié'} — "
+                            f"{e['source'] or 'saisie manuelle'}")
+            if not e["exercice"]:
+                motifs["roe_reserve"] = "exercice des capitaux propres non identifié dans le rapport"
         else:
             r["roe"] = None
             motifs["roe"] = ("capitaux propres non saisis dans fonds_propres.csv"
@@ -287,6 +299,11 @@ def signalements(r):
         f.append(f"PER de {r['per']} — valeur extrême, à ne pas comparer telle quelle")
     if r["rdt"] and r["rdt"] > 20:
         f.append(f"Rendement de {r['rdt']} % — dividende exceptionnel, non récurrent")
+    if r.get("cp") is not None and r["cp"] <= 0:
+        f.append(f"Capitaux propres négatifs ({r['cp']:,.0f} M FCFA) — ROE et PBR sans objet"
+                 .replace(",", " "))
+    if r.get("cp") is not None and not r.get("cp_exercice"):
+        f.append("Exercice des capitaux propres non identifié — ROE à confirmer")
     if r["croiRN"] is not None and r["croiRN"] > 100:
         f.append(f"Croissance du résultat de {r['croiRN']} % — effet de base, PEG peu fiable")
     for cle, lib in (("v3a", "3 ans"), ("v5a", "5 ans")):
