@@ -1,0 +1,80 @@
+name: Capitaux propres (notations)
+
+on:
+  schedule:
+    # 5 de chaque mois, 05h00 UTC. Les fiches de notation ne bougent qu'une à
+    # deux fois par an et par émetteur : une passe mensuelle suffit largement.
+    - cron: '0 5 5 * *'
+  workflow_dispatch:
+    inputs:
+      mois:
+        description: "Ancienneté maximale du rapport retenu, en mois"
+        required: false
+        default: '18'
+      test_seul:
+        description: "Rejouer l'analyseur sans rien télécharger (oui / non)"
+        required: false
+        default: 'non'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: donnees-brvm
+  cancel-in-progress: false
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dépendances
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          pip install requests
+
+      - name: Vérifier l'index des notations
+        run: |
+          if [ ! -f collecte/notations_financieres.csv ]; then
+            echo "::error::collecte/notations_financieres.csv absent — lancer d'abord P12."
+            exit 1
+          fi
+          echo "$(( $(wc -l < collecte/notations_financieres.csv) - 1 )) annonces indexées"
+
+      - name: Rejouer l'analyseur seul
+        if: ${{ github.event.inputs.test_seul == 'oui' }}
+        run: python pipeline/capitaux_propres.py --test
+
+      - name: Extraire les capitaux propres
+        if: ${{ github.event.inputs.test_seul != 'oui' }}
+        run: python pipeline/capitaux_propres.py --mois ${{ github.event.inputs.mois || 18 }}
+
+      - name: Reconstruire le fichier de données
+        if: ${{ github.event.inputs.test_seul != 'oui' }}
+        run: python pipeline/construit_donnees.py
+
+      - name: Publier si le contenu a changé
+        if: ${{ github.event.inputs.test_seul != 'oui' }}
+        run: |
+          git config user.name  "pipeline-brvm"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/fonds_propres.csv donnees/cote_reference.json docs/data_brvm.json
+          if git diff --cached --quiet; then
+            echo "Aucun changement."
+          else
+            git commit -m "Capitaux propres — relevé du $(date -u +%F)"
+            git push
+          fi
+
+      - name: Conserver la trace en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostic-capitaux-propres
+          path: donnees/
+          if-no-files-found: ignore
