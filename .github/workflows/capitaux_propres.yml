@@ -15,6 +15,10 @@ on:
         description: "Rejouer l'analyseur sans rien télécharger (oui / non)"
         required: false
         default: 'non'
+      diagnostic:
+        description: "Conserver le texte des rapports non exploités (oui / non)"
+        required: false
+        default: 'non'
 
 permissions:
   contents: write
@@ -52,7 +56,10 @@ jobs:
 
       - name: Extraire les capitaux propres
         if: ${{ github.event.inputs.test_seul != 'oui' }}
-        run: python pipeline/capitaux_propres.py --mois ${{ github.event.inputs.mois || 18 }}
+        run: |
+          python pipeline/capitaux_propres.py \
+            --mois ${{ github.event.inputs.mois || 18 }} \
+            ${{ github.event.inputs.diagnostic == 'oui' && '--diagnostic' || '' }}
 
       - name: Reconstruire le fichier de données
         if: ${{ github.event.inputs.test_seul != 'oui' }}
@@ -70,6 +77,14 @@ jobs:
             git commit -m "Capitaux propres — relevé du $(date -u +%F)"
             git push
           fi
+
+      - name: Remonter les extraits de diagnostic
+        if: ${{ github.event.inputs.diagnostic == 'oui' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapports-non-exploites
+          path: donnees/diagnostic/
+          if-no-files-found: ignore
 
       - name: Conserver la trace en cas d'échec
         if: failure()
