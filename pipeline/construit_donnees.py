@@ -25,6 +25,10 @@ SORTIE = os.path.join("docs", "data_brvm.json")
 # tous les écarts calculés pour ses voisins. On le reporte avec son dernier cours
 # connu, volume nul, tant que cette cotation n'est pas trop ancienne.
 REPORT_MAX_JOURS = 30
+# Registre durable de la cote : dernière ligne connue pour chaque symbole. Il ne
+# peut pas être déduit de la construction précédente — un titre absent en aurait
+# déjà disparu. Il est tenu à jour à chaque séance et sert de filet.
+REGISTRE = os.path.join("donnees", "cote_reference.json")
 SECTEURS = {"TEL": "Télécommunications", "FIN": "Services financiers",
             "CD": "Consommation discrétionnaire", "CB": "Consommation de base",
             "IND": "Industriels", "ENE": "Énergie", "SPU": "Services publics"}
@@ -58,43 +62,58 @@ def fonds_propres():
     return table
 
 
-def reporter_absents(lignes, seance):
-    """Réintègre les titres cotés précédemment mais absents du bulletin du jour."""
-    if not os.path.exists(SORTIE) or not seance:
-        return lignes, []
-    try:
-        ancien = json.load(open(SORTIE, encoding="utf-8"))
-    except (ValueError, OSError):
-        return lignes, []
+def lire_registre():
+    if os.path.exists(REGISTRE):
+        try:
+            return json.load(open(REGISTRE, encoding="utf-8"))
+        except (ValueError, OSError):
+            print(f"  {REGISTRE} illisible : il sera reconstruit.")
+    return {}
 
-    presents = {r["sym"] for r in lignes}
+
+def completer_bulletin(valeurs, seance):
+    """Ajoute les titres du registre absents du bulletin, au dernier cours connu."""
+    if not seance:
+        return valeurs, []
+    registre = lire_registre()
+    presents = {v["symbole"] for v in valeurs}
     jour = date.fromisoformat(seance)
-    reportes, perimes = [], []
+    reportes = []
 
-    for a in ancien.get("rows", []):
-        if a["sym"] in presents:
+    for sym, e in sorted(registre.items()):
+        if sym in presents or not e.get("seance"):
             continue
-        derniere = a.get("seance_cotation") or (ancien.get("meta") or {}).get("boc_seance")
-        if not derniere:
+        age = (jour - date.fromisoformat(e["seance"])).days
+        if age <= 0:
             continue
-        age = (jour - date.fromisoformat(derniere)).days
         if age > REPORT_MAX_JOURS:
-            perimes.append((a["sym"], age))
+            print(f"  retiré : {sym} sans cotation depuis {age} jours "
+                  f"(seuil {REPORT_MAX_JOURS}) — sortie de cote probable")
             continue
-        r = dict(a)
-        r["varJ"], r["vol"], r["val"] = None, 0, 0
-        r["seance_cotation"], r["hors_seance"] = derniere, age
-        r.setdefault("motifs", {})["varJ"] = (
-            f"titre non coté lors de la séance du {seance} — "
-            f"cours de clôture du {derniere} conservé, {age} j")
-        r["flags"] = [f["flags"] for f in [a]][0] + [
-            f"Non coté depuis le {derniere} ({age} j) — cours et ratios inchangés, volume nul"]
-        lignes.append(r)
-        reportes.append((a["sym"], derniere, age))
+        v = {k: val for k, val in e.items() if k != "seance"}
+        v.update(volume=0, valeur=0, variation_jour=None,
+                 cours_precedent=e.get("cloture"), ouverture=None,
+                 _seance=e["seance"], _age=age)
+        valeurs.append(v)
+        reportes.append((sym, e["seance"], age))
+    return valeurs, reportes
 
-    for sym, age in perimes:
-        print(f"  retiré : {sym} sans cotation depuis {age} jours (seuil {REPORT_MAX_JOURS})")
-    return lignes, reportes
+
+def ecrire_registre(valeurs, seance):
+    """Mémorise la dernière cotation réelle de chaque titre. Les lignes reportées
+    ne rafraîchissent rien : leur date d'origine doit continuer de vieillir."""
+    registre = lire_registre()
+    for v in valeurs:
+        if v.get("variation_jour") is None:
+            continue
+        e = {k: val for k, val in v.items()
+             if k not in ("volume", "valeur", "_seance", "_age")}
+        e["seance"] = seance
+        registre[v["symbole"]] = e
+    os.makedirs(os.path.dirname(REGISTRE) or ".", exist_ok=True)
+    json.dump(registre, open(REGISTRE, "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1, sort_keys=True)
+    return len(registre)
 
 
 def stats(vals):
@@ -125,8 +144,10 @@ def main():
     if not boc:
         raise SystemExit("donnees/boc.json manquant : lancer collecte_boc.py d'abord.")
 
+    valeurs, reportes = completer_bulletin(list(boc["valeurs"]), boc.get("seance"))
+
     lignes = []
-    for v in boc["valeurs"]:
+    for v in valeurs:
         sym = v["symbole"]
         s = sika["valeurs"].get(sym, {}) or {}
         perf = s.get("perf") or {}
@@ -200,13 +221,17 @@ def main():
             motifs["rdt"] = ("aucun dividende récent" if not r["divISO"]
                              else "rendement non publié au BOC")
 
-        r["seance_cotation"] = boc.get("seance")
-        r["hors_seance"] = 0
+        r["seance_cotation"] = v.get("_seance") or boc.get("seance")
+        r["hors_seance"] = v.get("_age", 0)
+        if r["hors_seance"]:
+            motifs["varJ"] = (f"titre non coté lors de la séance du {boc.get('seance')} — "
+                              f"clôture du {r['seance_cotation']} conservée, {r['hors_seance']} j")
         r["motifs"] = motifs
         r["flags"] = signalements(r)
+        if r["hors_seance"]:
+            r["flags"].insert(0, f"Non coté depuis le {r['seance_cotation']} "
+                                 f"({r['hors_seance']} j) — cours et ratios inchangés, volume nul")
         lignes.append(r)
-
-    lignes, reportes = reporter_absents(lignes, boc.get("seance"))
 
     # --- repères sectoriels et de marché
     bench = {"MARCHE": {m: stats([x[m] for x in lignes]) for m in METRIQUES}}
@@ -230,6 +255,9 @@ def main():
                     for c in ("per", "rdt", "bnpa", "ca", "rn", "croiRN", "roe", "peg",
                               "v1s", "v1m", "ytd", "v1an", "v3a", "v5a")},
         total=len(lignes))
+
+    n_reg = ecrire_registre(boc["valeurs"], boc.get("seance"))
+    print(f"{REGISTRE} : {n_reg} titres au registre de la cote")
 
     os.makedirs(os.path.dirname(SORTIE) or ".", exist_ok=True)
     json.dump(dict(meta=meta, bench=bench, rows=lignes),
