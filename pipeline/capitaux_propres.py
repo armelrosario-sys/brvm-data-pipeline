@@ -132,6 +132,15 @@ Capitaux propres 1 274
     return ok
 
 
+def recule_de_mois(jour, mois):
+    """Même quantième, `mois` mois plus tôt, en bornant les fins de mois."""
+    total = jour.year * 12 + (jour.month - 1) - mois
+    an, m = divmod(total, 12)
+    dernier = [31, 29 if an % 4 == 0 and (an % 100 or an % 400 == 0) else 28,
+               31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m]
+    return date(an, m + 1, min(jour.day, dernier))
+
+
 def deja_saisi():
     """Lignes renseignées à la main : elles ne sont jamais écrasées."""
     garde = {}
@@ -162,7 +171,8 @@ def main():
         lignes = [l for l in csv.DictReader(f) if (l.get("url_pdf") or "").strip()]
 
     # un seul rapport par titre : le plus récent, dans la fenêtre demandée
-    limite = date.today().replace(year=date.today().year - (a.mois // 12)) if a.mois >= 12 else date.today()
+    limite = recule_de_mois(date.today(), a.mois)
+    print(f"Rapports retenus à partir du {limite.isoformat()}")
     recents = {}
     for l in lignes:
         t = (l.get("ticker") or "").strip().upper()
