@@ -250,6 +250,28 @@ def totaux(txt):
 BLOQUANTS = ("volume", "valeur", "titres", "variation_jour_recalculee")
 
 
+def indices(txt):
+    """Niveaux et variations des trois indices, lus en tête de première page.
+
+    Les trois blocs sont côte à côte sur la même ligne : on lit donc les
+    occurrences dans l'ordre COMPOSITE, 30, PRESTIGE."""
+    def suite(motif, n):
+        m = re.search(motif, txt)
+        if not m:
+            return [None] * n
+        # l'espace ne sépare les milliers que suivi de trois chiffres, sinon le
+        # « 30 » du libellé « BRVM 30 » se collerait au niveau qui suit
+        vals = re.findall(r"-?\d{1,3}(?:[ \u00a0\u202f]\d{3})*,\d+", m.group(0))
+        return [nombre(v) for v in (vals + [None] * n)[:n]]
+
+    niveaux = suite(r"BRVM COMPOSITE.*", 3)
+    jour = suite(r"Variation Jour.*", 3)
+    annuel = suite(r"Variation annuelle.*", 3)
+    noms = ["composite", "brvm30", "prestige"]
+    return {noms[i]: dict(niveau=niveaux[i], variation_jour=jour[i],
+                          variation_annuelle=annuel[i]) for i in range(3)}
+
+
 def controle(valeurs, tot):
     """Réconcilie les lignes extraites avec la page de synthèse du bulletin."""
     calc = dict(volume=sum(v["volume"] for v in valeurs),
@@ -294,9 +316,13 @@ def main():
     numero, jour_iso = entete(txt)
     valeurs = lignes_actions(txt)
     tot = totaux(txt)
+    idx = indices(txt)
     rapport, ok = controle(valeurs, tot)
 
     print(f"BOC n° {numero} — séance du {jour_iso} — {len(valeurs)} valeurs extraites")
+    for nom, v in idx.items():
+        print(f"  indice {nom:10s} {v['niveau']}  jour {v['variation_jour']} %  "
+              f"annuel {v['variation_annuelle']} %")
     for r in rapport:
         if r["concorde"]:
             marque = "OK   "
@@ -313,7 +339,8 @@ def main():
 
     os.makedirs(os.path.dirname(a.sortie) or ".", exist_ok=True)
     json.dump(dict(numero=numero, seance=jour_iso, source="brvm.org",
-                   synthese=tot, controles=rapport, reconcilie=ok, valeurs=valeurs),
+                   synthese=tot, indices=idx, controles=rapport, reconcilie=ok,
+                   valeurs=valeurs),
               open(a.sortie, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(f"\n{a.sortie} écrit.")
     if tmp:
