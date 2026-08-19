@@ -26,9 +26,15 @@ INDEX = os.path.join("collecte", "notations_financieres.csv")
 SORTIE = os.path.join("donnees", "fonds_propres.csv")
 PAUSE = 1.5
 ENTETES = ["symbole", "exercice", "fonds_propres", "source", "agence",
-           "date_rapport", "statut", "releve_le"]
+           "date_rapport", "statut", "methode", "releve_le"]
 
 # « En millions de francs CFA 2023 2024 » — donne l'unité et les exercices colonnés
+# Capitalisation de toute la cote : environ 18 900 milliards FCFA. Les capitaux
+# propres d'une seule société ne peuvent en approcher le tiers. Au-delà, c'est
+# une fusion de colonnes mal découpée, pas un montant.
+PLAFOND_M_FCFA = 5_000_000
+PLANCHER_M_FCFA = 10
+
 DEVISE = r"(?:F\s?)?CFA|XOF"        # « FCFA », « F CFA » ou « francs CFA »
 RE_UNITE = re.compile(
     r"en\s+millions?\s+de\s+(?:francs?\s+)?(?:" + DEVISE + r")\s*"
@@ -100,6 +106,10 @@ def valeurs_de_ligne(ligne, annees):
     return None
 
 
+def vraisemblable(v):
+    return v is not None and PLANCHER_M_FCFA <= abs(v) <= PLAFOND_M_FCFA
+
+
 def extrait(texte):
     """Capitaux propres du dernier exercice publié, en millions de FCFA."""
     lignes = texte.split("\n")
@@ -120,22 +130,27 @@ def extrait(texte):
         candidats = [e for e in entetes if e[0] <= i]
         annees = candidats[-1][2] if candidats else []
 
-        if not annees:                                       # tableau sans en-tête lisible
-            vals = [nombre(x) for x in RE_MONTANT.findall(m.group(1))]
-            vals = [v for v in vals if v is not None]
-            if len(vals) == 1:
-                return dict(fonds_propres=vals[0] * facteur, exercice="",
-                            unite="millions" if facteur == 1 else "milliards convertis",
-                            colonnes=1)
-            continue
+        vals = valeurs_de_ligne(l, annees) if annees else None
+        if vals is not None and vraisemblable(vals[-1] * facteur):
+            return resultat(vals[-1], facteur, annees[-1][0], len(vals), "colonnes")
 
-        vals = valeurs_de_ligne(l, annees)
-        if vals is None:
+        # Repli réservé aux tableaux sans en-tête de millésimes : on retient le
+        # dernier nombre de la ligne, le plus récent par convention, sous réserve
+        # d'un ordre de grandeur crédible. Lorsque des millésimes existent mais
+        # que le découpage échoue, on renonce : rien ne dit à quelle colonne
+        # rattacher la valeur.
+        if annees:
             continue
-        return dict(fonds_propres=vals[-1] * facteur, exercice=annees[-1][0],
-                    unite="millions" if facteur == 1 else "milliards convertis",
-                    colonnes=len(vals))
+        bruts = [v for v in (nombre(x) for x in RE_MONTANT.findall(m.group(1))) if v is not None]
+        if bruts and vraisemblable(bruts[-1] * facteur):
+            return resultat(bruts[-1], facteur, "", len(bruts), "sans en-tête")
     return None
+
+
+def resultat(valeur, facteur, exercice, colonnes, methode):
+    return dict(fonds_propres=valeur * facteur, exercice=exercice, colonnes=colonnes,
+                unite="millions" if facteur == 1 else "milliards convertis",
+                methode=methode)
 
 
 def texte_pdf(octets):
@@ -297,9 +312,10 @@ def main():
             trouves[t] = dict(symbole=t, exercice=res["exercice"],
                               fonds_propres=res["fonds_propres"], source=l["url_pdf"],
                               agence=l.get("agence", ""), date_rapport=l["date_annonce"],
-                              statut="notation", releve_le=date.today().isoformat())
-            print(f"[{i:2}/{len(recents)}] {t:6s} {res['fonds_propres']:>14,.0f} M FCFA "
-                  f"({res['exercice'] or 'exercice non lu'}, {res['colonnes']} colonne(s))"
+                              statut="notation", methode=res.get("methode", ""),
+                              releve_le=date.today().isoformat())
+            libelle = f"({res['exercice'] or 'exercice non lu'}, {res['methode']})"
+            print(f"[{i:2}/{len(recents)}] {t:6s} {res['fonds_propres']:>14,.0f} M FCFA {libelle}"
                   .replace(",", " "))
         except Exception as e:
             echecs.append(f"{t} : {e}")
