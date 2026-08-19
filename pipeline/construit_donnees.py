@@ -269,7 +269,9 @@ def main():
         boc_numero=boc.get("numero"), boc_seance=boc.get("seance"),
         boc_reconcilie=boc.get("reconcilie"), boc_controles=boc.get("controles"),
         indices=boc.get("indices") or {}, synthese=boc.get("synthese") or {},
-        sika_releve=sika.get("releve_le"), sika_exercice=sika.get("exercice"),
+        sika_perf=sika.get("releve_perf") or sika.get("releve_le"),
+        sika_fond=sika.get("releve_fondamentaux") or sika.get("releve_le"),
+        sika_exercice=sika.get("exercice"),
         construit_le=date.today().isoformat(),
         hors_seance=[dict(symbole=s, derniere_cotation=d, jours=j) for s, d, j in reportes],
         couverture={c: sum(1 for r in lignes if r[c] is not None)
