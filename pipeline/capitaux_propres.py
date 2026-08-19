@@ -58,27 +58,84 @@ def nombre(t):
     return -v if negatif else v
 
 
+def colonnes_annees(ligne):
+    """Position de chaque millésime dans la ligne d'en-tête du tableau."""
+    return [(m.group(0), m.start(), m.end())
+            for m in re.finditer(r"(?:19|20)\d{2}", ligne)]
+
+
+def decouper_sur_colonnes(ligne, annees):
+    """Découpe une ligne de tableau aux frontières des colonnes de l'en-tête.
+
+    Indispensable car pdftotext sépare parfois deux colonnes par une simple
+    espace : « 178 208 199 352 » se lirait alors comme un unique 178 208 199 352,
+    l'espace étant aussi le séparateur de milliers en français.
+    """
+    bornes = []
+    for i in range(1, len(annees)):
+        bornes.append((annees[i - 1][2] + annees[i][1]) // 2)
+    segments, debut = [], 0
+    for b in bornes:
+        segments.append(ligne[debut:b])
+        debut = b
+    segments.append(ligne[debut:])
+    return segments
+
+
+def valeurs_de_ligne(ligne, annees):
+    """Un nombre par exercice, par lecture directe puis par découpe en colonnes."""
+    directe = [nombre(x) for x in RE_MONTANT.findall(ligne)]
+    directe = [v for v in directe if v is not None]
+    if len(directe) == len(annees):
+        return directe
+    par_colonne = []
+    for seg in decouper_sur_colonnes(ligne, annees):
+        m = RE_MONTANT.search(seg)          # le premier nombre de la colonne ;
+        if m:                               # le reste peut venir du texte voisin
+            v = nombre(m.group(0))
+            if v is not None:
+                par_colonne.append(v)
+    if len(par_colonne) == len(annees):
+        return par_colonne
+    return None
+
+
 def extrait(texte):
     """Capitaux propres du dernier exercice publié, en millions de FCFA."""
-    m_cap = RE_CAPITAUX.search(texte)
-    if not m_cap:
-        return None
-    valeurs = [v for v in (nombre(x) for x in RE_MONTANT.findall(m_cap.group(1))) if v is not None]
-    if not valeurs:
-        return None
-
-    m_u = RE_UNITE.search(texte)
-    annees = re.findall(r"(?:19|20)\d{2}", m_u.group(1)) if m_u else []
+    lignes = texte.split("\n")
     facteur = 1000 if RE_MILLIARDS.search(texte) else 1      # tout ramené en millions
 
-    # Une colonne par exercice. Si le compte ne tombe pas juste, la mise en page a
-    # été mal découpée : on renonce plutôt que de retenir un montant douteux.
-    if annees and len(valeurs) != len(annees):
-        return None
-    exercice = annees[-1] if annees else ""
-    return dict(fonds_propres=valeurs[-1] * facteur, exercice=exercice,
-                unite="millions" if facteur == 1 else "milliards convertis",
-                colonnes=len(valeurs))
+    entetes = []                                             # (indice, millésimes)
+    for i, l in enumerate(lignes):
+        if RE_UNITE.search(l):
+            a = colonnes_annees(l)
+            if a:
+                entetes.append((i, l, a))
+
+    for i, l in enumerate(lignes):
+        m = RE_CAPITAUX.search(l)
+        if not m:
+            continue
+        # l'en-tête de millésimes le plus proche au-dessus de la ligne
+        candidats = [e for e in entetes if e[0] <= i]
+        annees = candidats[-1][2] if candidats else []
+
+        if not annees:                                       # tableau sans en-tête lisible
+            vals = [nombre(x) for x in RE_MONTANT.findall(m.group(1))]
+            vals = [v for v in vals if v is not None]
+            if len(vals) == 1:
+                return dict(fonds_propres=vals[0] * facteur, exercice="",
+                            unite="millions" if facteur == 1 else "milliards convertis",
+                            colonnes=1)
+            continue
+
+        vals = valeurs_de_ligne(l, annees)
+        if vals is None:
+            continue
+        return dict(fonds_propres=vals[-1] * facteur, exercice=annees[-1][0],
+                    unite="millions" if facteur == 1 else "milliards convertis",
+                    colonnes=len(vals))
+    return None
 
 
 def texte_pdf(octets):
@@ -113,6 +170,14 @@ Capitaux propres    (8 420) (10 659)
 Informations financières de base En millions de FCFA 2025
 Capitaux propres 1 274 638
 """, 1274638.0, "2025"),
+        ("colonnes fusionnées par pdftotext (Ecobank CI, Bloomfield)", """
+Données financières de base
+         En millions de francs CFA        2023      2024
+Total Bilan                             1 953 299 2 050 681
+Dettes à l'égard de la clientèle        1 450 927 1 412 512
+Capitaux propres                         178 208 199 352          La notation est basée sur
+Résultat net                              48 071    57 477
+""", 199352.0, "2024"),
         ("intitulé bancaire « Fonds propres part du groupe »", """
 Informations financières de base
 En millions de FCFA            2023      2024
