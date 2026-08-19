@@ -209,9 +209,13 @@ def main():
                              + " — le ROE n'a pas de signification")
         elif e and r["rn"] is not None:
             r["roe"] = round(r["rn"] / e["montant"] * 100, 2)
-            r["roe_src"] = (f"résultat net {ch.get('exercice') or '?'} rapporté aux capitaux propres "
-                            f"{e['exercice'] or 'd\'exercice non identifié'} — "
-                            f"{e['source'] or 'saisie manuelle'}")
+            # Pas de contre-oblique dans une expression de f-string : Python 3.11
+            # la refuse, et les runners GitHub Actions tournent en 3.11.
+            ex_cp = e["exercice"] or "d'exercice non identifié"
+            ex_rn = ch.get("exercice") or "?"
+            origine = e["source"] or "saisie manuelle"
+            r["roe_src"] = (f"résultat net {ex_rn} rapporté aux capitaux propres "
+                            f"{ex_cp} — {origine}")
             if not e["exercice"]:
                 motifs["roe_reserve"] = "exercice des capitaux propres non identifié dans le rapport"
         else:
