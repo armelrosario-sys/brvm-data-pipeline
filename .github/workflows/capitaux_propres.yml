@@ -12,13 +12,17 @@ on:
         required: false
         default: '18'
       test_seul:
-        description: "Rejouer l'analyseur sans rien télécharger (oui / non)"
-        required: false
-        default: 'non'
+        description: "Rejouer l'analyseur seul, sans rien télécharger"
+        type: choice
+        required: true
+        default: non
+        options: [non, oui]
       diagnostic:
-        description: "Conserver le texte des rapports non exploités (oui / non)"
-        required: false
-        default: 'non'
+        description: "Conserver le texte des rapports non exploités"
+        type: choice
+        required: true
+        default: oui
+        options: [oui, non]
 
 permissions:
   contents: write
