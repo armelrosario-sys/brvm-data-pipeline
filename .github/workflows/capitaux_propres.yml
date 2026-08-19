@@ -42,6 +42,9 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
           pip install requests
 
+      - name: Vérifier la compatibilité Python 3.11 des scripts
+        run: python pipeline/lint_fstring.py pipeline/*.py
+
       - name: Vérifier l'index des notations
         run: |
           if [ ! -f collecte/notations_financieres.csv ]; then
@@ -79,7 +82,7 @@ jobs:
           fi
 
       - name: Remonter les extraits de diagnostic
-        if: ${{ github.event.inputs.diagnostic == 'oui' }}
+        if: ${{ always() && github.event.inputs.diagnostic == 'oui' }}
         uses: actions/upload-artifact@v4
         with:
           name: rapports-non-exploites
