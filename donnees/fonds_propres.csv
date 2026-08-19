@@ -1,19 +1,26 @@
 symbole;exercice;fonds_propres;source;agence;date_rapport;statut;releve_le
-BNBC;2024;17748.0;https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_bernabe_ci.pdf;Bloomfield Investment Corporation;2025-08-22;notation;2026-08-15
-CIEC;2024;32915.0;https://www.brvm.org/sites/default/files/20260108_-_notation_financiere_-_cie_ci.pdf;Bloomfield Investment Corporation;2026-01-08;notation;2026-08-15
-LNBB;2024;23615.0;https://www.brvm.org/sites/default/files/20250828_-_notation_financiere_-_lnb_bn.pdf;Bloomfield Investment Corporation;2025-08-28;notation;2026-08-15
-NEIC;;3718.0;https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_nei_ceda_ci.pdf;Bloomfield Investment Corporation;2026-03-03;notation;2026-08-15
-NSBC;2024;215330.0;https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_nsia_banque_ci.pdf;Bloomfield Investment Corporation;2025-10-28;notation;2026-08-15
-NTLC;2024;29259.0;https://www.brvm.org/sites/default/files/20260605_-_notation_financiere_-_nestle_ci.pdf;Bloomfield Investment Corporation;2026-06-07;notation;2026-08-15
-ORAC;2024;508331.0;https://www.brvm.org/sites/default/files/20260202_-_notation_financiere_-_orange_ci.pdf;Bloomfield Investment Corporation;2026-02-02;notation;2026-08-15
-ORGT;;129324.0;https://www.brvm.org/sites/default/files/fiche_de_notation_-_oragroup_sa_-_2025.pdf;Bloomfield Investment Corporation;2026-05-05;notation;2026-08-15
-PALC;;135061.0;https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_palm_ci.pdf;;2025-08-22;notation;2026-08-15
-SDCC;;18591.0;https://www.brvm.org/sites/default/files/20260127_-_notation_financiere_-_sode_ci.pdf;Bloomfield Investment Corporation;2026-01-27;notation;2026-08-15
-SDSC;2024;77808.0;https://www.brvm.org/sites/default/files/20260623_-_notation_financiere_-_africa_global_logistics_ci.pdf;Bloomfield Investment Corporation;2026-06-24;notation;2026-08-15
-SEMC;;13049.0;https://www.brvm.org/sites/default/files/20250415_-_notation_financiere_-_eviosys_packaging_siem_ci.pdf;;2025-04-15;notation;2026-08-15
-SGBC;2024;451721.0;https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_societe_generale_ci.pdf;Bloomfield Investment Corporation;2025-09-15;notation;2026-08-15
-SIBC;2024;187136.0;https://www.brvm.org/sites/default/files/20260421_-_notation_financiere_-_sib_ci.pdf;Bloomfield Investment Corporation;2026-04-22;notation;2026-08-15
-SIVC;;3272.0;https://www.brvm.org/sites/default/files/fiche_de_notation-_erium_ci_-_2025.pdf;Bloomfield Investment Corporation;2026-05-05;notation;2026-08-15
-SMBC;;35294.0;https://www.brvm.org/sites/default/files/20251209_-_notation_financiere_-_smb_ci.pdf;Bloomfield Investment Corporation;2025-12-09;notation;2026-08-15
-STBC;2024;51825.0;https://www.brvm.org/sites/default/files/fiche_de_notation_-_sitab_2025.pdf;Bloomfield Investment Corporation;2026-05-05;notation;2026-08-15
-UNLC;2023;-10659.0;https://www.brvm.org/sites/default/files/20250415_-_notation_financiere_-_unilever_ci.pdf;;2025-04-15;notation;2026-08-15
+BNBC;2024;17748.0;https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_bernabe_ci.pdf;Bloomfield Investment Corporation;2025-08-22;notation;2026-08-19
+BOAB;2024;117396.0;https://www.brvm.org/sites/default/files/20250723_-_notation_financiere_-_boa_benin.pdf;;2025-07-23;notation;2026-08-19
+BOAC;2025;127340.0;https://www.brvm.org/sites/default/files/20260703_-_notation_financiere_-_boa_ci.pdf;Bloomfield Investment Corporation;2026-07-05;notation;2026-08-19
+BOAM;2024;46195.0;https://www.brvm.org/sites/default/files/20250723_-_notation_financiere_-_boa_mali.pdf;;2025-07-23;notation;2026-08-19
+BOAN;2024;37154.0;https://www.brvm.org/sites/default/files/20251117_-_notation_financiere_-_boa_ng.pdf;Bloomfield Investment Corporation;2025-11-18;notation;2026-08-19
+BOAS;;88621.0;https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_boa_sn.pdf;Bloomfield Investment Corporation;2025-10-23;notation;2026-08-19
+CBIBF;2024;239797.0;https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_coris_bank_international_bf.pdf;Bloomfield Investment Corporation;2025-09-15;notation;2026-08-19
+CIEC;2024;32915.0;https://www.brvm.org/sites/default/files/20260108_-_notation_financiere_-_cie_ci.pdf;Bloomfield Investment Corporation;2026-01-08;notation;2026-08-19
+LNBB;2024;23615.0;https://www.brvm.org/sites/default/files/20250828_-_notation_financiere_-_lnb_bn.pdf;Bloomfield Investment Corporation;2025-08-28;notation;2026-08-19
+NEIC;;3718.0;https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_nei_ceda_ci.pdf;Bloomfield Investment Corporation;2026-03-03;notation;2026-08-19
+NSBC;2024;215330.0;https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_nsia_banque_ci.pdf;Bloomfield Investment Corporation;2025-10-28;notation;2026-08-19
+NTLC;2024;29259.0;https://www.brvm.org/sites/default/files/20260605_-_notation_financiere_-_nestle_ci.pdf;Bloomfield Investment Corporation;2026-06-07;notation;2026-08-19
+ORAC;2024;508331.0;https://www.brvm.org/sites/default/files/20260202_-_notation_financiere_-_orange_ci.pdf;Bloomfield Investment Corporation;2026-02-02;notation;2026-08-19
+ORGT;;129324.0;https://www.brvm.org/sites/default/files/fiche_de_notation_-_oragroup_sa_-_2025.pdf;Bloomfield Investment Corporation;2026-05-05;notation;2026-08-19
+PALC;;135061.0;https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_palm_ci.pdf;;2025-08-22;notation;2026-08-19
+SAFC;2024;5215.0;https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_safca_ci.pdf;Bloomfield Investment Corporation;2026-03-03;notation;2026-08-19
+SDCC;;18591.0;https://www.brvm.org/sites/default/files/20260127_-_notation_financiere_-_sode_ci.pdf;Bloomfield Investment Corporation;2026-01-27;notation;2026-08-19
+SDSC;2024;77808.0;https://www.brvm.org/sites/default/files/20260623_-_notation_financiere_-_africa_global_logistics_ci.pdf;Bloomfield Investment Corporation;2026-06-24;notation;2026-08-19
+SEMC;;13049.0;https://www.brvm.org/sites/default/files/20250415_-_notation_financiere_-_eviosys_packaging_siem_ci.pdf;;2025-04-15;notation;2026-08-19
+SGBC;2024;451721.0;https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_societe_generale_ci.pdf;Bloomfield Investment Corporation;2025-09-15;notation;2026-08-19
+SIBC;2024;187136.0;https://www.brvm.org/sites/default/files/20260421_-_notation_financiere_-_sib_ci.pdf;Bloomfield Investment Corporation;2026-04-22;notation;2026-08-19
+SIVC;;3272.0;https://www.brvm.org/sites/default/files/fiche_de_notation-_erium_ci_-_2025.pdf;Bloomfield Investment Corporation;2026-05-05;notation;2026-08-19
+SMBC;;35294.0;https://www.brvm.org/sites/default/files/20251209_-_notation_financiere_-_smb_ci.pdf;Bloomfield Investment Corporation;2025-12-09;notation;2026-08-19
+STBC;2024;51825.0;https://www.brvm.org/sites/default/files/fiche_de_notation_-_sitab_2025.pdf;Bloomfield Investment Corporation;2026-05-05;notation;2026-08-19
+UNLC;2023;-10659.0;https://www.brvm.org/sites/default/files/20250415_-_notation_financiere_-_unilever_ci.pdf;;2025-04-15;notation;2026-08-19
