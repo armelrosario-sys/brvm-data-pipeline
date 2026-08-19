@@ -1,0 +1,93 @@
+name: Sikafinance
+
+on:
+  schedule:
+    # Performances : chaque jour ouvré à 18h30 UTC, une demi-heure après le BOC,
+    # pour que les horizons 1S à 5A soient alignés sur la cote affichée à côté.
+    - cron: '30 18 * * 1-5'
+    # Fondamentaux : le 3 de chaque mois. Les comptes ne sont publiés qu'une à
+    # deux fois par an ; interroger 47 fiches société chaque semaine ne sert à rien.
+    - cron: '0 4 3 * *'
+  workflow_dispatch:
+    inputs:
+      volet:
+        description: "Volet à collecter : perf, fondamentaux ou tout"
+        required: false
+        default: 'tout'
+        type: choice
+        options: [perf, fondamentaux, tout]
+      symboles:
+        description: "Symboles à collecter, séparés par un espace (vide = les 47)"
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: donnees-brvm
+  cancel-in-progress: false
+
+jobs:
+  collecte:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dépendances
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          pip install requests beautifulsoup4
+
+      - name: Vérifier la compatibilité Python 3.11 des scripts
+        run: python pipeline/lint_fstring.py pipeline/*.py
+
+      - name: Déterminer le volet
+        id: volet
+        run: |
+          case "${{ github.event.schedule }}" in
+            "30 18 * * 1-5") V=perf ;;
+            "0 4 3 * *")     V=fondamentaux ;;
+            *)               V="${{ github.event.inputs.volet || 'tout' }}" ;;
+          esac
+          echo "valeur=$V" >> "$GITHUB_OUTPUT"
+          echo "Volet retenu : $V"
+
+      - name: S'assurer qu'un bulletin est disponible
+        run: |
+          if [ ! -f donnees/boc.json ]; then
+            echo "Aucune collecte BOC préalable : on récupère le dernier bulletin publié."
+            python pipeline/collecte_boc.py
+          fi
+
+      - name: Collecter
+        run: |
+          python pipeline/collecte_sikafinance.py \
+            --volet ${{ steps.volet.outputs.valeur }} ${{ github.event.inputs.symboles }}
+
+      - name: Reconstruire le fichier de données
+        run: python pipeline/construit_donnees.py
+
+      - name: Publier si le contenu a changé
+        run: |
+          git config user.name  "pipeline-brvm"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/sikafinance.json donnees/boc.json donnees/cote_reference.json docs/data_brvm.json
+          if git diff --cached --quiet; then
+            echo "Aucun changement."
+          else
+            git commit -m "Sikafinance ${{ steps.volet.outputs.valeur }} — $(date -u +%F)"
+            git push
+          fi
+
+      - name: Conserver la trace en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostic-sikafinance
+          path: donnees/
+          if-no-files-found: ignore
