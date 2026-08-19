@@ -56,7 +56,8 @@ def fonds_propres():
                 try:
                     table[ligne["symbole"].strip().upper()] = {
                         "montant": float(v), "exercice": (ligne.get("exercice") or "").strip(),
-                        "source": (ligne.get("source") or "").strip()}
+                        "source": (ligne.get("source") or "").strip(),
+                        "methode": (ligne.get("methode") or "").strip()}
                 except ValueError:
                     pass
     return table
@@ -214,8 +215,11 @@ def main():
             ex_cp = e["exercice"] or "d'exercice non identifié"
             ex_rn = ch.get("exercice") or "?"
             origine = e["source"] or "saisie manuelle"
+            reserve = ""
+            if e.get("methode") == "sans en-tête":
+                reserve = " — millésime des capitaux propres non confirmé dans le rapport"
             r["roe_src"] = (f"résultat net {ex_rn} rapporté aux capitaux propres "
-                            f"{ex_cp} — {origine}")
+                            f"{ex_cp} — {origine}{reserve}")
             if not e["exercice"]:
                 motifs["roe_reserve"] = "exercice des capitaux propres non identifié dans le rapport"
         else:
@@ -264,6 +268,7 @@ def main():
     meta = dict(
         boc_numero=boc.get("numero"), boc_seance=boc.get("seance"),
         boc_reconcilie=boc.get("reconcilie"), boc_controles=boc.get("controles"),
+        indices=boc.get("indices") or {}, synthese=boc.get("synthese") or {},
         sika_releve=sika.get("releve_le"), sika_exercice=sika.get("exercice"),
         construit_le=date.today().isoformat(),
         hors_seance=[dict(symbole=s, derniere_cotation=d, jours=j) for s, d, j in reportes],
