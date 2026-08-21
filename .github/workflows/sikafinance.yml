@@ -4,7 +4,7 @@ on:
   schedule:
     # Performances : chaque jour ouvré à 18h30 UTC, une demi-heure après le BOC,
     # pour que les horizons 1S à 5A soient alignés sur la cote affichée à côté.
-    - cron: '30 18 * * 1-5'
+    - cron: '30 21 * * 1-5'
     # Fondamentaux : le 3 de chaque mois. Les comptes ne sont publiés qu'une à
     # deux fois par an ; interroger 47 fiches société chaque semaine ne sert à rien.
     - cron: '0 4 3 * *'
@@ -50,7 +50,7 @@ jobs:
         id: volet
         run: |
           case "${{ github.event.schedule }}" in
-            "30 18 * * 1-5") V=perf ;;
+            "30 21 * * 1-5") V=perf ;;
             "0 4 3 * *")     V=fondamentaux ;;
             *)               V="${{ github.event.inputs.volet || 'tout' }}" ;;
           esac
