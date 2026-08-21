@@ -2,12 +2,10 @@
  "releve_le": "2026-08-21",
  "releve_perf": "2026-08-21",
  "releve_fondamentaux": "2026-08-21",
- "dernier_volet": "tout",
+ "dernier_volet": "perf",
  "exercice": "2025",
  "source": "sikafinance.com",
- "echecs": [
-  "TTLS/chiffres : ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
- ],
+ "echecs": [],
  "valeurs": {
   "SDSC": {
    "symbole": "SDSC",
@@ -37,10 +35,10 @@
   "BOAB": {
    "symbole": "BOAB",
    "perf": {
-    "v1s": 14.9,
-    "v1m": 16.1,
+    "v1s": 14.77,
+    "v1m": 16.38,
     "ytd": 70.68,
-    "v1an": 122.38,
+    "v1an": 121.89,
     "v3a": 217.24,
     "v5a": 359.61
    },
@@ -63,10 +61,10 @@
    "symbole": "BOABF",
    "perf": {
     "v1s": 7.04,
-    "v1m": 9.35,
+    "v1m": 5.56,
     "ytd": 102.67,
-    "v1an": 106.52,
-    "v3a": 137.5,
+    "v1an": 108.79,
+    "v3a": 135.66,
     "v5a": 226.88
    },
    "sources": [
@@ -112,11 +110,11 @@
   "BOAM": {
    "symbole": "BOAM",
    "perf": {
-    "v1s": 5.7,
-    "v1m": 13.86,
+    "v1s": 5.53,
+    "v1m": 14.56,
     "ytd": 62.25,
-    "v1an": 85.96,
-    "v3a": 618.45,
+    "v1an": 85.43,
+    "v3a": 595.36,
     "v5a": 459.48
    },
    "sources": [
@@ -237,11 +235,11 @@
   "BICC": {
    "symbole": "BICC",
    "perf": {
-    "v1s": -0.69,
-    "v1m": 2.86,
+    "v1s": 0.45,
+    "v1m": 2.71,
     "ytd": 48.11,
-    "v1an": 76.69,
-    "v3a": 329.85,
+    "v1an": 77.34,
+    "v3a": 350.0,
     "v5a": 366.4
    },
    "sources": [
@@ -262,11 +260,11 @@
   "CFAC": {
    "symbole": "CFAC",
    "perf": {
-    "v1s": 8.75,
-    "v1m": 2.35,
+    "v1s": 4.5,
+    "v1m": 8.41,
     "ytd": 21.68,
-    "v1an": 161.65,
-    "v3a": 82.2,
+    "v1an": 155.88,
+    "v3a": 85.11,
     "v5a": 110.91
    },
    "sources": [
@@ -287,11 +285,11 @@
   "CIEC": {
    "symbole": "CIEC",
    "perf": {
-    "v1s": 26.61,
+    "v1s": 25.11,
     "v1m": 32.95,
     "ytd": 192.37,
     "v1an": 220.93,
-    "v3a": 228.57,
+    "v3a": 229.36,
     "v5a": 219.44
    },
    "sources": [
@@ -387,8 +385,8 @@
   "SIVC": {
    "symbole": "SIVC",
    "perf": {
-    "v1s": -1.66,
-    "v1m": 3.04,
+    "v1s": -2.47,
+    "v1m": 9.72,
     "ytd": 50.0,
     "v1an": 301.69,
     "v3a": 330.91,
@@ -515,8 +513,8 @@
     "v1s": -2.58,
     "v1m": 6.35,
     "ytd": 59.62,
-    "v1an": 39.29,
-    "v3a": 102.62,
+    "v1an": 39.23,
+    "v3a": 102.74,
     "v5a": 345.03
    },
    "sources": [
@@ -613,10 +611,10 @@
    "symbole": "ORAC",
    "perf": {
     "v1s": 16.75,
-    "v1m": 30.12,
+    "v1m": 31.34,
     "ytd": 47.47,
-    "v1an": 41.99,
-    "v3a": 101.87,
+    "v1an": 40.15,
+    "v3a": 96.49,
     "v5a": null
    },
    "sources": [
@@ -637,11 +635,11 @@
   "PALC": {
    "symbole": "PALC",
    "perf": {
-    "v1s": 7.0,
-    "v1m": 10.94,
+    "v1s": 5.65,
+    "v1m": 10.06,
     "ytd": 18.89,
-    "v1an": 5.3,
-    "v3a": 21.13,
+    "v1an": 4.67,
+    "v3a": 20.38,
     "v5a": 118.86
    },
    "sources": [
@@ -712,10 +710,10 @@
   "ABJC": {
    "symbole": "ABJC",
    "perf": {
-    "v1s": 5.02,
-    "v1m": 13.56,
+    "v1s": 5.68,
+    "v1m": 13.18,
     "ytd": 15.52,
-    "v1an": 91.43,
+    "v1an": 85.6,
     "v3a": 149.07,
     "v5a": 138.43
    },
@@ -887,11 +885,11 @@
   "SIBC": {
    "symbole": "SIBC",
    "perf": {
-    "v1s": -1.1,
-    "v1m": 2.21,
+    "v1s": -1.91,
+    "v1m": 1.64,
     "ytd": 56.52,
-    "v1an": 85.57,
-    "v3a": 256.44,
+    "v1an": 87.11,
+    "v3a": 252.94,
     "v5a": 391.13
    },
    "sources": [
@@ -962,11 +960,11 @@
   "SLBC": {
    "symbole": "SLBC",
    "perf": {
-    "v1s": -2.62,
-    "v1m": -5.13,
+    "v1s": -0.66,
+    "v1m": -5.1,
     "ytd": 28.04,
     "v1an": 100.03,
-    "v3a": 371.67,
+    "v3a": 338.79,
     "v5a": 127.7
    },
    "sources": [
