@@ -2,7 +2,7 @@
  "releve_le": "2026-08-21",
  "releve_perf": "2026-08-21",
  "releve_fondamentaux": "2026-08-21",
- "dernier_volet": "perf",
+ "dernier_volet": "tout",
  "exercice": "2025",
  "source": "sikafinance.com",
  "echecs": [],
@@ -1079,7 +1079,8 @@
     "croissance_rn": -13.31,
     "bnpa": 188.69
    },
-   "perf_releve": "2026-08-21"
+   "perf_releve": "2026-08-21",
+   "chiffres_releve": "2026-08-21"
   },
   "PRSC": {
    "symbole": "PRSC",
