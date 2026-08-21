@@ -29,24 +29,16 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
           pip install requests beautifulsoup4
 
+      - name: Vérifier la compatibilité Python 3.11 des scripts
+        run: python pipeline/lint_fstring.py pipeline/*.py
+
       - name: Collecter le bulletin du jour
         run: python pipeline/collecte_boc.py
 
-      - name: Reconstruire le fichier de données
-        run: python pipeline/construit_donnees.py
-
-      - name: Publier si le contenu a changé
+      - name: Publier sur main
         run: |
-          git config user.name  "pipeline-brvm"
-          git config user.email "actions@users.noreply.github.com"
-          git add donnees/boc.json docs/data_brvm.json
-          if git diff --cached --quiet; then
-            echo "Aucun changement : pas de séance ou bulletin identique."
-          else
-            SEANCE=$(python -c "import json;print(json.load(open('donnees/boc.json'))['seance'])")
-            git commit -m "BOC séance du $SEANCE"
-            git push
-          fi
+          SEANCE=$(python -c "import json;print(json.load(open('donnees/boc.json'))['seance'])")
+          bash pipeline/publier.sh "donnees/boc.json" "BOC séance du $SEANCE"
 
       - name: Conserver la trace en cas d'échec
         if: failure()
