@@ -2,9 +2,12 @@ name: BOC quotidien
 
 on:
   schedule:
-    # 18h00 UTC, du lundi au vendredi. La BRVM publie le bulletin en fin de séance ;
-    # l'horaire des exécutions planifiées GitHub dérive souvent de plusieurs minutes.
+    # Deux passages, du lundi au vendredi. La BRVM met parfois plusieurs heures à
+    # publier le bulletin après la clôture : un seul passage à 18h00 ramènerait
+    # systématiquement celui de la veille. Le second rattrape la séance du jour ;
+    # s'il ne trouve rien de neuf, publier.sh sort sans rien committer.
     - cron: '0 18 * * 1-5'
+    - cron: '0 21 * * 1-5'
   workflow_dispatch:
 
 permissions:
