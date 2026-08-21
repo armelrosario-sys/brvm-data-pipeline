@@ -68,30 +68,11 @@ jobs:
             --mois ${{ github.event.inputs.mois || 18 }} \
             ${{ github.event.inputs.diagnostic == 'oui' && '--diagnostic' || '' }}
 
-      - name: Reconstruire le fichier de données
-        if: ${{ github.event.inputs.test_seul != 'oui' }}
-        run: python pipeline/construit_donnees.py
-
-      - name: Publier si le contenu a changé
+      - name: Publier sur main
         if: ${{ github.event.inputs.test_seul != 'oui' }}
         run: |
-          git config user.name  "pipeline-brvm"
-          git config user.email "actions@users.noreply.github.com"
-          git add donnees/fonds_propres.csv donnees/cote_reference.json docs/data_brvm.json
-          if git diff --cached --quiet; then
-            echo "Aucun changement."
-          else
-            git commit -m "Capitaux propres — relevé du $(date -u +%F)"
-            git push
-          fi
-
-      - name: Remonter les extraits de diagnostic
-        if: ${{ always() && github.event.inputs.diagnostic == 'oui' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: rapports-non-exploites
-          path: donnees/diagnostic/
-          if-no-files-found: ignore
+          bash pipeline/publier.sh "donnees/fonds_propres.csv" \
+            "Capitaux propres — relevé du $(date -u +%F)"
 
       - name: Conserver la trace en cas d'échec
         if: failure()
