@@ -69,20 +69,10 @@ jobs:
           python pipeline/collecte_sikafinance.py \
             --volet ${{ steps.volet.outputs.valeur }} ${{ github.event.inputs.symboles }}
 
-      - name: Reconstruire le fichier de données
-        run: python pipeline/construit_donnees.py
-
-      - name: Publier si le contenu a changé
+      - name: Publier sur main
         run: |
-          git config user.name  "pipeline-brvm"
-          git config user.email "actions@users.noreply.github.com"
-          git add donnees/sikafinance.json donnees/boc.json donnees/cote_reference.json docs/data_brvm.json
-          if git diff --cached --quiet; then
-            echo "Aucun changement."
-          else
-            git commit -m "Sikafinance ${{ steps.volet.outputs.valeur }} — $(date -u +%F)"
-            git push
-          fi
+          bash pipeline/publier.sh "donnees/sikafinance.json" \
+            "Sikafinance ${{ steps.volet.outputs.valeur }} — $(date -u +%F)"
 
       - name: Conserver la trace en cas d'échec
         if: failure()
