@@ -28,41 +28,47 @@
    },
    "g": {
     "titre": 1.52,
-    "mediane_secteur": 2.1,
-    "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_secteur": 10.48,
+    "n_secteur": 4,
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 1.69,
     "mediane_secteur": 0.99,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 26.28,
     "mediane_secteur": 23.54,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
-  "grade": "B",
-  "notes": [],
+  "grade": "C",
+  "notes": [
+   "dernier exercice en net recul : la croissance moyenne masque un retournement en cours — profil a reexaminer a la prochaine publication",
+   "croissance non exploitable (rattrapage extreme ou base ecrasee)"
+  ],
   "reserves": [
+   "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 49,
-  "croissance_pctl": 32,
+  "croissance_pctl": 34,
   "reference_axes": "marche (n=36)",
   "g": 1.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
+   "INFLEXION_RECENTE",
    "SERIE_COMPLETEE_N1"
   ],
   "per": 25.82,
@@ -117,25 +123,26 @@
     "titre": null,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.41,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
   "notes": [],
@@ -191,25 +198,26 @@
     "titre": 43.38,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.53,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 30.29,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -254,6 +262,7 @@
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -283,17 +292,7 @@
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",
   "n_secteur": 4,
   "source_fait": "Bulletins officiels de la cote 2025-2026",
-  "notation": {
-   "agence": "Bloomfield Investment Corporation",
-   "note": "A+",
-   "note_precedente": "",
-   "perspective": "stable",
-   "date": "2025-08-22",
-   "validite": "Juillet 2025 a Juin 2026",
-   "marge_nette": "",
-   "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_bernabe_ci.pdf"
-  },
+  "notation": null,
   "contradiction_notation": false
  },
  "BOAB": {
@@ -327,25 +326,26 @@
     "titre": 3.35,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 1.18,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 14.82,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -372,7 +372,17 @@
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
   "source_fait": null,
-  "notation": null,
+  "notation": {
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A+",
+   "note_precedente": "",
+   "perspective": "stable",
+   "date": "2026-08-18",
+   "validite": "juin 2026 a mai 2027",
+   "marge_nette": "",
+   "ca_mds": "",
+   "url": "https://www.brvm.org/sites/default/files/20260818_-_notation_financiere_-_boa_bn.pdf"
+  },
   "contradiction_notation": false
  },
  "BOABF": {
@@ -406,29 +416,34 @@
     "titre": -8.92,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 1.04,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 34.29,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": null,
-  "grade": "B",
-  "notes": [],
+  "grade": "C",
+  "notes": [
+   "dernier exercice en net recul : la croissance moyenne masque un retournement en cours — profil a reexaminer a la prochaine publication",
+   "croissance non exploitable (rattrapage extreme ou base ecrasee)"
+  ],
   "reserves": [
+   "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
@@ -439,6 +454,7 @@
   "g": -8.9,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
+   "INFLEXION_RECENTE",
    "SERIE_COMPLETEE_N1"
   ],
   "per": 13.59,
@@ -449,7 +465,17 @@
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
   "source_fait": null,
-  "notation": null,
+  "notation": {
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A+",
+   "note_precedente": "",
+   "perspective": "stable",
+   "date": "2026-08-26",
+   "validite": "",
+   "marge_nette": "",
+   "ca_mds": "",
+   "url": "https://www.brvm.org/sites/default/files/20260826_-_notation_financiere_-_boa_bf.pdf"
+  },
   "contradiction_notation": false
  },
  "BOAC": {
@@ -483,25 +509,26 @@
     "titre": 20.98,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.76,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 27.92,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": "GROWTH",
   "grade": "A",
   "notes": [],
@@ -566,25 +593,26 @@
     "titre": 44.28,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.76,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -611,7 +639,17 @@
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
   "source_fait": null,
-  "notation": null,
+  "notation": {
+   "agence": "Bloomfield Investment Corporation",
+   "note": "A-",
+   "note_precedente": "",
+   "perspective": "stable",
+   "date": "2026-08-18",
+   "validite": "Juin 2026 a Mai 2027",
+   "marge_nette": "",
+   "ca_mds": "",
+   "url": "https://www.brvm.org/sites/default/files/20260818_-_notation_financiere_-_boa_ml.pdf"
+  },
   "contradiction_notation": false
  },
  "BOAN": {
@@ -628,6 +666,7 @@
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -697,25 +736,26 @@
     "titre": -2.13,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.74,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": "RENDEMENT",
   "grade": "B",
   "notes": [],
@@ -737,17 +777,7 @@
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
   "source_fait": null,
-  "notation": {
-   "agence": "Bloomfield Investment Corporation",
-   "note": "A",
-   "note_precedente": "",
-   "perspective": "stable",
-   "date": "2025-10-23",
-   "validite": "",
-   "marge_nette": "",
-   "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_boa_sn.pdf"
-  },
+  "notation": null,
   "contradiction_notation": false
  },
  "CABC": {
@@ -779,27 +809,28 @@
    },
    "g": {
     "titre": 21.86,
-    "mediane_secteur": 14.76,
+    "mediane_secteur": -24.83,
     "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.53,
-    "mediane_secteur": 0.35,
+    "mediane_secteur": 0.53,
     "n_secteur": 3,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 15.4,
-    "mediane_secteur": 21.24,
+    "mediane_secteur": 8.24,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": "GROWTH",
   "grade": "A",
   "notes": [],
@@ -807,7 +838,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 32,
-  "croissance_pctl": 85,
+  "croissance_pctl": 83,
   "reference_axes": "marche (n=36)",
   "g": 21.9,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -864,25 +895,26 @@
     "titre": 5.06,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.44,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 29.75,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -913,11 +945,11 @@
    "note": "AA",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-09-15",
-   "validite": "Juin 2025 a Mai 2026",
+   "date": "2026-08-26",
+   "validite": "Juin 2026 a Mai 2027",
    "marge_nette": "",
    "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_coris_bank_international_bf.pdf"
+   "url": "https://www.brvm.org/sites/default/files/20260826_-_notation_financiere_-_coris_bank_international_bf.pdf"
   },
   "contradiction_notation": false
  },
@@ -935,6 +967,7 @@
   "motif": "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
   "notes": [
@@ -942,6 +975,7 @@
   ],
   "reserves": [
    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
+   "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
@@ -952,6 +986,7 @@
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [
    "SERIE_TROUEE",
+   "INFLEXION_RECENTE",
    "SERIE_COMPLETEE_N1"
   ],
   "per": 61.83,
@@ -996,25 +1031,26 @@
     "titre": 10.09,
     "mediane_secteur": 3.74,
     "n_secteur": 2,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 1.0,
     "mediane_secteur": 0.77,
     "n_secteur": 2,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 26.36,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -1022,7 +1058,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 12,
-  "croissance_pctl": 56,
+  "croissance_pctl": 57,
   "reference_axes": "marche (n=36)",
   "g": 10.1,
   "source_croissance": "RN_PROBABLE(4ex)",
@@ -1079,25 +1115,26 @@
     "titre": 26.51,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.68,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": "GROWTH",
   "grade": "B",
   "notes": [
@@ -1170,25 +1207,26 @@
     "titre": 14.74,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.05,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 21.62,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -1229,6 +1267,7 @@
   "motif": "la nature economique de la societe a change : l'historique n'est plus predictif",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -1237,6 +1276,7 @@
   "reserves": [
    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+   "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
@@ -1246,7 +1286,8 @@
   "g": -61.1,
   "source_croissance": "RN_VERIFIE(3ex)",
   "drapeaux": [
-   "PIC_YOY"
+   "PIC_YOY",
+   "INFLEXION_RECENTE"
   ],
   "per": 60.08,
   "payout": 52.257584,
@@ -1266,11 +1307,11 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": null,
+  "peg": 0.31,
   "dy": 6.35,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance non calculable (historique trop court ou series absentes) : l'axe croissance manque, ce n'est pas un diagnostic mais une lacune",
+  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P54)",
   "comparaisons": {
    "per": {
     "titre": 18.78,
@@ -1287,61 +1328,71 @@
     "n_marche": 36
    },
    "g": {
-    "titre": null,
-    "mediane_secteur": 2.1,
-    "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "titre": 60.0,
+    "mediane_secteur": 10.48,
+    "n_secteur": 4,
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 1.19,
     "mediane_secteur": 0.99,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 23.54,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
-  "notes": [],
+  "notes": [
+   "dernier exercice en net recul : la croissance moyenne masque un retournement en cours — profil a reexaminer a la prochaine publication",
+   "croissance non exploitable (rattrapage extreme ou base ecrasee)"
+  ],
   "reserves": [
-   "aucune source de croissance exploitable",
+   "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+   "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
+   "BASE_ECRASEE : la fenetre demarre sur un creux non representatif",
+   "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
+   "CAP_60 : croissance plafonnee",
+   "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
+   "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
+   "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 54,
-  "croissance_pctl": null,
+  "croissance_pctl": 100,
   "reference_axes": "marche (n=36)",
-  "g": null,
-  "source_croissance": "AUCUNE",
-  "drapeaux": [],
+  "g": 60.0,
+  "source_croissance": "RN_PROBABLE(3ex)",
+  "drapeaux": [
+   "PIC_YOY",
+   "CYCLE_SERIE_RESTAUREE",
+   "BASE_ECRASEE",
+   "SERIE_TROUEE",
+   "CAP_60",
+   "INFLEXION_RECENTE",
+   "SERIE_COMPLETEE_N1",
+   "RATTRAPAGE"
+  ],
   "per": 18.78,
   "payout": 1.19253,
   "roe": null,
-  "pegy": null,
+  "pegy": 0.28,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",
   "n_secteur": 4,
   "source_fait": null,
-  "notation": {
-   "agence": "Bloomfield Investment Corporation",
-   "note": "A+",
-   "note_precedente": "",
-   "perspective": "stable",
-   "date": "2025-08-28",
-   "validite": "",
-   "marge_nette": "",
-   "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20250828_-_notation_financiere_-_lnb_bn.pdf"
-  },
+  "notation": null,
   "contradiction_notation": false
  },
  "NEIC": {
@@ -1373,27 +1424,28 @@
    },
    "g": {
     "titre": 18.86,
-    "mediane_secteur": 2.1,
-    "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_secteur": 10.48,
+    "n_secteur": 4,
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.51,
     "mediane_secteur": 0.99,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 23.54,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": "GROWTH",
   "grade": "B",
   "notes": [],
@@ -1402,7 +1454,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 44,
-  "croissance_pctl": 76,
+  "croissance_pctl": 74,
   "reference_axes": "marche (n=36)",
   "g": 18.9,
   "source_croissance": "BPA_IMPLICITE",
@@ -1459,25 +1511,26 @@
     "titre": 7.93,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.41,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 17.45,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "A",
   "notes": [],
@@ -1499,15 +1552,15 @@
   "n_secteur": 14,
   "source_fait": null,
   "notation": {
-   "agence": "Bloomfield Investment Corporation",
-   "note": "AA-",
+   "agence": "GCR",
+   "note": "BB+(WU)",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-10-28",
+   "date": "2026-09-01",
    "validite": "",
    "marge_nette": "",
-   "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_nsia_banque_ci.pdf"
+   "ca_mds": "10.0",
+   "url": "https://www.brvm.org/sites/default/files/20260901_-_notation_financiere_-_fctc_zaka_rmbs_nsia_banque_cote_divoire_2025-2044.pdf"
   },
   "contradiction_notation": false
  },
@@ -1540,27 +1593,28 @@
    },
    "g": {
     "titre": 3.49,
-    "mediane_secteur": 8.93,
+    "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.5,
     "mediane_secteur": 0.47,
     "n_secteur": 6,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 18.1,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "A",
   "notes": [
@@ -1570,7 +1624,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 38,
-  "croissance_pctl": 44,
+  "croissance_pctl": 46,
   "reference_axes": "marche (n=36)",
   "g": 3.5,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -1627,25 +1681,26 @@
     "titre": -13.42,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.68,
     "mediane_secteur": 0.63,
     "n_secteur": 3,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 27.61,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -1654,7 +1709,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 62,
-  "croissance_pctl": 6,
+  "croissance_pctl": 9,
   "reference_axes": "marche (n=36)",
   "g": -13.4,
   "source_croissance": "BPA_IMPLICITE",
@@ -1711,25 +1766,26 @@
     "titre": 4.08,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.63,
     "mediane_secteur": 0.63,
     "n_secteur": 3,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 27.23,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -1740,7 +1796,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 52,
-  "croissance_pctl": 47,
+  "croissance_pctl": 49,
   "reference_axes": "marche (n=36)",
   "g": 4.1,
   "source_croissance": "RN_PROBABLE(3ex)",
@@ -1799,25 +1855,26 @@
     "titre": 3.03,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.0,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 19.15,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -1881,27 +1938,28 @@
    },
    "g": {
     "titre": -10.48,
-    "mediane_secteur": 8.93,
+    "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.44,
     "mediane_secteur": 0.47,
     "n_secteur": 6,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 11.74,
     "mediane_secteur": 18.1,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -1909,7 +1967,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 76,
-  "croissance_pctl": 12,
+  "croissance_pctl": 14,
   "reference_axes": "marche (n=36)",
   "g": -10.5,
   "source_croissance": "RN_PROBABLE(3ex)",
@@ -1922,7 +1980,17 @@
   "secteur": "CONSOMMATION_DE_BASE",
   "n_secteur": 6,
   "source_fait": null,
-  "notation": null,
+  "notation": {
+   "agence": "Bloomfield Investment Corporation",
+   "note": "AA-",
+   "note_precedente": "",
+   "perspective": "stable",
+   "date": "2026-08-26",
+   "validite": "juillet 2026 a juin 2027",
+   "marge_nette": "",
+   "ca_mds": "",
+   "url": "https://www.brvm.org/sites/default/files/20260826_-_notation_financiere_-_palm_ci.pdf"
+  },
   "contradiction_notation": false
  },
  "PRSC": {
@@ -1954,27 +2022,28 @@
    },
    "g": {
     "titre": 2.1,
-    "mediane_secteur": 2.1,
-    "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_secteur": 10.48,
+    "n_secteur": 4,
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.79,
     "mediane_secteur": 0.99,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 20.8,
     "mediane_secteur": 23.54,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -1983,7 +2052,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 32,
-  "croissance_pctl": 35,
+  "croissance_pctl": 37,
   "reference_axes": "marche (n=36)",
   "g": 2.1,
   "source_croissance": "RN_VERIFIE(8ex)",
@@ -2015,6 +2084,7 @@
   "motif": "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)",
   "comparaisons": null,
   "payout_source": null,
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
   "notes": [
@@ -2066,6 +2136,7 @@
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -2114,7 +2185,7 @@
   "dy": 2.92,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "ni decote (cherte P22), ni croissance dans le tercile superieur (P24), ni rendement superieur : coeur de cote correctement paye",
+  "motif": "ni decote (cherte P22), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
   "comparaisons": {
    "per": {
     "titre": 18.43,
@@ -2134,25 +2205,26 @@
     "titre": -2.61,
     "mediane_secteur": 3.74,
     "n_secteur": 2,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.54,
     "mediane_secteur": 0.77,
     "n_secteur": 2,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 15.35,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -2162,7 +2234,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 22,
-  "croissance_pctl": 24,
+  "croissance_pctl": 26,
   "reference_axes": "marche (n=36)",
   "g": -2.6,
   "source_croissance": "RN_PROBABLE(4ex)",
@@ -2192,17 +2264,17 @@
   "contradiction_notation": false
  },
  "SDSC": {
-  "dominant": "GARP",
-  "mixte": true,
+  "dominant": "VIGILANCE_CONTRACTION",
+  "mixte": false,
   "VALUE": null,
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.43,
+  "peg": null,
   "dy": 3.72,
   "confiance": "HAUTE",
-  "profil": "GARP",
-  "motif": "croissance de 14.8 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.35 — la croissance n'est pas encore dans le prix",
+  "profil": "VIGILANCE_CONTRACTION",
+  "motif": "benefices en contraction de -57.2 %/an sans decote suffisante pour la compenser",
   "comparaisons": {
    "per": {
     "titre": 6.38,
@@ -2219,44 +2291,51 @@
     "n_marche": 36
    },
    "g": {
-    "titre": 14.76,
-    "mediane_secteur": 14.76,
+    "titre": -57.25,
+    "mediane_secteur": -24.83,
     "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
-    "titre": 0.24,
-    "mediane_secteur": 0.35,
+    "titre": 0.69,
+    "mediane_secteur": 0.53,
     "n_secteur": 3,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
-    "titre": 27.08,
-    "mediane_secteur": 21.24,
+    "titre": 1.08,
+    "mediane_secteur": 8.24,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "secondaire": "GROWTH",
-  "grade": "B",
-  "notes": [],
+  "part_operationnelle": null,
+  "secondaire": null,
+  "grade": "C",
+  "notes": [
+   "dernier exercice en net recul : la croissance moyenne masque un retournement en cours — profil a reexaminer a la prochaine publication",
+   "croissance non exploitable (rattrapage extreme ou base ecrasee)"
+  ],
   "reserves": [
+   "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 66,
-  "croissance_pctl": 71,
+  "croissance_pctl": 3,
   "reference_axes": "marche (n=36)",
-  "g": 14.8,
+  "g": -57.2,
   "source_croissance": "RN_PROBABLE(4ex)",
-  "drapeaux": [],
+  "drapeaux": [
+   "INFLEXION_RECENTE"
+  ],
   "per": 6.38,
-  "payout": 0.2377,
-  "roe": 27.1,
-  "pegy": 0.35,
+  "payout": 0.6935,
+  "roe": 1.1,
+  "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "INDUSTRIELS",
   "n_secteur": 3,
@@ -2303,27 +2382,28 @@
    },
    "g": {
     "titre": -24.83,
-    "mediane_secteur": 14.76,
+    "mediane_secteur": -24.83,
     "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.35,
-    "mediane_secteur": 0.35,
+    "mediane_secteur": 0.53,
     "n_secteur": 3,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
-    "mediane_secteur": 21.24,
+    "mediane_secteur": 8.24,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
   "notes": [],
@@ -2333,7 +2413,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 3,
-  "croissance_pctl": 3,
+  "croissance_pctl": 6,
   "reference_axes": "marche (n=36)",
   "g": -24.8,
   "source_croissance": "BPA_IMPLICITE",
@@ -2382,25 +2462,26 @@
     "titre": 15.89,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.51,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 22.11,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": "GROWTH",
   "grade": "B",
   "notes": [],
@@ -2426,17 +2507,7 @@
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
   "source_fait": null,
-  "notation": {
-   "agence": "Bloomfield Investment Corporation",
-   "note": "AAA",
-   "note_precedente": "",
-   "perspective": "stable",
-   "date": "2025-09-15",
-   "validite": "Juillet 2025 a Juin 2026",
-   "marge_nette": "",
-   "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_societe_generale_ci.pdf"
-  },
+  "notation": null,
   "contradiction_notation": false
  },
  "SHEC": {
@@ -2470,25 +2541,26 @@
     "titre": 19.32,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.79,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": "GROWTH",
   "grade": "A",
   "notes": [],
@@ -2496,7 +2568,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 15,
-  "croissance_pctl": 79,
+  "croissance_pctl": 77,
   "reference_axes": "marche (n=36)",
   "g": 19.3,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -2543,25 +2615,26 @@
     "titre": -11.5,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.59,
     "mediane_secteur": 0.56,
     "n_secteur": 14,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 27.16,
     "mediane_secteur": 24.64,
     "n_secteur": 10,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
   "notes": [
@@ -2608,36 +2681,42 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": null,
+  "peg": 30.69,
   "dy": null,
   "confiance": "HAUTE",
   "profil": "NON_ANALYSABLE",
   "motif": "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)",
   "comparaisons": null,
   "payout_source": null,
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
   "notes": [
    "PER absent ou > 50 : benefices nuls ou residuels"
   ],
   "reserves": [
-   "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
-   "CONTRADICTION_RN_BPA : les resultats nets en base et le BPA implicite evoluent en sens OPPOSE — la croissance affichee n'est pas fiable, trancher avant tout usage",
+   "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+   "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
+   "FENETRE_ELARGIE : fenetre etendue au-dela de 4 exercices car elle demarrait sur un pic — la tendance de fond remplace l'effet de base",
+   "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "payout non disponible — soutenabilite du dividende non verifiee",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
-  "g": -45.6,
-  "source_croissance": "BPA_IMPLICITE",
+  "g": 4.3,
+  "source_croissance": "RN_PROBABLE(5ex)",
   "drapeaux": [
-   "CONTRADICTION_RN_BPA"
+   "PIC_YOY",
+   "CYCLE_SERIE_RESTAUREE",
+   "FENETRE_ELARGIE",
+   "SERIE_COMPLETEE_N1"
   ],
   "per": 133.44,
   "payout": null,
   "roe": null,
-  "pegy": null,
+  "pegy": 30.69,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DE_BASE",
   "n_secteur": 6,
@@ -2659,6 +2738,7 @@
   "motif": "la nature economique de la societe a change : l'historique n'est plus predictif",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -2726,27 +2806,28 @@
    },
    "g": {
     "titre": 60.0,
-    "mediane_secteur": 8.93,
+    "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.39,
     "mediane_secteur": 0.47,
     "n_secteur": 6,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 18.1,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -2811,25 +2892,26 @@
     "titre": 11.54,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.37,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 30.47,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "A",
   "notes": [],
@@ -2837,7 +2919,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 52,
-  "croissance_pctl": 59,
+  "croissance_pctl": 60,
   "reference_axes": "marche (n=36)",
   "g": 11.5,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -2894,25 +2976,26 @@
     "titre": 14.03,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.42,
     "mediane_secteur": 0.63,
     "n_secteur": 3,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 29.56,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": "VALUE",
   "grade": "B",
   "notes": [],
@@ -2920,7 +3003,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 83,
-  "croissance_pctl": 62,
+  "croissance_pctl": 63,
   "reference_axes": "marche (n=36)",
   "g": 14.0,
   "source_croissance": "RN_PROBABLE(4ex)",
@@ -2975,27 +3058,28 @@
    },
    "g": {
     "titre": -7.24,
-    "mediane_secteur": 8.93,
+    "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.91,
     "mediane_secteur": 0.47,
     "n_secteur": 6,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 18.1,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -3003,7 +3087,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 62,
-  "croissance_pctl": 21,
+  "croissance_pctl": 23,
   "reference_axes": "marche (n=36)",
   "g": -7.2,
   "source_croissance": "RN_PROBABLE(4ex)",
@@ -3047,41 +3131,46 @@
     "n_marche": 36
    },
    "g": {
-    "titre": 14.37,
-    "mediane_secteur": 8.93,
+    "titre": 14.35,
+    "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.33,
     "mediane_secteur": 0.47,
     "n_secteur": 6,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 18.1,
     "mediane_secteur": 18.1,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": "VALUE",
   "grade": "B",
   "notes": [],
   "reserves": [
-   "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+   "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+   "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 71,
-  "croissance_pctl": 65,
+  "croissance_pctl": 66,
   "reference_axes": "marche (n=36)",
   "g": 14.4,
-  "source_croissance": "BPA_IMPLICITE",
-  "drapeaux": [],
+  "source_croissance": "RN_VERIFIE(4ex)",
+  "drapeaux": [
+   "PIC_YOY",
+   "CYCLE_SERIE_RESTAUREE"
+  ],
   "per": 8.09,
   "payout": 0.33168999999999993,
   "roe": 18.1,
@@ -3090,17 +3179,7 @@
   "secteur": "CONSOMMATION_DE_BASE",
   "n_secteur": 6,
   "source_fait": null,
-  "notation": {
-   "agence": "GCR",
-   "note": "BBB+(WU)",
-   "note_precedente": "",
-   "perspective": "stable",
-   "date": "2025-10-16",
-   "validite": "",
-   "marge_nette": "",
-   "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20251016_-_notation_financiere_-_saph_ci.pdf"
-  },
+  "notation": null,
   "contradiction_notation": false
  },
  "STAC": {
@@ -3117,6 +3196,7 @@
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -3173,46 +3253,51 @@
    },
    "g": {
     "titre": 46.9,
-    "mediane_secteur": 8.93,
+    "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 0.8,
     "mediane_secteur": 0.47,
     "n_secteur": 6,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 79.89,
     "mediane_secteur": 18.1,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
   "notes": [
+   "dernier exercice en net recul : la croissance moyenne masque un retournement en cours — profil a reexaminer a la prochaine publication",
    "croissance non exploitable (rattrapage extreme ou base ecrasee)",
    "PEGY < 0.25 : protocole de revue obligatoire (donnee erronee ? risque non capture ?)"
   ],
   "reserves": [
-   "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
-   "CONTRADICTION_RN_BPA : les resultats nets en base et le BPA implicite evoluent en sens OPPOSE — la croissance affichee n'est pas fiable, trancher avant tout usage",
+   "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+   "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
+   "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 84,
-  "croissance_pctl": 97,
+  "croissance_pctl": 94,
   "reference_axes": "marche (n=36)",
   "g": 46.9,
-  "source_croissance": "BPA_IMPLICITE",
+  "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
-   "CONTRADICTION_RN_BPA",
+   "PIC_YOY",
+   "CYCLE_SERIE_RESTAUREE",
+   "INFLEXION_RECENTE",
    "RATTRAPAGE"
   ],
   "per": 12.09,
@@ -3267,25 +3352,26 @@
     "titre": -9.55,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 1.1,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": 25.1,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "ETATS_FINANCIERS",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "A",
   "notes": [],
@@ -3294,7 +3380,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 56,
-  "croissance_pctl": 15,
+  "croissance_pctl": 17,
   "reference_axes": "marche (n=36)",
   "g": -9.5,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -3351,25 +3437,26 @@
     "titre": 1.11,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 6.49,
-    "n_marche": 34
+    "mediane_marche": 5.06,
+    "n_marche": 35
    },
    "payout": {
     "titre": 1.07,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.57,
+    "mediane_marche": 0.61,
     "n_marche": 36
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
+    "mediane_marche": 25.69,
     "n_marche": 24
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [],
@@ -3378,7 +3465,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "cherte_pctl": 39,
-  "croissance_pctl": 29,
+  "croissance_pctl": 31,
   "reference_axes": "marche (n=36)",
   "g": 1.1,
   "source_croissance": "RN_PROBABLE(4ex)",
@@ -3408,6 +3495,7 @@
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": null,
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
@@ -3450,6 +3538,7 @@
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
+  "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
