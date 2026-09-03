@@ -64,29 +64,68 @@ div[data-testid="stMetricValue"]{font-size:1.5rem}
 # ----------------------------------------------------------------------
 # Donnees
 # ----------------------------------------------------------------------
+QUOTIDIEN = RACINE / "collecte" / "cours_quotidien_boc.csv"
+
+
+def empreinte_donnees():
+    """Signature des donnees sources. Sert de CLE DE CACHE : quand un workflow
+    commite de nouveaux cours, l'empreinte change et la base est reconstruite.
+
+    Correctif du 03/09/2026 (constat direct de l'utilisateur : "les donnees ne
+    sont pas regulierement actualisees"). Deux causes cumulees :
+      1. le moteur et l'application lisaient cours_mensuels (bulletins de FIN DE
+         MOIS, arretes au 07/07/2026) alors que la collecte quotidienne allait
+         jusqu'au 01/09 — pres de deux mois de retard. Le pont
+         charger_cours_quotidien.py existait depuis le 28/07 mais n'etait appele
+         par personne ;
+      2. @st.cache_resource sans cle ne se reinvalidait JAMAIS tant que le
+         conteneur vivait : la base construite au premier lancement restait en
+         place indefiniment, meme apres l'arrivee de nouvelles donnees.
+    """
+    parties = []
+    for f in (QUOTIDIEN, RACINE / "collecte" / "cours_extraits.csv",
+              RACINE / "collecte" / "dividendes_par_exercice.csv",
+              RACINE / "collecte" / "notations_financieres.csv"):
+        parties.append(f"{f.name}:{int(f.stat().st_mtime)}" if f.exists() else f"{f.name}:0")
+    return "|".join(parties)
+
+
 @st.cache_resource(show_spinner="Construction de la base (30 s au premier lancement)…")
-def preparer_base():
-    """Reconstruit brvm.db si absente. La base n'est jamais commitee."""
-    if not DB.exists():
-        for script in [RACINE / "moteur" / "peupler.py",
-                       RACINE / "collecte" / "charger_cours.py",
-                       RACINE / "moteur" / "profils.py"]:
-            subprocess.run([sys.executable, str(script)], cwd=str(script.parent),
-                           check=False, capture_output=True, timeout=300)
-    elif not PROFILS.exists():
-        subprocess.run([sys.executable, str(RACINE / "moteur" / "profils.py")],
-                       cwd=str(RACINE / "moteur"), check=False, capture_output=True)
+def preparer_base(_empreinte):
+    """Reconstruit brvm.db quand l'empreinte des sources change.
+    La base n'est jamais commitee : elle est rebatie depuis les CSV du depot."""
+    scripts = [RACINE / "moteur" / "peupler.py",
+               RACINE / "collecte" / "charger_cours.py",
+               RACINE / "collecte" / "charger_cours_quotidien.py",  # pont ajoute 03/09
+               RACINE / "moteur" / "profils.py"]
+    for script in scripts:
+        if not script.exists():
+            continue
+        subprocess.run([sys.executable, str(script)], cwd=str(script.parent),
+                       check=False, capture_output=True, timeout=300)
     return DB.exists()
 
 
-@st.cache_data(ttl=3600)
-def charger():
+@st.cache_data(ttl=1800)
+def charger(_empreinte):
     profils = json.loads(PROFILS.read_text(encoding="utf-8")) if PROFILS.exists() else {}
     conn = sqlite3.connect(DB)
     noms = dict(conn.execute("SELECT ticker, nom FROM societes").fetchall())
-    cours = pd.read_sql_query(
-        "SELECT ticker, fin_mois, cours, per, rendement FROM cours_mensuels "
-        "WHERE cours IS NOT NULL ORDER BY fin_mois", conn)
+    # Source la plus fraiche disponible, avec repli explicite sur le mensuel.
+    try:
+        n_quot = conn.execute("SELECT COUNT(*) FROM cours_quotidien_boc").fetchone()[0]
+    except Exception:
+        n_quot = 0
+    if n_quot:
+        cours = pd.read_sql_query(
+            "SELECT ticker, date_bulletin AS fin_mois, cours, per, rendement "
+            "FROM cours_quotidien_boc WHERE cours IS NOT NULL ORDER BY date_bulletin", conn)
+        origine_cours = "BOC quotidien"
+    else:
+        cours = pd.read_sql_query(
+            "SELECT ticker, fin_mois, cours, per, rendement FROM cours_mensuels "
+            "WHERE cours IS NOT NULL ORDER BY fin_mois", conn)
+        origine_cours = "bulletins mensuels (repli)"
     etats = pd.read_sql_query(
         "SELECT ticker, exercice, resultat_net, capitaux_propres, statut_donnee, "
         "source_url, date_publication FROM etats_financiers ORDER BY ticker, exercice", conn)
@@ -108,7 +147,7 @@ def charger():
             notation_perspective=(v.get("notation") or {}).get("perspective"),
             notation_date=(v.get("notation") or {}).get("date"),
             contradiction=bool(v.get("contradiction_notation"))))
-    return pd.DataFrame(lignes), profils, cours, etats
+    return pd.DataFrame(lignes), profils, cours, etats, origine_cours
 
 
 @st.cache_data(ttl=3600)
@@ -132,12 +171,13 @@ def badge_grade(g):
     return f"<span class='grade' style='background:{couleur}'>grade {g}</span>"
 
 
-preparer_base()
+emp = empreinte_donnees()
+preparer_base(emp)
 if not DB.exists() or not PROFILS.exists():
     st.error("Base indisponible. Verifier que moteur/peupler.py et collecte/charger_cours.py "
              "s'executent sans erreur.")
     st.stop()
-df, profils, cours, etats = charger()
+df, profils, cours, etats, origine_cours = charger(emp)
 var12, var24 = regime_marche(cours)
 
 # ----------------------------------------------------------------------
@@ -145,7 +185,24 @@ var12, var24 = regime_marche(cours)
 # ----------------------------------------------------------------------
 with st.sidebar:
     st.markdown("### Profilage BRVM")
-    st.caption(f"{len(df)} titres · donnees au {cours.fin_mois.max()}")
+    derniere = str(cours.fin_mois.max())[:10]
+    try:
+        retard = (pd.Timestamp.today().normalize() - pd.Timestamp(derniere)).days
+    except Exception:
+        retard = None
+    st.caption(f"{len(df)} titres · cours au **{derniere}** · source : {origine_cours}")
+    if retard is not None:
+        if retard <= 5:
+            st.success(f"Donnees a jour ({retard} j)")
+        elif retard <= 20:
+            st.warning(f"Donnees vieilles de {retard} jours")
+        else:
+            st.error(f"Donnees vieilles de {retard} jours — verifier les "
+                     f"workflows de collecte")
+    if st.button("Actualiser les donnees", width='stretch'):
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        st.rerun()
     st.markdown("---")
     f_profil = st.multiselect("Profil", ORDRE, default=[])
     f_grade = st.multiselect("Grade de confiance", ["A", "B", "C"], default=[])
