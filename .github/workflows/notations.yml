@@ -71,6 +71,7 @@ jobs:
         run: |
           python3 moteur/peupler.py
           python3 collecte/charger_cours.py
+          python3 collecte/charger_cours_quotidien.py
           python3 moteur/profils.py
 
       - name: Golden tests
