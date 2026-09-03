@@ -77,6 +77,34 @@ from scoring import charger_seuils, charger_marche, appliquer_gate  # noqa: E402
 # ----------------------------------------------------------------------
 
 
+def source_cours(cur):
+    """Choisit la table de cours la plus FRAICHE et la renvoie sous une forme
+    unifiee (fin_mois, cours, per, rendement).
+
+    Correctif du 03/09/2026, sur constat direct de l'utilisateur : le tableau de
+    bord affichait des cours arretes au 07/07/2026 alors que la collecte
+    quotidienne (P11) allait jusqu'au 01/09 — pres de deux mois de retard.
+    Cause : cours_mensuels est alimente par cours_extraits.csv (bulletins de FIN
+    DE MOIS, extraction manuelle), tandis que cours_quotidien_boc est collecte
+    chaque jour. Le pont charger_cours_quotidien.py existait depuis le 28/07 mais
+    ni le moteur ni l'application ne lisaient la table qu'il remplit.
+
+    Le mensuel n'est pas abandonne : il reste le repli si la table quotidienne est
+    vide (base reconstruite sans le pont). L'argument de microstructure qui avait
+    justifie le mensuel — sur un titre peu liquide, un cours quotidien isole peut
+    n'etre qu'une transaction non representative — reste valable ; c'est pourquoi
+    la DATE de la donnee est desormais exposee dans profils.json et affichee dans
+    l'application, plutot que d'etre implicite.
+    """
+    try:
+        n = cur.execute("SELECT COUNT(*) FROM cours_quotidien_boc").fetchone()[0]
+    except Exception:
+        n = 0
+    if n:
+        return "cours_quotidien_boc", "date_bulletin"
+    return "cours_mensuels", "fin_mois"
+
+
 def _mediane(vals):
     v = sorted(x for x in vals if x is not None)
     if not v:
@@ -262,10 +290,11 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
     """Repli : CAGR du BPA implicite (cours/PER du BOC), fin d'annee.
     Statut PROBABLE par construction (source circulaire : le PER vient de la
     BRVM elle-meme ; validation croisee faite sur NSBC uniquement)."""
+    table, col = source_cours(cur)
     lignes = cur.execute(
-        "SELECT fin_mois, cours, per FROM cours_mensuels "
+        f"SELECT {col}, cours, per FROM {table} "
         "WHERE ticker=? AND per IS NOT NULL AND per>0 AND cours IS NOT NULL "
-        "ORDER BY fin_mois", (ticker,)).fetchall()
+        f"ORDER BY {col}", (ticker,)).fetchall()
     if not lignes:
         return None, []
     par_an = {}
@@ -291,12 +320,14 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
 
 
 def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50):
+    table, col = source_cours(cur)
     per_row = cur.execute(
-        "SELECT per FROM cours_mensuels WHERE ticker=? AND per IS NOT NULL "
-        "ORDER BY fin_mois DESC LIMIT 1", (ticker,)).fetchone()
+        f"SELECT per, {col} FROM {table} WHERE ticker=? AND per IS NOT NULL "
+        f"ORDER BY {col} DESC LIMIT 1", (ticker,)).fetchone()
     dy_row = cur.execute(
-        "SELECT rendement FROM cours_mensuels WHERE ticker=? AND rendement IS NOT NULL "
-        "ORDER BY fin_mois DESC LIMIT 1", (ticker,)).fetchone()
+        f"SELECT rendement FROM {table} WHERE ticker=? AND rendement IS NOT NULL "
+        f"ORDER BY {col} DESC LIMIT 1", (ticker,)).fetchone()
+    date_cours = per_row[1] if per_row else None
     etats = cur.execute(
         "SELECT exercice, resultat_net, capitaux_propres, payout_ratio FROM etats_financiers "
         "WHERE ticker=? ORDER BY exercice DESC", (ticker,)).fetchall()
@@ -394,6 +425,7 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50):
 
     return dict(per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
                 payout_source=payout_source, part_operationnelle=part_operationnelle,
+                date_cours=date_cours, table_cours=table,
                 roe=roe, g=100.0 * g if g is not None else None, source_croissance=source_g,
                 drapeaux=drapeaux, n_exercices=len(rn_dispo), dernier_rn=dernier_rn,
                 peg=round(peg, 2) if peg else None,
@@ -624,8 +656,9 @@ def calculer():
     brut = {}
     for t in tickers:
         # un titre sans aucune cotation n'est pas encore cote (ex. IPO annoncee)
+        _tbl, _c = source_cours(cur)
         cote = cur.execute(
-            "SELECT COUNT(*) FROM cours_mensuels WHERE ticker=?", (t,)).fetchone()[0]
+            f"SELECT COUNT(*) FROM {_tbl} WHERE ticker=?", (t,)).fetchone()[0]
         if not cote:
             continue
         ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"])
@@ -789,6 +822,8 @@ def calculer():
             "motif": motif,
             "comparaisons": comparaisons(v) if v["analysable"] else None,
             "payout_source": v["payout_source"],
+            "date_cours": v["date_cours"],
+            "table_cours": v["table_cours"],
             "part_operationnelle": (round(v["part_operationnelle"], 2)
                                     if v.get("part_operationnelle") is not None else None),
             "secondaire": secondaire,
