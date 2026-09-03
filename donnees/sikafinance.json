@@ -1,8 +1,8 @@
 {
- "releve_le": "2026-09-02",
+ "releve_le": "2026-09-03",
  "releve_perf": "2026-09-02",
- "releve_fondamentaux": "2026-08-21",
- "dernier_volet": "perf",
+ "releve_fondamentaux": "2026-09-03",
+ "dernier_volet": "fondamentaux",
  "exercice": "2025",
  "source": "sikafinance.com",
  "echecs": [],
@@ -30,7 +30,7 @@
     "bnpa": 14.42
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BOAB": {
    "symbole": "BOAB",
@@ -55,7 +55,7 @@
     "bnpa": 495.73
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BOABF": {
    "symbole": "BOABF",
@@ -80,7 +80,7 @@
     "bnpa": 437.55
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BOAC": {
    "symbole": "BOAC",
@@ -105,7 +105,7 @@
     "bnpa": 888.5
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BOAM": {
    "symbole": "BOAM",
@@ -130,7 +130,7 @@
     "bnpa": 403.69
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BOAN": {
    "symbole": "BOAN",
@@ -155,7 +155,7 @@
     "bnpa": 19.68
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BOAS": {
    "symbole": "BOAS",
@@ -180,7 +180,7 @@
     "bnpa": 608.47
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BICB": {
    "symbole": "BICB",
@@ -205,7 +205,7 @@
     "bnpa": 418.66
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BNBC": {
    "symbole": "BNBC",
@@ -230,7 +230,7 @@
     "bnpa": 3.37
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "BICC": {
    "symbole": "BICC",
@@ -255,7 +255,7 @@
     "bnpa": 2191.0
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "CFAC": {
    "symbole": "CFAC",
@@ -280,7 +280,7 @@
     "bnpa": 46.4
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "CIEC": {
    "symbole": "CIEC",
@@ -305,7 +305,7 @@
     "bnpa": 234.41
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "CBIBF": {
    "symbole": "CBIBF",
@@ -330,7 +330,7 @@
     "bnpa": 2046.73
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SEMC": {
    "symbole": "SEMC",
@@ -355,7 +355,7 @@
     "bnpa": 1.79
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "ECOC": {
    "symbole": "ECOC",
@@ -380,7 +380,7 @@
     "bnpa": 1153.16
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SIVC": {
    "symbole": "SIVC",
@@ -405,7 +405,7 @@
     "bnpa": 20.53
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "ETIT": {
    "symbole": "ETIT",
@@ -430,7 +430,7 @@
     "bnpa": 10.0
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "FTSC": {
    "symbole": "FTSC",
@@ -455,7 +455,7 @@
     "bnpa": 33.04
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "LNBB": {
    "symbole": "LNBB",
@@ -480,7 +480,7 @@
     "bnpa": 231.11
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "NEIC": {
    "symbole": "NEIC",
@@ -505,7 +505,7 @@
     "bnpa": 159.54
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "NTLC": {
    "symbole": "NTLC",
@@ -530,7 +530,7 @@
     "bnpa": 834.91
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "NSBC": {
    "symbole": "NSBC",
@@ -555,7 +555,7 @@
     "bnpa": 1646.0
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "ONTBF": {
    "symbole": "ONTBF",
@@ -580,7 +580,7 @@
     "bnpa": 233.63
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "ORGT": {
    "symbole": "ORGT",
@@ -605,7 +605,7 @@
     "bnpa": 311.79
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "ORAC": {
    "symbole": "ORAC",
@@ -630,7 +630,7 @@
     "bnpa": 1114.0
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "PALC": {
    "symbole": "PALC",
@@ -655,7 +655,7 @@
     "bnpa": 1003.0
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SAFC": {
    "symbole": "SAFC",
@@ -680,7 +680,7 @@
     "bnpa": 59.06
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SPHC": {
    "symbole": "SPHC",
@@ -705,7 +705,7 @@
     "bnpa": 977.07
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "ABJC": {
    "symbole": "ABJC",
@@ -730,7 +730,7 @@
     "bnpa": 123.78
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "STAC": {
    "symbole": "STAC",
@@ -755,7 +755,7 @@
     "bnpa": null
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SGBC": {
    "symbole": "SGBC",
@@ -780,7 +780,7 @@
     "bnpa": 3257.73
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "CABC": {
    "symbole": "CABC",
@@ -805,7 +805,7 @@
     "bnpa": 287.91
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SICC": {
    "symbole": "SICC",
@@ -830,7 +830,7 @@
     "bnpa": null
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "STBC": {
    "symbole": "STBC",
@@ -855,7 +855,7 @@
     "bnpa": 2030.83
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SMBC": {
    "symbole": "SMBC",
@@ -880,7 +880,7 @@
     "bnpa": 1677.31
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SIBC": {
    "symbole": "SIBC",
@@ -905,7 +905,7 @@
     "bnpa": 556.23
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SDCC": {
    "symbole": "SDCC",
@@ -930,7 +930,7 @@
     "bnpa": 518.08
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SOGC": {
    "symbole": "SOGC",
@@ -955,7 +955,7 @@
     "bnpa": 578.31
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SLBC": {
    "symbole": "SLBC",
@@ -980,7 +980,7 @@
     "bnpa": 2781.0
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SNTS": {
    "symbole": "SNTS",
@@ -1005,7 +1005,7 @@
     "bnpa": 4136.0
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SCRC": {
    "symbole": "SCRC",
@@ -1030,7 +1030,7 @@
     "bnpa": null
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "TTLC": {
    "symbole": "TTLC",
@@ -1055,7 +1055,7 @@
     "bnpa": 144.33
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "TTLS": {
    "symbole": "TTLS",
@@ -1080,7 +1080,7 @@
     "bnpa": 188.69
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "PRSC": {
    "symbole": "PRSC",
@@ -1105,7 +1105,7 @@
     "bnpa": 231.19
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "UNLC": {
    "symbole": "UNLC",
@@ -1130,7 +1130,7 @@
     "bnpa": 69.73
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "UNXC": {
    "symbole": "UNXC",
@@ -1155,7 +1155,7 @@
     "bnpa": null
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   },
   "SHEC": {
    "symbole": "SHEC",
@@ -1180,7 +1180,7 @@
     "bnpa": 95.68
    },
    "perf_releve": "2026-09-02",
-   "chiffres_releve": "2026-08-21"
+   "chiffres_releve": "2026-09-03"
   }
  }
 }
