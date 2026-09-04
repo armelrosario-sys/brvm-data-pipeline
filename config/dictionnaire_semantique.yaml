@@ -28,3 +28,22 @@ champs_canoniques:
   chiffre_affaires:
     syscohada: ["Chiffre d'affaires", "Chiffre d'affaires net"]
     bancaire_umoa: ["Produit net bancaire", "PNB"]
+
+  # --- Ajout 04/09/2026 : detection des resultats non operationnels ---
+  # Motif : le profilage d'AGL CI reposait sur une croissance du RESULTAT NET
+  # de +14,8 %/an, alors qu'en 2024 ce resultat etait a 96 % d'origine
+  # FINANCIERE (resultat d'exploitation 941,675 M pour un resultat financier de
+  # 20 870,055 M). L'exercice 2025 a fait tomber le resultat net de 96 %.
+  # Le champ resultat_activites_ordinaires (RAO) NE SUFFIT PAS a detecter ce
+  # cas : le RAO INCLUT le resultat financier (21 811,730 M pour AGL CI 2024).
+  # Seul le resultat d'EXPLOITATION isole la performance du metier.
+  resultat_exploitation:
+    syscohada: ["RESULTAT D'EXPLOITATION", "Résultat d'exploitation",
+                "RESULTAT D EXPLOITATION", "Resultat d'exploitation"]
+    # Pour une banque, l'equivalent fonctionnel est le resultat brut
+    # d'exploitation ou le resultat d'exploitation apres cout du risque.
+    bancaire_umoa: ["Résultat brut d'exploitation", "Resultat brut d'exploitation",
+                    "Résultat d'exploitation", "RESULTAT BRUT D'EXPLOITATION"]
+  resultat_financier:
+    syscohada: ["RESULTAT FINANCIER", "Résultat financier", "Resultat financier"]
+    bancaire_umoa: []
