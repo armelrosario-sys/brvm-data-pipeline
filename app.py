@@ -142,6 +142,7 @@ def charger(_empreinte):
             reference=v.get("reference_axes"), drapeaux=", ".join(v.get("drapeaux") or []),
             confiance=v.get("confiance"), gate=v.get("gate"),
             motif=v.get("motif"), payout_source=v.get("payout_source"),
+            part_op=v.get("part_operationnelle"),
             notation=(v.get("notation") or {}).get("note"),
             notation_agence=(v.get("notation") or {}).get("agence"),
             notation_perspective=(v.get("notation") or {}).get("perspective"),
@@ -574,6 +575,23 @@ with o3:
                    + contexte("payout", pct=True))
     m4.metric("ROE", f"{r.roe:.1f} %" if pd.notna(r.roe) else "non disponible",
               help=contexte("roe", " %"))
+
+    # Origine du resultat : la question que le cas AGL CI a rendue incontournable.
+    if pd.notna(r.part_op):
+        pct = r.part_op * 100
+        libelle = (f"**Origine du resultat** — le resultat d'exploitation represente "
+                   f"{pct:.0f} % du resultat net.")
+        if "RESULTAT_NON_OPERATIONNEL" in str(v.get("drapeaux") or ""):
+            st.warning(libelle + " Le benefice provient donc majoritairement du "
+                       "financier ou de l'exceptionnel : **une croissance de ce "
+                       "resultat ne mesure pas la dynamique du metier**. Jurisprudence "
+                       "AGL CI, dont le resultat net a chute de 96 % l'exercice "
+                       "suivant un profil GARP construit sur des produits financiers.")
+        else:
+            st.caption(libelle + " Le benefice vient bien du metier.")
+    elif v.get("profil") not in ("NON_ANALYSABLE", "MUTATION"):
+        st.caption("**Origine du resultat** — non disponible : le resultat "
+                   "d'exploitation n'est pas encore extrait pour ce titre.")
 
     if pd.notna(r.cherte_pctl):
         st.markdown(f"**Positionnement** — cherte P{int(r.cherte_pctl)} · "
