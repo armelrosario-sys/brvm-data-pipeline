@@ -119,6 +119,21 @@ button.dt-button{background:#fff!important;border:1px solid var(--trait)!importa
   font-family:var(--mono)!important;font-size:11px!important;letter-spacing:.09em;text-transform:uppercase;
   color:var(--encre)!important;padding:7px 13px!important;margin:0 0 0 6px!important}
 button.dt-button:hover:not(.disabled){background:var(--encre)!important;color:#fff!important;border-color:var(--encre)!important}
+.zone-graphe{padding:16px 18px}
+#graphe svg{width:100%;height:auto;display:block}
+.gr-grille{stroke:#EDF0F5;stroke-width:1}
+.gr-axe{stroke:var(--trait);stroke-width:1}
+.gr-lib{font-family:var(--mono);font-size:9.5px;fill:var(--gris)}
+.gr-ligne{fill:none;stroke-width:1.7;opacity:.85}
+.gr-pt{stroke:#fff;stroke-width:1}
+.legende{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.lg{display:flex;align-items:center;gap:6px;border:1px solid var(--trait);padding:3px 9px;
+  font-family:var(--mono);font-size:11px;cursor:pointer;background:#fff;color:var(--encre)}
+.lg:hover{border-color:var(--encre)}
+.lg i{width:10px;height:10px;display:block}
+.lg.eteint{opacity:.3}
+.note-graphe{font-size:12.5px;color:#31405E;margin:14px 0 0;max-width:80ch}
+.vide-graphe{font-size:13px;color:var(--gris);padding:26px 0;text-align:center}
 .notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
 .note{padding:16px 18px;border-right:1px solid var(--trait)}
 .note:last-child{border-right:0}
@@ -203,9 +218,25 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
           <button type="button" data-vue="brut" aria-pressed="true">Valeurs brutes</button>
           <button type="button" data-vue="sect" aria-pressed="false">Écarts au secteur</button>
           <button type="button" data-vue="marche" aria-pressed="false">Écarts au marché</button>
+          <button type="button" data-vue="evolution" aria-pressed="false">Évolution</button>
         </div></div>
       <label class="bascule"><input type="checkbox" id="fsig"> Titres signalés</label>
       <button class="raz" id="raz" type="button">Réinitialiser</button>
+    </div>
+  </section>
+
+  <section class="carte" id="carteEvol" hidden>
+    <div class="carte-tete"><h2>Chemin de cours sur cinq ans</h2>
+      <span class="compte" id="evolCompte">—</span></div>
+    <div class="zone-graphe">
+      <div id="graphe"></div>
+      <div class="legende" id="legende"></div>
+      <p class="note-graphe">Base 100 au point le plus ancien, échelle logarithmique — sinon les
+      titres de faible amplitude seraient écrasés par ceux qui ont fait plus de vingt fois leur
+      valeur. Les cours intermédiaires sont <b>reconstitués</b> à partir des variations cumulées
+      publiées, et non relevés séance par séance : ce sont des repères datés, pas un historique de
+      cotation. Deux d'entre eux se vérifient — le point de la veille redonne le cours précédent du
+      bulletin, celui du 31 décembre la clôture de l'exercice précédent.</p>
     </div>
   </section>
 
@@ -420,6 +451,35 @@ function bmk(prefixe){
   };
 }
 
+/* --- chemin de cours ------------------------------------------------------
+   Les points intermédiaires viennent de construit_donnees.py, qui les déduit des
+   variations cumulées publiées. On trace en base 100 et en échelle logarithmique :
+   sur cinq ans les écarts vont de -65 % à plus de +1900 %, une échelle linéaire
+   collerait les trois quarts des titres sur l'axe. */
+const TEINTES = ['#1D3567','#C02A28','#0B7A47','#E4A11B','#6B4E9B','#0E7490',
+                 '#B45309','#9D174D','#3F6212','#1E40AF','#7C2D12','#155E75'];
+const MAX_COURBES = 12;
+let eteints = new Set();
+
+function jour(t){ return Date.parse(t + 'T00:00:00Z'); }
+
+function spark(r){
+  const p = r.serie || [];
+  if (p.length < 3) return '<span class="nd">—</span>';
+  const L = 84, H = 22, vals = p.map(x => x.c);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const t0 = jour(p[0].t), t1 = jour(p[p.length-1].t) || t0 + 1;
+  const x = q => 1 + (L - 2) * ((jour(q.t) - t0) / ((t1 - t0) || 1));
+  const y = q => H - 3 - (H - 6) * ((q.c - lo) / ((hi - lo) || 1));
+  const d = p.map((q, i) => (i ? 'L' : 'M') + x(q).toFixed(1) + ' ' + y(q).toFixed(1)).join(' ');
+  const monte = p[p.length-1].c >= p[0].c;
+  const teinte = monte ? 'var(--hausse)' : 'var(--baisse)';
+  return '<svg class="spark" width="' + L + '" height="' + H + '" viewBox="0 0 ' + L + ' ' + H +
+    '" role="img" aria-label="chemin de cours sur cinq ans"><path d="' + d +
+    '" fill="none" stroke="' + teinte + '" stroke-width="1.4"/><circle cx="' + x(p[p.length-1]).toFixed(1) +
+    '" cy="' + y(p[p.length-1]).toFixed(1) + '" r="1.9" fill="' + teinte + '"/></svg>';
+}
+
 const COLS = [
  {title:'Code',data:'sym',className:'code',
   render:(v,t,r)=>t==='display'?v+(r.flags.length?'<span class="alerte" title="'+r.flags.join(' — ').replace(/"/g,'&quot;')+'">▲</span>':''):v},
@@ -448,7 +508,9 @@ const COLS = [
  {title:'Div. date',data:'divD',className:'mono',visible:false,
   render:(v,t,r)=>(t==='sort'||t==='type')?r.divISO:v},
  {title:'Écart secteur',data:null,className:'mono',render:bmk('es')},
- {title:'Écart marché',data:null,className:'mono',render:bmk('em')}
+ {title:'Écart marché',data:null,className:'mono',render:bmk('em')},
+ {title:'Aperçu 5 ans',data:'serie',orderable:false,visible:false,
+  render:(v,t,r)=> t==='display' ? spark(r) : (t==='export' ? '' : 0)}
 ];
 
 const LANG={lengthMenu:'Afficher _MENU_ lignes',info:'_START_ à _END_ sur _TOTAL_ titres',
@@ -472,6 +534,91 @@ const table = $('#cote').DataTable({
     {extend:'colvis',text:'Colonnes'}
   ],
   createdRow:(tr,d)=>{if(d.flags.length)tr.classList.add('signale')}
+});
+
+function tracerEvolution(){
+  const lignes = table.rows({search:'applied'}).data().toArray()
+                  .filter(r => (r.serie || []).length >= 3);
+  const total = lignes.length;
+  const retenus = lignes.slice(0, MAX_COURBES);
+  $('#evolCompte').text(total
+    ? (retenus.length + ' courbe(s) tracée(s)' +
+       (total > MAX_COURBES ? ' sur ' + total + ' — affiner les filtres pour les voir toutes' : ''))
+    : 'aucune série disponible');
+
+  if (!retenus.length){
+    $('#graphe').html('<p class="vide-graphe">Aucun titre filtré ne dispose d\'un chemin de cours reconstituable.</p>');
+    $('#legende').empty();
+    return;
+  }
+
+  const W = 1000, H = 380, mg = {h:16, d:54, b:34, g:46};
+  let tMin = Infinity, tMax = -Infinity, rMin = Infinity, rMax = -Infinity;
+  const courbes = retenus.map((r, i) => {
+    const base = r.serie[0].c || 1;
+    const pts = r.serie.map(p => ({x: jour(p.t), y: p.c / base * 100, t: p.t, c: p.c, h: p.h}));
+    pts.forEach(p => {
+      tMin = Math.min(tMin, p.x); tMax = Math.max(tMax, p.x);
+      rMin = Math.min(rMin, p.y); rMax = Math.max(rMax, p.y);
+    });
+    return {sym: r.sym, titre: r.titre, teinte: TEINTES[i % TEINTES.length], pts};
+  });
+
+  const lMin = Math.log10(Math.max(rMin * 0.9, 1)), lMax = Math.log10(rMax * 1.1);
+  const px = v => mg.g + (W - mg.g - mg.d) * ((v - tMin) / ((tMax - tMin) || 1));
+  const py = v => mg.h + (H - mg.h - mg.b) *
+                  (1 - (Math.log10(Math.max(v, 1)) - lMin) / ((lMax - lMin) || 1));
+
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" ' +
+            'role="img" aria-label="Chemins de cours en base 100">';
+
+  const paliers = [];
+  for (let e = Math.floor(lMin * 2) / 2; e <= lMax + 0.5; e += 0.5) paliers.push(Math.pow(10, e));
+  paliers.filter(v => v >= Math.pow(10, lMin) && v <= Math.pow(10, lMax)).forEach(v => {
+    svg += '<line class="gr-grille" x1="' + mg.g + '" x2="' + (W - mg.d) +
+           '" y1="' + py(v).toFixed(1) + '" y2="' + py(v).toFixed(1) + '"/>' +
+           '<text class="gr-lib" x="' + (mg.g - 6) + '" y="' + (py(v) + 3).toFixed(1) +
+           '" text-anchor="end">' + NF(Math.round(v), 0) + '</text>';
+  });
+
+  const a0 = new Date(tMin).getUTCFullYear(), a1 = new Date(tMax).getUTCFullYear();
+  for (let a = a0; a <= a1; a++){
+    const q = Date.UTC(a, 0, 1);
+    if (q < tMin || q > tMax) continue;
+    svg += '<line class="gr-grille" y1="' + mg.h + '" y2="' + (H - mg.b) +
+           '" x1="' + px(q).toFixed(1) + '" x2="' + px(q).toFixed(1) + '"/>' +
+           '<text class="gr-lib" x="' + px(q).toFixed(1) + '" y="' + (H - mg.b + 14) +
+           '" text-anchor="middle">' + a + '</text>';
+  }
+  svg += '<line class="gr-axe" x1="' + mg.g + '" x2="' + (W - mg.d) + '" y1="' + (H - mg.b) +
+         '" y2="' + (H - mg.b) + '"/>';
+
+  courbes.forEach(c => {
+    if (eteints.has(c.sym)) return;
+    const d = c.pts.map((p, i) => (i ? 'L' : 'M') + px(p.x).toFixed(1) + ' ' + py(p.y).toFixed(1)).join(' ');
+    svg += '<path class="gr-ligne" d="' + d + '" stroke="' + c.teinte + '"/>';
+    c.pts.forEach(p => {
+      svg += '<circle class="gr-pt" cx="' + px(p.x).toFixed(1) + '" cy="' + py(p.y).toFixed(1) +
+             '" r="3" fill="' + c.teinte + '"><title>' + c.sym + ' — ' + p.h + ' (' + p.t + ') : ' +
+             NF(p.c, 0) + ' FCFA, base ' + NF(p.y, 0) + '</title></circle>';
+    });
+    const dernier = c.pts[c.pts.length - 1];
+    svg += '<text class="gr-lib" x="' + (W - mg.d + 5) + '" y="' + (py(dernier.y) + 3).toFixed(1) +
+           '" fill="' + c.teinte + '">' + c.sym + '</text>';
+  });
+  svg += '</svg>';
+  $('#graphe').html(svg);
+
+  $('#legende').html(courbes.map(c =>
+    '<button type="button" class="lg' + (eteints.has(c.sym) ? ' eteint' : '') +
+    '" data-sym="' + c.sym + '" title="' + c.titre.replace(/"/g, '&quot;') + '">' +
+    '<i style="background:' + c.teinte + '"></i>' + c.sym + '</button>').join(''));
+}
+
+$(document).on('click', '.lg', function(){
+  const s = $(this).data('sym');
+  if (eteints.has(s)) eteints.delete(s); else eteints.add(s);
+  tracerEvolution();
 });
 
 /* --- repères sectoriels -------------------------------------------------- */
@@ -512,17 +659,22 @@ function majCrans(){
 }
 
 /* --- groupes de colonnes par vue ---------------------------------------- */
-const G_PERF=[6,7,8,9,10,11,12], G_FOND=[13,14,15,16,17,18], G_VAL=[19,20,21,22], G_BMK=[24,25];
+const G_PERF=[6,7,8,9,10,11,12], G_FOND=[13,14,15,16,17,18], G_VAL=[19,20,21,22],
+      G_BMK=[24,25], C_SPARK=26;
 function appliqueVue(){
-  const v=VUE;
-  table.columns(G_PERF).visible(v==='brut',false);
+  const v=VUE, evo = v==='evolution';
+  table.columns(G_PERF).visible(v==='brut'||evo,false);
   table.columns(G_FOND).visible(v==='brut',false);
-  table.columns(G_VAL).visible(true,false);
-  table.columns(G_BMK).visible(v!=='brut',false);
+  table.columns(G_VAL).visible(!evo,false);
+  table.columns(G_BMK).visible(v==='sect'||v==='marche',false);
+  table.column(C_SPARK).visible(evo,false);
   table.columns.adjust().draw(false);
-  const t=v==='brut'?'Cote comparative'
-    :(v==='sect'?'Écarts à la médiane sectorielle — '+LIBM[MET]
-                :'Écarts à la médiane du marché — '+LIBM[MET]);
+  $('#carteEvol').prop('hidden', !evo);
+  if (evo) tracerEvolution();
+  const t = evo ? 'Cote comparative — chemins de cours'
+    : (v==='brut' ? 'Cote comparative'
+    : (v==='sect' ? 'Écarts à la médiane sectorielle — '+LIBM[MET]
+                  : 'Écarts à la médiane du marché — '+LIBM[MET]));
   $('#cote').closest('.carte').find('h2').text(t);
 }
 
@@ -551,6 +703,7 @@ $('#raz').on('click',()=>{
   table.search('').order([[9,'desc']]);majSecteurs();appliqueVue();maj();
 });
 table.on('draw',()=>{$('#compte').text(table.rows({search:'applied'}).count());$('#total').text(ROWS.length)});
+table.on('search.dt', ()=>{ if (VUE==='evolution') tracerEvolution(); });
 
 /* --- import CSV des fondamentaux ---------------------------------------- */
 function nb(x){
