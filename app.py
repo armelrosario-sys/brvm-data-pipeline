@@ -153,12 +153,43 @@ def charger(_empreinte):
 @st.cache_data(ttl=3600)
 def regime_marche(cours):
     """Condition 0 : ou en est le marche dans son cycle.
-    Un profil se lit differemment selon le regime — la mesure historique montre
-    que le regime domine tout le reste."""
+
+    BUG CORRIGE le 04/09/2026, signale par l'utilisateur ("l'evolution du marche
+    en 24 mois depasse largement les 8 % affiches" — il avait raison) :
+    l'ancienne version utilisait piv.shift(12) et shift(24), un decalage
+    POSITIONNEL de 12 et 24 LIGNES. Sur des cours mensuels cela valait bien 12 et
+    24 mois ; depuis la migration vers cours_quotidien_boc (03/09), cela ne valait
+    plus que 12 et 24 SEANCES, soit environ deux semaines et demie et cinq
+    semaines. Ecart mesure au 01/09/2026 : +5,6 % et +6,6 % affiches contre
+    +93,0 % et +126,8 % reels.
+
+    Ce n'etait PAS un simple defaut d'affichage : la condition 0 de regime est
+    l'element dont la profondeur historique a montre qu'il domine tout le reste
+    (0-25 % d'explosions en annee plate contre 75-100 % en reprise). Le tableau
+    de bord annoncait "marche calme, les profils se lisent sans distorsion" alors
+    que le marche est en FIN DE RALLYE a +93 % sur douze mois — soit exactement
+    le regime ou les nouvelles entrees sont historiquement le moins bien
+    recompensees. Le message inversait la lecture.
+
+    Correctif : decalage TEMPOREL reel (DateOffset), independant de la frequence
+    d'echantillonnage. Le calcul donne desormais le meme resultat que la source
+    soit quotidienne, hebdomadaire ou mensuelle.
+    """
     piv = cours.pivot_table(index="fin_mois", columns="ticker", values="cours").sort_index()
-    var12 = (piv / piv.shift(12) - 1).median(axis=1)
-    var24 = (piv / piv.shift(24) - 1).median(axis=1)
-    return var12, var24
+    piv.index = pd.to_datetime(piv.index)
+    if piv.empty:
+        return None, None, None
+    fin = piv.index[-1]
+
+    def variation(mois):
+        cible = fin - pd.DateOffset(months=mois)
+        anterieures = piv.index[piv.index <= cible]
+        if not len(anterieures):
+            return None
+        v = (piv.loc[fin] / piv.loc[anterieures[-1]] - 1).median()
+        return None if pd.isna(v) else float(v)
+
+    return variation(12), variation(24), fin
 
 
 def puce(profil):
@@ -178,27 +209,42 @@ if not DB.exists() or not PROFILS.exists():
              "s'executent sans erreur.")
     st.stop()
 df, profils, cours, etats, origine_cours = charger(emp)
-var12, var24 = regime_marche(cours)
+r12, r24, fin_cours = regime_marche(cours)
 
 # ----------------------------------------------------------------------
 # Barre laterale
 # ----------------------------------------------------------------------
 with st.sidebar:
     st.markdown("### Profilage BRVM")
+    # Fraicheur comptee en SEANCES MANQUEES, pas en jours calendaires
+    # (correctif 04/09/2026, question de l'utilisateur : "pourquoi des donnees du
+    # 01 septembre pour estimer que nous sommes a jour, alors que nous sommes au
+    # 04 ?"). Deux ajustements :
+    #  - le compte se fait en jours OUVRES : un lundi apres un vendredi n'est pas
+    #    un retard de 3 jours mais d'une seance ;
+    #  - les seuils sont resserres. Sur des cours QUOTIDIENS, l'ancien seuil de
+    #    5 jours calendaires laissait passer une semaine entiere de seances
+    #    manquantes en affichant "a jour" — c'est ce qui a produit le message
+    #    trompeur constate.
+    # Une seance de decalage est NORMALE : le BOC du jour n'est publie qu'apres
+    # la cloture, et le workflow P11 tourne en soiree.
     derniere = str(cours.fin_mois.max())[:10]
     try:
-        retard = (pd.Timestamp.today().normalize() - pd.Timestamp(derniere)).days
+        import numpy as _np
+        manquees = int(_np.busday_count(pd.Timestamp(derniere).date(),
+                                        pd.Timestamp.today().date()))
     except Exception:
-        retard = None
+        manquees = None
     st.caption(f"{len(df)} titres · cours au **{derniere}** · source : {origine_cours}")
-    if retard is not None:
-        if retard <= 5:
-            st.success(f"Donnees a jour ({retard} j)")
-        elif retard <= 20:
-            st.warning(f"Donnees vieilles de {retard} jours")
+    if manquees is not None:
+        if manquees <= 1:
+            st.success("Donnees a jour (derniere seance publiee)")
+        elif manquees <= 3:
+            st.warning(f"{manquees} seances manquantes — le BOC du jour n'est publie "
+                       f"qu'apres cloture ; verifier P11 si cela persiste")
         else:
-            st.error(f"Donnees vieilles de {retard} jours — verifier les "
-                     f"workflows de collecte")
+            st.error(f"{manquees} seances manquantes — la collecte quotidienne ne "
+                     f"tourne plus correctement (workflows P11 / P9)")
     if st.button("Actualiser les donnees", width='stretch'):
         st.cache_data.clear()
         st.cache_resource.clear()
@@ -307,8 +353,6 @@ o1, o2, o3, o4 = st.tabs(["Vue d'ensemble", "Explorer", "Fiche titre",
 # 1. Vue d'ensemble
 # ----------------------------------------------------------------------
 with o1:
-    r12 = var12.dropna().iloc[-1] if len(var12.dropna()) else None
-    r24 = var24.dropna().iloc[-1] if len(var24.dropna()) else None
     if r12 is not None:
         if r12 > 0.35:
             lecture = ("**Fin de rallye.** Le marche a deja fortement re-rate : "
@@ -324,7 +368,9 @@ with o1:
             lecture = ("**Marche calme.** Ni euphorie ni capitulation : les profils "
                        "se lisent sans distorsion majeure de regime.")
         c1, c2, c3 = st.columns([1, 1, 3])
-        c1.metric("Marche sur 12 mois", f"{r12:+.0%}", help="Progression mediane des 47 titres")
+        c1.metric("Marche sur 12 mois", f"{r12:+.0%}",
+                  help="Progression mediane des titres cotes, mesuree sur douze mois "
+                       "calendaires reels (et non sur un nombre fixe de seances).")
         c2.metric("Marche sur 24 mois", f"{r24:+.0%}" if r24 is not None else "n/d")
         c3.info(lecture)
 
@@ -548,7 +594,12 @@ with o3:
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("**Cours (36 derniers mois)**")
-        s = cours[cours.ticker == choix].tail(36)
+        s = cours[cours.ticker == choix].copy()
+        s["_d"] = pd.to_datetime(s.fin_mois)
+        if len(s):
+            # meme piege que regime_marche : tail(36) valait 36 mois en mensuel,
+            # 36 seances en quotidien. On borne par la DATE, pas par le rang.
+            s = s[s._d >= s._d.max() - pd.DateOffset(months=36)]
         if len(s):
             st.altair_chart(alt.Chart(s).mark_line(color="#1f4e79").encode(
                 x=alt.X("fin_mois:T", title=None), y=alt.Y("cours:Q", title=None,
