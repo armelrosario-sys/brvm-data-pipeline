@@ -19,6 +19,16 @@ CREATE TABLE IF NOT EXISTS etats_financiers (
     resultat_net_n1 REAL,                    -- comparatif N-1 republie dans le meme document
     resultat_activites_ordinaires REAL,       -- RAO (SYSCOHADA) : resultat hors elements HAO, quand
                                               -- disponible dans le document source (jamais devine)
+    resultat_exploitation REAL,               -- resultat du METIER, avant financier et HAO.
+                                              -- NE FAIT PAS DOUBLON avec le RAO : le RAO inclut le
+                                              -- resultat financier. Cas AGL CI 2024 : RAO 21811,730
+                                              -- mais resultat d'exploitation 941,675 seulement, le
+                                              -- reste etant financier (20870,055). Le RAO n'aurait
+                                              -- donc PAS detecte que la croissance profilee ne
+                                              -- venait pas du metier -- et le resultat net s'est
+                                              -- effondre de 96 % l'exercice suivant.
+    resultat_financier REAL,                  -- contrepartie du precedent : permet de verifier
+                                              -- l'origine du resultat sans la deduire
     total_actif REAL,
     total_passif REAL,
     capitaux_propres REAL,
