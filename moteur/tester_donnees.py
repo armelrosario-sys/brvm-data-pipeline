@@ -264,6 +264,54 @@ def test_application():
     verifie(len(at.tabs) >= 4, f"les onglets sont rendus ({len(at.tabs)} trouves)")
 
 
+# ----------------------------------------------------------------------
+# 5. JURISPRUDENCE DU DRAPEAU RESULTAT_NON_OPERATIONNEL (bloquant)
+# ----------------------------------------------------------------------
+def test_resultat_non_operationnel():
+    """Verrouille le comportement du drapeau sur les deux cas de reference.
+
+    AGL CI (SDSC) est le cas FONDATEUR : en 2024, son resultat net de
+    21 069 M provenait a 96 % du financier (resultat d'exploitation : 942 M).
+    Le profilage y lisait une croissance GARP de +14,8 %/an ; l'exercice 2025 a
+    fait tomber le resultat net de 96 %. Le drapeau doit se declencher.
+
+    SAPH (SPHC) est le CONTRE-EXEMPLE, tout aussi important : son resultat
+    d'exploitation (38 130 M) DEPASSE son resultat net (24 972 M). Sa croissance
+    est pleinement operationnelle et le drapeau ne doit PAS se declencher. Sans
+    ce second cas, rien n'empecherait de durcir le seuil jusqu'a marquer toute
+    la cote — un drapeau qui se leve partout ne signale plus rien.
+    """
+    print("\n=== 5. Drapeau RESULTAT_NON_OPERATIONNEL (bloquant) ===")
+    import json
+    p = RACINE / "collecte" / "profils.json"
+    if not p.exists():
+        verifie(False, "profils.json absent — lancer profils.py", bloquant=False)
+        return
+    profils = json.loads(p.read_text(encoding="utf-8"))
+
+    sdsc = profils.get("SDSC", {})
+    verifie("RESULTAT_NON_OPERATIONNEL" in (sdsc.get("drapeaux") or []),
+            "SDSC (AGL CI) porte le drapeau : resultat majoritairement non "
+            f"operationnel (part mesuree : {sdsc.get('part_operationnelle')})")
+    verifie(sdsc.get("grade") == "C",
+            f"SDSC est plafonne en grade C (grade actuel : {sdsc.get('grade')})")
+
+    sphc = profils.get("SPHC", {})
+    verifie("RESULTAT_NON_OPERATIONNEL" not in (sphc.get("drapeaux") or []),
+            "SPHC (SAPH) ne porte PAS le drapeau : croissance operationnelle "
+            f"(part mesuree : {sphc.get('part_operationnelle')})")
+
+    # Le drapeau doit rester RARE : s'il touche plus du quart des titres
+    # renseignes, le seuil est mal calibre.
+    renseignes = [v for v in profils.values() if v.get("part_operationnelle") is not None]
+    marques = [v for v in renseignes
+               if "RESULTAT_NON_OPERATIONNEL" in (v.get("drapeaux") or [])]
+    if renseignes:
+        verifie(len(marques) <= max(1, len(renseignes) // 4),
+                f"le drapeau reste discriminant : {len(marques)} titre(s) marque(s) "
+                f"sur {len(renseignes)} renseigne(s)")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -272,6 +320,7 @@ def main():
     test_fraicheur()
     test_coherence_frequence()
     test_source_cours()
+    test_resultat_non_operationnel()
     if not sans_app:
         test_application()
 
