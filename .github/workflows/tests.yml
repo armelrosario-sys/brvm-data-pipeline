@@ -16,7 +16,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install pyyaml==6.0.2 openpyxl==3.1.5
+      # streamlit + pandas : requis par tester_donnees.py, qui LANCE reellement
+      # app.py. Sans cette installation, le test du demarrage se met en veille
+      # au lieu d'echouer — et le conflit starlette du 05/08 serait repasse.
+      - run: pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas
+      - run: pip install -r requirements.txt
       - name: Fusionner les donnees en attente (ponts automatiques, 28/07/2026)
         run: |
           python3 moteur/fusionner_fondamentaux.py
@@ -29,5 +33,24 @@ jobs:
           python3 ../collecte/charger_dividendes_exercice.py brvm.db
           python3 ../collecte/charger_liquidite_quotidienne.py brvm.db
           python3 tester.py
+      # Ajout 04/09/2026 : trois regressions sont passees en une semaine sans
+      # qu'aucun des 28 golden tests ne bronche, parce qu'aucune ne portait sur
+      # le moteur (conflit de dependance, retard de donnees de deux mois,
+      # decalage positionnel apres migration vers le quotidien). Ces tests-ci
+      # couvrent les donnees et l'application.
+      #   code 0 = tout va bien | 1 = incoherence BLOQUANTE | 2 = alertes de
+      #   fraicheur seules (retard de collecte : on previent, on ne bloque pas
+      #   un commit de code pour autant).
+      - name: Tests de non-regression (donnees et application)
+        run: |
+          python3 moteur/tester_donnees.py
+          code=$?
+          if [ $code -eq 1 ]; then
+            echo "::error::Incoherence bloquante detectee — ne pas deployer"
+            exit 1
+          elif [ $code -eq 2 ]; then
+            echo "::warning::Retard de collecte detecte — le code est sain, "\
+                 "verifier les workflows P11 et P9"
+          fi
       - name: Generer le dashboard (test de fumee)
         run: python3 dashboard/generer_dashboard.py
