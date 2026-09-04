@@ -679,6 +679,29 @@ AVIS = [
 # document source ou confirme par sourcage documentaire. Jamais devine. Utilise en
 # COMPARAISON au resultat net (jamais en substitution), cf. principe "quality of
 # earnings" applique sans distordre le score (voir discussion methodologique 07/2026).
+# Resultat d'EXPLOITATION et resultat FINANCIER (ajout 04/09/2026).
+# Distincts du RAO : le RAO inclut le financier. Sert au drapeau
+# RESULTAT_NON_OPERATIONNEL du moteur de profils, qui compare le resultat
+# d'exploitation au resultat net.
+# Amorcage manuel a partir des documents deja lus ; l'extraction automatique
+# prend le relais via config/dictionnaire_semantique.yaml.
+EXPLOITATION = [
+    # (ticker, exercice, resultat_exploitation, resultat_financier, source)
+    ("SDSC", 2025, -2271.029, 7079.898,
+     "etats financiers de synthese provisoire au 31/12/2025, publies BRVM 03/08/2026"),
+    ("SDSC", 2024, 941.675, 20870.055,
+     "colonne comparative 2024 du meme document"),
+    # ^ CAS FONDATEUR : en 2024, le resultat net de 21068,974 provenait a 96 %
+    #   du financier. Le profilage lisait "+14,8 %/an de croissance GARP" ; le
+    #   resultat net a chute de 96 % en 2025 quand les produits financiers ont
+    #   ete divises par trois. Ratio exploitation/net 2024 : 4,5 %.
+    ("SPHC", 2025, 38130.0, None,
+     "etats financiers 2025 certifies : resultat d'exploitation +30 %"),
+    # ^ CONTRE-EXEMPLE : resultat d'exploitation (38130) SUPERIEUR au resultat
+    #   net (24972). Croissance pleinement operationnelle -> le drapeau ne doit
+    #   PAS se declencher. Sert de garde-fou contre un seuil trop severe.
+]
+
 RAO = [
     ("FTSC", 2025, 142.325),   # trouve directement dans le document, complete la serie 2023-2025
     ("FTSC", 2024, 4340.0),    # confirme (croissanceafrique.com) : RAO +26% a 4,34 Mds vs RN +504.7%
@@ -879,6 +902,10 @@ def main():
         "UPDATE etats_financiers SET resultat_activites_ordinaires=? "
         "WHERE ticker=? AND exercice=?",
         [(rao, t, e) for t, e, rao in RAO])
+    cur.executemany(
+        "UPDATE etats_financiers SET resultat_exploitation=?, resultat_financier=? "
+        "WHERE ticker=? AND exercice=?",
+        [(re_, rf, t, e) for t, e, re_, rf, _src in EXPLOITATION])
     cur.executemany(
         "UPDATE etats_financiers SET source_url=? WHERE ticker=? AND exercice=?",
         [(url, t, e) for t, e, url in SOURCE_URLS])
