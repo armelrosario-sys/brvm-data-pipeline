@@ -16,7 +16,7 @@ Règles de dérivation, appliquées dans cet ordre :
 Rien n'est estimé : une donnée absente reste nulle et porte un motif d'absence.
 """
 import csv, json, os, statistics as st
-from datetime import date
+from datetime import date, timedelta
 
 SORTIE = os.path.join("docs", "data_brvm.json")
 # Un titre peu liquide peut ne pas être coté d'une séance à l'autre : le bulletin
@@ -115,6 +115,49 @@ def ecrire_registre(valeurs, seance):
     json.dump(registre, open(REGISTRE, "w", encoding="utf-8"),
               ensure_ascii=False, indent=1, sort_keys=True)
     return len(registre)
+
+
+def recule(jour, annees=0, mois=0, jours=0):
+    """Même quantième, plus tôt, en bornant les fins de mois."""
+    total = (jour.year - annees) * 12 + (jour.month - 1) - mois
+    an, m = divmod(total, 12)
+    bissext = an % 4 == 0 and (an % 100 or an % 400 == 0)
+    dernier = [31, 29 if bissext else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m]
+    return date(an, m + 1, min(jour.day, dernier)) - timedelta(days=jours)
+
+
+def serie_cours(r, seance):
+    """Chemin de cours reconstitué à partir des variations cumulées publiées.
+
+    Une variation cumulée sur N mois et le cours du jour donnent le cours d'il y a
+    N mois : cours / (1 + variation). On obtient ainsi huit points datés sur cinq
+    ans. Ce ne sont pas des clôtures relevées séance par séance, mais des repères
+    déduits — la reconstitution est vérifiable : le point à un jour redonne le
+    cours précédent du bulletin, celui au 1er janvier redonne la clôture de
+    l'exercice précédent, tous deux connus par ailleurs.
+    """
+    if not seance or not r.get("clot"):
+        return []
+    j = date.fromisoformat(seance)
+    c = r["clot"]
+    reperes = [
+        ("v5a", recule(j, annees=5), "5 ans"),
+        ("v3a", recule(j, annees=3), "3 ans"),
+        ("v1an", recule(j, annees=1), "1 an"),
+        ("ytd", date(j.year - 1, 12, 31), "1er janvier"),
+        ("v1m", recule(j, mois=1), "1 mois"),
+        ("v1s", recule(j, jours=7), "1 semaine"),
+        ("varJ", recule(j, jours=1), "veille"),
+    ]
+    points = []
+    for cle, quand, libelle in reperes:
+        v = r.get(cle)
+        if v is None or v <= -100:
+            continue
+        points.append(dict(t=quand.isoformat(), c=round(c / (1 + v / 100)), h=libelle))
+    points.append(dict(t=seance, c=c, h="clôture"))
+    points.sort(key=lambda x: x["t"])
+    return points
 
 
 def stats(vals):
@@ -246,6 +289,7 @@ def main():
         if r["hors_seance"]:
             motifs["varJ"] = (f"titre non coté lors de la séance du {boc.get('seance')} — "
                               f"clôture du {r['seance_cotation']} conservée, {r['hors_seance']} j")
+        r["serie"] = serie_cours(r, boc.get("seance"))
         r["motifs"] = motifs
         r["flags"] = signalements(r)
         if r["hors_seance"]:
