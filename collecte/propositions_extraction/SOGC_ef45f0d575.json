@@ -1,8 +1,8 @@
 {
   "ticker": "SOGC",
   "fichier_source": "faffff28_20220429_-_etats_financiers_exercice_2021_-_sogb_ci.pdf",
-  "exercice_courant": 2020,
-  "exercice_precedent": 2021,
+  "exercice_courant": 2021,
+  "exercice_precedent": 2020,
   "referentiel": "syscohada",
   "unite_detectee": "milliers",
   "methode_pages": [
@@ -31,7 +31,7 @@
     }
   },
   "alertes_plausibilite": [],
-  "date_extraction": "2026-07-16",
+  "date_extraction": "2026-09-04",
   "statut": "A_VERIFIER_HUMAIN",
   "sha256": "ef45f0d5751c0ad05794ddab8642794962592c171e478d6848bd686a0939393a"
 }

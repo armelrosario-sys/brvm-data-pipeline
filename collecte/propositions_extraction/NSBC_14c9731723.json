@@ -1,8 +1,8 @@
 {
   "ticker": "NSBC",
   "fichier_source": "dc7fea86_20220401_-_etats_financiers_exercice_2021_-_nsia_banque_ci.pdf",
-  "exercice_courant": 2020,
-  "exercice_precedent": 2021,
+  "exercice_courant": 2021,
+  "exercice_precedent": 2020,
   "referentiel": "bancaire_umoa",
   "unite_detectee": "millions",
   "methode_pages": [
@@ -45,10 +45,17 @@
       "ligne_source": "Produit Net Bancaire 71 364 76 622",
       "valeur_courante_M_FCFA": 71364.0,
       "valeur_precedente_M_FCFA": 76622.0
+    },
+    "resultat_exploitation": {
+      "valeur_courante": 23888,
+      "valeur_precedente": 29199,
+      "ligne_source": "Résultat Brut d'Exploitation 23 888 29 199",
+      "valeur_courante_M_FCFA": 23888.0,
+      "valeur_precedente_M_FCFA": 29199.0
     }
   },
   "alertes_plausibilite": [],
-  "date_extraction": "2026-07-16",
+  "date_extraction": "2026-09-04",
   "statut": "A_VERIFIER_HUMAIN",
   "sha256": "14c973172307e8e20ecadde4d566f5a871bd957f43349c8c1137f6bd2b593858"
 }

@@ -1,8 +1,8 @@
 {
   "ticker": "BOAB",
   "fichier_source": "caa58b11_20240403_-_etats_financiers_-_exercice_2023_-_boa_benin.pdf",
-  "exercice_courant": 2022,
-  "exercice_precedent": 2023,
+  "exercice_courant": 2023,
+  "exercice_precedent": 2022,
   "referentiel": "syscohada",
   "unite_detectee": "milliers (hypothese par defaut, aucune mention explicite trouvee)",
   "methode_pages": [
@@ -24,13 +24,20 @@
       "valeur_precedente": null,
       "ligne_source": "9 CAPITAUX PROPRES ET RESSOURCES ASSIMILEES 104 674 009 283 112 817 609 313",
       "valeur_courante_M_FCFA": 1.0467400928311281e+20
+    },
+    "resultat_exploitation": {
+      "valeur_courante": 23196758789,
+      "valeur_precedente": 23012889188,
+      "ligne_source": "16 RESULTAT D'EXPLOITATION 23 196 758 789 23 012 889 188",
+      "valeur_courante_M_FCFA": 23196758.789,
+      "valeur_precedente_M_FCFA": 23012889.188
     }
   },
   "alertes_plausibilite": [
     "valeur_courante_M_FCFA = 19,143,163 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement",
     "valeur_precedente_M_FCFA = 21,528,746 M FCFA depasse le plafond de plausibilite (1,000,000 M FCFA) -- l'hypothese 'milliers de FCFA' est probablement fausse pour ce document, unite reelle a verifier manuellement"
   ],
-  "date_extraction": "2026-07-16",
+  "date_extraction": "2026-09-04",
   "statut": "A_VERIFIER_HUMAIN",
   "sha256": "670da39f89166fb9db162654e50437e8902acd9b7129fc0267a0a09d802e3a07"
 }
