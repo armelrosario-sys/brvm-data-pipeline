@@ -312,6 +312,77 @@ def test_resultat_non_operationnel():
                 f"sur {len(renseignes)} renseigne(s)")
 
 
+# ----------------------------------------------------------------------
+# 6. ECHELLE DES GRANDEURS (bloquant)
+# ----------------------------------------------------------------------
+def test_echelles():
+    """Verifie qu'aucune grandeur n'a change d'ORDRE DE GRANDEUR entre deux
+    sources censees dire la meme chose.
+
+    Bug detecte le 10/09/2026 par l'utilisateur, sur le graphique et non par les
+    tests : charger_cours_quotidien.py divisait le rendement par 100, alors que
+    le CSV le stocke deja en fraction. Le rendement passait de 4,93 % a 0,0493 %.
+    Rien ne plantait ; deux effets silencieux :
+      - le profil RENDEMENT devenait inatteignable (seuil 4,8 %) ;
+      - le payout implicite (rendement x PER) tombait sous 1 % pour 26 titres,
+        donc la condition "payout <= 100 %" passait TOUJOURS, et les societes
+        distribuant plus que leur benefice n'etaient plus ecartees.
+    Une erreur d'unite ne casse rien : elle deplace des titres. D'ou ce test.
+    """
+    print("\n=== 6. Echelle des grandeurs (bloquant) ===")
+    if not DB.exists():
+        verifie(False, "brvm.db absente", bloquant=False)
+        return
+    cur = sqlite3.connect(DB).cursor()
+
+    # Les rendements des deux tables doivent partager la meme unite.
+    try:
+        med_q = cur.execute(
+            "SELECT rendement FROM cours_quotidien_boc WHERE rendement IS NOT NULL "
+            "AND rendement < 0.5 ORDER BY rendement LIMIT 1 OFFSET "
+            "(SELECT COUNT(*)/2 FROM cours_quotidien_boc WHERE rendement IS NOT NULL "
+            "AND rendement < 0.5)").fetchone()
+        med_m = cur.execute(
+            "SELECT rendement FROM cours_mensuels WHERE rendement IS NOT NULL "
+            "AND rendement < 0.5 ORDER BY rendement LIMIT 1 OFFSET "
+            "(SELECT COUNT(*)/2 FROM cours_mensuels WHERE rendement IS NOT NULL "
+            "AND rendement < 0.5)").fetchone()
+    except Exception:
+        med_q = med_m = None
+    if med_q and med_m and med_q[0] and med_m[0]:
+        rapport = med_q[0] / med_m[0]
+        verifie(0.2 <= rapport <= 5.0,
+                f"rendements quotidien et mensuel a la meme echelle "
+                f"(medianes {med_q[0]:.4f} et {med_m[0]:.4f}, rapport {rapport:.2f})")
+
+    # Un rendement median de marche hors de [1 %, 12 %] signale une unite fausse
+    # bien avant de signaler un marche extraordinaire.
+    if med_q and med_q[0]:
+        verifie(0.01 <= med_q[0] <= 0.12,
+                f"rendement median plausible : {med_q[0]*100:.2f} %")
+
+    # Le profil RENDEMENT ne doit pas disparaitre entierement : sur un marche ou
+    # la mediane depasse 4 %, zero titre classe signale un seuil devenu
+    # inatteignable, donc une unite fausse en amont.
+    import json
+    f = RACINE / "collecte" / "profils.json"
+    if f.exists():
+        profils = json.loads(f.read_text(encoding="utf-8"))
+        dys = [v["dy"] for v in profils.values() if v.get("dy") is not None]
+        if dys:
+            dys.sort()
+            mediane = dys[len(dys) // 2]
+            verifie(1.0 <= mediane <= 12.0,
+                    f"rendements de profils.json en POURCENTAGE "
+                    f"(mediane {mediane:.2f})")
+        payouts = [v["payout"] for v in profils.values() if v.get("payout") is not None]
+        if payouts:
+            aberrants = [x for x in payouts if 0 < x < 0.02]
+            verifie(len(aberrants) <= max(2, len(payouts) // 10),
+                    f"payouts a la bonne echelle : {len(aberrants)} valeur(s) "
+                    f"sous 2 % sur {len(payouts)}")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -321,6 +392,7 @@ def main():
     test_coherence_frequence()
     test_source_cours()
     test_resultat_non_operationnel()
+    test_echelles()
     if not sans_app:
         test_application()
 
