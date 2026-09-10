@@ -40,7 +40,21 @@ def main():
                 (r["ticker"], r["date_bulletin"],
                  float(r["cours"]) if r.get("cours") else None,
                  float(r["per"]) if r.get("per") else None,
-                 float(r["rendement"]) / 100 if r.get("rendement") else None))
+                 # BUG CORRIGE le 10/09/2026 : la division par 100 etait de trop.
+                 # cours_quotidien_boc.csv stocke deja le rendement en FRACTION
+                 # (0,0493 pour 4,93 %), comme cours_mensuels. La division le
+                 # ramenait a 0,000493, soit un rendement cent fois trop petit.
+                 # Consequences mesurees, toutes silencieuses :
+                 #   - le profil RENDEMENT devenait INATTEIGNABLE (seuil 4,8 %) :
+                 #     zero titre classe, contre un auparavant ;
+                 #   - le payout implicite (rendement x PER) tombait sous 1 % pour
+                 #     26 titres, donc la condition "payout <= 100 %" passait
+                 #     TOUJOURS : des titres qui distribuent plus que leur benefice
+                 #     n'etaient plus ecartes. SOLIBRA est ainsi passe de AUCUN
+                 #     PROFIL a VALUE sans qu'aucun fait economique n'ait change.
+                 # Detecte par l'utilisateur sur le graphique, pas par les tests :
+                 # d'ou le controle d'echelle ajoute a tester_donnees.py.
+                 float(r["rendement"]) if r.get("rendement") else None))
             n += 1
             tickers.add(r["ticker"])
             dates.add(r["date_bulletin"])
