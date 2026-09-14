@@ -383,6 +383,73 @@ def test_echelles():
                     f"sous 2 % sur {len(payouts)}")
 
 
+# ----------------------------------------------------------------------
+# 7. PER NORMALISE ET OPERATIONS SUR TITRE (bloquant)
+# ----------------------------------------------------------------------
+def test_per_normalise_et_operations():
+    """Deux controles issus des constats du 12/09/2026.
+
+    (a) PER normalise : le PER affiche se calcule sur le DERNIER benefice. Quand
+        celui-ci est un pic, le titre parait bon marche alors qu'il est cher.
+        Ecarts mesures : SLBC 13,6 -> 29,9 ; BICC 15,1 -> 29,4. Le drapeau
+        BENEFICE_NON_REPRESENTATIF doit rester actif et discriminant.
+
+    (b) Operations sur titre : SOLIBRA a divise son nominal le 27/09/2024 (cours
+        de ~95 000 a 10 215 en une seance) sans que l'operation soit enregistree.
+        Toutes ses performances sur deux ans en etaient faussees. Une chute de
+        plus de 60 % en une seule seance est presque toujours une division de
+        nominal, pas un krach : on la signale.
+    """
+    print("\n=== 7. PER normalise et operations sur titre (bloquant) ===")
+    import json
+    f = RACINE / "collecte" / "profils.json"
+    if not f.exists():
+        verifie(False, "profils.json absent", bloquant=False)
+        return
+    profils = json.loads(f.read_text(encoding="utf-8"))
+
+    calcules = [v for v in profils.values() if v.get("per_normalise") is not None]
+    verifie(len(calcules) >= 15,
+            f"PER normalise calcule pour {len(calcules)} titres "
+            f"(sous 15, l'historique des resultats est trop court)")
+    marques = [v for v in calcules
+               if "BENEFICE_NON_REPRESENTATIF" in (v.get("drapeaux") or [])]
+    verifie(1 <= len(marques) <= max(2, len(calcules) // 3),
+            f"le drapeau BENEFICE_NON_REPRESENTATIF reste discriminant : "
+            f"{len(marques)} titre(s) sur {len(calcules)}")
+
+    # Le taux sans risque doit etre present et plausible pour la zone.
+    taux = {v.get("taux_reference") for v in profils.values() if v.get("taux_reference")}
+    verifie(len(taux) == 1 and 0.03 <= list(taux)[0] <= 0.15,
+            f"taux de reference UEMOA renseigne et plausible : {taux}")
+
+    # (b) divisions de nominal non enregistrees
+    csv_cours = RACINE / "collecte" / "cours_quotidien_boc.csv"
+    ops = RACINE / "collecte" / "operations_sur_titre.csv"
+    if csv_cours.exists():
+        try:
+            import pandas as pd
+        except ImportError:
+            return
+        c = pd.read_csv(csv_cours, parse_dates=["date_bulletin"])
+        c = c.sort_values(["ticker", "date_bulletin"])
+        c["var"] = c.groupby("ticker").cours.pct_change()
+        # on ignore les erreurs de saisie manifestes (facteur ~1000)
+        suspects = c[(c["var"] < -0.60) & (c["var"] > -0.995)]
+        connues = set()
+        if ops.exists():
+            o = pd.read_csv(ops)
+            connues = {(r.ticker, str(r.date)[:7]) for r in o.itertuples()}
+        non_tracees = [(r.ticker, str(r.date_bulletin)[:10])
+                       for r in suspects.itertuples()
+                       if (r.ticker, str(r.date_bulletin)[:7]) not in connues]
+        verifie(len(non_tracees) == 0,
+                "aucune division de nominal non enregistree"
+                + ("" if not non_tracees
+                   else f" — a documenter dans operations_sur_titre.csv : {non_tracees}"),
+                bloquant=False)
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -393,6 +460,7 @@ def main():
     test_source_cours()
     test_resultat_non_operationnel()
     test_echelles()
+    test_per_normalise_et_operations()
     if not sans_app:
         test_application()
 
