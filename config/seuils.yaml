@@ -142,3 +142,19 @@ extraction:
 collecte:
   requetes_par_seconde_max: 2
   cibles: ["boc_fin_de_mois", "avis", "rapports_financiers"]
+
+# Reference macro UEMOA (ajout 12/09/2026).
+# Sans taux sans risque, un rendement s'affiche hors contexte : 4 % parait
+# correct alors qu'il est INFERIEUR a ce que paie le Tresor. Constat qui a
+# motive l'ajout : sur 47 titres, UN SEUL rend plus que l'OAT 5 ans (STBC a
+# 8,5 %, et son dividende n'est pas couvert par son benefice). Acheter une
+# action BRVM pour son revenu n'a donc plus de sens a ce niveau de marche.
+# A actualiser trimestriellement depuis umoatitres.org.
+macro:
+  taux_oat_3ans: 0.0718        # rendement moyen pondere, adjudication Togo 06/03/2026
+  taux_oat_5ans: 0.0736        # idem, maturite 5 ans
+  taux_reference: 0.0736       # celui utilise pour les comparaisons de rendement
+  source: "UMOA-Titres, adjudication Togo du 06/03/2026 (rendements moyens ponderes)"
+  date_releve: "2026-03-06"
+  # Seuils de lecture d'un rendement action, rapportes au taux de reference :
+  prime_exigee_min: 0.00       # au-dessous du taux sans risque : le revenu ne justifie pas l'achat
