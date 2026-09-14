@@ -24,6 +24,45 @@ CSV_SOURCE = str(_BASE / "cours_quotidien_boc.csv")
 DB = sys.argv[1] if len(sys.argv) > 1 else str(_BASE.parent / "moteur" / "brvm.db")
 
 
+
+def _rendement_normalise(valeur):
+    """Ramene tous les rendements a la meme unite : la FRACTION (0,0493 = 4,93 %).
+
+    Correctif du 12/09/2026. Le fichier cours_quotidien_boc.csv melange DEUX
+    unites selon l'origine de la ligne :
+      - extraction historique des bulletins : en POURCENTAGE (4,71 pour 4,71 %)
+      - collecte quotidienne P11 : en FRACTION (0,0493 pour 4,93 %)
+    Consequence mesuree : SIVC ressortait a 2 681 % de rendement, FTSC a 81 %.
+    Le moteur ne lisant que la derniere valeur, les profils du jour restaient
+    justes, mais toute lecture historique du rendement etait fausse d'un facteur
+    cent — et la comparaison au taux souverain devenait absurde.
+
+    Regle de discrimination, calee sur la distribution reelle : aucun rendement
+    exprime en FRACTION ne depasse 1,5 (150 % du cours en dividende). Une valeur
+    superieure a 1,5 est donc necessairement un pourcentage et se divise par
+    cent ; en dessous, c'est deja une fraction.
+    Un premier essai avec un seuil a 0,30 ecrasait a tort FTSC, dont le
+    rendement de 81 % est REEL (dividende exceptionnel de cession) : 0,8144
+    aurait ete divise et serait devenu 0,81 %. Le seuil a 1,5 traite
+    correctement les trois familles observees :
+       4,71  -> 0,0471 (ancienne extraction, en %)
+      26,81  -> 0,2681 (SIVC, dividende exceptionnel en %)
+       0,8144 -> inchange (FTSC, deja en fraction)
+       0,0493 -> inchange (collecte quotidienne)
+    Les rendements superieurs a 15 % restent de toute facon ecartes en aval
+    comme non recurrents (regle Q0.3 du modele de fiche).
+    """
+    if valeur in (None, ""):
+        return None
+    try:
+        v = float(valeur)
+    except (TypeError, ValueError):
+        return None
+    if v > 1.5:           # necessairement exprime en pourcentage
+        v = v / 100.0
+    return v if 0 <= v <= 1.5 else None
+
+
 def main():
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
@@ -54,7 +93,7 @@ def main():
                  #     PROFIL a VALUE sans qu'aucun fait economique n'ait change.
                  # Detecte par l'utilisateur sur le graphique, pas par les tests :
                  # d'ou le controle d'echelle ajoute a tester_donnees.py.
-                 float(r["rendement"]) if r.get("rendement") else None))
+                 _rendement_normalise(r.get("rendement"))))
             n += 1
             tickers.add(r["ticker"])
             dates.add(r["date_bulletin"])
