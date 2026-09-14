@@ -319,7 +319,7 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
 # ----------------------------------------------------------------------
 
 
-def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50):
+def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30):
     table, col = source_cours(cur)
     per_row = cur.execute(
         f"SELECT per, {col} FROM {table} WHERE ticker=? AND per IS NOT NULL "
@@ -423,9 +423,14 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50):
     if part_operationnelle is not None and part_operationnelle < sp_part_min:
         drapeaux = drapeaux + ["RESULTAT_NON_OPERATIONNEL"]
 
+    pern, ecart_ben, n_ex_pern = per_normalise(cur, ticker, per)
+    if ecart_ben is not None and ecart_ben > sp_ecart_max:
+        drapeaux = drapeaux + ["BENEFICE_NON_REPRESENTATIF"]
+
     return dict(per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
                 payout_source=payout_source, part_operationnelle=part_operationnelle,
                 date_cours=date_cours, table_cours=table,
+                per_normalise=pern, ecart_benefice=ecart_ben, n_ex_normalise=n_ex_pern,
                 roe=roe, g=100.0 * g if g is not None else None, source_croissance=source_g,
                 drapeaux=drapeaux, n_exercices=len(rn_dispo), dernier_rn=dernier_rn,
                 peg=round(peg, 2) if peg else None,
@@ -484,6 +489,45 @@ def profil_par_signature(ing, cherte, croissance, sp):
     if not retenus:
         return "AUCUN_PROFIL", None, notes
     return retenus[0], (retenus[1] if len(retenus) > 1 else None), notes
+
+
+def per_normalise(cur, ticker, per, fenetre=4):
+    """PER calcule sur le benefice MOYEN des derniers exercices, et non sur le
+    seul dernier.
+
+    Ajout du 12/09/2026. Un PER se calcule sur un benefice : si ce benefice est
+    un pic, le PER parait bas alors que le titre est cher. Ecarts mesures sur la
+    cote :
+      SLBC  PER affiche 14,9 -> PER normalise 32,7 (dernier benefice +119 % au
+            dessus de sa moyenne : 45,8 Mds contre 20,9 Mds)
+      BICC  12,9 -> 25,1 (+95 %)
+      SHEC  23,7 -> 30,1 (+27 %)
+      STBC  12,1 -> 16,8 (+39 %)
+    Mediane de la cote : 14,0 en affiche, 17,3 en normalise. Le marche est
+    environ un quart plus cher qu'il n'en a l'air.
+
+    Meme logique que le drapeau RESULTAT_NON_OPERATIONNEL : verifier que le
+    benefice qui sert de denominateur est representatif. Ici c'est sa
+    REGULARITE dans le temps ; la c'etait son ORIGINE.
+
+    Retourne (per_normalise, ecart_dernier_sur_moyenne, n_exercices).
+    """
+    if not per or per <= 0:
+        return None, None, 0
+    lignes = cur.execute(
+        "SELECT resultat_net FROM etats_financiers WHERE ticker=? "
+        "AND resultat_net IS NOT NULL AND resultat_net > 0 "
+        "ORDER BY exercice DESC LIMIT ?", (ticker, fenetre)).fetchall()
+    vals = [x[0] for x in lignes]
+    if len(vals) < 3:
+        return None, None, len(vals)
+    dernier = vals[0]
+    moyenne = sum(vals) / len(vals)
+    if moyenne <= 0:
+        return None, None, len(vals)
+    # PER_normalise = PER_affiche x (dernier / moyenne) : le nombre d'actions
+    # s'annule, inutile de l'estimer.
+    return per * (dernier / moyenne), (dernier / moyenne - 1), len(vals)
 
 
 def motif_du_profil(profil, ing, cherte, croissance, sp):
@@ -588,6 +632,9 @@ def grade_confiance(profil, ing, faits_titre):
         "CYCLE_SERIE_RESTAUREE": "serie certifiee restauree malgre une rupture d'echelle "
                                  "(creux de cycle) : la croissance porte sur l'ensemble du "
                                  "cycle, pas sur une phase",
+        "BENEFICE_NON_REPRESENTATIF": "le dernier benefice depasse nettement la moyenne des "
+                                      "exercices precedents : le PER affiche SOUS-ESTIME la "
+                                      "chertee reelle du titre (comparer au PER normalise)",
         "RESULTAT_NON_OPERATIONNEL": "le resultat net provient majoritairement du financier "
                                      "ou de l'exceptionnel : la croissance affichee ne mesure "
                                      "PAS la dynamique du metier (jurisprudence AGL CI)",
@@ -633,6 +680,8 @@ def calculer():
     conn = sqlite3.connect(DB)
     cur = conn.cursor()
     seuils, marche = charger_seuils(), charger_marche()
+    macro = seuils.get("macro") or {}
+    taux_ref = macro.get("taux_reference")
     faits = charger_faits()
     notations = charger_notations()
 
@@ -641,7 +690,7 @@ def calculer():
         croissance_cap=0.60, bpa_implicite_annees=3, rattrapage_min=0.25,
         rattrapage_bloquant=0.30, payout_max=1.0, per_max_analysable=50,
         base_gonflee_max=1.5, fenetre_exercices_etendue=8,
-        part_operationnelle_min=0.50,
+        part_operationnelle_min=0.50, ecart_benefice_max=0.30,
         n_secteur_min=8, value_pctl_min=67, growth_pctl_min=67,
         garp_g_min=0.08, garp_g_max=0.30, garp_pegy_max=1.5, growth_g_min=0.05,
         rendement_dy_min=0.048, contraction_seuil=0.10, alerte_pegy_max=0.25,
@@ -661,7 +710,8 @@ def calculer():
             f"SELECT COUNT(*) FROM {_tbl} WHERE ticker=?", (t,)).fetchone()[0]
         if not cote:
             continue
-        ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"])
+        ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"],
+                          sp["ecart_benefice_max"])
         statut_gate, _motifs = appliquer_gate(cur, t, secteurs.get(t, ""), seuils, marche)
         brut[t] = dict(ing, gate=statut_gate, secteur=secteurs.get(t, ""))
 
@@ -823,7 +873,17 @@ def calculer():
             "comparaisons": comparaisons(v) if v["analysable"] else None,
             "payout_source": v["payout_source"],
             "date_cours": v["date_cours"],
+            # Prime du rendement sur le taux sans risque regional. Negative =
+            # le titre rapporte MOINS qu'une obligation d'Etat de la zone.
+            "taux_reference": taux_ref,
+            "prime_rendement": (round(v["dy"] / 100 - taux_ref, 4)
+                                if (v["dy"] is not None and taux_ref) else None),
             "table_cours": v["table_cours"],
+            "per_normalise": (round(v["per_normalise"], 1)
+                              if v.get("per_normalise") is not None else None),
+            "ecart_benefice": (round(v["ecart_benefice"], 2)
+                               if v.get("ecart_benefice") is not None else None),
+            "n_ex_normalise": v.get("n_ex_normalise"),
             "part_operationnelle": (round(v["part_operationnelle"], 2)
                                     if v.get("part_operationnelle") is not None else None),
             "secondaire": secondaire,
