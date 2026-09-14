@@ -143,6 +143,8 @@ def charger(_empreinte):
             confiance=v.get("confiance"), gate=v.get("gate"),
             motif=v.get("motif"), payout_source=v.get("payout_source"),
             part_op=v.get("part_operationnelle"),
+            per_norm=v.get("per_normalise"), ecart_ben=v.get("ecart_benefice"),
+            prime=v.get("prime_rendement"), taux_ref=v.get("taux_reference"),
             notation=(v.get("notation") or {}).get("note"),
             notation_agence=(v.get("notation") or {}).get("agence"),
             notation_perspective=(v.get("notation") or {}).get("perspective"),
@@ -374,6 +376,18 @@ with o1:
                        "calendaires reels (et non sur un nombre fixe de seances).")
         c2.metric("Marche sur 24 mois", f"{r24:+.0%}" if r24 is not None else "n/d")
         c3.info(lecture)
+    taux = df.taux_ref.dropna()
+    if len(taux):
+        tx = float(taux.iloc[0])
+        au_dessus = int((df.prime.dropna() > 0).sum())
+        st.warning(
+            f"**Taux sans risque de la zone : {tx:.2%}** (obligations d'Etat UEMOA a "
+            f"5 ans). Sur {int(df.prime.notna().sum())} titres, **{au_dessus}** rendent "
+            f"davantage — et ceux-la portent un dividende exceptionnel ou non couvert. "
+            f"Le rendement mediane de la cote est de {df.dy.median():.2f} %. "
+            f"Autrement dit : acheter une action pour son revenu rapporte aujourd'hui "
+            f"MOINS que preter a un Etat de la zone. La seule justification d'un achat "
+            f"reste la croissance attendue.")
 
     st.markdown("#### Repartition des profils")
     st.caption("Cliquer sur un groupe pour afficher les societes qui le composent, "
@@ -519,8 +533,15 @@ with o3:
                     + ("  — secteur trop etroit pour etre significatif"
                        if c["n_secteur"] < 8 else "")
                     + f"\n\nMediane du marche analysable : {mm} (n={c['n_marche']})")
-        st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d", help=_ctx("per"))
+        aide_per = _ctx("per") or ""
+        if pd.notna(r.per_norm):
+            aide_per += (f"\n\nPER normalise (sur le benefice MOYEN des derniers "
+                         f"exercices) : {r.per_norm:.1f}")
+        st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d", help=aide_per,
+                  delta=(f"normalise {r.per_norm:.1f}" if pd.notna(r.per_norm) else None),
+                  delta_color="off")
         st.metric("Rendement", f"{r.dy:.1f} %" if pd.notna(r.dy) else "n/d",
+                  delta=(f"{r.prime*100:+.1f} pts vs Etat" if pd.notna(r.prime) else None),
                   help=(_ctx("dy", " %") or "") + "\n\nConvention brut/net du champ "
                        "rendement du BOC : chantier de verification ouvert.")
 
@@ -575,6 +596,20 @@ with o3:
                    + contexte("payout", pct=True))
     m4.metric("ROE", f"{r.roe:.1f} %" if pd.notna(r.roe) else "non disponible",
               help=contexte("roe", " %"))
+
+    # Representativite du benefice : un PER se calcule sur un benefice ; si ce
+    # benefice est un pic, le PER parait bas alors que le titre est cher.
+    if pd.notna(r.per_norm) and pd.notna(r.per):
+        if "BENEFICE_NON_REPRESENTATIF" in str(v.get("drapeaux") or ""):
+            st.warning(
+                f"**Attention au PER affiche** — il vaut {r.per:.1f}, mais calcule sur "
+                f"le benefice MOYEN des derniers exercices il vaut **{r.per_norm:.1f}**. "
+                f"Le dernier benefice depasse de {r.ecart_ben*100:.0f} % la moyenne : "
+                f"le titre est donc nettement plus cher qu'il n'en a l'air. A confirmer "
+                f"au prochain exercice.")
+        else:
+            st.caption(f"**PER normalise** (sur le benefice moyen) : {r.per_norm:.1f} — "
+                       f"proche du PER affiche, le dernier benefice est representatif.")
 
     # Origine du resultat : la question que le cas AGL CI a rendue incontournable.
     if pd.notna(r.part_op):
