@@ -1,0 +1,107 @@
+name: P13 - Veille des avis BRVM
+
+# Surveille les rubriques d'avis officiels de brvm.org : suspensions de cotation,
+# convocations d'assemblees generales, paiements de dividendes, operations sur
+# titres.
+#
+# POURQUOI QUOTIDIEN (contrairement a P12, mensuel) : ces avis changent la
+# lecture d'un titre du jour au lendemain. Trois exemples reels :
+#   - 16/09/2026 : Sucrivoire, SICOR et SONOCO suspendus de cotation. Un titre
+#     suspendu ne peut etre ni achete ni vendu — le profiler sans le dire est
+#     trompeur.
+#   - 10/09/2026 : AGE Sonatel portant un projet de FRACTIONNEMENT. Un
+#     fractionnement non enregistre divise le cours sans diviser l'historique et
+#     fausse silencieusement toutes les series. C'est deja arrive sur Solibra le
+#     27/09/2024, et le controle ajoute a tester_donnees.py a trouve DOUZE cas
+#     comparables non documentes.
+#   - les paiements de dividendes, dont la table accusait un retard de plusieurs
+#     semaines (cas NSBC).
+#
+# Le garde-fou (--test) rejoue les analyseurs sur un echantillon fige AVANT toute
+# collecte : si la BRVM change la mise en page de ses pages, le job le signale
+# plutot que d'ecrire des donnees fausses.
+
+on:
+  schedule:
+    - cron: "40 18 * * 1-5"   # chaque jour ouvre, 18h40 UTC (apres cloture BRVM)
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "Pages par rubrique (4 couvre environ 3 mois)"
+        required: false
+        default: "4"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: avis-brvm
+  cancel-in-progress: false
+
+jobs:
+  veille:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests==2.32.3 pyyaml==6.0.2
+
+      - name: Garde-fou — analyseurs sur echantillon (sans reseau)
+        id: autotest
+        continue-on-error: true
+        run: python3 collecte/avis_brvm.py --test
+
+      - name: Collecte des avis
+        timeout-minutes: 8
+        run: python3 collecte/avis_brvm.py --pages "${{ github.event.inputs.pages || 4 }}"
+
+      # Le recalcul est un bonus : si le moteur echoue, les avis collectes
+      # doivent quand meme etre commites.
+      - name: Recalcul des profils
+        id: profils
+        continue-on-error: true
+        run: |
+          python3 moteur/peupler.py
+          python3 collecte/charger_cours.py
+          python3 collecte/charger_cours_quotidien.py
+          python3 moteur/profils.py
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add collecte/avis_brvm.csv collecte/avis_echecs.jsonl \
+                  collecte/profils.json || true
+          git commit -m "Veille avis BRVM $(date -u +%F)" || echo "rien a committer"
+          git pull --rebase --autostash origin main
+          git push || echo "push impossible"
+
+      - name: Resume
+        if: always()
+        run: |
+          echo "### Veille des avis BRVM" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.autotest.outcome }}" != "success" ]; then
+            echo "- ⚠️ **Garde-fou en echec** : la mise en page de brvm.org a" \
+                 "peut-etre change. Verifier avant d'exploiter." >> $GITHUB_STEP_SUMMARY
+          fi
+          python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import csv, json, pathlib
+          p = pathlib.Path("collecte/avis_brvm.csv")
+          if p.exists():
+              lignes = list(csv.DictReader(p.open(encoding="utf-8")))
+              crit = [x for x in lignes if x.get("critique") == "oui"]
+              print(f"- {len(lignes)} avis collectes, dont **{len(crit)} critiques**")
+              for x in crit[:10]:
+                  print(f"  - {x['date_avis']} · `{x['type']}` · "
+                        f"{x['ticker'] or '----'} · {x['titre'][:80]}")
+          pr = pathlib.Path("collecte/profils.json")
+          if pr.exists():
+              d = json.loads(pr.read_text(encoding="utf-8"))
+              s = [t for t, v in d.items() if v.get("statut_cotation") == "SUSPENDU"]
+              print(f"- **Titres suspendus de cotation : {', '.join(s) or 'aucun'}**")
+          PY
