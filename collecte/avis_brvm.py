@@ -90,9 +90,24 @@ TYPES = [
 CRITIQUES = {"SUSPENSION", "FRACTIONNEMENT", "AUGMENTATION_CAPITAL", "RADIATION",
              "OPA_OPR", "RETARD_PUBLICATION"}
 
-RE_LIGNE = re.compile(
-    r"(\d{2}/\d{2}/\d{4})\s*\|?\s*([^|\n]{5,200}?)\s*\|?\s*"
-    r"\[(?:T[ée]l[ée]charger|Lire|Voir)\]\((https?://[^\)]+)\)", re.I)
+# Plusieurs mises en page coexistent sur brvm.org (tableaux, listes, cartes), et
+# le premier run reel n'a RIEN extrait avec un motif unique : le CSV produit ne
+# contenait que son en-tete. On essaie donc plusieurs structures, de la plus
+# precise a la plus permissive, et on garde la premiere qui donne des resultats.
+MOTIFS = [
+    # 1. tableau : date | titre | [Télécharger](url)
+    re.compile(r"(\d{2}/\d{2}/\d{4})\s*\|?\s*([^|\n]{5,200}?)\s*\|?\s*"
+               r"\[(?:T[ée]l[ée]charger|Lire|Voir|Consulter)\]\((https?://[^\)]+)\)", re.I),
+    # 2. titre puis date puis lien (ordre inverse, frequent sur les pages "annonces")
+    re.compile(r"([^|\n]{8,200}?)\s*\|?\s*(\d{2}/\d{2}/\d{4})\s*\|?\s*"
+               r"\[[^\]]*\]\((https?://[^\)]+\.pdf)\)", re.I),
+    # 3. lien PDF dont le NOM DE FICHIER porte la date et le libelle :
+    #    20260916_-_avis_ndeg..._-_suspension_de_la_cotation_-_sicor.pdf
+    re.compile(r"\[[^\]]*\]\((https?://[^\)]*?(\d{8})[^\)]*?\.pdf)\)", re.I),
+    # 4. date et lien PDF proches, titre pris dans le texte intercalaire
+    re.compile(r"(\d{2}/\d{2}/\d{4})(.{5,220}?)\[[^\]]*\]\((https?://[^\)]+\.pdf)\)",
+               re.I | re.S),
+]
 RE_DATE_SEULE = re.compile(r"(\d{2}/\d{2}/\d{4})")
 
 
@@ -142,7 +157,8 @@ def reduire(s):
     # la BRVM alterne entre "Cote d'Ivoire" et "CI" dans ses libelles
     s = re.sub(r"c[oô]te\s+d[''’]?\s*ivoire", "ci", s)
     for a, b in (("é", "e"), ("è", "e"), ("ê", "e"), ("à", "a"), ("ô", "o"),
-                 ("î", "i"), ("ç", "c"), ("û", "u"), ("'", ""), ("’", ""), (".", "")):
+                 ("î", "i"), ("ç", "c"), ("û", "u"), ("'", ""), ("\u2019", ""),
+                 ("\u00b4", ""), (".", "")):
         s = s.replace(a, b)
     return re.sub(r"\s+", " ", s).strip()
 
@@ -205,19 +221,59 @@ def journaliser(obj):
         f.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
 
+def _depuis_nom_fichier(url):
+    """Recompose date et libelle a partir du nom du PDF, quand la page ne les
+    expose pas lisiblement. Les avis BRVM suivent une convention stable :
+    20260916_-_avis_ndeg_237_-_suspension_de_la_cotation_-_sicor.pdf
+    """
+    nom = url.rstrip("/").split("/")[-1]
+    m = re.match(r"(\d{4})(\d{2})(\d{2})[_\-]+(.*)\.pdf$", nom, re.I)
+    if not m:
+        return None, None
+    a, mo, j, reste = m.groups()
+    libelle = re.sub(r"[_\-]+", " ", reste)
+    libelle = re.sub(r"\bavis\s+ndeg\s*\d+\s*", "", libelle, flags=re.I).strip()
+    return f"{a}-{mo}-{j}", libelle[:250]
+
+
 def analyser(texte, rubrique, table):
-    """Extrait les avis d'une page. Separe du reseau pour etre testable hors ligne."""
-    lignes = []
-    for d, titre, url in RE_LIGNE.findall(texte):
-        titre = titre.strip(" |")
-        if len(titre) < 5:
-            continue
-        typ = classer(titre)
-        lignes.append(dict(
-            date_avis=_iso(d), rubrique=rubrique, type=typ,
-            ticker=ticker_depuis(titre, table), titre=titre[:250],
-            url=url, critique="oui" if typ in CRITIQUES else "non"))
-    return lignes
+    """Extrait les avis d'une page. Separe du reseau pour etre testable hors ligne.
+    Essaie les mises en page dans l'ordre et retient la premiere productive."""
+    for i, motif in enumerate(MOTIFS):
+        lignes, vus = [], set()
+        for groupes in motif.findall(texte):
+            if i == 0:
+                d, titre, url = groupes
+            elif i == 1:
+                titre, d, url = groupes
+            elif i == 2:
+                url, aaaammjj = groupes
+                d = f"{aaaammjj[6:8]}/{aaaammjj[4:6]}/{aaaammjj[0:4]}"
+                _, titre = _depuis_nom_fichier(url)
+                titre = titre or ""
+            else:
+                d, titre, url = groupes
+                titre = re.sub(r"\s+", " ", re.sub(r"\[[^\]]*\]", " ", titre))
+            titre = (titre or "").strip(" |\n\t")
+            if len(titre) < 5:
+                iso_nom, lib_nom = _depuis_nom_fichier(url)
+                titre = lib_nom or ""
+            if len(titre) < 5 or url in vus:
+                continue
+            vus.add(url)
+            typ = classer(titre)
+            try:
+                date_iso = _iso(d)
+            except Exception:
+                continue
+            lignes.append(dict(
+                date_avis=date_iso, rubrique=rubrique, type=typ,
+                ticker=ticker_depuis(titre, table) or ticker_depuis(url, table),
+                titre=titre[:250], url=url,
+                critique="oui" if typ in CRITIQUES else "non"))
+        if lignes:
+            return lignes
+    return []
 
 
 def collecter(session, rubrique, chemin, pages, table):
@@ -230,7 +286,18 @@ def collecter(session, rubrique, chemin, pages, table):
         except Exception as e:
             journaliser({"rubrique": rubrique, "page": page, "erreur": str(e)[:200]})
             break
-        lignes = analyser(_texte(r), rubrique, table)
+        texte = _texte(r)
+        lignes = analyser(texte, rubrique, table)
+        if not lignes and page == 0:
+            # Le premier run reel a produit un CSV vide : sans trace de la page,
+            # impossible de savoir pourquoi. On conserve un extrait pour pouvoir
+            # corriger le motif au lieu de deviner.
+            echantillon = ICI / f"diagnostic_{rubrique.lower()}.txt"
+            echantillon.write_text(texte[:20000], encoding="utf-8")
+            print(f"  {rubrique:10s} AUCUN avis reconnu — extrait conserve dans "
+                  f"{echantillon.name} pour diagnostic")
+            journaliser({"rubrique": rubrique, "erreur": "aucun avis reconnu",
+                         "longueur_page": len(texte)})
         nouvelles = [x for x in lignes if x["url"] not in vus]
         for x in nouvelles:
             vus.add(x["url"])
@@ -243,17 +310,21 @@ def collecter(session, rubrique, chemin, pages, table):
     return resultats
 
 
+# Echantillon repris TEL QUEL de la page reelle du 18/09/2026, format inclus.
+# Un echantillon invente avait produit un collecteur qui passait son autotest et
+# ne ramenait rien du site — le test doit imiter la source, pas l'idee qu'on
+# s'en fait.
 ECHANTILLON = """
-| 16/09/2026 | SONOCO METAL PACKAGING SIEM CI : Suspension de la cotation | [Télécharger](https://www.brvm.org/sites/default/files/a1.pdf) |
-| 16/09/2026 | SICOR S.A : Suspension de la cotation | [Télécharger](https://www.brvm.org/sites/default/files/a2.pdf) |
-| 14/09/2026 | SUCRIVOIRE S.A : Suspension de la cotation | [Télécharger](https://www.brvm.org/sites/default/files/a3.pdf) |
-| 10/09/2026 | SONATEL : Convocation Assemblée Générale Extraordinaire - Projet de fractionnement de l'action | [Télécharger](https://www.brvm.org/sites/default/files/a4.pdf) |
-| 04/09/2026 | SMB CI : Paiement de dividendes - Exercice 2025 | [Télécharger](https://www.brvm.org/sites/default/files/a5.pdf) |
-| 01/09/2026 | SODE CI : Paiement de dividendes - Exercice 2025 | [Télécharger](https://www.brvm.org/sites/default/files/a6.pdf) |
-| 04/09/2026 | BRIDGE BANK GROUP COTE D'IVOIRE : Première cotation | [Télécharger](https://www.brvm.org/sites/default/files/a7.pdf) |
-| 23/04/2026 | SAFCA CI : Augmentation de capital - Droit préférentiel de souscription | [Télécharger](https://www.brvm.org/sites/default/files/a8.pdf) |
-| 16/09/2025 | FILTISAC CI : Paiement de dividendes exercice 2024 et dividendes exceptionnels | [Télécharger](https://www.brvm.org/sites/default/files/a9.pdf) |
-| 12/08/2026 | SONOCO METAL PACKAGING SIEM CI : Reprise de la cotation | [Télécharger](https://www.brvm.org/sites/default/files/a10.pdf) |
+| SONOCO METAL PACKAGING SIEM CI (Ex-EVIOSYS PACKAGING SIEM CI) : Suspension de la cotation | 17/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a1.pdf) |  |
+| SUCRIVOIRE S.A : Suspension de la cotation | 17/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a2.pdf) |  |
+| SICOR S.A : Suspension de la cotation | 17/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a3.pdf) |  |
+| Avis : Calendrier de paiement de dividendes | 17/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a4.pdf) |  |
+| BRIDGE BANK GROUP COTE D’IVOIRE : Première cotation | 08/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a5.pdf) |  |
+| SONATEL : Convocation Assemblée Générale Extraordinaire - Projet de fractionnement de l'action | 10/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a6.pdf) |  |
+| SMB CI : Paiement de dividendes - Exercice 2025 | 04/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a7.pdf) |  |
+| SAFCA CI : Augmentation de capital - Droit préférentiel de souscription | 23/04/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a8.pdf) |  |
+| FILTISAC CI : Paiement de dividendes exercice 2024 et dividendes exceptionnels | 16/09/2025 | [Télécharger](https://www.brvm.org/sites/default/files/a9.pdf) |  |
+| SONOCO METAL PACKAGING SIEM CI : Reprise de la cotation | 12/08/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a10.pdf) |  |
 """
 
 
@@ -267,11 +338,12 @@ def autotest():
     if len(lignes) != 10:
         echecs.append(f"{len(lignes)} avis reconnus au lieu de 10")
     attendu = {
-        "SONOCO METAL PACKAGING SIEM CI : Suspension de la cotation": "SUSPENSION",
+        "SONOCO METAL PACKAGING SIEM CI (Ex-EVIOSYS PACKAGING SIEM CI) : "
+        "Suspension de la cotation": "SUSPENSION",
         "SUCRIVOIRE S.A : Suspension de la cotation": "SUSPENSION",
         "SONOCO METAL PACKAGING SIEM CI : Reprise de la cotation": "REPRISE_COTATION",
         "SMB CI : Paiement de dividendes - Exercice 2025": "DIVIDENDE",
-        "BRIDGE BANK GROUP COTE D'IVOIRE : Première cotation": "PREMIERE_COTATION",
+        "BRIDGE BANK GROUP COTE D\u2019IVOIRE : Première cotation": "PREMIERE_COTATION",
         "SAFCA CI : Augmentation de capital - Droit préférentiel de souscription":
             "AUGMENTATION_CAPITAL",
         "FILTISAC CI : Paiement de dividendes exercice 2024 et dividendes exceptionnels":
@@ -289,7 +361,11 @@ def autotest():
     elif frac[0]["ticker"] != "SNTS":
         echecs.append(f"fractionnement rattache a {frac[0]['ticker']} au lieu de SNTS")
     rattaches = sum(1 for x in lignes if x["ticker"])
-    if rattaches < 8:
+    # Le seul avis non rattache de l'echantillon est "Avis : Calendrier de
+    # paiement de dividendes" — un avis GENERAL de la BRVM, sans emetteur. C'est
+    # le comportement voulu : mieux vaut un avis sans ticker qu'un avis colle au
+    # mauvais titre.
+    if rattaches < 9:
         echecs.append(f"{rattaches} avis rattaches a un ticker sur 10")
 
     if echecs:
