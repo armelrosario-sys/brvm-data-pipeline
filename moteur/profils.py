@@ -68,6 +68,7 @@ RACINE = Path(__file__).resolve().parent.parent
 SORTIE = RACINE / "collecte" / "profils.json"
 FAITS = RACINE / "config" / "faits_qualitatifs.yaml"
 NOTATIONS = RACINE / "collecte" / "notations_financieres.csv"
+AVIS = RACINE / "collecte" / "avis_brvm.csv"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scoring import charger_seuils, charger_marche, appliquer_gate  # noqa: E402
@@ -119,6 +120,42 @@ def pctl(vals, x, inverse=False):
     if x is None or not v:
         return None
     return round(100 * sum(1 for val in v if (val >= x if inverse else val <= x)) / len(v))
+
+
+def charger_avis():
+    """Avis officiels de la BRVM, par ticker, les plus recents d'abord.
+
+    Ajout du 18/09/2026. Trois informations changeaient la lecture d'un titre du
+    jour au lendemain sans que l'outil les voie : les suspensions de cotation
+    (Sucrivoire, SICOR, SONOCO depuis le 16/09/2026), les projets de
+    fractionnement soumis en assemblee extraordinaire (Sonatel), et les
+    paiements de dividendes. Un titre suspendu reste profile comme s'il etait
+    negociable ; un fractionnement non enregistre fausse toute la serie de cours,
+    comme cela s'est produit sur Solibra.
+    """
+    if not AVIS.exists():
+        return {}
+    import csv as _csv
+    par_ticker = {}
+    with AVIS.open(encoding="utf-8") as f:
+        for ligne in _csv.DictReader(f):
+            t = (ligne.get("ticker") or "").strip()
+            if t:
+                par_ticker.setdefault(t, []).append(ligne)
+    for t in par_ticker:
+        par_ticker[t].sort(key=lambda x: x.get("date_avis", ""), reverse=True)
+    return par_ticker
+
+
+def statut_cotation(avis_titre):
+    """SUSPENDU / NEGOCIABLE, d'apres le dernier avis de suspension ou de reprise.
+    Un avis de reprise posterieur annule une suspension."""
+    for a in avis_titre:
+        if a.get("type") == "SUSPENSION":
+            return "SUSPENDU", a.get("date_avis"), a.get("titre")
+        if a.get("type") == "REPRISE_COTATION":
+            return "NEGOCIABLE", a.get("date_avis"), a.get("titre")
+    return "NEGOCIABLE", None, None
 
 
 def charger_notations():
@@ -684,6 +721,7 @@ def calculer():
     taux_ref = macro.get("taux_reference")
     faits = charger_faits()
     notations = charger_notations()
+    avis = charger_avis()
 
     par_defaut = dict(
         fenetre_exercices_max=4, pic_yoy_max=3.5, base_ecrasee_min=0.30,
@@ -797,6 +835,29 @@ def calculer():
             cherte, croissance, ref = axes(t, v)
             principal, secondaire, notes = profil_par_signature(v, cherte, croissance, sp)
 
+        # --- Avis officiels : suspension, fractionnement, operation sur capital ---
+        avis_titre = avis.get(t, [])
+        statut, date_statut, libelle_statut = statut_cotation(avis_titre)
+        if statut == "SUSPENDU":
+            # Un titre suspendu ne peut etre ni achete ni vendu : le profil
+            # devient une information theorique. On le CONSERVE (l'analyse reste
+            # valable pour la reprise) mais on le signale sans ambiguite.
+            notes = notes + [
+                "COTATION SUSPENDUE depuis le %s — le titre ne peut etre ni achete "
+                "ni vendu. Le profil ci-dessous reste une lecture des comptes, pas "
+                "une opportunite accessible. Motif : %s"
+                % (date_statut, (libelle_statut or "voir l'avis BRVM"))]
+        alertes_avis = [a for a in avis_titre[:12]
+                        if a.get("type") in ("FRACTIONNEMENT", "AUGMENTATION_CAPITAL",
+                                             "RADIATION", "OPA_OPR")]
+        for a in alertes_avis[:2]:
+            notes = notes + [
+                "AVIS BRVM du %s — %s : %s. Une operation sur le capital modifie le "
+                "nombre d'actions et donc le cours de reference ; tant qu'elle n'est "
+                "pas enregistree dans operations_sur_titre.csv, les series historiques "
+                "de ce titre seront faussees."
+                % (a.get("date_avis"), a.get("type"), (a.get("titre") or "")[:110])]
+
         motif = motif_du_profil(principal, v, cherte, croissance, sp)
         if sensible_brut_net(principal, v, sp):
             notes = notes + [
@@ -845,6 +906,8 @@ def calculer():
                 notes = notes + ["CONTRADICTION_NOTATION : " + contradiction]
 
         grade, reserves = grade_confiance(principal, v, fait)
+        if statut == "SUSPENDU" and grade == "A":
+            grade = "B"
         if contradiction and grade == "A":
             grade = "B"  # une contradiction externe interdit le grade maximal
         if fait.get("note"):
@@ -913,6 +976,11 @@ def calculer():
                           "ca_mds": note.get("ca_mds"),
                           "url": note.get("url_pdf")} if note else None),
             "contradiction_notation": bool(contradiction),
+            "statut_cotation": statut,
+            "date_statut_cotation": date_statut,
+            "avis_recents": [{"date": a.get("date_avis"), "type": a.get("type"),
+                              "titre": a.get("titre"), "url": a.get("url")}
+                             for a in avis_titre[:5]],
         }
 
     SORTIE.write_text(json.dumps(profils, ensure_ascii=False, indent=1), encoding="utf-8")
