@@ -450,6 +450,57 @@ def test_per_normalise_et_operations():
                 bloquant=False)
 
 
+# ----------------------------------------------------------------------
+# 8. VEILLE DES AVIS BRVM (bloquant)
+# ----------------------------------------------------------------------
+def test_avis_brvm():
+    """Verifie que la veille des avis officiels alimente bien le moteur.
+
+    Ajout du 18/09/2026. Trois faits officiels etaient invisibles dans l'outil :
+    les suspensions de cotation (Sucrivoire, SICOR, SONOCO au 16/09/2026), les
+    projets de fractionnement (AGE Sonatel) et les paiements de dividendes. Un
+    titre suspendu ne peut etre ni achete ni vendu : le profiler sans le dire est
+    trompeur. Un fractionnement non enregistre fausse toute la serie de cours —
+    c'est deja arrive sur Solibra, et le controle des divisions de nominal en a
+    trouve douze non documentees.
+    """
+    print("\n=== 8. Veille des avis BRVM (bloquant) ===")
+    import json
+    fichier = RACINE / "collecte" / "avis_brvm.csv"
+    verifie(fichier.exists(),
+            "collecte/avis_brvm.csv present (sinon la veille n'a jamais tourne)",
+            bloquant=False)
+    f = RACINE / "collecte" / "profils.json"
+    if not f.exists():
+        return
+    profils = json.loads(f.read_text(encoding="utf-8"))
+
+    avec_statut = sum(1 for v in profils.values() if v.get("statut_cotation"))
+    verifie(avec_statut == len(profils),
+            f"statut de cotation expose pour les {len(profils)} titres "
+            f"({avec_statut} renseignes)")
+
+    suspendus = [t for t, v in profils.items() if v.get("statut_cotation") == "SUSPENDU"]
+    # Un titre suspendu ne peut pas etre presente comme exploitable tel quel.
+    mal_gradues = [t for t in suspendus if profils[t].get("grade") == "A"]
+    verifie(not mal_gradues,
+            f"aucun titre suspendu en grade A (suspendus : {suspendus or 'aucun'})")
+
+    # Une alerte d'operation sur capital doit remonter dans les notes du titre.
+    if fichier.exists():
+        import csv as _csv
+        with fichier.open(encoding="utf-8") as fh:
+            lignes = list(_csv.DictReader(fh))
+        frac = [x for x in lignes
+                if x.get("type") in ("FRACTIONNEMENT", "AUGMENTATION_CAPITAL")
+                and x.get("ticker")]
+        for x in frac[:3]:
+            notes = " ".join(profils.get(x["ticker"], {}).get("notes") or [])
+            verifie("AVIS BRVM" in notes,
+                    f"l'operation sur capital de {x['ticker']} ({x['type']}, "
+                    f"{x['date_avis']}) est signalee sur sa fiche")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -461,6 +512,7 @@ def main():
     test_resultat_non_operationnel()
     test_echelles()
     test_per_normalise_et_operations()
+    test_avis_brvm()
     if not sans_app:
         test_application()
 
