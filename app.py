@@ -437,6 +437,30 @@ with o1:
                          "Motif du classement": st.column_config.TextColumn(width="large")})
 
     st.markdown("---")
+    tous_avis = []
+    for t, v in profils.items():
+        for a in (v.get("avis_recents") or []):
+            tous_avis.append(dict(ticker=t, **a))
+    if tous_avis:
+        tous_avis.sort(key=lambda x: x.get("date") or "", reverse=True)
+        critiques = [a for a in tous_avis
+                     if a.get("type") in ("SUSPENSION", "FRACTIONNEMENT",
+                                          "AUGMENTATION_CAPITAL", "RADIATION",
+                                          "OPA_OPR", "RETARD_PUBLICATION")]
+        titre_bloc = (f"Avis officiels BRVM — {len(critiques)} critique(s) "
+                      f"sur {len(tous_avis)} recents")
+        with st.expander(titre_bloc, expanded=bool(critiques)):
+            st.caption("Suspensions, operations sur le capital, assemblees et "
+                       "dividendes, collectes chaque jour ouvre sur brvm.org. "
+                       "Les avis d'un titre figurent aussi sur sa fiche.")
+            for a in (critiques or tous_avis)[:15]:
+                lien = f" · [avis officiel]({a['url']})" if a.get("url") else ""
+                st.markdown(f"- **{a.get('date')}** · `{a.get('type')}` · "
+                            f"**{a['ticker']}** — {(a.get('titre') or '')[:110]}{lien}")
+    else:
+        st.info("Aucun avis BRVM collecte pour l'instant. Lancer le workflow "
+                "**P13 - Veille des avis BRVM** depuis l'onglet Actions de GitHub.")
+
     st.markdown("#### Plan cherte × croissance")
     n_plan = int((vue.cherte_pctl.notna() & vue.croissance_pctl.notna()).sum())
     st.caption(f"**{n_plan} titres sur {len(vue)} positionnes.** Percentiles au sein du "
@@ -462,6 +486,141 @@ with o1:
                    .encode(y="v:Q"))
         st.altair_chart((base + texte + regles + regles2).properties(height=460),
                         width='stretch')
+
+        # Lecture du plan, titre par titre. Un nuage de points sans legende de
+        # lecture laisse chacun interpreter les positions a sa facon ; ces phrases
+        # sont derivees mecaniquement du quadrant, du profil et des drapeaux.
+        def quadrant(ch, cr):
+            if ch >= 67 and cr >= 67:
+                return "Decote ET croissance", 0
+            if ch < 67 <= cr:
+                return "Croissance deja payee", 1
+            if cr < 67 <= ch:
+                return "Bon marche, sans dynamique", 2
+            return "Ni decote ni croissance", 3
+
+        def lecture(r, vv):
+            bits = []
+            dra = vv.get("drapeaux") or []
+            if vv.get("statut_cotation") == "SUSPENDU":
+                bits.append("**cotation suspendue**")
+            if "BENEFICE_NON_REPRESENTATIF" in dra and vv.get("per_normalise"):
+                bits.append(f"PER trompeur ({r.per:.0f} affiche, "
+                            f"{vv['per_normalise']:.0f} sur benefice moyen)")
+            if "RESULTAT_NON_OPERATIONNEL" in dra:
+                bits.append("benefice non operationnel")
+            if any(d in dra for d in ("RATTRAPAGE", "CAP_60", "BASE_ECRASEE", "PIC_YOY")):
+                bits.append("croissance de rattrapage, non extrapolable")
+            if "INFLEXION_RECENTE" in dra:
+                bits.append("dernier exercice en recul")
+            if pd.notna(r.prime) and r.prime > 0:
+                bits.append(f"rend plus que l'Etat ({r.dy:.1f} %)")
+            if vv.get("grade") == "C":
+                bits.append("grade C : verifier avant usage")
+            if not bits:
+                if r.profil == "GARP":
+                    bits.append("croissance encore payable au prix actuel")
+                elif r.profil == "VALUE":
+                    bits.append("decote sur des benefices etablis")
+                elif r.profil == "VIGILANCE_CONTRACTION":
+                    bits.append("benefices en recul")
+                else:
+                    bits.append("correctement paye, sans angle particulier")
+            return " · ".join(bits)
+
+        with st.expander(f"Lecture du plan — les {len(plan)} titres positionnes",
+                         expanded=False):
+            st.caption("Une ligne par titre, deduite de sa position, de son profil "
+                       "et de ses drapeaux. A lire comme un point de depart, pas "
+                       "comme un verdict : les rangs voisins ne sont pas "
+                       "significativement differents.")
+            plan2 = plan.copy()
+            plan2["_q"] = [quadrant(r.cherte_pctl, r.croissance_pctl)[1]
+                           for _, r in plan2.iterrows()]
+            noms_q = ["Decote ET croissance (quadrant favorable)",
+                      "Croissance deja payee (haut a gauche)",
+                      "Bon marche mais sans dynamique (bas a droite)",
+                      "Ni decote ni croissance (bas a gauche)"]
+            for q in range(4):
+                sous = plan2[plan2._q == q].sort_values("cherte_pctl", ascending=False)
+                if not len(sous):
+                    continue
+                st.markdown(f"**{noms_q[q]}** — {len(sous)} titre(s)")
+                for _, r in sous.iterrows():
+                    vv = profils.get(r.ticker, {})
+                    st.markdown(
+                        f"- **{r.ticker}** ({r.nom}) · {r.profil.replace('_', ' ')} "
+                        f"· grade {r.grade} — {lecture(r, vv)}")
+
+        # --- Lecture du plan, titre par titre ---
+        # Un nuage de points sans legende oblige chacun a reconstruire le sens de
+        # chaque position. On explicite les quatre zones et ce que chaque titre y
+        # fait, en une ligne.
+        st.markdown("##### Comment lire ce plan")
+        st.caption("Les pointilles marquent le tercile superieur de chaque axe. "
+                   "Quatre zones en resultent. Rappel : ces percentiles sont "
+                   "RELATIFS a la cote — un titre \"decote\" l'est par rapport aux "
+                   "autres titres BRVM, pas dans l'absolu.")
+
+        plan2 = plan.copy()
+        plan2["zone"] = plan2.apply(
+            lambda r: ("Decote ET croissance" if r.cherte_pctl >= 67 and r.croissance_pctl >= 67
+                       else "Croissance deja payee" if r.croissance_pctl >= 67
+                       else "Bon marche sans dynamique" if r.cherte_pctl >= 67
+                       else "Ni l'un ni l'autre"), axis=1)
+
+        ZONES = {
+            "Decote ET croissance": (
+                "**Haut a droite — decote ET croissance.** La zone la plus "
+                "recherchee : le titre croit et n'est pas encore paye pour cela. "
+                "C'est par construction l'endroit ou se trouvent les profils GARP."),
+            "Croissance deja payee": (
+                "**Haut a gauche — croissance deja payee.** Ces societes croissent, "
+                "mais le marche l'a compris avant vous. Attention : plusieurs y sont "
+                "pour une croissance de rattrapage, non extrapolable."),
+            "Bon marche sans dynamique": (
+                "**Bas a droite — bon marche, sans dynamique.** On y trouve autant "
+                "de profils de rendement legitimes que de pieges a valeur : la "
+                "decote peut etre meritee."),
+            "Ni l'un ni l'autre": (
+                "**Bas a gauche — ni decote, ni croissance.** La zone la moins "
+                "attrayante, ou se concentrent logiquement les benefices en recul."),
+        }
+        for zone in ["Decote ET croissance", "Croissance deja payee",
+                     "Bon marche sans dynamique", "Ni l'un ni l'autre"]:
+            sub = plan2[plan2.zone == zone].sort_values("cherte_pctl", ascending=False)
+            if not len(sub):
+                continue
+            st.markdown(ZONES[zone] + f"  ({len(sub)} titre(s))")
+            for _, r in sub.iterrows():
+                bits = []
+                if pd.notna(r.per):
+                    bits.append(f"PER {r.per:.1f}")
+                if pd.notna(r.per_norm) and pd.notna(r.per) and abs(r.per_norm - r.per) > 1:
+                    bits.append(f"**{r.per_norm:.1f} normalise**")
+                if pd.notna(r.dy):
+                    bits.append(f"rdt {r.dy:.1f} %")
+                if pd.notna(r.croissance):
+                    bits.append(f"croiss. {r.croissance:+.0f} %/an")
+                alertes = []
+                if r.statut_cotation == "SUSPENDU":
+                    alertes.append("COTATION SUSPENDUE")
+                if "BENEFICE_NON_REPRESENTATIF" in str(r.drapeaux):
+                    alertes.append("benefice non representatif")
+                if "RATTRAPAGE" in str(r.drapeaux) or "CAP_" in str(r.drapeaux):
+                    alertes.append("croissance de rattrapage")
+                if "RESULTAT_NON_OPERATIONNEL" in str(r.drapeaux):
+                    alertes.append("benefice non operationnel")
+                if pd.notna(r.payout) and r.payout > 1:
+                    alertes.append("dividende non couvert")
+                if pd.notna(r.prime) and r.prime > 0:
+                    alertes.append("rend plus que l'Etat")
+                suffixe = (f" — <span style='color:#b45f3f'>{' · '.join(alertes)}</span>"
+                           if alertes else "")
+                st.markdown(
+                    f"<div class='reserve'><b>{r.ticker}</b> ({r.nom}) · "
+                    f"{r.profil.replace('_', ' ').lower()} · grade {r.grade} · "
+                    f"{' · '.join(bits)}{suffixe}</div>", unsafe_allow_html=True)
 
         # Les titres hors axes ne doivent pas DISPARAITRE du tableau de bord :
         # un plan qui n'affiche que 34 titres sur 47 laisse croire que les 13
