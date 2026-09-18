@@ -145,6 +145,8 @@ def charger(_empreinte):
             part_op=v.get("part_operationnelle"),
             per_norm=v.get("per_normalise"), ecart_ben=v.get("ecart_benefice"),
             prime=v.get("prime_rendement"), taux_ref=v.get("taux_reference"),
+            statut_cotation=v.get("statut_cotation", "NEGOCIABLE"),
+            date_statut=v.get("date_statut_cotation"),
             notation=(v.get("notation") or {}).get("note"),
             notation_agence=(v.get("notation") or {}).get("agence"),
             notation_perspective=(v.get("notation") or {}).get("perspective"),
@@ -257,6 +259,7 @@ with st.sidebar:
     f_grade = st.multiselect("Grade de confiance", ["A", "B", "C"], default=[])
     f_secteur = st.multiselect("Secteur", sorted(df.secteur.dropna().unique()), default=[])
     f_contra = st.checkbox("Uniquement les contradictions avec une agence de notation")
+    f_negoc = st.checkbox("Masquer les titres suspendus de cotation")
     st.markdown("---")
     st.markdown("""<div class='bloc-verite'><b>Ce que cet outil n'est pas</b><br>
     • Il ne cherche pas les hausses explosives : il en est structurellement l'anti-outil.<br>
@@ -274,6 +277,8 @@ if f_secteur:
     vue = vue[vue.secteur.isin(f_secteur)]
 if f_contra:
     vue = vue[vue.contradiction]
+if f_negoc:
+    vue = vue[vue.statut_cotation != "SUSPENDU"]
 
 st.title("Profilage fondamental — BRVM")
 
@@ -388,6 +393,14 @@ with o1:
             f"Autrement dit : acheter une action pour son revenu rapporte aujourd'hui "
             f"MOINS que preter a un Etat de la zone. La seule justification d'un achat "
             f"reste la croissance attendue.")
+
+    susp = vue[vue.statut_cotation == "SUSPENDU"]
+    if len(susp):
+        noms = ", ".join(f"{r.ticker} ({r.nom})" for _, r in susp.iterrows())
+        st.error(f"**{len(susp)} titre(s) suspendu(s) de cotation : {noms}.** "
+                 f"Ces titres ne peuvent etre ni achetes ni vendus tant que la BRVM "
+                 f"n'a pas leve la suspension. Leur profil reste affiche — il decrit "
+                 f"les comptes, pas une opportunite accessible.")
 
     st.markdown("#### Repartition des profils")
     st.caption("Cliquer sur un groupe pour afficher les societes qui le composent, "
@@ -545,6 +558,16 @@ with o3:
                   help=(_ctx("dy", " %") or "") + "\n\nConvention brut/net du champ "
                        "rendement du BOC : chantier de verification ouvert.")
 
+    if v.get("statut_cotation") == "SUSPENDU":
+        st.error(f"**Cotation suspendue depuis le {v.get('date_statut_cotation')}.** "
+                 f"Ce titre ne peut etre ni achete ni vendu jusqu'a la levee de la "
+                 f"suspension par la BRVM. Tout ce qui suit decrit ses comptes, pas "
+                 f"une opportunite accessible.")
+
+    for n in (v.get("notes") or []):
+        if n.startswith("AVIS BRVM"):
+            st.warning(n)
+
     if v.get("motif"):
         st.info(f"**Pourquoi ce profil** — {v['motif']}")
 
@@ -669,6 +692,14 @@ with o3:
         else:
             st.info("Aucun resultat net transcrit en base pour ce titre "
                     "(profil appuye sur le BPA implicite).")
+
+    recents = v.get("avis_recents") or []
+    if recents:
+        with st.expander(f"Derniers avis officiels BRVM ({len(recents)})", expanded=False):
+            for a in recents:
+                lien = f" — [avis]({a['url']})" if a.get("url") else ""
+                st.markdown(f"- **{a.get('date')}** · `{a.get('type')}` · "
+                            f"{(a.get('titre') or '')[:130]}{lien}")
 
     st.markdown("**A completer par l'analyste** — obligatoire avant tout usage reel")
     st.text_area("These adverse : quel est le meilleur argument pour le profil que je n'ai "
