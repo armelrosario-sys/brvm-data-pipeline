@@ -100,7 +100,26 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-08-14",
+    "type": "AUTRE",
+    "titre": "SERVAIR ABIDJAN CI : Modification du montant du dividende - Exercice 2025",
+    "url": "https://www.brvm.org/sites/default/files/20260814_-_avis_ndeg244_brvmdg_-_paiement_de_dividendes_exo_2025_-_servair_abidjan_ci_modification_du_montant_du_dividende.pdf"
+   },
+   {
+    "date": "2026-07-01",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 servair abidjan ci",
+    "url": "https://www.brvm.org/sites/default/files/20260701_-_avis_ndeg193_brvmdg_-_paiement_de_dividendes_exo_2025_-_servair_abidjan_ci.pdf"
+   },
+   {
+    "date": "2026-04-30",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire servair abidjan ci",
+    "url": "https://www.brvm.org/sites/default/files/20260430_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_servair_abidjan_ci.pdf"
+   }
+  ]
  },
  "BICB": {
   "dominant": "AUCUN_PROFIL",
@@ -278,7 +297,14 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-04-17",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire bici ci",
+    "url": "https://www.brvm.org/sites/default/files/20260417_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_bici_ci.pdf"
+   }
+  ]
  },
  "BNBC": {
   "dominant": "RETOURNEMENT",
@@ -335,7 +361,14 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-05-20",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire bernabe ci",
+    "url": "https://www.brvm.org/sites/default/files/20260520_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_bernabe_ci.pdf"
+   }
+  ]
  },
  "BOAB": {
   "dominant": "AUCUN_PROFIL",
@@ -632,7 +665,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-04-17",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 boa ci",
+    "url": "https://www.brvm.org/sites/default/files/20260417_-_avis_ndeg102_brvmdg_-_paiement_de_dividendes_exo_2025_-_boa_ci.pdf"
+   },
+   {
+    "date": "2026-03-27",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire boa ci",
+    "url": "https://www.brvm.org/sites/default/files/20260327_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_boa_ci.pdf"
+   }
+  ]
  },
  "BOAM": {
   "dominant": "AUCUN_PROFIL",
@@ -977,7 +1023,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-05-13",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 sicable ci",
+    "url": "https://www.brvm.org/sites/default/files/20260513-_avis_ndeg134_brvmdg_-_paiement_de_dividendes_exercice_2025_-_sicable_ci.pdf"
+   },
+   {
+    "date": "2026-03-11",
+    "type": "AGO",
+    "titre": "pouvoir assemblee generale ordinaire sicable ci annule et remplace le precedent",
+    "url": "https://www.brvm.org/sites/default/files/20260311_-_pouvoir_-_assemblee_generale_ordinaire_-_sicable_ci_annule_et_remplace_le_precedent.pdf"
+   }
+  ]
  },
  "CBIBF": {
   "dominant": "AUCUN_PROFIL",
@@ -1076,7 +1135,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-06-03",
+    "type": "DIVIDENDE",
+    "titre": "avis n154 brvmdg paiement de dividendes exercice 2025 coris bank international bf",
+    "url": "https://www.brvm.org/sites/default/files/20260603_-_avis_n154_brvmdg_-_paiement_de_dividendes_-_exercice_2025_-_coris_bank_international_bf.pdf"
+   },
+   {
+    "date": "2026-03-31",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire coris bank international bf",
+    "url": "https://www.brvm.org/sites/default/files/20260331_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_coris_bank_international_bf.pdf"
+   }
+  ]
  },
  "CFAC": {
   "dominant": "AUCUN_PROFIL",
@@ -1171,7 +1243,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-07-30",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 cfao motors ci",
+    "url": "https://www.brvm.org/sites/default/files/20260730_-_avis_ndeg227_brvmdg_-_paiement_de_dividendes_exo_2025_-_cfao_motors_ci.pdf"
+   },
+   {
+    "date": "2026-05-12",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire cfao motors ci",
+    "url": "https://www.brvm.org/sites/default/files/20260512_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_cfao_motors_ci.pdf"
+   }
+  ]
  },
  "CIEC": {
   "dominant": "AUCUN_PROFIL",
@@ -1265,7 +1350,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-07-07",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 cie ci",
+    "url": "https://www.brvm.org/sites/default/files/20260707_-_avis_ndeg201_brvmdg_-_paiement_de_dividendes_exercice_2025_-_cie_ci.pdf"
+   },
+   {
+    "date": "2026-06-03",
+    "type": "AGO",
+    "titre": "avis de convocation et projets de resolutions assemblee generale ordinaire cie ci",
+    "url": "https://www.brvm.org/sites/default/files/20260603_-_avis_de_convocation_et_projets_de_resolutions_-_assemblee_generale_ordinaire_-_cie_ci.pdf"
+   }
+  ]
  },
  "ECOC": {
   "dominant": "GARP",
@@ -1367,7 +1465,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-05-08",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 ecobank ci",
+    "url": "https://www.brvm.org/sites/default/files/20260508_-_avis_ndeg128_brvmdg_-_paiement_de_dividendes_-_exercice_2025_-_ecobank_ci.pdf"
+   },
+   {
+    "date": "2026-04-10",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire ecobank ci",
+    "url": "https://www.brvm.org/sites/default/files/20260410_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_ecobank_ci.pdf"
+   }
+  ]
  },
  "ETIT": {
   "dominant": "GARP",
@@ -1511,7 +1622,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-05-29",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire filtisac ci",
+    "url": "https://www.brvm.org/sites/default/files/20260529_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_filtisac_ci.pdf"
+   },
+   {
+    "date": "2025-09-16",
+    "type": "DIVIDENDE_EXCEPTIONNEL",
+    "titre": "brvmdg paiement de dividendes exercice 2024 et paiement de dividendes exceptionnels filtisac ci 0",
+    "url": "https://www.brvm.org/sites/default/files/20250916_-_avis_ndeg230_brvmdg_-_paiement_de_dividendes_exercice_2024_et_paiement_de_dividendes_exceptionnels_-_filtisac_ci_0.pdf"
+   }
+  ]
  },
  "LNBB": {
   "dominant": "AUCUN_PROFIL",
@@ -1615,7 +1739,14 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2025-07-20",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 loterie nationale du benin",
+    "url": "https://www.brvm.org/sites/default/files/20250720_-_avis_ndeg211_brvmdg_-_paiement_de_dividendes_exo_2025_-_loterie_nationale_du_benin.pdf"
+   }
+  ]
  },
  "NEIC": {
   "dominant": "GARP",
@@ -1804,7 +1935,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-07-21",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 nsia banque ci",
+    "url": "https://www.brvm.org/sites/default/files/20260721_-_avis_ndeg212_brvmdg_-_paiement_de_dividendes_exercice_2025_-_nsia_banque_ci.pdf"
+   },
+   {
+    "date": "2026-06-11",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire nsia banque ci",
+    "url": "https://www.brvm.org/sites/default/files/20260611_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_nsia_banque_ci.pdf"
+   }
+  ]
  },
  "NTLC": {
   "dominant": "AUCUN_PROFIL",
@@ -1898,7 +2042,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-07-30",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 nestle ci",
+    "url": "https://www.brvm.org/sites/default/files/20260730_-_avis_ndeg228_brvmdg_-_paiement_de_dividendes_exo_2025_-_nestle_ci.pdf"
+   },
+   {
+    "date": "2026-05-22",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire nestle ci",
+    "url": "https://www.brvm.org/sites/default/files/20260522_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_nestle_ci.pdf"
+   }
+  ]
  },
  "ONTBF": {
   "dominant": "VIGILANCE_CONTRACTION",
@@ -1993,7 +2150,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-05-19",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes onatel bf",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_ndeg137_brvmdg_-_paiement_de_dividendes_-_onatel_bf.pdf"
+   },
+   {
+    "date": "2026-04-09",
+    "type": "AUTRE",
+    "titre": "communique de presse onatel bf 0",
+    "url": "https://www.brvm.org/sites/default/files/20260409_-_communique_de_presse_-_onatel_bf_0.pdf"
+   }
+  ]
  },
  "ORAC": {
   "dominant": "AUCUN_PROFIL",
@@ -2090,7 +2260,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-05-20",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 orange ci",
+    "url": "https://www.brvm.org/sites/default/files/20260520_-_avis_ndeg138_brvmdg_-_paiement_de_dividendes_-_exercice_2025_-_orange_ci.pdf"
+   },
+   {
+    "date": "2026-04-03",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire orange ci",
+    "url": "https://www.brvm.org/sites/default/files/20260403_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_orange_ci.pdf"
+   }
+  ]
  },
  "ORGT": {
   "dominant": "AUCUN_PROFIL",
@@ -2279,7 +2462,26 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-06-10",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 palm ci",
+    "url": "https://www.brvm.org/sites/default/files/20260610_-_avis_ndeg162_brvmdg_-_paiement_de_dividendes_exo_2025_-_palm_ci.pdf"
+   },
+   {
+    "date": "2026-03-25",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire palm ci",
+    "url": "https://www.brvm.org/sites/default/files/20260325_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_palm_ci.pdf"
+   },
+   {
+    "date": "2025-08-25",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2024 palm ci",
+    "url": "https://www.brvm.org/sites/default/files/20250825_-_avis_ndeg209_brvmdg_-_paiement_de_dividendes_exo_2024_-_palm_ci.pdf"
+   }
+  ]
  },
  "PRSC": {
   "dominant": "AUCUN_PROFIL",
@@ -2366,7 +2568,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-06-15",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale mixte tractafric motors ci",
+    "url": "https://www.brvm.org/sites/default/files/20260615_-_avis_de_convocation_-_assemblee_generale_mixte_-_tractafric_motors_ci.pdf"
+   },
+   {
+    "date": "2025-09-11",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2024 tractafric motors ci",
+    "url": "https://www.brvm.org/sites/default/files/20250911_-_avis_ndeg223_brvmdg_-_paiement_de_dividendes_exo_2024_-_tractafric_motors_ci.pdf"
+   }
+  ]
  },
  "SAFC": {
   "dominant": "NON_ANALYSABLE",
@@ -2393,7 +2608,8 @@
   "secondaire": null,
   "grade": "C",
   "notes": [
-   "PER absent ou > 50 : benefices nuls ou residuels"
+   "PER absent ou > 50 : benefices nuls ou residuels",
+   "AVIS BRVM du 2026-07-25 — AUGMENTATION_CAPITAL : Avis : Augmentation de capital - Admission à la cote des actions nouvelles de la société SAFCA CI. Une operation sur le capital modifie le nombre d'actions et donc le cours de reference ; tant qu'elle n'est pas enregistree dans operations_sur_titre.csv, les series historiques de ce titre seront faussees."
   ],
   "reserves": [
    "aucune source de croissance exploitable",
@@ -2428,7 +2644,26 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-08-11",
+    "type": "AUTRE",
+    "titre": "Avis : Admission à la cote des actions nouvelles - ALIOS FINANCE",
+    "url": "https://www.brvm.org/sites/default/files/20260811_-_avis_ndeg237_brvmdg_-_admission_a_la_cote_actions_nouvelles_safca_ci.pdf"
+   },
+   {
+    "date": "2026-07-25",
+    "type": "AUGMENTATION_CAPITAL",
+    "titre": "Avis : Augmentation de capital - Admission à la cote des actions nouvelles de la société SAFCA CI",
+    "url": "https://www.brvm.org/sites/default/files/20260724_-_avis_ndeg220_brvmdg_-_admission_a_la_cote_actions_nouvelles_safca_ci.pdf"
+   },
+   {
+    "date": "2026-06-02",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire safca ci",
+    "url": "https://www.brvm.org/sites/default/files/20260602_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_safca_ci.pdf"
+   }
+  ]
  },
  "SCRC": {
   "dominant": "RETOURNEMENT",
@@ -2455,6 +2690,7 @@
   "secondaire": null,
   "grade": "B",
   "notes": [
+   "COTATION SUSPENDUE depuis le 2026-09-17 — le titre ne peut etre ni achete ni vendu. Le profil ci-dessous reste une lecture des comptes, pas une opportunite accessible. Motif : SUCRIVOIRE S.A : Suspension de la cotation",
    "Perte nette 2025 de 6,1 Mds FCFA (comptes sociaux) / 7,95 Mds (consolide), apres un benefice en 2024. Dette totale portee de 24,1 a 64,5 Mds en un an pour financer la rehabilitation des usines et l'extension des plantations ; emprunt obligataire convertible emis en octobre 2025. Catalyseur : montee en capacite industrielle. Risque dominant : le levier, si la production ne suit pas."
   ],
   "reserves": [
@@ -2488,9 +2724,22 @@
    "url": "https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_sucrivoire_ci.pdf"
   },
   "contradiction_notation": false,
-  "statut_cotation": "NEGOCIABLE",
-  "date_statut_cotation": null,
-  "avis_recents": []
+  "statut_cotation": "SUSPENDU",
+  "date_statut_cotation": "2026-09-17",
+  "avis_recents": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SUCRIVOIRE S.A : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg269_brvmdg_-_suspension_-_sucrivoire_ci.pdf"
+   },
+   {
+    "date": "2026-04-30",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire sucrivoire ci",
+    "url": "https://www.brvm.org/sites/default/files/20260430_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sucrivoire_ci.pdf"
+   }
+  ]
  },
  "SDCC": {
   "dominant": "AUCUN_PROFIL",
@@ -2589,7 +2838,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-09-02",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 sode ci",
+    "url": "https://www.brvm.org/sites/default/files/20260902_-_avis_ndeg259_brvmdg_-_paiement_de_dividendes_exercice_2025_-_sode_ci.pdf"
+   },
+   {
+    "date": "2026-06-08",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire sode ci",
+    "url": "https://www.brvm.org/sites/default/files/20260608_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sode_ci.pdf"
+   }
+  ]
  },
  "SDSC": {
   "dominant": "NON_ANALYSABLE",
@@ -2654,7 +2916,26 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-08-03",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale mixte africa global logistics ci",
+    "url": "https://www.brvm.org/sites/default/files/20260803_-_avis_de_convocation_-_assemblee_generale_mixte_-_africa_global_logistics_ci.pdf"
+   },
+   {
+    "date": "2026-08-03",
+    "type": "AGO",
+    "titre": "pouvoir assemblee generale mixte africa global logistics ci",
+    "url": "https://www.brvm.org/sites/default/files/20260803_-_pouvoir_-_assemblee_generale_mixte_-_africa_global_logistics_ci.pdf"
+   },
+   {
+    "date": "2026-08-03",
+    "type": "AGO",
+    "titre": "formulaire de vote par correspondance assemblee generale mixte africa global logistics ci",
+    "url": "https://www.brvm.org/sites/default/files/20260803_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_mixte_-_africa_global_logistics_ci.pdf"
+   }
+  ]
  },
  "SEMC": {
   "dominant": "VIGILANCE_CONTRACTION",
@@ -2716,7 +2997,9 @@
   "part_operationnelle": null,
   "secondaire": null,
   "grade": "C",
-  "notes": [],
+  "notes": [
+   "COTATION SUSPENDUE depuis le 2026-09-17 — le titre ne peut etre ni achete ni vendu. Le profil ci-dessous reste une lecture des comptes, pas une opportunite accessible. Motif : SONOCO METAL PACKAGING SIEM CI (Ex-EVIOSYS PACKAGING SIEM CI) : Suspension de la cotation"
+  ],
   "reserves": [
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "AUCUN_RN_EN_BASE : aucun resultat net transcrit : la croissance repose integralement sur le BPA implicite, invérifiable en l'etat",
@@ -2740,9 +3023,16 @@
   "source_fait": null,
   "notation": null,
   "contradiction_notation": false,
-  "statut_cotation": "NEGOCIABLE",
-  "date_statut_cotation": null,
-  "avis_recents": []
+  "statut_cotation": "SUSPENDU",
+  "date_statut_cotation": "2026-09-17",
+  "avis_recents": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SONOCO METAL PACKAGING SIEM CI (Ex-EVIOSYS PACKAGING SIEM CI) : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg270_brvmdg_-_suspension_-_sonoco_metal_packaging_siem_ci.pdf"
+   }
+  ]
  },
  "SGBC": {
   "dominant": "GARP",
@@ -2831,7 +3121,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-08-06",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 societe generale ci",
+    "url": "https://www.brvm.org/sites/default/files/20260806_-_avis_ndeg231_brvmdg_-_paiement_de_dividendes_exercice_2025_-_societe_generale_ci.pdf"
+   },
+   {
+    "date": "2026-06-03",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale mixte societe generale ci",
+    "url": "https://www.brvm.org/sites/default/files/20260603_-_avis_de_convocation_-_assemblee_generale_mixte_-_societe_generale_ci.pdf"
+   }
+  ]
  },
  "SHEC": {
   "dominant": "GARP",
@@ -2915,7 +3218,26 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-08-21",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 vivo energy ci",
+    "url": "https://www.brvm.org/sites/default/files/20260821_-_avis_ndeg249_brvmdg_-_paiement_de_dividendes_-_exercice_2025_-_vivo_energy_ci.pdf"
+   },
+   {
+    "date": "2026-06-03",
+    "type": "AGO",
+    "titre": "avis de convocation et projets de resolutions assemblee generale ordinaire vivo energy ci",
+    "url": "https://www.brvm.org/sites/default/files/20260603_-_avis_de_convocation_et_projets_de_resolutions_-_assemblee_generale_ordinaire_-_vivo_energy_ci.pdf"
+   },
+   {
+    "date": "2025-09-30",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2024 vivo energy ci",
+    "url": "https://www.brvm.org/sites/default/files/20250930_-_avis_ndeg240_brvmdg_-_paiement_de_dividendes_exo_2024_-_vivo_energy_ci.pdf"
+   }
+  ]
  },
  "SIBC": {
   "dominant": "VIGILANCE_CONTRACTION",
@@ -3042,7 +3364,8 @@
   "secondaire": null,
   "grade": "C",
   "notes": [
-   "PER absent ou > 50 : benefices nuls ou residuels"
+   "PER absent ou > 50 : benefices nuls ou residuels",
+   "COTATION SUSPENDUE depuis le 2026-09-17 — le titre ne peut etre ni achete ni vendu. Le profil ci-dessous reste une lecture des comptes, pas une opportunite accessible. Motif : SICOR S.A : Suspension de la cotation"
   ],
   "reserves": [
    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
@@ -3073,9 +3396,22 @@
   "source_fait": null,
   "notation": null,
   "contradiction_notation": false,
-  "statut_cotation": "NEGOCIABLE",
-  "date_statut_cotation": null,
-  "avis_recents": []
+  "statut_cotation": "SUSPENDU",
+  "date_statut_cotation": "2026-09-17",
+  "avis_recents": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SICOR S.A : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg268_brvmdg_-_suspension_-_sicor_ci.pdf"
+   },
+   {
+    "date": "2026-05-15",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire sicor ci",
+    "url": "https://www.brvm.org/sites/default/files/20260515_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sicor_ci.pdf"
+   }
+  ]
  },
  "SIVC": {
   "dominant": "MUTATION",
@@ -3138,7 +3474,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-06-26",
+    "type": "AGO",
+    "titre": "pouvoir assemblee generale ordinaire erium ci",
+    "url": "https://www.brvm.org/sites/default/files/20260626_-_pouvoir_-_assemblee_generale_ordinaire_-_erium_ci.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire erium ci",
+    "url": "https://www.brvm.org/sites/default/files/20260625_-avis_de_convocation_-_assemblee_generale_ordinaire_-_erium_ci.pdf"
+   }
+  ]
  },
  "SLBC": {
   "dominant": "VALUE",
@@ -3234,7 +3583,32 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-07-13",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 solibra ci",
+    "url": "https://www.brvm.org/sites/default/files/20260713_-_avis_ndeg208_brvmdg_-_paiement_de_dividendes_exo_2025_-_solibra_ci.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire solibra ci",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "type": "AGO",
+    "titre": "pouvoir assemblee generale ordinaire solibra ci",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_pouvoir_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "type": "AGO",
+    "titre": "formulaire de vote par correspondance assemblee generale ordinaire solibra ci",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
+   }
+  ]
  },
  "SMBC": {
   "dominant": "GARP",
@@ -3328,7 +3702,32 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-09-04",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 smb ci",
+    "url": "https://www.brvm.org/sites/default/files/20260904_-_avis_ndeg261_brvmdg_-_paiement_de_dividendes_exercice_2025_-_smb_ci.pdf"
+   },
+   {
+    "date": "2026-06-05",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire smb ci",
+    "url": "https://www.brvm.org/sites/default/files/20260605_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_smb_ci.pdf"
+   },
+   {
+    "date": "2026-06-05",
+    "type": "AGO",
+    "titre": "pouvoir assemblee generale ordinaire smb ci",
+    "url": "https://www.brvm.org/sites/default/files/20260605_-_pouvoir_-_assemblee_generale_ordinaire_-_smb_ci.pdf"
+   },
+   {
+    "date": "2025-08-27",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2024 smb ci",
+    "url": "https://www.brvm.org/sites/default/files/20250827_-_avis_ndeg211_brvmdg_-_paiement_de_dividendes_exercice_2024_-_smb_ci.pdf"
+   }
+  ]
  },
  "SNTS": {
   "dominant": "GARP",
@@ -3424,7 +3823,26 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-09-17",
+    "type": "AGE",
+    "titre": "avis de convocation assemblee generale extraordinaire sonatel sn",
+    "url": "https://www.brvm.org/sites/default/files/20260917_-_avis_de_convocation_-_assemblee_generale_extraordinaire_-_sonatel_sn.pdf"
+   },
+   {
+    "date": "2026-04-23",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 sonatel sn",
+    "url": "https://www.brvm.org/sites/default/files/20260423_-_avis_ndeg111_brvmdg_-_paiement_de_dividendes_exo_2025_-_sonatel_sn.pdf"
+   },
+   {
+    "date": "2026-03-27",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire sonatel sn",
+    "url": "https://www.brvm.org/sites/default/files/20260327_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sonatel_sn.pdf"
+   }
+  ]
  },
  "SOGC": {
   "dominant": "VALUE",
@@ -3508,7 +3926,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-07-22",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 sogb ci",
+    "url": "https://www.brvm.org/sites/default/files/20260722_-_avis_ndeg213_brvmdg_-_paiement_de_dividendes_exercice_2025_-_sogb_ci.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire sogb ci",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sogb_ci.pdf"
+   }
+  ]
  },
  "SPHC": {
   "dominant": "GARP",
@@ -3599,7 +4030,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-08-12",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 saph ci",
+    "url": "https://www.brvm.org/sites/default/files/20260812_-_avis_ndeg238_brvmdg_-_paiement_de_dividendes_exo_2025_-_saph_ci.pdf"
+   },
+   {
+    "date": "2026-03-25",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire saph ci",
+    "url": "https://www.brvm.org/sites/default/files/20260325_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_saph_ci.pdf"
+   }
+  ]
  },
  "STAC": {
   "dominant": "RETOURNEMENT",
@@ -3651,7 +4095,14 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-04-30",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire setao ci",
+    "url": "https://www.brvm.org/sites/default/files/20260430_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_setao_ci.pdf"
+   }
+  ]
  },
  "STBC": {
   "dominant": "VALUE",
@@ -3760,7 +4211,32 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-07-29",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 sitab ci",
+    "url": "https://www.brvm.org/sites/default/files/20260729_-_avis_ndeg226_brvmdg_-_paiement_de_dividendes_exercice_2025_-_sitab_ci.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire sitab ci",
+    "url": "https://www.brvm.org/sites/default/files/20260625_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "type": "AGO",
+    "titre": "pouvoir personne morale assemblee generale ordinaire sitab ci",
+    "url": "https://www.brvm.org/sites/default/files/20260625_-_pouvoir_personne_morale_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "type": "AGO",
+    "titre": "pouvoir personne physique assemblee generale ordinaire sitab ci",
+    "url": "https://www.brvm.org/sites/default/files/20260625_-_pouvoir_personne_physique_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
+   }
+  ]
  },
  "TTLC": {
   "dominant": "AUCUN_PROFIL",
@@ -3857,7 +4333,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-08-14",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exo 2025 totalenergies marketing ci",
+    "url": "https://www.brvm.org/sites/default/files/20260814_-_avis_ndeg245_brvmdg_-_paiement_de_dividendes_exo_2025_-_totalenergies_marketing_ci.pdf"
+   },
+   {
+    "date": "2026-05-05",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire totalenergies marketing ci",
+    "url": "https://www.brvm.org/sites/default/files/20260505_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_totalenergies_marketing_ci.pdf"
+   }
+  ]
  },
  "TTLS": {
   "dominant": "AUCUN_PROFIL",
@@ -3943,7 +4432,20 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-06-24",
+    "type": "DIVIDENDE",
+    "titre": "brvmdg paiement de dividendes exercice 2025 totalenergies marketing sn",
+    "url": "https://www.brvm.org/sites/default/files/20260624_-_avis_ndeg185_brvmdg_-_paiement_de_dividendes_exercice_2025_-_totalenergies_marketing_sn.pdf"
+   },
+   {
+    "date": "2026-05-28",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire totalenergies marketing sn",
+    "url": "https://www.brvm.org/sites/default/files/20260528_-_avis_de_convocation-assemblee_generale_ordinaire_-_totalenergies_marketing_sn.pdf"
+   }
+  ]
  },
  "UNLC": {
   "dominant": "RETOURNEMENT",
@@ -3996,7 +4498,14 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-03-11",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire unilever ci",
+    "url": "https://www.brvm.org/sites/default/files/20260311_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_unilever_ci.pdf"
+   }
+  ]
  },
  "UNXC": {
   "dominant": "RETOURNEMENT",
@@ -4048,6 +4557,19 @@
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
   "date_statut_cotation": null,
-  "avis_recents": []
+  "avis_recents": [
+   {
+    "date": "2026-06-29",
+    "type": "AGO",
+    "titre": "avis de convocation et projet de resolution assemblee generale ordinaire uniwax ci",
+    "url": "https://www.brvm.org/sites/default/files/20260629_-_avis_de_convocation_et_projet_de_resolution_-_assemblee_generale_ordinaire_-_uniwax_ci.pdf"
+   },
+   {
+    "date": "2026-06-29",
+    "type": "AGO",
+    "titre": "formulaire de vote par correspondance assemblee generale ordinaire uniwax ci",
+    "url": "https://www.brvm.org/sites/default/files/20260629_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_ordinaire_uniwax_ci.pdf"
+   }
+  ]
  }
 }
