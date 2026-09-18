@@ -92,7 +92,7 @@ SOCIETES = [
     ("CABC", "Sicable CI", "INDUSTRIELS", None, "CI", None, None),
     ("FTSC", "Filtisac CI", "INDUSTRIELS", None, "CI", None, None),
     ("SDSC", "Africa Global Logistics CI", "INDUSTRIELS", None, "CI", None, None),
-    ("SEMC", "Eviosys Packaging Siem CI", "INDUSTRIELS", None, "CI", None, None),
+    ("SEMC", "Sonoco Metal Packaging Siem CI (ex-Eviosys)", "INDUSTRIELS", None, "CI", None, None),
     ("SIVC", "Erium CI (ex-Air Liquide CI)", "INDUSTRIELS", None, "CI", None, None),
     ("STAC", "Setao CI", "INDUSTRIELS", None, "CI", None, None),
     ("CIEC", "CIE CI", "SERVICES_PUBLICS", None, "CI", None, None),
