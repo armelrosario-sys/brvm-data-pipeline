@@ -92,6 +92,37 @@ CREATE TABLE IF NOT EXISTS dividendes (
     source TEXT                                      -- origine de la valeur (meme exigence que l'extraction)
 );
 
+-- Resultats INTERMEDIAIRES (trimestres, semestres). Ajout du 18/09/2026.
+-- Motif : le profilage ne lisait que les exercices ANNUELS, donc avec un an de
+-- retard. Deux cas mesures le meme jour :
+--   SGBC : profil affichant +15,9 %/an de croissance, alors que son premier
+--          semestre 2026 sort a +0,6 % (53,4 Mds contre 53,1).
+--   BOAC : croissance certifiee de +21 %/an sur 2022-2025, mais premier
+--          trimestre 2026 a +0,91 % seulement (10 801 contre 10 703 M), avec un
+--          cout du risque multiplie par 4,2 et un resultat brut d'exploitation
+--          en RECUL de 1,1 %.
+-- Autrement dit : les deux banques que le tableau de bord presentait comme des
+-- profils de croissance stagnent en 2026, et rien ne le signalait.
+-- Ces chiffres sont le plus souvent NON AUDITES : statut PROBABLE par defaut,
+-- jamais utilises pour calculer un profil — seulement pour le CONTREDIRE.
+CREATE TABLE IF NOT EXISTS resultats_intermediaires (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticker TEXT NOT NULL REFERENCES societes(ticker),
+    exercice INTEGER NOT NULL,
+    periode TEXT NOT NULL,            -- T1 | T2 | T3 | S1 | S2 | 9M
+    resultat_net REAL,
+    resultat_net_n1 REAL,             -- meme periode de l'exercice precedent
+    produit_net_bancaire REAL,
+    resultat_brut_exploitation REAL,
+    cout_du_risque REAL,
+    coefficient_exploitation REAL,
+    statut_donnee TEXT NOT NULL,      -- VALIDE (audite) | PROBABLE (non audite)
+    date_publication TEXT,
+    source_url TEXT,
+    note TEXT,
+    UNIQUE(ticker, exercice, periode)
+);
+
 CREATE TABLE IF NOT EXISTS avis_reglementaires (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticker TEXT NOT NULL REFERENCES societes(ticker),
