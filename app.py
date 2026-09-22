@@ -724,8 +724,13 @@ with o3:
                  f"une opportunite accessible.")
 
     for n in (v.get("notes") or []):
-        if n.startswith("AVIS BRVM"):
+        if n.startswith("AVIS BRVM") or n.startswith("CONTREDIT PAR L'EXERCICE"):
             st.warning(n)
+
+    if v.get("roe") is None and v.get("roe_exercice"):
+        st.caption(f"ROE non affiche : les capitaux propres en base datent de "
+                   f"{v['roe_exercice']}. Un ratio calcule sur des fonds propres aussi "
+                   f"anciens induirait en erreur.")
 
     if v.get("motif"):
         st.info(f"**Pourquoi ce profil** — {v['motif']}")
