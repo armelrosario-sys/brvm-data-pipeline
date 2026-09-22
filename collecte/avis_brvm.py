@@ -71,7 +71,17 @@ RUBRIQUES = {
 #     "Reprise" avant "Suspension" : un avis de reprise contient souvent le mot
 #     suspension ("levee de la suspension") et serait sinon classe a l'envers.
 TYPES = [
-    ("REPRISE_COTATION", r"reprise\s+(?:de\s+la\s+)?cotation|lev[ée]e?\s+de\s+la\s+suspension"),
+    # BUG CORRIGE le 22/09/2026 : la BRVM ecrit "Levee de suspension de la
+    # cotation" — SANS "la" entre "de" et "suspension". L'ancien motif exigeait
+    # "levee de LA suspension" et ne reconnaissait donc pas l'avis. Pire : ce
+    # meme libelle contient "suspension de la cotation", si bien que l'avis de
+    # LEVEE etait classe comme une nouvelle SUSPENSION. Cas reel : Sucrivoire,
+    # suspendue le 17/09 et levee le 22/09, serait restee "suspendue" dans
+    # l'outil indefiniment. Les variantes sont couvertes, et ce type reste en
+    # tete de liste pour l'emporter sur SUSPENSION.
+    ("REPRISE_COTATION", r"reprise\s+(?:de\s+(?:la\s+)?|des\s+)?cotations?|"
+                         r"lev[ée]e?\s+(?:de\s+(?:la\s+)?)?suspension|"
+                         r"fin\s+de\s+(?:la\s+)?suspension"),
     ("SUSPENSION", r"suspension\s+(?:de\s+la\s+)?cotation"),
     ("FRACTIONNEMENT", r"fractionnement|division\s+(?:du\s+)?(?:la\s+)?(?:valeur\s+)?nominal|"
                        r"split\b|regroupement\s+d['’]actions"),
@@ -324,6 +334,7 @@ ECHANTILLON = """
 | SMB CI : Paiement de dividendes - Exercice 2025 | 04/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a7.pdf) |  |
 | SAFCA CI : Augmentation de capital - Droit préférentiel de souscription | 23/04/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a8.pdf) |  |
 | FILTISAC CI : Paiement de dividendes exercice 2024 et dividendes exceptionnels | 16/09/2025 | [Télécharger](https://www.brvm.org/sites/default/files/a9.pdf) |  |
+| SUCRIVOIRE S.A. : Levée de suspension de la cotation | 22/09/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a11.pdf) |  |
 | SONOCO METAL PACKAGING SIEM CI : Reprise de la cotation | 12/08/2026 | [Télécharger](https://www.brvm.org/sites/default/files/a10.pdf) |  |
 """
 
@@ -335,13 +346,15 @@ def autotest():
     table = charger_tickers()
     lignes = analyser(ECHANTILLON, "AVIS", table)
     echecs = []
-    if len(lignes) != 10:
-        echecs.append(f"{len(lignes)} avis reconnus au lieu de 10")
+    if len(lignes) != 11:
+        echecs.append(f"{len(lignes)} avis reconnus au lieu de 11")
     attendu = {
         "SONOCO METAL PACKAGING SIEM CI (Ex-EVIOSYS PACKAGING SIEM CI) : "
         "Suspension de la cotation": "SUSPENSION",
         "SUCRIVOIRE S.A : Suspension de la cotation": "SUSPENSION",
         "SONOCO METAL PACKAGING SIEM CI : Reprise de la cotation": "REPRISE_COTATION",
+        # avis reel du 22/09/2026 — le cas qui a revele le bug
+        "SUCRIVOIRE S.A. : Levée de suspension de la cotation": "REPRISE_COTATION",
         "SMB CI : Paiement de dividendes - Exercice 2025": "DIVIDENDE",
         "BRIDGE BANK GROUP COTE D\u2019IVOIRE : Première cotation": "PREMIERE_COTATION",
         "SAFCA CI : Augmentation de capital - Droit préférentiel de souscription":
@@ -365,16 +378,16 @@ def autotest():
     # paiement de dividendes" — un avis GENERAL de la BRVM, sans emetteur. C'est
     # le comportement voulu : mieux vaut un avis sans ticker qu'un avis colle au
     # mauvais titre.
-    if rattaches < 9:
-        echecs.append(f"{rattaches} avis rattaches a un ticker sur 10")
+    if rattaches < 10:
+        echecs.append(f"{rattaches} avis rattaches a un ticker sur 11")
 
     if echecs:
         print(f"AUTOTEST : {len(echecs)} ECHEC(S)")
         for e in echecs:
             print(f"  - {e}")
         return 1
-    print(f"AUTOTEST : analyseurs OK (10 avis, {rattaches} rattaches, "
-          f"classification 7/7, fractionnement SNTS detecte)")
+    print(f"AUTOTEST : analyseurs OK (11 avis, {rattaches} rattaches, "
+          f"classification 8/8, levee Sucrivoire et fractionnement SNTS detectes)")
     return 0
 
 
