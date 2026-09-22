@@ -61,6 +61,7 @@ Sortie : collecte/profils.json
 import sqlite3
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 DB = Path(__file__).resolve().parent / "brvm.db"
@@ -356,7 +357,8 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
 # ----------------------------------------------------------------------
 
 
-def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30):
+def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
+                sp_age_max_cp=3):
     table, col = source_cours(cur)
     per_row = cur.execute(
         f"SELECT per, {col} FROM {table} WHERE ticker=? AND per IS NOT NULL "
@@ -372,11 +374,22 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30):
     per = per_row[0] if per_row else None
     dy = dy_row[0] if dy_row else None  # fraction (0,056 = 5,6 %)
 
-    roe = None
+    roe, roe_exercice = None, None
     for exercice, rn, cp, _payout in etats:
         if rn is not None and cp:
-            roe = 100.0 * rn / cp
+            roe, roe_exercice = 100.0 * rn / cp, exercice
             break
+    # Drapeau DONNEES_PERIMEES (18/09/2026) : un ROE se calcule sur des capitaux
+    # propres. Si ceux-ci datent de plusieurs annees, le ratio n'a plus de sens
+    # et induit en erreur d'autant plus qu'il s'affiche sans date. Cas mesure :
+    # SGBC affichait un ROE de 22,1 % calcule sur des capitaux propres de 2021 —
+    # peri me de cinq ans, alors que son resultat net a progresse de 50 % depuis.
+    # On masque plutot que de publier un chiffre faux.
+    annee_courante = date.today().year
+    roe_perime = (roe_exercice is not None
+                  and (annee_courante - roe_exercice) > sp_age_max_cp)
+    if roe_perime:
+        roe = None
     payout, payout_source = None, None
     for _e, _rn, _cp, p in etats:
         if p is not None:
@@ -463,10 +476,13 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30):
     pern, ecart_ben, n_ex_pern = per_normalise(cur, ticker, per)
     if ecart_ben is not None and ecart_ben > sp_ecart_max:
         drapeaux = drapeaux + ["BENEFICE_NON_REPRESENTATIF"]
+    if roe_perime:
+        drapeaux = drapeaux + ["DONNEES_PERIMEES"]
 
     return dict(per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
                 payout_source=payout_source, part_operationnelle=part_operationnelle,
                 date_cours=date_cours, table_cours=table,
+                roe_exercice=roe_exercice, roe_perime=roe_perime,
                 per_normalise=pern, ecart_benefice=ecart_ben, n_ex_normalise=n_ex_pern,
                 roe=roe, g=100.0 * g if g is not None else None, source_croissance=source_g,
                 drapeaux=drapeaux, n_exercices=len(rn_dispo), dernier_rn=dernier_rn,
@@ -493,7 +509,17 @@ def profil_par_signature(ing, cherte, croissance, sp):
     if inflexion:
         notes.append("dernier exercice en net recul : la croissance moyenne masque "
                      "un retournement en cours — profil a reexaminer a la prochaine publication")
+    # SERIE_TROUEE devient BLOQUANTE (18/09/2026). Cas mesure SGBC : croissance
+    # de +15,9 %/an calculee en reliant 2021 a 2025 sans les quatre exercices
+    # intermediaires, alors que son premier semestre 2026 sort a +0,6 %. Une
+    # croissance qui saute des annees n'est pas une tendance, c'est une
+    # interpolation : elle ne peut plus fonder un profil GARP ou GROWTH.
+    if "SERIE_TROUEE" in drapeaux:
+        notes.append("croissance calculee sur une serie A TROUS : des exercices "
+                     "manquent entre les bornes, le taux affiche relie deux points "
+                     "sans les annees intermediaires")
     bloc = (inflexion
+            or "SERIE_TROUEE" in drapeaux
             or "BASE_ECRASEE" in drapeaux
             or any(d.startswith("CAP_") for d in drapeaux)
             or (g is not None and g > sp["rattrapage_bloquant"] * 100))
@@ -526,6 +552,36 @@ def profil_par_signature(ing, cherte, croissance, sp):
     if not retenus:
         return "AUCUN_PROFIL", None, notes
     return retenus[0], (retenus[1] if len(retenus) > 1 else None), notes
+
+
+def tendance_intermediaire(cur, ticker):
+    """Derniere publication trimestrielle ou semestrielle, et ce qu'elle dit de
+    l'exercice EN COURS.
+
+    Ajout du 18/09/2026, apres deux constats simultanes qui invalidaient les deux
+    profils bancaires les mieux notes du tableau de bord :
+      SGBC — profil a +15,9 %/an, premier semestre 2026 a +0,6 %.
+      BOAC — croissance certifiee de +21 %/an sur 2022-2025, premier trimestre
+             2026 a +0,91 %, avec un cout du risque multiplie par 4,2 et un
+             resultat brut d'exploitation en recul de 1,1 %.
+    Le profilage lisait des exercices CLOS, donc le passe, et presentait comme
+    croissance ce qui avait cesse de croitre. Ces chiffres non audites ne
+    calculent aucun profil : ils le CONTREDISENT quand l'ecart est net.
+
+    Retourne (variation, periode, exercice, note, contredit) ou (None, ...).
+    """
+    try:
+        ligne = cur.execute(
+            "SELECT exercice, periode, resultat_net, resultat_net_n1, note "
+            "FROM resultats_intermediaires WHERE ticker=? AND resultat_net IS NOT NULL "
+            "AND resultat_net_n1 IS NOT NULL "
+            "ORDER BY exercice DESC, periode DESC LIMIT 1", (ticker,)).fetchone()
+    except Exception:
+        return None, None, None, None
+    if not ligne or not ligne[3]:
+        return None, None, None, None
+    exercice, periode, rn, rn1, note = ligne
+    return (rn / rn1 - 1), periode, exercice, note
 
 
 def per_normalise(cur, ticker, per, fenetre=4):
@@ -672,6 +728,12 @@ def grade_confiance(profil, ing, faits_titre):
         "BENEFICE_NON_REPRESENTATIF": "le dernier benefice depasse nettement la moyenne des "
                                       "exercices precedents : le PER affiche SOUS-ESTIME la "
                                       "chertee reelle du titre (comparer au PER normalise)",
+        "DONNEES_PERIMEES": "les capitaux propres en base ont plus de trois ans : le ROE "
+                            "n'est plus calculable de facon fiable et n'est pas affiche",
+        "CONTREDIT_PAR_INTERMEDIAIRE": "la derniere publication trimestrielle ou "
+                                       "semestrielle contredit la croissance annuelle "
+                                       "affichee : l'exercice en cours ne suit pas la "
+                                       "tendance des exercices clos",
         "RESULTAT_NON_OPERATIONNEL": "le resultat net provient majoritairement du financier "
                                      "ou de l'exceptionnel : la croissance affichee ne mesure "
                                      "PAS la dynamique du metier (jurisprudence AGL CI)",
@@ -694,7 +756,8 @@ def grade_confiance(profil, ing, faits_titre):
     if profil == "NON_ANALYSABLE":
         return "C", reserves
     critiques = {"CONTRADICTION_RN_BPA", "AUCUN_RN_EN_BASE", "BASE_GONFLEE", "CONFLIT_N1",
-                 "RESULTAT_NON_OPERATIONNEL", "INFLEXION_RECENTE"}
+                 "RESULTAT_NON_OPERATIONNEL", "INFLEXION_RECENTE",
+                 "DONNEES_PERIMEES", "CONTREDIT_PAR_INTERMEDIAIRE"}
     if critiques & set(ing["drapeaux"]):
         return "C", reserves
     if profil in ("VALUE", "RENDEMENT") and ing["payout"] is None:
@@ -729,6 +792,7 @@ def calculer():
         rattrapage_bloquant=0.30, payout_max=1.0, per_max_analysable=50,
         base_gonflee_max=1.5, fenetre_exercices_etendue=8,
         part_operationnelle_min=0.50, ecart_benefice_max=0.30,
+        age_max_capitaux_propres=3, ecart_intermediaire_max=0.08,
         n_secteur_min=8, value_pctl_min=67, growth_pctl_min=67,
         garp_g_min=0.08, garp_g_max=0.30, garp_pegy_max=1.5, growth_g_min=0.05,
         rendement_dy_min=0.048, contraction_seuil=0.10, alerte_pegy_max=0.25,
@@ -749,7 +813,7 @@ def calculer():
         if not cote:
             continue
         ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"],
-                          sp["ecart_benefice_max"])
+                          sp["ecart_benefice_max"], sp["age_max_capitaux_propres"])
         statut_gate, _motifs = appliquer_gate(cur, t, secteurs.get(t, ""), seuils, marche)
         brut[t] = dict(ing, gate=statut_gate, secteur=secteurs.get(t, ""))
 
@@ -858,6 +922,22 @@ def calculer():
                 "de ce titre seront faussees."
                 % (a.get("date_avis"), a.get("type"), (a.get("titre") or "")[:110])]
 
+        # --- Confrontation a la derniere publication intermediaire ---
+        var_int, periode_int, ex_int, note_int = tendance_intermediaire(cur, t)
+        if var_int is not None and v["g"] is not None:
+            ecart = (v["g"] / 100.0) - var_int
+            # Un profil de croissance dement par l'exercice en cours n'est plus
+            # un profil de croissance : on le signale et on plafonne le grade.
+            if ecart > sp["ecart_intermediaire_max"] and v["g"] > 5:
+                notes = notes + [
+                    "CONTREDIT PAR L'EXERCICE EN COURS — le profil affiche une "
+                    "croissance de %.1f %%/an, mais la derniere publication (%s %s) "
+                    "ressort a %+.1f %%. %s"
+                    % (v["g"], periode_int, ex_int, var_int * 100,
+                       (note_int or "")[:220])]
+                if "CONTREDIT_PAR_INTERMEDIAIRE" not in v["drapeaux"]:
+                    v["drapeaux"] = v["drapeaux"] + ["CONTREDIT_PAR_INTERMEDIAIRE"]
+
         motif = motif_du_profil(principal, v, cherte, croissance, sp)
         if sensible_brut_net(principal, v, sp):
             notes = notes + [
@@ -936,6 +1016,10 @@ def calculer():
             "comparaisons": comparaisons(v) if v["analysable"] else None,
             "payout_source": v["payout_source"],
             "date_cours": v["date_cours"],
+            "tendance_intermediaire": (round(var_int, 4) if var_int is not None else None),
+            "periode_intermediaire": (f"{periode_int} {ex_int}" if var_int is not None
+                                      else None),
+            "roe_exercice": v.get("roe_exercice"),
             # Prime du rendement sur le taux sans risque regional. Negative =
             # le titre rapporte MOINS qu'une obligation d'Etat de la zone.
             "taux_reference": taux_ref,
