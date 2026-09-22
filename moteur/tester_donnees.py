@@ -501,6 +501,78 @@ def test_avis_brvm():
                     f"{x['date_avis']}) est signalee sur sa fiche")
 
 
+# ----------------------------------------------------------------------
+# 9. FRAICHEUR DES FONDAMENTAUX ET EXERCICE EN COURS (bloquant)
+# ----------------------------------------------------------------------
+def test_fondamentaux_a_jour():
+    """Trois controles issus de la comparaison SGBC / BOAC du 18/09/2026.
+
+    (a) Aucun ROE ne doit etre affiche s'il repose sur des capitaux propres de
+        plus de trois ans. SGBC affichait 22,1 % calcule sur 2021.
+    (b) Une croissance calculee sur une serie a trous ne peut pas fonder un
+        profil GARP ou GROWTH. SGBC ressortait a +15,9 %/an en reliant 2021 a
+        2025 ; son premier semestre 2026 sort a +0,6 %.
+    (c) Quand la derniere publication trimestrielle contredit nettement la
+        croissance annuelle, le titre doit porter le drapeau. BOAC : +21 %/an
+        certifie sur 2022-2025, mais +0,91 % au premier trimestre 2026.
+    """
+    print("\n=== 9. Fondamentaux a jour et exercice en cours (bloquant) ===")
+    import json
+    f = RACINE / "collecte" / "profils.json"
+    if not f.exists():
+        return
+    profils = json.loads(f.read_text(encoding="utf-8"))
+    annee = date.today().year
+
+    perimes = [t for t, v in profils.items()
+               if v.get("roe") is not None and v.get("roe_exercice")
+               and annee - v["roe_exercice"] > 3]
+    verifie(not perimes,
+            f"aucun ROE affiche sur des capitaux propres de plus de 3 ans "
+            f"({perimes or 'aucun'})")
+
+    troues_croissance = [t for t, v in profils.items()
+                         if "SERIE_TROUEE" in (v.get("drapeaux") or [])
+                         and v.get("profil") in ("GARP", "GROWTH")]
+    verifie(not troues_croissance,
+            f"aucun profil GARP ou GROWTH fonde sur une serie a trous "
+            f"({troues_croissance or 'aucun'})")
+
+    boac = profils.get("BOAC", {})
+    if boac.get("tendance_intermediaire") is not None:
+        verifie("CONTREDIT_PAR_INTERMEDIAIRE" in (boac.get("drapeaux") or []),
+                f"BOAC signale : croissance annuelle {boac.get('g')} %/an contre "
+                f"{boac['tendance_intermediaire']*100:+.1f} % au "
+                f"{boac.get('periode_intermediaire')}")
+
+
+# ----------------------------------------------------------------------
+# 10. COHERENCE DES STATUTS DE COTATION (bloquant)
+# ----------------------------------------------------------------------
+def test_statuts_cotation():
+    """Une levee de suspension ne doit jamais etre lue comme une suspension.
+
+    Bug du 22/09/2026 : l'avis "SUCRIVOIRE S.A. : Levee de suspension de la
+    cotation" etait classe SUSPENSION, parce que le motif de levee exigeait
+    "levee de LA suspension" alors que la BRVM ecrit "levee DE suspension" — et
+    que le libelle contient par ailleurs "suspension de la cotation". Un titre
+    redevenu negociable serait reste bloque dans l'outil.
+    """
+    print("\n=== 10. Coherence des statuts de cotation (bloquant) ===")
+    sys.path.insert(0, str(RACINE / "collecte"))
+    try:
+        import avis_brvm
+    except ImportError:
+        verifie(True, "collecteur d'avis absent — test ignore", bloquant=False)
+        return
+    for titre, attendu in (
+            ("SUCRIVOIRE S.A. : Levée de suspension de la cotation", "REPRISE_COTATION"),
+            ("SICOR S.A : Suspension de la cotation", "SUSPENSION"),
+            ("X : Reprise des cotations", "REPRISE_COTATION")):
+        verifie(avis_brvm.classer(titre) == attendu,
+                f"'{titre[:48]}' classe {avis_brvm.classer(titre)} (attendu {attendu})")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -513,6 +585,8 @@ def main():
     test_echelles()
     test_per_normalise_et_operations()
     test_avis_brvm()
+    test_fondamentaux_a_jour()
+    test_statuts_cotation()
     if not sans_app:
         test_application()
 
