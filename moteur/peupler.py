@@ -685,6 +685,33 @@ AVIS = [
 # d'exploitation au resultat net.
 # Amorcage manuel a partir des documents deja lus ; l'extraction automatique
 # prend le relais via config/dictionnaire_semantique.yaml.
+# Resultats INTERMEDIAIRES (ajout 18/09/2026). Publications trimestrielles et
+# semestrielles, le plus souvent NON AUDITEES (statut PROBABLE). Elles ne servent
+# JAMAIS a calculer un profil — uniquement a le contredire quand la tendance de
+# l'exercice en cours dement la croissance annuelle affichee.
+# (ticker, exercice, periode, RN, RN_n1, PNB, RBE, cout_risque, coef_exploit,
+#  statut, date_publication, source_url, note)
+INTERMEDIAIRES = [
+    ("BOAC", 2026, "T1", 10801.0, 10703.0, 18960.0, 12194.0, -652.0, 0.3568,
+     "PROBABLE", "2026-06-01",
+     "https://www.brvm.org/sites/default/files/20260601_-_rapport_dactivites_-_1er_trimestre_2026_-_boa_ci.pdf",
+     "Non audite. Resultat net +0,91 % seulement, tres loin du +21 %/an certifie "
+     "sur 2022-2025. Signaux de fond : depots +21,4 % mais credits nets -0,29 % "
+     "(la banque collecte sans preter), cout du risque multiplie par 4,2 (652 "
+     "contre 157), et RESULTAT BRUT D'EXPLOITATION EN RECUL de 1,1 %. Le resultat "
+     "net ne tient que par les lignes situees sous l'exploitation."),
+    ("SGBC", 2026, "T1", 24000.0, 27100.0, 65600.0, None, None, 0.406,
+     "PROBABLE", "2026-05-07", None,
+     "Non audite. RN -11 %, attribue par la banque a une hausse DELIBEREE des "
+     "depenses d'investissement (informatique, siege, plateforme numerique) et "
+     "non a l'activite. Coefficient d'exploitation de 37 % a 40,6 %."),
+    ("SGBC", 2026, "T2", 29400.0, 26000.0, 97300.0, None, None, None,
+     "PROBABLE", "2026-08-01", None,
+     "Non audite. RN +13 %, marge nette 30 % contre 28 %. Cumul du semestre : "
+     "53,4 Mds contre 53,1 un an plus tot, soit +0,6 % — stagnation, alors que le "
+     "profil affichait +15,9 %/an."),
+]
+
 EXPLOITATION = [
     # (ticker, exercice, resultat_exploitation, resultat_financier, source)
     ("SDSC", 2025, -2271.029, 7079.898,
@@ -902,6 +929,12 @@ def main():
         "UPDATE etats_financiers SET resultat_activites_ordinaires=? "
         "WHERE ticker=? AND exercice=?",
         [(rao, t, e) for t, e, rao in RAO])
+    cur.executemany(
+        "INSERT OR REPLACE INTO resultats_intermediaires "
+        "(ticker,exercice,periode,resultat_net,resultat_net_n1,produit_net_bancaire,"
+        "resultat_brut_exploitation,cout_du_risque,coefficient_exploitation,"
+        "statut_donnee,date_publication,source_url,note) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", INTERMEDIAIRES)
     cur.executemany(
         "UPDATE etats_financiers SET resultat_exploitation=?, resultat_financier=? "
         "WHERE ticker=? AND exercice=?",
