@@ -160,7 +160,7 @@ def lignes_actions(txt):
     fin = txt.find("MARCHE DES DROITS", debut)
     bloc = txt[debut:fin if fin > 0 else None].split("\n")
 
-    valeurs, compartiment = [], None
+    valeurs, reparations, compartiment = [], [], None
     for i, brute in enumerate(bloc):
         ligne = brute.rstrip()
         if "COMPARTIMENT PRESTIGE" in ligne:
@@ -196,6 +196,14 @@ def lignes_actions(txt):
         prec, ouv, clot, varj, vol, val, ref, vara, divm = chiffres
         titre = " ".join(avant[1:-9]).strip()
 
+        # Une valeur transigée trop large pour sa colonne est renvoyée à la ligne
+        # par pdftotext : « 1 389 733 920 » devient « 1 389 733 » suivi de « 920 »
+        # sur la ligne d'après. Le montant tronqué reste un nombre valide, donc
+        # rien ne le signale — sauf le cours qu'il implique.
+        val, repare = recoud_valeur(val, vol, (prec, ouv, clot), bloc[i + 1:i + 4])
+        if repare:
+            reparations.append((sym, repare, val))
+
         # « 7,87 % 565,40 » : rendement et PER parfois collés dans un même champ
         rdt = per = None
         queue = " ".join(c.strip() for c in apres if c.strip())
@@ -223,7 +231,45 @@ def lignes_actions(txt):
             variation_jour=varj, volume=vol, valeur=val, cours_reference=ref,
             perf_1er_janvier=vara, dividende_montant=divm,
             dividende_date=date_div(m_date.group(1)), rendement_net=rdt, per=per))
+
+    for sym, tronque, entier in reparations:
+        print(f"  valeur recousue  {sym:6s} {tronque:>15,} -> {entier:>18,}".replace(",", " "))
     return valeurs
+
+
+def cours_implicite_plausible(val, vol, cours):
+    """La valeur transigée divisée par le volume doit retomber près des cours du jour."""
+    if not vol or val is None:
+        return True
+    reels = [c for c in cours if c]
+    if not reels:
+        return True
+    moyen = val / vol
+    return min(reels) * 0.5 <= moyen <= max(reels) * 2
+
+
+def recoud_valeur(val, vol, cours, suites):
+    """Rattache le fragment renvoyé à la ligne, et seulement s'il rétablit la cohérence.
+
+    On ne rafistole jamais à l'aveugle : le montant recousu n'est retenu que si le
+    cours qu'il implique rentre dans la fourchette des cours du jour, alors que le
+    montant tronqué en sortait. Ce contrôle valide l'ordre de grandeur, pas les
+    trois derniers chiffres : c'est la réconciliation de la valeur totale avec le
+    bulletin qui les confirme, et qui échouerait si le fragment était le mauvais.
+    """
+    if cours_implicite_plausible(val, vol, cours):
+        return val, None
+    for ligne in suites:
+        # exactement trois chiffres : un groupe de milliers renvoyé à la ligne.
+        # Un numéro de page, à un ou deux chiffres, ne peut donc pas être happé.
+        m = re.fullmatch(r"\s*(\d{3})\s*", ligne)
+        if not m:
+            continue
+        candidat = val * 1000 + int(m.group(1))
+        if cours_implicite_plausible(candidat, vol, cours):
+            return candidat, val
+        break
+    return val, None
 
 
 def totaux(txt):
@@ -247,7 +293,8 @@ def totaux(txt):
 # calcule sur le cours de référence, ajusté les jours de détachement de dividende
 # ou d'opération sur titres, alors que la colonne « Variation jour » du bulletin
 # se rapporte au cours précédent. Les deux bases divergent alors d'un titre ou deux.
-BLOQUANTS = ("volume", "valeur", "titres", "variation_jour_recalculee")
+BLOQUANTS = ("volume", "valeur", "titres", "variation_jour_recalculee",
+             "coherence_valeur_volume")
 
 
 def indices(txt):
@@ -286,6 +333,16 @@ def controle(valeurs, tot):
             continue
         rapport.append(dict(controle=cle, calcule=calc[cle], bulletin=attendu,
                             concorde=calc[cle] == attendu, bloquant=cle in BLOQUANTS))
+    # cohérence de chaque valeur transigée avec son volume
+    incoherents = [v["symbole"] for v in valeurs
+                   if not cours_implicite_plausible(v["valeur"], v["volume"],
+                                                    (v["cours_precedent"], v["ouverture"],
+                                                     v["cloture"]))]
+    rapport.append(dict(controle="coherence_valeur_volume",
+                        calcule=len(valeurs) - len(incoherents), bulletin=len(valeurs),
+                        concorde=not incoherents, bloquant=True,
+                        titres_en_ecart=incoherents))
+
     # variations du jour recalculées depuis le cours précédent
     ecarts = [v["symbole"] for v in valeurs
               if abs((v["cloture"] - v["cours_precedent"]) / v["cours_precedent"] * 100
@@ -347,6 +404,9 @@ def main():
         os.unlink(tmp.name)
     if not ok:
         rates = [r["controle"] for r in rapport if r["bloquant"] and not r["concorde"]]
+        for r in rapport:
+            if r.get("titres_en_ecart"):
+                print("  titres en cause : " + ", ".join(r["titres_en_ecart"]))
         sys.exit("Réconciliation en échec sur : " + ", ".join(rates)
                  + "\nLe format du bulletin a probablement changé ; rien n'a été publié.")
 
