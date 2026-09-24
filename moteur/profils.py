@@ -123,6 +123,18 @@ def pctl(vals, x, inverse=False):
     return round(100 * sum(1 for val in v if (val >= x if inverse else val <= x)) / len(v))
 
 
+# Types d'avis qui changent la lecture d'un titre. Recalcules ICI plutot que lus
+# dans la colonne "critique" du CSV : celle-ci reflete la version du collecteur
+# au moment de la collecte. Cas mesure le 24/09/2026 — la levee de suspension de
+# Sucrivoire etait enregistree avec critique="non", parce que REPRISE_COTATION
+# avait rejoint la liste des types critiques APRES la collecte du fichier. La
+# levee restait donc invisible dans le tableau de bord alors meme qu'elle etait
+# correctement classee.
+TYPES_CRITIQUES = {"SUSPENSION", "REPRISE_COTATION", "PREMIERE_COTATION",
+                   "FRACTIONNEMENT", "AUGMENTATION_CAPITAL", "RADIATION",
+                   "OPA_OPR", "RETARD_PUBLICATION"}
+
+
 def charger_avis():
     """Avis officiels de la BRVM, par ticker, les plus recents d'abord.
 
@@ -142,10 +154,65 @@ def charger_avis():
         for ligne in _csv.DictReader(f):
             t = (ligne.get("ticker") or "").strip()
             if t:
+                ligne["critique"] = ("oui" if ligne.get("type") in TYPES_CRITIQUES
+                                     else "non")
                 par_ticker.setdefault(t, []).append(ligne)
     for t in par_ticker:
         par_ticker[t].sort(key=lambda x: x.get("date_avis", ""), reverse=True)
     return par_ticker
+
+
+def evenements_cotation(avis_titre, jours=45):
+    """Suspensions ET levees des dernieres semaines, dans l'ordre chronologique.
+
+    Ajout du 24/09/2026 (retour d'usage). Jusqu'ici, quand la BRVM levait une
+    suspension, le titre cessait simplement d'etre signale : l'information
+    disparaissait sans que rien n'annonce la reprise. Or une levee est un
+    evenement aussi important que la suspension — elle dit qu'un titre redevient
+    negociable, et pourquoi il ne l'etait plus. On conserve donc la sequence
+    complete sur une fenetre glissante, pour raconter l'EVOLUTION plutot que de
+    n'afficher qu'un etat instantane.
+    """
+    from datetime import datetime, timedelta
+    limite = (datetime.today() - timedelta(days=jours)).strftime("%Y-%m-%d")
+    recents = [a for a in avis_titre
+               if a.get("type") in ("SUSPENSION", "REPRISE_COTATION")
+               and (a.get("date_avis") or "") >= limite]
+    return sorted(recents, key=lambda a: a.get("date_avis") or "")
+
+
+def historique_cotation(avis_titre, jours=120):
+    """Suite des suspensions et reprises, du plus recent au plus ancien.
+
+    Ajout du 24/09/2026, sur demande de l'utilisatrice : jusqu'ici, la levee
+    d'une suspension faisait simplement DISPARAITRE l'alerte. Sucrivoire,
+    suspendue le 17/09 et retablie le 22/09, est repassee de "suspendue" a rien
+    du tout — comme si l'episode n'avait jamais eu lieu. Or une societe qui a
+    ete suspendue pour manquement a ses obligations de publication, puis
+    retablie cinq jours plus tard, n'est pas dans le meme etat qu'une societe
+    qui n'a jamais ete inquietee. L'evenement reste une information, meme resolu.
+    On conserve donc la trace et on affiche l'EVOLUTION.
+    """
+    from datetime import datetime as _dt
+    limite = None
+    try:
+        limite = _dt.now().date().toordinal() - jours
+    except Exception:
+        pass
+    suite = []
+    for a in avis_titre:
+        if a.get("type") not in ("SUSPENSION", "REPRISE_COTATION"):
+            continue
+        d = a.get("date_avis")
+        if limite and d:
+            try:
+                if _dt.strptime(d[:10], "%Y-%m-%d").date().toordinal() < limite:
+                    continue
+            except Exception:
+                pass
+        suite.append({"date": d, "type": a.get("type"), "titre": a.get("titre"),
+                      "url": a.get("url")})
+    return suite
 
 
 def statut_cotation(avis_titre):
@@ -656,6 +723,16 @@ def motif_du_profil(profil, ing, cherte, croissance, sp):
     if profil == "MUTATION":
         return "la nature economique de la societe a change : l'historique n'est plus predictif"
     if profil == "NON_ANALYSABLE":
+        # Cas d'une INTRODUCTION RECENTE (24/09/2026, prepare pour Bridge Bank
+        # Group CI) : une societe peut arriver sur la cote avec des comptes
+        # certifies impeccables et n'etre pas profilable pour une seule raison —
+        # la BRVM ne publie pas encore son PER, faute d'historique de cotation.
+        # Dire "donnees insuffisantes" serait injuste et trompeur : ce qui manque
+        # est le PRIX, pas les comptes.
+        if ing.get("source_croissance", "").startswith("RN_") and g is not None:
+            return ("comptes solides (croissance de %.1f %%/an sur exercices "
+                    "certifies) mais PER non encore publie par la BRVM : le titre "
+                    "sera profilable des que sa valorisation sera etablie" % g)
         return "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)"
 
     # --- AUCUN_PROFIL : identifier la cause reelle ---
@@ -902,6 +979,16 @@ def calculer():
         # --- Avis officiels : suspension, fractionnement, operation sur capital ---
         avis_titre = avis.get(t, [])
         statut, date_statut, libelle_statut = statut_cotation(avis_titre)
+        evenements = evenements_cotation(avis_titre)
+        if statut == "NEGOCIABLE" and any(e["type"] == "SUSPENSION" for e in evenements):
+            # Le titre a ete suspendu puis repris recemment : on l'annonce.
+            susp = [e for e in evenements if e["type"] == "SUSPENSION"][-1]
+            repr_ = [e for e in evenements if e["type"] == "REPRISE_COTATION"][-1]
+            notes = notes + [
+                "COTATION RETABLIE le %s, apres une suspension prononcee le %s. "
+                "Le titre est de nouveau negociable. Motif de la suspension : %s"
+                % (repr_["date_avis"], susp["date_avis"],
+                   (susp.get("titre") or "voir l'avis BRVM"))]
         if statut == "SUSPENDU":
             # Un titre suspendu ne peut etre ni achete ni vendu : le profil
             # devient une information theorique. On le CONSERVE (l'analyse reste
@@ -911,6 +998,18 @@ def calculer():
                 "ni vendu. Le profil ci-dessous reste une lecture des comptes, pas "
                 "une opportunite accessible. Motif : %s"
                 % (date_statut, (libelle_statut or "voir l'avis BRVM"))]
+        hist = historique_cotation(avis_titre)
+        if statut == "NEGOCIABLE" and len(hist) >= 2 and hist[0]["type"] == "REPRISE_COTATION":
+            susp = next((h for h in hist[1:] if h["type"] == "SUSPENSION"), None)
+            if susp:
+                notes = notes + [
+                    "SUSPENSION LEVEE — ce titre a ete suspendu de cotation le %s puis "
+                    "retabli le %s. L'episode est resolu, mais il reste une information : "
+                    "une societe suspendue pour manquement a ses obligations n'est pas "
+                    "dans la meme situation qu'une societe jamais inquietee. "
+                    "Motif de la suspension : %s"
+                    % (susp["date"], hist[0]["date"], (susp.get("titre") or "voir l'avis"))]
+
         alertes_avis = [a for a in avis_titre[:12]
                         if a.get("type") in ("FRACTIONNEMENT", "AUGMENTATION_CAPITAL",
                                              "RADIATION", "OPA_OPR")]
@@ -1061,7 +1160,11 @@ def calculer():
                           "url": note.get("url_pdf")} if note else None),
             "contradiction_notation": bool(contradiction),
             "statut_cotation": statut,
+            "evenements_cotation": [{"date": e["date_avis"], "type": e["type"],
+                                     "titre": e.get("titre"), "url": e.get("url")}
+                                    for e in evenements],
             "date_statut_cotation": date_statut,
+            "historique_cotation": hist,
             "avis_recents": [{"date": a.get("date_avis"), "type": a.get("type"),
                               "titre": a.get("titre"), "url": a.get("url")}
                              for a in avis_titre[:5]],
