@@ -6,24 +6,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 21.29,
-  "dy": 5.21,
+  "peg": 21.16,
+  "dy": 5.25,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
   "motif": "distribution non couverte (payout 169 %) : le rendement de 5.2 % ne qualifie pas un profil de revenu",
   "comparaisons": {
    "per": {
-    "titre": 32.42,
+    "titre": 32.22,
     "mediane_secteur": 18.17,
     "n_secteur": 5,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.21,
-    "mediane_secteur": 4.34,
+    "titre": 5.25,
+    "mediane_secteur": 4.44,
     "n_secteur": 5,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -49,12 +49,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2023,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0215,
+  "prime_rendement": -0.0211,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -72,7 +72,7 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 40,
+  "cherte_pctl": 38,
   "croissance_pctl": 34,
   "reference_axes": "marche (n=36)",
   "g": 1.5,
@@ -81,10 +81,10 @@
    "INFLEXION_RECENTE",
    "SERIE_COMPLETEE_N1"
   ],
-  "per": 32.42,
-  "payout": 1.6890820000000002,
+  "per": 32.22,
+  "payout": 1.6915499999999999,
   "roe": 26.3,
-  "pegy": 4.82,
+  "pegy": 4.76,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",
   "n_secteur": 5,
@@ -102,7 +102,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-08-14",
@@ -132,23 +134,23 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 2.75,
+  "dy": 2.97,
   "confiance": "FAIBLE",
   "profil": "AUCUN_PROFIL",
   "motif": "croissance non calculable (historique trop court ou series absentes) : l'axe croissance manque, ce n'est pas un diagnostic mais une lacune",
   "comparaisons": {
    "per": {
-    "titre": 14.74,
-    "mediane_secteur": 14.45,
+    "titre": 13.64,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 2.75,
-    "mediane_secteur": 4.31,
+    "titre": 2.97,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -174,12 +176,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0461,
+  "prime_rendement": -0.0439,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -198,8 +200,8 @@
   "g": null,
   "source_croissance": "AUCUNE",
   "drapeaux": [],
-  "per": 14.74,
-  "payout": 0.40535,
+  "per": 13.64,
+  "payout": 0.405108,
   "roe": null,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -209,7 +211,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "BICC": {
@@ -219,24 +223,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.33,
-  "dy": 3.7000000000000006,
+  "peg": 0.31,
+  "dy": 3.8900000000000006,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P50)",
+  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P46)",
   "comparaisons": {
    "per": {
-    "titre": 14.26,
-    "mediane_secteur": 14.45,
+    "titre": 13.57,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 3.7,
-    "mediane_secteur": 4.31,
+    "titre": 3.89,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -262,14 +266,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0366,
+  "prime_rendement": -0.0347,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 27.8,
+  "per_normalise": 26.5,
   "ecart_benefice": 0.95,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -284,7 +288,7 @@
    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 50,
+  "cherte_pctl": 46,
   "croissance_pctl": 92,
   "reference_axes": "secteur (n=14)",
   "g": 43.4,
@@ -294,10 +298,10 @@
    "RATTRAPAGE",
    "BENEFICE_NON_REPRESENTATIF"
   ],
-  "per": 14.26,
-  "payout": 0.5276200000000001,
+  "per": 13.57,
+  "payout": 0.527873,
   "roe": 30.3,
-  "pegy": 0.3,
+  "pegy": 0.29,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -305,7 +309,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-04-17",
@@ -323,18 +329,18 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 7.89,
+  "dy": 7.9399999999999995,
   "confiance": "HAUTE",
   "profil": "RETOURNEMENT",
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": 0.0053,
+  "prime_rendement": 0.0058,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 14.5,
   "ecart_benefice": -0.97,
@@ -361,8 +367,8 @@
    "FENETRE_ELARGIE",
    "SERIE_COMPLETEE_N1"
   ],
-  "per": 563.92,
-  "payout": 44.49328799999999,
+  "per": 560.95,
+  "payout": 44.53943,
   "roe": 0.1,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -372,7 +378,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-05-20",
@@ -389,24 +397,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 5.48,
-  "dy": 6.43,
+  "peg": 5.29,
+  "dy": 6.660000000000001,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "distribution non couverte (payout 118 %) : le rendement de 6.4 % ne qualifie pas un profil de revenu",
+  "motif": "distribution non couverte (payout 118 %) : le rendement de 6.7 % ne qualifie pas un profil de revenu",
   "comparaisons": {
    "per": {
-    "titre": 18.35,
-    "mediane_secteur": 14.45,
+    "titre": 17.73,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 6.43,
-    "mediane_secteur": 4.31,
+    "titre": 6.66,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -432,12 +440,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2021,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0093,
+  "prime_rendement": -0.007,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -466,10 +474,10 @@
    "SERIE_COMPLETEE_N1",
    "DONNEES_PERIMEES"
   ],
-  "per": 18.35,
-  "payout": 1.179905,
+  "per": 17.73,
+  "payout": 1.1808180000000001,
   "roe": null,
-  "pegy": 1.88,
+  "pegy": 1.77,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -487,7 +495,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "BOABF": {
@@ -504,17 +514,17 @@
   "motif": "distribution non couverte (payout 104 %) : le rendement de 5.4 % ne qualifie pas un profil de revenu",
   "comparaisons": {
    "per": {
-    "titre": 16.92,
-    "mediane_secteur": 14.45,
+    "titre": 16.91,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
     "titre": 5.36,
-    "mediane_secteur": 4.31,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -540,7 +550,7 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
@@ -563,7 +573,7 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 46,
+  "cherte_pctl": 39,
   "croissance_pctl": 15,
   "reference_axes": "secteur (n=14)",
   "g": -8.9,
@@ -572,7 +582,7 @@
    "INFLEXION_RECENTE",
    "SERIE_COMPLETEE_N1"
   ],
-  "per": 16.92,
+  "per": 16.91,
   "payout": 1.037,
   "roe": 34.3,
   "pegy": null,
@@ -593,7 +603,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "BOAC": {
@@ -603,24 +615,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.61,
-  "dy": 5.24,
+  "peg": 0.58,
+  "dy": 5.53,
   "confiance": "HAUTE",
   "profil": "GARP",
-  "motif": "croissance de 21.0 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.49 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 21.0 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.46 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 12.83,
-    "mediane_secteur": 14.45,
+    "titre": 12.16,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.24,
-    "mediane_secteur": 4.31,
+    "titre": 5.53,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -646,14 +658,14 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": 0.0092,
   "periode_intermediaire": "T1 2026",
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0212,
+  "prime_rendement": -0.0183,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 16.0,
+  "per_normalise": 15.2,
   "ecart_benefice": 0.25,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -674,10 +686,10 @@
   "drapeaux": [
    "CONTREDIT_PAR_INTERMEDIAIRE"
   ],
-  "per": 12.83,
+  "per": 12.16,
   "payout": 0.76,
   "roe": 27.9,
-  "pegy": 0.49,
+  "pegy": 0.46,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -695,7 +707,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-04-17",
@@ -712,34 +726,34 @@
   ]
  },
  "BOAM": {
-  "dominant": "AUCUN_PROFIL",
+  "dominant": "VALUE",
   "mixte": false,
   "VALUE": null,
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.33,
-  "dy": 5.16,
+  "peg": 0.31,
+  "dy": 5.58,
   "confiance": "FAIBLE",
-  "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 44.3 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P57)",
+  "profil": "VALUE",
+  "motif": "decote marquee (cherte P68) sur des benefices etablis, croissance de 44.3 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
-    "titre": 14.64,
-    "mediane_secteur": 14.45,
+    "titre": 13.55,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.16,
-    "mediane_secteur": 4.31,
+    "titre": 5.58,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
-    "titre": 44.27,
+    "titre": 44.28,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -761,12 +775,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.022,
+  "prime_rendement": -0.0178,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -782,7 +796,7 @@
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 57,
+  "cherte_pctl": 68,
   "croissance_pctl": 100,
   "reference_axes": "secteur (n=14)",
   "g": 44.3,
@@ -790,10 +804,10 @@
   "drapeaux": [
    "RATTRAPAGE"
   ],
-  "per": 14.64,
-  "payout": 0.755424,
+  "per": 13.55,
+  "payout": 0.75609,
   "roe": null,
-  "pegy": 0.3,
+  "pegy": 0.27,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -811,7 +825,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "BOAN": {
@@ -822,18 +838,18 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 4.27,
+  "dy": 4.6,
   "confiance": "FAIBLE",
   "profil": "RETOURNEMENT",
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0309,
+  "prime_rendement": -0.0276,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -857,8 +873,8 @@
   "g": -70.7,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
-  "per": 249.03,
-  "payout": 10.633581,
+  "per": 231.24,
+  "payout": 10.63704,
   "roe": null,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -878,7 +894,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "BOAS": {
@@ -889,27 +907,27 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 5.63,
+  "dy": 5.88,
   "confiance": "FAIBLE",
   "profil": "VALUE",
   "motif": "decote marquee (cherte P78) sur des benefices etablis, croissance de -2.1 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
-    "titre": 13.13,
-    "mediane_secteur": 14.45,
+    "titre": 12.57,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.63,
-    "mediane_secteur": 4.31,
+    "titre": 5.88,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
-    "titre": -2.13,
+    "titre": -2.12,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -931,12 +949,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0173,
+  "prime_rendement": -0.0148,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -955,10 +973,10 @@
   "g": -2.1,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
-  "per": 13.13,
-  "payout": 0.739219,
+  "per": 12.57,
+  "payout": 0.739116,
   "roe": null,
-  "pegy": 3.75,
+  "pegy": 3.35,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -966,7 +984,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "CABC": {
@@ -977,23 +997,23 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": 0.6,
-  "dy": 4.75,
+  "dy": 4.77,
   "confiance": "HAUTE",
   "profil": "GARP",
   "motif": "croissance de 21.9 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.49 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 13.16,
-    "mediane_secteur": 25.19,
+    "titre": 13.12,
+    "mediane_secteur": 25.16,
     "n_secteur": 2,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.75,
-    "mediane_secteur": 2.84,
+    "titre": 4.77,
+    "mediane_secteur": 2.85,
     "n_secteur": 2,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -1019,14 +1039,14 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0261,
+  "prime_rendement": -0.0259,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 16.0,
+  "per_normalise": 15.9,
   "ecart_benefice": 0.21,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -1038,13 +1058,13 @@
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 66,
+  "cherte_pctl": 61,
   "croissance_pctl": 83,
   "reference_axes": "marche (n=36)",
   "g": 21.9,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [],
-  "per": 13.16,
+  "per": 13.12,
   "payout": 0.527,
   "roe": 15.4,
   "pegy": 0.49,
@@ -1065,7 +1085,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-05-13",
@@ -1088,24 +1110,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 2.99,
-  "dy": 2.9,
+  "peg": 2.77,
+  "dy": 3.1400000000000006,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P29) ni rendement distinctifs",
+  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P32) ni rendement distinctifs",
   "comparaisons": {
    "per": {
-    "titre": 15.15,
-    "mediane_secteur": 14.45,
+    "titre": 14.01,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 2.9,
-    "mediane_secteur": 4.31,
+    "titre": 3.14,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -1131,12 +1153,12 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2022,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0446,
+  "prime_rendement": -0.0422,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1154,7 +1176,7 @@
    "DONNEES_PERIMEES : les capitaux propres en base ont plus de trois ans : le ROE n'est plus calculable de facon fiable et n'est pas affiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 29,
+  "cherte_pctl": 32,
   "croissance_pctl": 46,
   "reference_axes": "secteur (n=14)",
   "g": 5.1,
@@ -1164,10 +1186,10 @@
    "SERIE_COMPLETEE_N1",
    "DONNEES_PERIMEES"
   ],
-  "per": 15.15,
+  "per": 14.01,
   "payout": 0.44,
   "roe": null,
-  "pegy": 1.9,
+  "pegy": 1.71,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -1185,7 +1207,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-06-03",
@@ -1209,23 +1233,23 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 3.47,
+  "dy": 3.75,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "distribution non couverte (payout 120 %) : le rendement de 3.5 % ne qualifie pas un profil de revenu",
+  "motif": "distribution non couverte (payout 120 %) : le rendement de 3.8 % ne qualifie pas un profil de revenu",
   "comparaisons": {
    "per": {
-    "titre": 34.48,
+    "titre": 31.89,
     "mediane_secteur": 18.17,
     "n_secteur": 5,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 3.47,
-    "mediane_secteur": 4.34,
+    "titre": 3.75,
+    "mediane_secteur": 4.44,
     "n_secteur": 5,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -1251,12 +1275,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0389,
+  "prime_rendement": -0.0361,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1276,7 +1300,7 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 18,
+  "cherte_pctl": 20,
   "croissance_pctl": 23,
   "reference_axes": "marche (n=36)",
   "g": -5.3,
@@ -1286,8 +1310,8 @@
    "INFLEXION_RECENTE",
    "SERIE_COMPLETEE_N1"
   ],
-  "per": 34.48,
-  "payout": 1.196456,
+  "per": 31.89,
+  "payout": 1.195875,
   "roe": null,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -1297,7 +1321,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-07-30",
@@ -1320,24 +1346,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 2.66,
-  "dy": 3.27,
+  "peg": 2.62,
+  "dy": 3.32,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance reelle de 10.1 %/an mais deja payee (PEGY 2.01, au-dela de 1.5)",
+  "motif": "croissance reelle de 10.1 %/an mais deja payee (PEGY 1.97, au-dela de 1.5)",
   "comparaisons": {
    "per": {
-    "titre": 26.88,
-    "mediane_secteur": 22.67,
+    "titre": 26.47,
+    "mediane_secteur": 21.78,
     "n_secteur": 2,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 3.27,
-    "mediane_secteur": 3.55,
+    "titre": 3.32,
+    "mediane_secteur": 3.73,
     "n_secteur": 2,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -1363,14 +1389,14 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0409,
+  "prime_rendement": -0.0404,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 31.3,
+  "per_normalise": 30.8,
   "ecart_benefice": 0.16,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -1380,16 +1406,16 @@
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 20,
+  "cherte_pctl": 16,
   "croissance_pctl": 57,
   "reference_axes": "marche (n=36)",
   "g": 10.1,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [],
-  "per": 26.88,
+  "per": 26.47,
   "payout": 1.0,
   "roe": 26.4,
-  "pegy": 2.01,
+  "pegy": 1.97,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_PUBLICS",
   "n_secteur": 2,
@@ -1407,7 +1433,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-07-07",
@@ -1430,24 +1458,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.56,
-  "dy": 4.56,
+  "peg": 0.55,
+  "dy": 4.65,
   "confiance": "MOYENNE",
   "profil": "GARP",
-  "motif": "croissance de 26.5 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.48 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 26.5 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.47 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 14.87,
-    "mediane_secteur": 14.45,
+    "titre": 14.57,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.56,
-    "mediane_secteur": 4.31,
+    "titre": 4.65,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -1473,14 +1501,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.028,
+  "prime_rendement": -0.0271,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 19.1,
+  "per_normalise": 18.8,
   "ecart_benefice": 0.29,
   "n_ex_normalise": 3,
   "part_operationnelle": null,
@@ -1495,7 +1523,7 @@
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 46,
+  "cherte_pctl": 43,
   "croissance_pctl": 85,
   "reference_axes": "secteur (n=14)",
   "g": 26.5,
@@ -1504,10 +1532,10 @@
    "SERIE_COMPLETEE_N1",
    "RATTRAPAGE"
   ],
-  "per": 14.87,
-  "payout": 0.6780719999999999,
+  "per": 14.57,
+  "payout": 0.6775050000000001,
   "roe": null,
-  "pegy": 0.48,
+  "pegy": 0.47,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -1525,7 +1553,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-05-08",
@@ -1548,28 +1578,28 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": true,
-  "peg": 0.25,
-  "dy": 1.33,
+  "peg": 0.23,
+  "dy": 1.44,
   "confiance": "FAIBLE",
   "profil": "GARP",
-  "motif": "croissance de 14.7 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.23 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 14.7 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.21 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 3.61,
-    "mediane_secteur": 14.45,
+    "titre": 3.35,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 1.33,
-    "mediane_secteur": 4.31,
+    "titre": 1.44,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
-    "titre": 14.67,
+    "titre": 14.65,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -1591,12 +1621,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0603,
+  "prime_rendement": -0.0592,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1617,10 +1647,10 @@
   "g": 14.7,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
-  "per": 3.61,
-  "payout": 0.048013,
+  "per": 3.35,
+  "payout": 0.04824,
   "roe": 21.6,
-  "pegy": 0.23,
+  "pegy": 0.21,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -1628,7 +1658,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "FTSC": {
@@ -1639,20 +1671,20 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 90.4,
+  "dy": 86.33,
   "confiance": "HAUTE",
   "profil": "MUTATION",
   "motif": "la nature economique de la societe a change : l'historique n'est plus predictif",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": 0.8304,
+  "prime_rendement": 0.7897,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 4.8,
+  "per_normalise": 5.1,
   "ecart_benefice": -0.92,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -1677,10 +1709,10 @@
    "PIC_YOY",
    "INFLEXION_RECENTE"
   ],
-  "per": 57.81,
-  "payout": 52.26024,
+  "per": 60.53,
+  "payout": 52.255548999999995,
   "roe": 3.0,
-  "pegy": 1.97,
+  "pegy": 2.4,
   "gate": "ELIGIBLE",
   "secteur": "INDUSTRIELS",
   "n_secteur": 2,
@@ -1688,7 +1720,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-05-29",
@@ -1711,24 +1745,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.29,
-  "dy": 4.1,
+  "peg": 0.27,
+  "dy": 4.44,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P39)",
+  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P43)",
   "comparaisons": {
    "per": {
-    "titre": 17.31,
+    "titre": 16.01,
     "mediane_secteur": 18.17,
     "n_secteur": 5,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.1,
-    "mediane_secteur": 4.34,
+    "titre": 4.44,
+    "mediane_secteur": 4.44,
     "n_secteur": 5,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -1754,12 +1788,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0326,
+  "prime_rendement": -0.0292,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1770,7 +1804,8 @@
   "notes": [
    "dernier exercice en net recul : la croissance moyenne masque un retournement en cours — profil a reexaminer a la prochaine publication",
    "croissance calculee sur une serie A TROUS : des exercices manquent entre les bornes, le taux affiche relie deux points sans les annees intermediaires",
-   "croissance non exploitable (rattrapage extreme ou base ecrasee)"
+   "croissance non exploitable (rattrapage extreme ou base ecrasee)",
+   "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
   ],
   "reserves": [
    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
@@ -1783,7 +1818,7 @@
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 39,
+  "cherte_pctl": 43,
   "croissance_pctl": 100,
   "reference_axes": "marche (n=36)",
   "g": 60.0,
@@ -1798,10 +1833,10 @@
    "SERIE_COMPLETEE_N1",
    "RATTRAPAGE"
   ],
-  "per": 17.31,
-  "payout": 0.7097099999999998,
+  "per": 16.01,
+  "payout": 0.7108440000000001,
   "roe": null,
-  "pegy": 0.27,
+  "pegy": 0.25,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",
   "n_secteur": 5,
@@ -1809,7 +1844,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2025-07-20",
@@ -1826,28 +1863,28 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.76,
-  "dy": 6.1,
+  "peg": 0.8,
+  "dy": 5.84,
   "confiance": "FAIBLE",
   "profil": "GARP",
-  "motif": "croissance de 18.9 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.58 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 18.9 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.61 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 14.42,
+    "titre": 15.07,
     "mediane_secteur": 18.17,
     "n_secteur": 5,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 6.1,
-    "mediane_secteur": 4.34,
+    "titre": 5.84,
+    "mediane_secteur": 4.44,
     "n_secteur": 5,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
-    "titre": 18.88,
+    "titre": 18.9,
     "mediane_secteur": 2.1,
     "n_secteur": 5,
     "mediane_marche": 5.06,
@@ -1869,12 +1906,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0126,
+  "prime_rendement": -0.0152,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1887,16 +1924,16 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 74,
+  "cherte_pctl": 65,
   "croissance_pctl": 74,
   "reference_axes": "marche (n=36)",
   "g": 18.9,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
-  "per": 14.42,
-  "payout": 0.87962,
+  "per": 15.07,
+  "payout": 0.880088,
   "roe": null,
-  "pegy": 0.58,
+  "pegy": 0.61,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",
   "n_secteur": 5,
@@ -1914,7 +1951,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "NSBC": {
@@ -1924,24 +1963,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 1.72,
-  "dy": 3.0,
+  "peg": 1.6,
+  "dy": 3.25,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
   "motif": "croissance de 7.9 %/an sous la fenetre GARP (8 %) — a 0.1 point de la fenetre, a revoir a la prochaine publication, sans decote (cherte P50) ni rendement distinctifs",
   "comparaisons": {
    "per": {
-    "titre": 13.67,
-    "mediane_secteur": 14.45,
+    "titre": 12.65,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 3.0,
-    "mediane_secteur": 4.31,
+    "titre": 3.25,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -1967,14 +2006,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0436,
+  "prime_rendement": -0.0411,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 15.2,
+  "per_normalise": 14.1,
   "ecart_benefice": 0.12,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -1990,10 +2029,10 @@
   "g": 7.9,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [],
-  "per": 13.67,
-  "payout": 0.41009999999999996,
+  "per": 12.65,
+  "payout": 0.411125,
   "roe": 17.5,
-  "pegy": 1.25,
+  "pegy": 1.13,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -2011,7 +2050,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-07-21",
@@ -2034,24 +2075,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 5.22,
-  "dy": 2.43,
+  "peg": 4.98,
+  "dy": 2.55,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
   "motif": "croissance de 3.5 %/an sous la fenetre GARP (8 %), sans decote (cherte P21) ni rendement distinctifs",
   "comparaisons": {
    "per": {
-    "titre": 18.21,
-    "mediane_secteur": 12.02,
+    "titre": 17.37,
+    "mediane_secteur": 11.45,
     "n_secteur": 6,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 2.43,
-    "mediane_secteur": 5.48,
+    "titre": 2.55,
+    "mediane_secteur": 5.59,
     "n_secteur": 6,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -2077,14 +2118,14 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0493,
+  "prime_rendement": -0.0481,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 19.2,
+  "per_normalise": 18.4,
   "ecart_benefice": 0.06,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -2100,10 +2141,10 @@
   "g": 3.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [],
-  "per": 18.21,
+  "per": 17.37,
   "payout": 0.503,
   "roe": null,
-  "pegy": 3.08,
+  "pegy": 2.88,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DE_BASE",
   "n_secteur": 6,
@@ -2121,7 +2162,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-07-30",
@@ -2145,27 +2188,27 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 5.01,
+  "dy": 5.19,
   "confiance": "FAIBLE",
   "profil": "VIGILANCE_CONTRACTION",
   "motif": "benefices en contraction de -13.4 %/an sans decote suffisante pour la compenser",
   "comparaisons": {
    "per": {
-    "titre": 13.58,
-    "mediane_secteur": 13.58,
+    "titre": 13.11,
+    "mediane_secteur": 13.11,
     "n_secteur": 3,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.01,
-    "mediane_secteur": 4.14,
+    "titre": 5.19,
+    "mediane_secteur": 4.24,
     "n_secteur": 3,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
-    "titre": -13.4,
+    "titre": -13.39,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
     "mediane_marche": 5.06,
@@ -2187,12 +2230,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0235,
+  "prime_rendement": -0.0217,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -2211,8 +2254,8 @@
   "g": -13.4,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
-  "per": 13.58,
-  "payout": 0.680358,
+  "per": 13.11,
+  "payout": 0.680409,
   "roe": 27.6,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -2232,7 +2275,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-05-19",
@@ -2255,24 +2300,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 4.56,
-  "dy": 3.4000000000000004,
+  "peg": 4.49,
+  "dy": 3.45,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
   "motif": "croissance de 4.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P24) ni rendement distinctifs",
   "comparaisons": {
    "per": {
-    "titre": 18.59,
-    "mediane_secteur": 13.58,
+    "titre": 18.32,
+    "mediane_secteur": 13.11,
     "n_secteur": 3,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 3.4,
-    "mediane_secteur": 4.14,
+    "titre": 3.45,
+    "mediane_secteur": 4.24,
     "n_secteur": 3,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -2298,12 +2343,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0396,
+  "prime_rendement": -0.0391,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -2324,10 +2369,10 @@
   "drapeaux": [
    "SERIE_COMPLETEE_N1"
   ],
-  "per": 18.59,
-  "payout": 0.6320600000000001,
+  "per": 18.32,
+  "payout": 0.63204,
   "roe": 27.2,
-  "pegy": 2.49,
+  "pegy": 2.43,
   "gate": "ELIGIBLE",
   "secteur": "TELECOMMUNICATIONS",
   "n_secteur": 3,
@@ -2345,7 +2390,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-05-20",
@@ -2368,28 +2415,28 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 3.19,
-  "dy": 1.9799999999999998,
+  "peg": 2.98,
+  "dy": 2.13,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
   "motif": "croissance de 3.0 %/an sous la fenetre GARP (8 %), sans decote (cherte P54) ni rendement distinctifs",
   "comparaisons": {
    "per": {
-    "titre": 9.62,
-    "mediane_secteur": 14.45,
+    "titre": 8.98,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 1.98,
-    "mediane_secteur": 4.31,
+    "titre": 2.13,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
-    "titre": 3.02,
+    "titre": 3.01,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -2411,14 +2458,14 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0538,
+  "prime_rendement": -0.0523,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 10.3,
+  "per_normalise": 9.6,
   "ecart_benefice": 0.07,
   "n_ex_normalise": 3,
   "part_operationnelle": null,
@@ -2435,10 +2482,10 @@
   "g": 3.0,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
-  "per": 9.62,
+  "per": 8.98,
   "payout": 0.0,
   "roe": 19.2,
-  "pegy": 1.93,
+  "pegy": 1.75,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -2456,7 +2503,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "PALC": {
@@ -2467,23 +2516,23 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 5.38,
+  "dy": 5.44,
   "confiance": "MOYENNE",
   "profil": "VIGILANCE_CONTRACTION",
   "motif": "benefices en contraction de -10.5 %/an sans decote suffisante pour la compenser",
   "comparaisons": {
    "per": {
-    "titre": 8.17,
-    "mediane_secteur": 12.02,
+    "titre": 8.07,
+    "mediane_secteur": 11.45,
     "n_secteur": 6,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.38,
-    "mediane_secteur": 5.48,
+    "titre": 5.44,
+    "mediane_secteur": 5.59,
     "n_secteur": 6,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -2509,14 +2558,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0198,
+  "prime_rendement": -0.0192,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 7.5,
+  "per_normalise": 7.4,
   "ecart_benefice": -0.08,
   "n_ex_normalise": 3,
   "part_operationnelle": null,
@@ -2526,14 +2575,14 @@
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 88,
+  "cherte_pctl": 84,
   "croissance_pctl": 11,
   "reference_axes": "marche (n=36)",
   "g": -10.5,
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [],
-  "per": 8.17,
-  "payout": 0.439546,
+  "per": 8.07,
+  "payout": 0.43900800000000006,
   "roe": 11.7,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -2553,7 +2602,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-06-10",
@@ -2586,20 +2637,20 @@
   "dy": 4.34,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 2.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P40) ni rendement distinctifs",
+  "motif": "croissance de 2.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P34) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 18.17,
     "mediane_secteur": 18.17,
     "n_secteur": 5,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
     "titre": 4.34,
-    "mediane_secteur": 4.34,
+    "mediane_secteur": 4.44,
     "n_secteur": 5,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -2625,7 +2676,7 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
@@ -2645,7 +2696,7 @@
    "FENETRE_ELARGIE : fenetre etendue au-dela de 4 exercices car elle demarrait sur un pic — la tendance de fond remplace l'effet de base",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 40,
+  "cherte_pctl": 34,
   "croissance_pctl": 37,
   "reference_axes": "marche (n=36)",
   "g": 2.1,
@@ -2664,7 +2715,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-06-15",
@@ -2694,7 +2747,7 @@
   "motif": "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)",
   "comparaisons": null,
   "payout_source": null,
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
@@ -2722,7 +2775,7 @@
   "g": null,
   "source_croissance": "AUCUNE",
   "drapeaux": [],
-  "per": 72.81,
+  "per": 67.39,
   "payout": null,
   "roe": 11.8,
   "pegy": null,
@@ -2743,7 +2796,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-08-11",
@@ -2773,7 +2828,7 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": 1.15,
-  "dy": 1.39,
+  "dy": 1.51,
   "confiance": "MOYENNE",
   "profil": "RETOURNEMENT",
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
@@ -2784,7 +2839,7 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0597,
+  "prime_rendement": -0.0585,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -2793,6 +2848,8 @@
   "secondaire": null,
   "grade": "B",
   "notes": [
+   "COTATION RETABLIE le 2026-09-22, apres une suspension prononcee le 2026-09-17. Le titre est de nouveau negociable. Motif de la suspension : SUCRIVOIRE S.A : Suspension de la cotation",
+   "SUSPENSION LEVEE — ce titre a ete suspendu de cotation le 2026-09-17 puis retabli le 2026-09-22. L'episode est resolu, mais il reste une information : une societe suspendue pour manquement a ses obligations n'est pas dans la meme situation qu'une societe jamais inquietee. Motif de la suspension : SUCRIVOIRE S.A : Suspension de la cotation",
    "Perte nette 2025 de 6,1 Mds FCFA (comptes sociaux) / 7,95 Mds (consolide), apres un benefice en 2024. Dette totale portee de 24,1 a 64,5 Mds en un an pour financer la rehabilitation des usines et l'extension des plantations ; emprunt obligataire convertible emis en octobre 2025. Catalyseur : montee en capacite industrielle. Risque dominant : le levier, si la production ne suit pas."
   ],
   "reserves": [
@@ -2807,9 +2864,9 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 15.09,
-  "payout": 0.209751,
+  "payout": 0.227859,
   "roe": 46.1,
-  "pegy": 1.04,
+  "pegy": 1.03,
   "gate": "EXCLU",
   "secteur": "CONSOMMATION_DE_BASE",
   "n_secteur": 6,
@@ -2827,7 +2884,35 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SUCRIVOIRE S.A : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg269_brvmdg_-_suspension_-_sucrivoire_ci.pdf"
+   },
+   {
+    "date": "2026-09-22",
+    "type": "REPRISE_COTATION",
+    "titre": "SUCRIVOIRE S.A. : Levée de suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260921_-_avis_ndeg276_brvmdg_-_levee_de_la_suspension_sucrivoire_s.a.pdf"
+   }
+  ],
   "date_statut_cotation": "2026-09-22",
+  "historique_cotation": [
+   {
+    "date": "2026-09-22",
+    "type": "REPRISE_COTATION",
+    "titre": "SUCRIVOIRE S.A. : Levée de suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260921_-_avis_ndeg276_brvmdg_-_levee_de_la_suspension_sucrivoire_s.a.pdf"
+   },
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SUCRIVOIRE S.A : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg269_brvmdg_-_suspension_-_sucrivoire_ci.pdf"
+   }
+  ],
   "avis_recents": [
    {
     "date": "2026-09-22",
@@ -2857,23 +2942,23 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 3.83,
+  "dy": 4.14,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "ni decote (cherte P29), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
+  "motif": "ni decote (cherte P34), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
   "comparaisons": {
    "per": {
-    "titre": 18.46,
-    "mediane_secteur": 22.67,
+    "titre": 17.09,
+    "mediane_secteur": 21.78,
     "n_secteur": 2,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 3.83,
-    "mediane_secteur": 3.55,
+    "titre": 4.14,
+    "mediane_secteur": 3.73,
     "n_secteur": 2,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -2899,14 +2984,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0353,
+  "prime_rendement": -0.0322,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 18.7,
+  "per_normalise": 17.3,
   "ecart_benefice": 0.01,
   "n_ex_normalise": 3,
   "part_operationnelle": null,
@@ -2921,7 +3006,7 @@
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 29,
+  "cherte_pctl": 34,
   "croissance_pctl": 26,
   "reference_axes": "marche (n=36)",
   "g": -2.6,
@@ -2930,10 +3015,10 @@
    "SERIE_TROUEE",
    "SERIE_COMPLETEE_N1"
   ],
-  "per": 18.46,
-  "payout": 0.707018,
+  "per": 17.09,
+  "payout": 0.707526,
   "roe": 15.3,
-  "pegy": 15.17,
+  "pegy": 11.19,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_PUBLICS",
   "n_secteur": 2,
@@ -2951,7 +3036,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-09-02",
@@ -2975,20 +3062,20 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 3.2400000000000007,
+  "dy": 3.29,
   "confiance": "HAUTE",
   "profil": "NON_ANALYSABLE",
-  "motif": "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)",
+  "motif": "comptes solides (croissance de -57.2 %/an sur exercices certifies) mais PER non encore publie par la BRVM : le titre sera profilable des que sa valorisation sera etablie",
   "comparaisons": null,
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0412,
+  "prime_rendement": -0.0407,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 12.6,
+  "per_normalise": 12.4,
   "ecart_benefice": -0.94,
   "n_ex_normalise": 4,
   "part_operationnelle": -2.89,
@@ -3011,7 +3098,7 @@
    "INFLEXION_RECENTE",
    "RESULTAT_NON_OPERATIONNEL"
   ],
-  "per": 196.95,
+  "per": 194.17,
   "payout": 0.6935,
   "roe": 1.1,
   "pegy": null,
@@ -3032,7 +3119,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-08-03",
@@ -3069,16 +3158,16 @@
   "comparaisons": {
    "per": {
     "titre": 37.21,
-    "mediane_secteur": 25.19,
+    "mediane_secteur": 25.16,
     "n_secteur": 2,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
     "titre": 0.94,
-    "mediane_secteur": 2.84,
+    "mediane_secteur": 2.85,
     "n_secteur": 2,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -3104,7 +3193,7 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
@@ -3144,7 +3233,23 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "SUSPENDU",
+  "evenements_cotation": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SONOCO METAL PACKAGING SIEM CI (Ex-EVIOSYS PACKAGING SIEM CI) : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg270_brvmdg_-_suspension_-_sonoco_metal_packaging_siem_ci.pdf"
+   }
+  ],
   "date_statut_cotation": "2026-09-17",
+  "historique_cotation": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SONOCO METAL PACKAGING SIEM CI (Ex-EVIOSYS PACKAGING SIEM CI) : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg270_brvmdg_-_suspension_-_sonoco_metal_packaging_siem_ci.pdf"
+   }
+  ],
   "avis_recents": [
    {
     "date": "2026-09-17",
@@ -3161,24 +3266,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.74,
-  "dy": 5.97,
+  "peg": 0.73,
+  "dy": 6.05,
   "confiance": "MOYENNE",
   "profil": "VALUE",
   "motif": "decote marquee (cherte P90) sur des benefices etablis, croissance de 15.9 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
-    "titre": 11.82,
-    "mediane_secteur": 14.45,
+    "titre": 11.66,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.97,
-    "mediane_secteur": 4.31,
+    "titre": 6.05,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -3204,12 +3309,12 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": 0.1308,
   "periode_intermediaire": "T2 2026",
   "roe_exercice": 2021,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0139,
+  "prime_rendement": -0.0131,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -3237,10 +3342,10 @@
    "SERIE_COMPLETEE_N1",
    "DONNEES_PERIMEES"
   ],
-  "per": 11.82,
+  "per": 11.66,
   "payout": 0.513,
   "roe": null,
-  "pegy": 0.54,
+  "pegy": 0.53,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -3248,7 +3353,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-08-06",
@@ -3271,24 +3378,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 1.45,
-  "dy": 2.81,
+  "peg": 1.34,
+  "dy": 3.44,
   "confiance": "HAUTE",
   "profil": "GARP",
-  "motif": "croissance de 19.3 %/an dans la fenetre soutenable (8-30 %), payee PEGY 1.26 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 19.3 %/an dans la fenetre soutenable (8-30 %), payee PEGY 1.14 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 27.96,
-    "mediane_secteur": 19.73,
+    "titre": 25.87,
+    "mediane_secteur": 19.47,
     "n_secteur": 4,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 2.81,
-    "mediane_secteur": 4.5,
+    "titre": 3.44,
+    "mediane_secteur": 4.67,
     "n_secteur": 4,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -3299,8 +3406,8 @@
     "n_marche": 35
    },
    "payout": {
-    "titre": 0.79,
-    "mediane_secteur": 0.82,
+    "titre": 0.89,
+    "mediane_secteur": 0.87,
     "n_secteur": 4,
     "mediane_marche": 0.68,
     "n_marche": 36
@@ -3314,14 +3421,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0455,
+  "prime_rendement": -0.0392,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 35.6,
+  "per_normalise": 32.9,
   "ecart_benefice": 0.27,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -3331,16 +3438,16 @@
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 14,
+  "cherte_pctl": 20,
   "croissance_pctl": 77,
   "reference_axes": "marche (n=36)",
   "g": 19.3,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [],
-  "per": 27.96,
-  "payout": 0.785676,
+  "per": 25.87,
+  "payout": 0.889928,
   "roe": null,
-  "pegy": 1.26,
+  "pegy": 1.14,
   "gate": "ELIGIBLE",
   "secteur": "ENERGIE",
   "n_secteur": 4,
@@ -3348,7 +3455,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-08-21",
@@ -3378,27 +3487,27 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 4.07,
+  "dy": 4.39,
   "confiance": "FAIBLE",
   "profil": "VIGILANCE_CONTRACTION",
   "motif": "benefices en contraction de -11.5 %/an sans decote suffisante pour la compenser",
   "comparaisons": {
    "per": {
-    "titre": 16.52,
-    "mediane_secteur": 14.45,
+    "titre": 15.31,
+    "mediane_secteur": 13.56,
     "n_secteur": 14,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.07,
-    "mediane_secteur": 4.31,
+    "titre": 4.39,
+    "mediane_secteur": 4.52,
     "n_secteur": 14,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
-    "titre": -11.5,
+    "titre": -11.51,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -3420,12 +3529,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0329,
+  "prime_rendement": -0.0297,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -3434,6 +3543,7 @@
   "secondaire": null,
   "grade": "C",
   "notes": [
+   "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee.",
    "CONTRADICTION_NOTATION : l'agence Bloomfield Investment Corporation affiche une perspective positive (note AA-, perspective positive, 2026-04-22) alors que le profilage conclut a une degradation — la source du profil (BPA_IMPLICITE) doit etre verifiee avant tout usage"
   ],
   "reserves": [
@@ -3449,8 +3559,8 @@
   "drapeaux": [
    "CONTRADICTION_RN_BPA"
   ],
-  "per": 16.52,
-  "payout": 0.672364,
+  "per": 15.31,
+  "payout": 0.672109,
   "roe": 27.2,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -3470,7 +3580,9 @@
   },
   "contradiction_notation": true,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": []
  },
  "SICC": {
@@ -3484,7 +3596,7 @@
   "dy": null,
   "confiance": "HAUTE",
   "profil": "NON_ANALYSABLE",
-  "motif": "donnees insuffisantes pour etablir un profil (PER absent ou benefices residuels)",
+  "motif": "comptes solides (croissance de 4.3 %/an sur exercices certifies) mais PER non encore publie par la BRVM : le titre sera profilable des que sa valorisation sera etablie",
   "comparaisons": null,
   "payout_source": null,
   "date_cours": "2026-06-09",
@@ -3534,7 +3646,23 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "SUSPENDU",
+  "evenements_cotation": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SICOR S.A : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg268_brvmdg_-_suspension_-_sicor_ci.pdf"
+   }
+  ],
   "date_statut_cotation": "2026-09-17",
+  "historique_cotation": [
+   {
+    "date": "2026-09-17",
+    "type": "SUSPENSION",
+    "titre": "SICOR S.A : Suspension de la cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260916_-_avis_ndeg268_brvmdg_-_suspension_-_sicor_ci.pdf"
+   }
+  ],
   "avis_recents": [
    {
     "date": "2026-09-17",
@@ -3564,7 +3692,7 @@
   "motif": "la nature economique de la societe a change : l'historique n'est plus predictif",
   "comparaisons": null,
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
@@ -3613,7 +3741,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-06-26",
@@ -3637,23 +3767,23 @@
   "GARP": null,
   "alerte_peg": true,
   "peg": 0.23,
-  "dy": 4.93,
+  "dy": 4.94,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P64)",
+  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P60)",
   "comparaisons": {
    "per": {
-    "titre": 13.66,
-    "mediane_secteur": 12.02,
+    "titre": 13.62,
+    "mediane_secteur": 11.45,
     "n_secteur": 6,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.93,
-    "mediane_secteur": 5.48,
+    "titre": 4.94,
+    "mediane_secteur": 5.59,
     "n_secteur": 6,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -3679,12 +3809,12 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0243,
+  "prime_rendement": -0.0242,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 29.9,
   "ecart_benefice": 1.19,
@@ -3703,7 +3833,7 @@
    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 64,
+  "cherte_pctl": 60,
   "croissance_pctl": 100,
   "reference_axes": "marche (n=36)",
   "g": 60.0,
@@ -3714,8 +3844,8 @@
    "RATTRAPAGE",
    "BENEFICE_NON_REPRESENTATIF"
   ],
-  "per": 13.66,
-  "payout": 0.673438,
+  "per": 13.62,
+  "payout": 0.6728280000000001,
   "roe": null,
   "pegy": 0.21,
   "gate": "ELIGIBLE",
@@ -3725,7 +3855,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-07-13",
@@ -3760,24 +3892,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.82,
-  "dy": 4.43,
+  "peg": 0.76,
+  "dy": 4.79,
   "confiance": "HAUTE",
   "profil": "GARP",
-  "motif": "croissance de 11.5 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.59 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 11.5 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.54 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 9.48,
-    "mediane_secteur": 19.73,
+    "titre": 8.77,
+    "mediane_secteur": 19.47,
     "n_secteur": 4,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.43,
-    "mediane_secteur": 4.5,
+    "titre": 4.79,
+    "mediane_secteur": 4.67,
     "n_secteur": 4,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -3789,7 +3921,7 @@
    },
    "payout": {
     "titre": 0.42,
-    "mediane_secteur": 0.82,
+    "mediane_secteur": 0.87,
     "n_secteur": 4,
     "mediane_marche": 0.68,
     "n_marche": 36
@@ -3803,14 +3935,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0293,
+  "prime_rendement": -0.0257,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 10.2,
+  "per_normalise": 9.5,
   "ecart_benefice": 0.08,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -3822,16 +3954,16 @@
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 71,
+  "cherte_pctl": 76,
   "croissance_pctl": 60,
   "reference_axes": "marche (n=36)",
   "g": 11.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [],
-  "per": 9.48,
-  "payout": 0.419964,
+  "per": 8.77,
+  "payout": 0.420083,
   "roe": 30.5,
-  "pegy": 0.59,
+  "pegy": 0.54,
   "gate": "ELIGIBLE",
   "secteur": "ENERGIE",
   "n_secteur": 4,
@@ -3849,7 +3981,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-09-04",
@@ -3884,24 +4018,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.72,
-  "dy": 4.14,
+  "peg": 0.71,
+  "dy": 4.24,
   "confiance": "HAUTE",
   "profil": "GARP",
-  "motif": "croissance de 14.0 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.56 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 14.0 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.54 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 10.15,
-    "mediane_secteur": 13.58,
+    "titre": 9.91,
+    "mediane_secteur": 13.11,
     "n_secteur": 3,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.14,
-    "mediane_secteur": 4.14,
+    "titre": 4.24,
+    "mediane_secteur": 4.24,
     "n_secteur": 3,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -3927,33 +4061,35 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0322,
+  "prime_rendement": -0.0312,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 11.8,
+  "per_normalise": 11.6,
   "ecart_benefice": 0.17,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
-  "notes": [],
+  "notes": [
+   "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
+  ],
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 65,
+  "cherte_pctl": 62,
   "croissance_pctl": 63,
   "reference_axes": "marche (n=36)",
   "g": 14.0,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [],
-  "per": 10.15,
-  "payout": 0.42021000000000003,
+  "per": 9.91,
+  "payout": 0.420184,
   "roe": 29.6,
-  "pegy": 0.56,
+  "pegy": 0.54,
   "gate": "ELIGIBLE",
   "secteur": "TELECOMMUNICATIONS",
   "n_secteur": 3,
@@ -3971,7 +4107,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-09-17",
@@ -4001,23 +4139,23 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 6.43,
+  "dy": 6.87,
   "confiance": "HAUTE",
   "profil": "VALUE",
-  "motif": "decote marquee (cherte P83) sur des benefices etablis, croissance de -7.2 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (cherte P84) sur des benefices etablis, croissance de -7.2 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
-    "titre": 13.49,
-    "mediane_secteur": 12.02,
+    "titre": 12.62,
+    "mediane_secteur": 11.45,
     "n_secteur": 6,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 6.43,
-    "mediane_secteur": 5.48,
+    "titre": 6.87,
+    "mediane_secteur": 5.59,
     "n_secteur": 6,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -4043,14 +4181,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0093,
+  "prime_rendement": -0.0049,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 14.5,
+  "per_normalise": 13.6,
   "ecart_benefice": 0.07,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -4060,14 +4198,14 @@
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 83,
+  "cherte_pctl": 84,
   "croissance_pctl": 20,
   "reference_axes": "marche (n=36)",
   "g": -7.2,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [],
-  "per": 13.49,
-  "payout": 0.8674069999999999,
+  "per": 12.62,
+  "payout": 0.8669939999999999,
   "roe": null,
   "pegy": null,
   "gate": "ELIGIBLE",
@@ -4077,7 +4215,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-07-22",
@@ -4100,24 +4240,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.55,
-  "dy": 5.59,
+  "peg": 0.54,
+  "dy": 5.74,
   "confiance": "HAUTE",
   "profil": "GARP",
-  "motif": "croissance de 14.4 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.40 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 14.4 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.38 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 7.88,
-    "mediane_secteur": 12.02,
+    "titre": 7.68,
+    "mediane_secteur": 11.45,
     "n_secteur": 6,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 5.59,
-    "mediane_secteur": 5.48,
+    "titre": 5.74,
+    "mediane_secteur": 5.59,
     "n_secteur": 6,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -4143,14 +4283,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0177,
+  "prime_rendement": -0.0162,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 12.3,
+  "per_normalise": 12.0,
   "ecart_benefice": 0.56,
   "n_ex_normalise": 4,
   "part_operationnelle": 1.53,
@@ -4173,10 +4313,10 @@
    "CYCLE_SERIE_RESTAUREE",
    "BENEFICE_NON_REPRESENTATIF"
   ],
-  "per": 7.88,
-  "payout": 0.440492,
+  "per": 7.68,
+  "payout": 0.440832,
   "roe": 18.1,
-  "pegy": 0.4,
+  "pegy": 0.38,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DE_BASE",
   "n_secteur": 6,
@@ -4184,7 +4324,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-09-22",
@@ -4214,7 +4356,7 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": 1.58,
-  "dy": 3.1300000000000003,
+  "dy": 3.15,
   "confiance": "HAUTE",
   "profil": "RETOURNEMENT",
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
@@ -4225,7 +4367,7 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0423,
+  "prime_rendement": -0.0421,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -4248,7 +4390,7 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 14.11,
-  "payout": 0.441643,
+  "payout": 0.444465,
   "roe": -27.1,
   "pegy": 1.17,
   "gate": "EXCLU",
@@ -4258,7 +4400,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-04-30",
@@ -4276,23 +4420,23 @@
   "GARP": null,
   "alerte_peg": true,
   "peg": 0.22,
-  "dy": 7.980000000000001,
+  "dy": 8.17,
   "confiance": "HAUTE",
   "profil": "VALUE",
   "motif": "decote marquee (cherte P92) sur des benefices etablis, croissance de 46.9 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
-    "titre": 10.54,
-    "mediane_secteur": 12.02,
+    "titre": 10.29,
+    "mediane_secteur": 11.45,
     "n_secteur": 6,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 7.98,
-    "mediane_secteur": 5.48,
+    "titre": 8.17,
+    "mediane_secteur": 5.59,
     "n_secteur": 6,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -4318,14 +4462,14 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": 0.0062,
+  "prime_rendement": 0.0081,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 14.6,
+  "per_normalise": 14.3,
   "ecart_benefice": 0.39,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -4356,7 +4500,7 @@
    "RATTRAPAGE",
    "BENEFICE_NON_REPRESENTATIF"
   ],
-  "per": 10.54,
+  "per": 10.29,
   "payout": 0.8,
   "roe": 79.9,
   "pegy": 0.19,
@@ -4377,19 +4521,15 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-07-29",
     "type": "DIVIDENDE",
     "titre": "brvmdg paiement de dividendes exercice 2025 sitab ci",
     "url": "https://www.brvm.org/sites/default/files/20260729_-_avis_ndeg226_brvmdg_-_paiement_de_dividendes_exercice_2025_-_sitab_ci.pdf"
-   },
-   {
-    "date": "2026-06-25",
-    "type": "AGO",
-    "titre": "avis de convocation assemblee generale ordinaire sitab ci",
-    "url": "https://www.brvm.org/sites/default/files/20260625_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
    },
    {
     "date": "2026-06-25",
@@ -4402,6 +4542,12 @@
     "type": "AGO",
     "titre": "pouvoir personne physique assemblee generale ordinaire sitab ci",
     "url": "https://www.brvm.org/sites/default/files/20260625_-_pouvoir_personne_physique_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire sitab ci",
+    "url": "https://www.brvm.org/sites/default/files/20260625_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
    }
   ]
  },
@@ -4413,23 +4559,23 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 4.58,
+  "dy": 4.68,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "distribution non couverte (payout 110 %) : le rendement de 4.6 % ne qualifie pas un profil de revenu",
+  "motif": "distribution non couverte (payout 110 %) : le rendement de 4.7 % ne qualifie pas un profil de revenu",
   "comparaisons": {
    "per": {
-    "titre": 21.13,
-    "mediane_secteur": 19.73,
+    "titre": 20.68,
+    "mediane_secteur": 19.47,
     "n_secteur": 4,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.58,
-    "mediane_secteur": 4.5,
+    "titre": 4.68,
+    "mediane_secteur": 4.67,
     "n_secteur": 4,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -4441,7 +4587,7 @@
    },
    "payout": {
     "titre": 1.1,
-    "mediane_secteur": 0.82,
+    "mediane_secteur": 0.87,
     "n_secteur": 4,
     "mediane_marche": 0.68,
     "n_marche": 36
@@ -4455,14 +4601,14 @@
    }
   },
   "payout_source": "ETATS_FINANCIERS",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0278,
+  "prime_rendement": -0.0268,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 19.5,
+  "per_normalise": 19.1,
   "ecart_benefice": -0.08,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -4481,7 +4627,7 @@
   "g": -9.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [],
-  "per": 21.13,
+  "per": 20.68,
   "payout": 1.1,
   "roe": 25.1,
   "pegy": null,
@@ -4502,7 +4648,9 @@
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-08-14",
@@ -4525,24 +4673,24 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 16.58,
-  "dy": 4.63,
+  "peg": 16.51,
+  "dy": 4.65,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 1.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P43) ni rendement distinctifs",
+  "motif": "croissance de 1.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P38) ni rendement distinctifs",
   "comparaisons": {
    "per": {
-    "titre": 18.33,
-    "mediane_secteur": 19.73,
+    "titre": 18.26,
+    "mediane_secteur": 19.47,
     "n_secteur": 4,
-    "mediane_marche": 14.69,
+    "mediane_marche": 13.82,
     "n_marche": 36
    },
    "dy": {
-    "titre": 4.63,
-    "mediane_secteur": 4.5,
+    "titre": 4.65,
+    "mediane_secteur": 4.67,
     "n_secteur": 4,
-    "mediane_marche": 4.49,
+    "mediane_marche": 4.65,
     "n_marche": 36
    },
    "g": {
@@ -4554,7 +4702,7 @@
    },
    "payout": {
     "titre": 0.85,
-    "mediane_secteur": 0.82,
+    "mediane_secteur": 0.87,
     "n_secteur": 4,
     "mediane_marche": 0.68,
     "n_marche": 36
@@ -4568,14 +4716,14 @@
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0273,
+  "prime_rendement": -0.0271,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 20.2,
+  "per_normalise": 20.1,
   "ecart_benefice": 0.1,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
@@ -4587,16 +4735,16 @@
   "reserves": [
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
-  "cherte_pctl": 43,
+  "cherte_pctl": 38,
   "croissance_pctl": 31,
   "reference_axes": "marche (n=36)",
   "g": 1.1,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [],
-  "per": 18.33,
-  "payout": 0.848679,
+  "per": 18.26,
+  "payout": 0.8490900000000002,
   "roe": null,
-  "pegy": 3.2,
+  "pegy": 3.17,
   "gate": "ELIGIBLE",
   "secteur": "ENERGIE",
   "n_secteur": 4,
@@ -4604,7 +4752,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-06-24",
@@ -4634,7 +4784,7 @@
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
   "comparaisons": null,
   "payout_source": null,
-  "date_cours": "2026-09-22",
+  "date_cours": "2026-09-23",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2023,
@@ -4662,7 +4812,7 @@
   "g": -52.8,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
-  "per": 745.69,
+  "per": 702.74,
   "payout": null,
   "roe": -6.0,
   "pegy": null,
@@ -4673,7 +4823,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-03-11",
@@ -4691,7 +4843,7 @@
   "GARP": null,
   "alerte_peg": false,
   "peg": null,
-  "dy": 2.61,
+  "dy": 2.76,
   "confiance": "HAUTE",
   "profil": "RETOURNEMENT",
   "motif": "pertes ou sortie de pertes avec catalyseur documente — hors perimetre du profilage",
@@ -4702,7 +4854,7 @@
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0736,
-  "prime_rendement": -0.0475,
+  "prime_rendement": -0.046,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -4725,7 +4877,7 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 11.11,
-  "payout": 0.289971,
+  "payout": 0.30663599999999996,
   "roe": null,
   "pegy": null,
   "gate": "EXCLU",
@@ -4735,7 +4887,9 @@
   "notation": null,
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
   "date_statut_cotation": null,
+  "historique_cotation": [],
   "avis_recents": [
    {
     "date": "2026-06-29",
