@@ -37,7 +37,7 @@ SOCIETES = [
     ("SAFC", "Safca (Alios Finance CI)", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "CI", None, None),
     ("ORGT", "Oragroup Togo", "SERVICES_FINANCIERS", "IFRS", "TG", None, "ECP Financial Holdings (50,01%)"),
     ("BOABF", "BOA Burkina Faso", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "BF", None, "Groupe BOA/BMCE"),
-    ("BBGCI", "Bridge Bank Group CI", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "CI", "2026-08-21",
+    ("BBGCI", "Bridge Bank Group CI", "SERVICES_FINANCIERS", "BANCAIRE_UMOA", "CI", "2026-09-24",
      "Bridge Group West Africa (BGWA) 57% post-IPO, CNPS 20%, flottant BRVM 20%, "
      "divers personnes physiques 3% -- source : Note d'Information IPO visee AMF-UMOA "
      "AO/26-03 du 26/06/2026. CORRECTIF 15/07/2026 : la mention anterieure 'Groupe Teyliom' "
