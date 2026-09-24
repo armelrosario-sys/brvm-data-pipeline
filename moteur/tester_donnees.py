@@ -573,6 +573,47 @@ def test_statuts_cotation():
                 f"'{titre[:48]}' classe {avis_brvm.classer(titre)} (attendu {attendu})")
 
 
+# ----------------------------------------------------------------------
+# 11. INTEGRITE DU FICHIER APPLICATION (bloquant)
+# ----------------------------------------------------------------------
+def test_integrite_app():
+    """Verifie qu'app.py contient bien toutes ses sections.
+
+    Ajout du 24/09/2026 apres un incident : une modification par ancrage de
+    lignes n'a pas trouve son ancre, est allee jusqu'a la fin du fichier et a
+    ECRASE tout ce qui suivait. Le fichier est passe de 943 a 444 lignes et a ete
+    commite tel quel. L'application demarrait sans la moindre erreur — elle
+    affichait seulement les trois metriques du haut et plus rien d'autre. Aucun
+    test existant ne l'a vu : ils verifiaient que l'app ne PLANTE pas, pas
+    qu'elle affiche quelque chose.
+    Une troncature silencieuse est plus dangereuse qu'un plantage.
+    """
+    print("\n=== 11. Integrite du fichier application (bloquant) ===")
+    app = RACINE / "app.py"
+    if not app.exists():
+        verifie(False, "app.py absent", bloquant=False)
+        return
+    code = app.read_text(encoding="utf-8")
+
+    sections = {
+        "onglets": 'st.tabs(',
+        "repartition des profils": "Repartition des profils",
+        "plan cherte x croissance": "Plan cherte",
+        "taux sans risque": "Taux sans risque",
+        "onglet Explorer": "Telecharger (CSV)",
+        "fiche titre": "Pourquoi ce profil",
+        "qualite des donnees": "Limites permanentes",
+    }
+    manquantes = [nom for nom, motif in sections.items() if motif not in code]
+    verifie(not manquantes,
+            f"app.py contient toutes ses sections"
+            + ("" if not manquantes else f" — MANQUANTES : {', '.join(manquantes)}"))
+
+    lignes = code.count("\n")
+    verifie(lignes >= 700,
+            f"app.py fait {lignes} lignes (une chute nette signale une troncature)")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -587,6 +628,7 @@ def main():
     test_avis_brvm()
     test_fondamentaux_a_jour()
     test_statuts_cotation()
+    test_integrite_app()
     if not sans_app:
         test_application()
 
