@@ -180,7 +180,7 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
   <div class="bandeau-int">
     <div>
       <h1 class="titre-doc">BRVM — tableau de bord <span>comparatif</span></h1>
-      <p class="sous-titre">47 sociétés · 6 horizons de performance · benchmark sectoriel et marché</p>
+      <p class="sous-titre"><span id="nSoc">—</span> sociétés · 6 horizons de performance · benchmark sectoriel et marché</p>
     </div>
     <div class="seance">
       <div>Cote de référence : <b id="kBoc">chargement…</b></div>
@@ -192,9 +192,9 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
   <div class="reglette"><div class="reglette-int">
     <div class="cran"><div class="cran-lib">BRVM Composite</div><div class="cran-val" id="iComp">—</div><div class="cran-note" id="iCompA">—</div></div>
     <div class="cran"><div class="cran-lib">BRVM 30</div><div class="cran-val" id="i30">—</div><div class="cran-note" id="i30A">—</div></div>
-    <div class="cran"><div class="cran-lib">PER médian</div><div class="cran-val" id="kPer">—</div><div class="cran-note">moyenne faussée par 7 valeurs extrêmes</div></div>
+    <div class="cran"><div class="cran-lib">PER médian</div><div class="cran-val" id="kPer">—</div><div class="cran-note">moyenne faussée par <span id="nExtremes">—</span> valeurs extrêmes</div></div>
     <div class="cran"><div class="cran-lib">Rendement médian</div><div class="cran-val" id="kRdt">—</div><div class="cran-note">dividende net / cours</div></div>
-    <div class="cran"><div class="cran-lib">Perf. médiane 5 ans</div><div class="cran-val" id="kP5">—</div><div class="cran-note">44 titres documentés</div></div>
+    <div class="cran"><div class="cran-lib">Perf. médiane 5 ans</div><div class="cran-val" id="kP5">—</div><div class="cran-note"><span id="nP5">—</span> titres documentés</div></div>
     <div class="cran"><div class="cran-lib">Séance</div><div class="cran-val" id="iSeance">—</div><div class="cran-note">hausse · baisse · inchangé</div></div>
   </div></div>
 </header>
@@ -698,6 +698,14 @@ function majSecteurs(){
 /* --- indicateurs d'en-tête ---------------------------------------------- */
 function majCrans(){
   majIndices();
+  /* La cote n'est pas figée : une introduction en bourse la fait grandir, une
+     radiation la réduit. Ces effectifs se lisent donc dans les données. */
+  const nSoc = META.total || ROWS.length;
+  $('#nSoc').text(nSoc);
+  const extremes = ROWS.filter(r => r.per !== null && r.per !== undefined && r.per > 50).length;
+  $('#nExtremes').text(extremes);
+  const b5 = (BENCH.MARCHE || {}).v5a;
+  $('#nP5').text(b5 ? b5.n : '—');
   $('#kPer').text(NF(BENCH.MARCHE.per.med,2));
   $('#kRdt').text(NF(BENCH.MARCHE.rdt.med,2)+' %');
   $('#kP5').text('+'+NF(BENCH.MARCHE.v5a.med,1)+' %');
