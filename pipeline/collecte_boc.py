@@ -30,6 +30,10 @@ MOIS = {"janv": 1, "févr": 2, "fevr": 2, "mars": 3, "avr": 4, "mai": 5, "juin":
 
 # une ligne de cotation se termine par une date de dividende de la forme 18-août-25
 RE_DATE_DIV = re.compile(r"(\d{1,2}-[a-zéû]{3,5}\.?-\d{2})\s*$", re.I)
+# Même motif, sans ancrage de fin : une ligne de cotation porte sa date suivie du
+# rendement et du PER, donc RE_DATE_DIV ne la reconnaît pas. Sert uniquement à
+# savoir qu'une ligne est déjà la cotation suivante.
+RE_DATE_PARTOUT = re.compile(r"\d{1,2}-[a-zéû]{3,5}\.?-\d{2}", re.I)
 RE_SECTEUR = re.compile(r"^(TEL|FIN|CD|CB|IND|ENE|SPU)$")
 RE_NOMBRE = re.compile(r"^-?[\d  \u202f]+(,\d+)?$")
 
@@ -259,17 +263,30 @@ def recoud_valeur(val, vol, cours, suites):
     """
     if cours_implicite_plausible(val, vol, cours):
         return val, None
-    for ligne in suites:
-        # exactement trois chiffres : un groupe de milliers renvoyé à la ligne.
-        # Un numéro de page, à un ou deux chiffres, ne peut donc pas être happé.
-        m = re.fullmatch(r"\s*(\d{3})\s*", ligne)
-        if not m:
-            continue
-        candidat = val * 1000 + int(m.group(1))
+    for frag in fragments_suivants(suites):
+        candidat = val * 1000 + int(frag)
         if cours_implicite_plausible(candidat, vol, cours):
             return candidat, val
-        break
     return val, None
+
+
+def fragments_suivants(suites):
+    """Groupes de milliers isolés sur les lignes qui suivent celle du titre.
+
+    Le fragment ne se présente pas seul : la ligne suivante porte aussi le code
+    secteur, et parfois la fin d'un libellé trop long. On examine donc les champs
+    de la ligne, pas la ligne entière, et on ne retient que ceux faits d'exactement
+    trois chiffres — un numéro de page, à un ou deux chiffres, ne peut pas être
+    happé. Le balayage s'arrête à la cotation suivante, reconnue à sa date de
+    dividende, pour ne pas aller puiser dans le titre d'après.
+    """
+    frags = []
+    for ligne in suites:
+        if RE_DATE_PARTOUT.search(ligne):
+            break
+        champs = [c.strip() for c in re.split(r"\s{2,}", ligne.strip()) if c.strip()]
+        frags += [c for c in champs if re.fullmatch(r"\d{3}", c)]
+    return frags
 
 
 def totaux(txt):
