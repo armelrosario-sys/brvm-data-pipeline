@@ -305,6 +305,49 @@ def totaux(txt):
         rendement_moyen=cherche(r"Taux de rendement moyen du marché\s+([\d,]+)"))
 
 
+def roster_carnet(txt):
+    """Symboles listés au carnet d'ordres du marché des actions, en fin de bulletin.
+
+    Le carnet recense toute la cote, y compris les valeurs qui n'ont pas traité.
+    Il sert de liste de contrôle : un symbole qui y figure mais qu'on n'a pas
+    extrait du tableau de cotation est soit suspendu, soit une ligne perdue.
+    """
+    i = txt.rfind("MARCHE DES ACTIONS")          # la dernière occurrence est le carnet
+    if i < 0:
+        return set()
+    fin = txt.find("MARCHE DES DROITS", i)
+    bloc = txt[i:fin if fin > 0 else None]
+    return set(re.findall(r"^\s*([A-Z]{3,6})\s{2,}\S", bloc, re.M))
+
+
+def diagnostiquer(txt, valeurs, tot):
+    """Quand les totaux ne tombent pas, dire ce qui manque et où le chercher.
+
+    Sans cela, un écart de plusieurs centaines de millions n'indique rien : il
+    faut rouvrir le PDF à la main. Les trois indices ci-dessous suffisent en
+    général à nommer la ligne fautive.
+    """
+    dv = (tot.get("volume") or 0) - sum(v["volume"] for v in valeurs)
+    dval = (tot.get("valeur") or 0) - sum(v["valeur"] for v in valeurs)
+    if dv or dval:
+        print(f"\n  Manquant : {dv:,} titres et {dval:,} FCFA".replace(",", " "))
+        if dv:
+            moyen = dval / dv
+            print(f"  Cours moyen implicite : {moyen:,.2f} FCFA".replace(",", " ")
+                  + ("  — un cours entier désigne une ligne unique perdue"
+                     if abs(moyen - round(moyen)) < 0.01 else ""))
+
+    absents = sorted(roster_carnet(txt) - {v["symbole"] for v in valeurs})
+    if absents:
+        print("  Au carnet d'ordres mais pas dans le tableau de cotation : "
+              + ", ".join(absents))
+        print("  (un titre suspendu y figure légitimement ; tout autre est une ligne perdue)")
+
+    nuls = [v["symbole"] for v in valeurs if not v["volume"]]
+    if nuls:
+        print("  Lignes extraites à volume nul : " + ", ".join(nuls))
+
+
 # Contrôles bloquants : une divergence signale une extraction fausse.
 # Le dénombrement hausse/baisse/inchangé est seulement indicatif — la BRVM le
 # calcule sur le cours de référence, ajusté les jours de détachement de dividende
@@ -424,6 +467,7 @@ def main():
         for r in rapport:
             if r.get("titres_en_ecart"):
                 print("  titres en cause : " + ", ".join(r["titres_en_ecart"]))
+        diagnostiquer(txt, valeurs, tot)
         sys.exit("Réconciliation en échec sur : " + ", ".join(rates)
                  + "\nLe format du bulletin a probablement changé ; rien n'a été publié.")
 
