@@ -410,8 +410,16 @@ function majEntete(origine){
     ? ' · ' + hs.length + ' ' + pl(hs.length,'titre') + ' ' + pl(hs.length,'non coté') + ' cette séance : '
       + hs.map(x => x.symbole + ' (clôture du ' + jolieDate(x.derniere_cotation) + ')').join(', ')
     : '';
-  $('#kSrc').text(origine + (m.boc_reconcilie === false ? ' · réconciliation BOC en échec'
-                  : (manquants ? ' · '+manquants+' colonne(s) incomplète(s)' : ' · jeu complet')) + suffixe);
+  /* Une séance peut être publiée alors qu'une ligne du bulletin n'a pas été lue :
+     mieux vaut les 47 titres justes que rien du tout. Encore faut-il dire lequel
+     manque, sinon son absence passe pour une radiation. */
+  const abs = m.boc_absents || [];
+  const etat = m.boc_reconcilie === false
+    ? ' · réconciliation BOC en échec' +
+      (abs.length ? ' — ' + pl(abs.length,'titre') + ' ' + pl(abs.length,'non lu') +
+                    ' dans le bulletin : ' + abs.join(', ') : '')
+    : (manquants ? ' · '+manquants+' colonne(s) incomplète(s)' : ' · jeu complet');
+  $('#kSrc').text(origine + etat + suffixe);
 }
 const BAS = -1e15, ND = '<span class="nd">n.d.</span>', NI = '<span class="ni">non importé</span>';
 const NF = (v,d) => v.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
