@@ -363,32 +363,162 @@ def roster_carnet(txt):
     return set(re.findall(r"^\s*([A-Z]{3,6})\s{2,}\S", bloc, re.M))
 
 
+def lignes_brutes(txt, symboles):
+    """Lignes du bulletin qui portent l'un des symboles donnés, telles quelles.
+
+    Un écart nommé sans sa ligne oblige à rouvrir le PDF, donc à attendre une
+    séance de plus pour corriger. La ligne brute, elle, dit immédiatement
+    pourquoi l'extraction l'a laissée passer.
+    """
+    trouvees = []
+    for ligne in txt.split("\n"):
+        tete = ligne.strip()[:8]
+        for s in symboles:
+            if tete.startswith(s):
+                trouvees.append((s, ligne.rstrip()))
+                break
+    return trouvees
+
+
 def diagnostiquer(txt, valeurs, tot):
     """Quand les totaux ne tombent pas, dire ce qui manque et où le chercher.
 
     Sans cela, un écart de plusieurs centaines de millions n'indique rien : il
-    faut rouvrir le PDF à la main. Les trois indices ci-dessous suffisent en
-    général à nommer la ligne fautive.
+    faut rouvrir le PDF à la main. Les indices ci-dessous suffisent en général
+    à nommer la ligne fautive — et à la montrer.
     """
+    lignes = []
+
+    def dire(s):
+        print(s)
+        lignes.append(s)
+
     dv = (tot.get("volume") or 0) - sum(v["volume"] for v in valeurs)
     dval = (tot.get("valeur") or 0) - sum(v["valeur"] for v in valeurs)
     if dv or dval:
-        print(f"\n  Manquant : {dv:,} titres et {dval:,} FCFA".replace(",", " "))
+        dire(f"\n  Manquant : {dv:,} titres et {dval:,} FCFA".replace(",", " "))
         if dv:
             moyen = dval / dv
-            print(f"  Cours moyen implicite : {moyen:,.2f} FCFA".replace(",", " ")
-                  + ("  — un cours entier désigne une ligne unique perdue"
-                     if abs(moyen - round(moyen)) < 0.01 else ""))
+            dire(f"  Cours moyen implicite : {moyen:,.2f} FCFA".replace(",", " ")
+                 + ("  — un cours entier désigne une ligne unique perdue"
+                    if abs(moyen - round(moyen)) < 0.01 else ""))
 
     absents = sorted(roster_carnet(txt) - {v["symbole"] for v in valeurs})
     if absents:
-        print("  Au carnet d'ordres mais pas dans le tableau de cotation : "
-              + ", ".join(absents))
-        print("  (un titre suspendu y figure légitimement ; tout autre est une ligne perdue)")
+        dire("  Au carnet d'ordres mais pas dans le tableau de cotation : "
+             + ", ".join(absents))
+        dire("  (une valeur non traitée ce jour-là y figure légitimement : le tableau"
+             " de cotation ne recense que les valeurs qui ont transigé)")
+        brutes = lignes_brutes(txt, absents)
+        if brutes:
+            dire("  Lignes du bulletin portant ces symboles, telles que pdftotext les rend :")
+            for s, l in brutes:
+                dire(f"    [{s}] {l!r}")
+        else:
+            dire("  Aucune ligne du bulletin ne commence par ces symboles : ils ne"
+                 " figurent qu'au carnet, donc n'ont pas traité.")
 
     nuls = [v["symbole"] for v in valeurs if not v["volume"]]
     if nuls:
-        print("  Lignes extraites à volume nul : " + ", ".join(nuls))
+        dire("  Lignes extraites à volume nul : " + ", ".join(nuls))
+
+    # Le journal du workflow défile ; le fichier, lui, se relit et se joint.
+    try:
+        os.makedirs(DOSSIER, exist_ok=True)
+        with open(os.path.join(DOSSIER, "diagnostic_boc.txt"), "w", encoding="utf-8") as f:
+            f.write("\n".join(lignes) + "\n")
+        print(f"  Diagnostic écrit dans {os.path.join(DOSSIER, 'diagnostic_boc.txt')}")
+    except OSError as e:
+        print(f"  (diagnostic non écrit : {e})")
+    return absents
+
+
+# Nombre de lignes manquantes au-delà duquel on préfère bloquer : un format qui
+# change casse bien plus de lignes qu'une introduction en bourse.
+LIGNES_MANQUANTES_MAX = 3
+# Part de la séance qu'on accepte de perdre quand PLUSIEURS lignes manquent. Une
+# ligne unique est publiée quel que soit son poids : à la BRVM, une seule valeur
+# très liquide emporte couramment l'essentiel du volume d'une séance — ETIT en a
+# porté 90 % le 10 août 2026 — et son absence, nommée, ne fausse pas les autres.
+PART_MANQUANTE_MAX = 0.60
+
+
+def ecart_par_manque(txt, valeurs, tot, rapport):
+    """L'écart s'explique-t-il par des lignes absentes plutôt que par des chiffres faux ?
+
+    Les deux cas n'appellent pas la même conduite. Des chiffres faux — une valeur
+    transigée mal recousue, une variation qui ne retombe pas sur ses cours — sont
+    une extraction à jeter : publier reviendrait à afficher des cours inventés.
+    Des lignes absentes, au contraire, laissent intactes celles qui ont été lues :
+    la bonne conduite est de publier les 47 justes en nommant la 48e qui manque,
+    et non de priver le tableau de bord d'une séance entière.
+
+    Limite connue, assumée : une ligne légitimement absente masque l'écart qu'une
+    AUTRE ligne mal lue aurait produit. Les deux écarts s'additionnent dans le même
+    total et rien ne les sépare, faute de connaître le volume du titre absent. Le
+    rempart restant est la cohérence interne de chaque ligne lue, et la séance est
+    alors publiée sous la mention « réconciliation BOC en échec » — jamais présentée
+    comme certifiée. Le cours implicite du manque est journalisé pour que l'anomalie
+    se voie : un cours hors de la cote trahit une seconde cause.
+
+    Renvoie (oui, absents, motif).
+    """
+    coherence = {r["controle"]: r for r in rapport}
+    # Ces deux contrôles ne comparent pas au bulletin : ils vérifient que chaque
+    # ligne lue se tient toute seule. S'ils passent, ce qui a été lu est juste.
+    for cle in ("coherence_valeur_volume", "variation_jour_recalculee"):
+        r = coherence.get(cle)
+        if r and not r["concorde"]:
+            return False, [], f"{cle} en échec : les lignes lues sont elles-mêmes fausses"
+
+    manquants = {}
+    for cle in ("volume", "valeur", "titres"):
+        r = coherence.get(cle)
+        if not r or r["concorde"]:
+            continue
+        if r["calcule"] > r["bulletin"]:
+            return False, [], (f"{cle} : {r['calcule']:,} lus pour {r['bulletin']:,} annoncés — "
+                               "un excédent ne s'explique pas par une ligne oubliée"
+                               ).replace(",", " ")
+        manquants[cle] = r["bulletin"] - r["calcule"]
+
+    if not manquants:
+        return False, [], "aucun écart par défaut à expliquer"
+
+    absents = sorted(roster_carnet(txt) - {v["symbole"] for v in valeurs})
+    if not absents:
+        return False, [], ("écart sans porteur : aucun symbole du carnet ne manque au "
+                           "tableau, donc l'écart vient d'une ligne mal lue")
+
+    n = manquants.get("titres")
+    if n is None:
+        return False, [], ("le nombre de titres transigés concorde alors que les volumes "
+                           "non : une ligne a donc été lue avec un mauvais volume")
+    if n > LIGNES_MANQUANTES_MAX:
+        return False, [], f"{n} lignes manquantes : trop pour une omission ponctuelle"
+    if n > len(absents):
+        return False, [], (f"{n} lignes manquantes pour seulement {len(absents)} symbole(s) "
+                           "absent(s) du tableau : le compte ne se fait pas")
+
+    if n > 1:
+        for cle in ("volume", "valeur"):
+            if cle in manquants and tot.get(cle):
+                part = manquants[cle] / tot[cle]
+                if part > PART_MANQUANTE_MAX:
+                    return False, [], (f"{n} lignes manquantes emportant {part:.0%} du {cle} "
+                                       "de la séance : c'est le format qui a changé")
+
+    # Le cours que le manque implique : hors de la cote, il désigne une seconde cause.
+    implicite = ""
+    dv, dval = manquants.get("volume"), manquants.get("valeur")
+    if dv and dval:
+        cours = [v["cloture"] for v in valeurs if v["cloture"]]
+        m = dval / dv
+        borne = "" if not cours or min(cours) / 2 <= m <= max(cours) * 2 else \
+                " — hors de la fourchette de la cote, donc suspect"
+        implicite = f" ; cours implicite du manque {m:,.0f} FCFA{borne}".replace(",", " ")
+    return True, absents, (f"{n} ligne(s) non lue(s) parmi {', '.join(absents)} ; "
+                           "les lignes extraites sont cohérentes entre elles" + implicite)
 
 
 # Contrôles bloquants : une divergence signale une extraction fausse.
@@ -497,22 +627,41 @@ def main():
         print("        d'opération sur titres. L'écart est attendu ces jours-là et")
         print("        n'affecte ni les cours ni les volumes extraits.")
 
-    os.makedirs(os.path.dirname(a.sortie) or ".", exist_ok=True)
-    json.dump(dict(numero=numero, seance=jour_iso, source="brvm.org",
-                   synthese=tot, indices=idx, controles=rapport, reconcilie=ok,
-                   valeurs=valeurs),
-              open(a.sortie, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    print(f"\n{a.sortie} écrit.")
-    if tmp:
-        os.unlink(tmp.name)
+    absents, motif, publiable = [], "", ok
     if not ok:
         rates = [r["controle"] for r in rapport if r["bloquant"] and not r["concorde"]]
         for r in rapport:
             if r.get("titres_en_ecart"):
                 print("  titres en cause : " + ", ".join(r["titres_en_ecart"]))
         diagnostiquer(txt, valeurs, tot)
-        sys.exit("Réconciliation en échec sur : " + ", ".join(rates)
-                 + "\nLe format du bulletin a probablement changé ; rien n'a été publié.")
+        publiable, absents, motif = ecart_par_manque(txt, valeurs, tot, rapport)
+
+    os.makedirs(os.path.dirname(a.sortie) or ".", exist_ok=True)
+    json.dump(dict(numero=numero, seance=jour_iso, source="brvm.org",
+                   synthese=tot, indices=idx, controles=rapport, reconcilie=ok,
+                   publiable=publiable, lignes_absentes=absents, motif_ecart=motif,
+                   valeurs=valeurs),
+              open(a.sortie, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print(f"\n{a.sortie} écrit.")
+    if tmp:
+        os.unlink(tmp.name)
+
+    if ok:
+        return
+    if publiable:
+        # Une valeur nouvellement introduite, ou dont la ligne s'écarte de la mise
+        # en page habituelle, ne doit pas priver les 47 autres de leur séance. On
+        # publie ce qui est lu, on nomme ce qui manque, et rien n'est inventé :
+        # le titre absent reste absent du tableau de bord.
+        print("\n  ATTENTION — séance publiée sans réconciliation complète.")
+        print(f"  Motif : {motif}")
+        print("  Les lignes extraites sont cohérentes entre elles ; le tableau de bord")
+        print("  affichera « réconciliation BOC en échec » et le ou les titres absents")
+        print("  n'y figureront pas, plutôt que d'y figurer avec des chiffres devinés.")
+        return
+    sys.exit("Réconciliation en échec sur : " + ", ".join(rates)
+             + f"\nÉcart non attribuable à une ligne absente ({motif})."
+             + "\nLe format du bulletin a probablement changé ; rien n'a été publié.")
 
 
 if __name__ == "__main__":
