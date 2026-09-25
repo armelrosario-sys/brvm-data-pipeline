@@ -182,23 +182,34 @@ def lignes_actions(txt):
                 pos, m_date = k, m
                 break
         if pos is None:
-            continue
-        # « 616 15-sept.-25 » : le montant du dividende précède la date sans double espace
-        reste = champs[pos][:m_date.start()].strip()
-        avant = champs[:pos] + ([reste] if reste else [])
-        apres = champs[pos + 1:]
-        if len(avant) < 11:
-            continue
-        sym = avant[0].strip()
-        if not re.match(r"^[A-Z]{3,6}$", sym):
-            continue
+            # Une valeur qui n'a encore payé aucun dividende — une première
+            # cotation, typiquement — n'a pas de date sur sa ligne. L'ancrage
+            # habituel la laisserait passer sans bruit.
+            intro = ligne_sans_dividende(champs)
+            if intro is None:
+                continue
+            sym, titre = intro["symbole"], intro["titre"]
+            prec, ouv, clot, varj = intro["prec"], intro["ouv"], intro["clot"], intro["varj"]
+            vol, val, ref = intro["vol"], intro["val"], intro["ref"]
+            vara = divm = None
+            apres = []
+        else:
+            # « 616 15-sept.-25 » : le montant du dividende précède la date sans double espace
+            reste = champs[pos][:m_date.start()].strip()
+            avant = champs[:pos] + ([reste] if reste else [])
+            apres = champs[pos + 1:]
+            if len(avant) < 11:
+                continue
+            sym = avant[0].strip()
+            if not re.match(r"^[A-Z]{3,6}$", sym):
+                continue
 
-        # les 9 derniers champs avant la date sont numériques et d'ordre fixe
-        chiffres = [nombre(c) for c in avant[-9:]]
-        if any(v is None for v in chiffres[:8]):
-            continue
-        prec, ouv, clot, varj, vol, val, ref, vara, divm = chiffres
-        titre = " ".join(avant[1:-9]).strip()
+            # les 9 derniers champs avant la date sont numériques et d'ordre fixe
+            chiffres = [nombre(c) for c in avant[-9:]]
+            if any(v is None for v in chiffres[:8]):
+                continue
+            prec, ouv, clot, varj, vol, val, ref, vara, divm = chiffres
+            titre = " ".join(avant[1:-9]).strip()
 
         # Une valeur transigée trop large pour sa colonne est renvoyée à la ligne
         # par pdftotext : « 1 389 733 920 » devient « 1 389 733 » suivi de « 920 »
@@ -234,7 +245,8 @@ def lignes_actions(txt):
             compartiment=compartiment, cours_precedent=prec, ouverture=ouv, cloture=clot,
             variation_jour=varj, volume=vol, valeur=val, cours_reference=ref,
             perf_1er_janvier=vara, dividende_montant=divm,
-            dividende_date=date_div(m_date.group(1)), rendement_net=rdt, per=per))
+            dividende_date=date_div(m_date.group(1)) if m_date else None,
+            rendement_net=rdt, per=per))
 
     for sym, tronque, entier in reparations:
         print(f"  valeur recousue  {sym:6s} {tronque:>15,} -> {entier:>18,}".replace(",", " "))
@@ -303,6 +315,37 @@ def totaux(txt):
         inchange=cherche(r"Nombre de titres inchangés\s+(\d+)\s{2,}"),
         per_moyen=cherche(r"PER moyen du marché\s+\(\*\*\)\s+([\d,]+)"),
         rendement_moyen=cherche(r"Taux de rendement moyen du marché\s+([\d,]+)"))
+
+
+def ligne_sans_dividende(champs):
+    """Cotation d'une valeur qui n'a encore payé aucun dividende.
+
+    C'est le cas d'une première cotation : la colonne « Dernier dividende payé »
+    est vide, donc la ligne ne porte aucune date et l'ancrage habituel ne la voit
+    pas. On se rabat sur la variation du jour — premier champ en pourcentage de la
+    ligne — dont la position dans le tableau est tout aussi fixe : les trois cours
+    la précèdent, le volume et la valeur transigée la suivent.
+
+    Renvoie None dès que la forme s'écarte de celle attendue : mieux vaut laisser
+    la réconciliation échouer que fabriquer une ligne mal alignée.
+    """
+    sym = champs[0].strip() if champs else ""
+    if not re.match(r"^[A-Z]{3,6}$", sym):
+        return None
+    pc = next((k for k, c in enumerate(champs) if c.strip().endswith("%")), None)
+    if pc is None or pc < 5:          # symbole, titre, puis les trois cours au minimum
+        return None
+    varj = nombre(champs[pc])
+    cours = [nombre(c) for c in champs[pc - 3:pc]]
+    suite = [nombre(c) for c in champs[pc + 1:pc + 4]]
+    if varj is None or any(v is None for v in cours):
+        return None
+    if len(suite) < 2 or any(v is None for v in suite[:2]):
+        return None
+    return dict(symbole=sym, titre=" ".join(champs[1:pc - 3]).strip(),
+                prec=cours[0], ouv=cours[1], clot=cours[2], varj=varj,
+                vol=suite[0], val=suite[1],
+                ref=suite[2] if len(suite) > 2 else None)
 
 
 def roster_carnet(txt):
