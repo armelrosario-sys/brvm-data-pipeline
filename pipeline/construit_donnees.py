@@ -312,6 +312,10 @@ def main():
     meta = dict(
         boc_numero=boc.get("numero"), boc_seance=boc.get("seance"),
         boc_reconcilie=boc.get("reconcilie"), boc_controles=boc.get("controles"),
+        # Publier une séance dont une ligne manque vaut mieux que ne rien publier,
+        # à condition de nommer ce qui manque : le bandeau l'affiche.
+        boc_absents=boc.get("lignes_absentes") or [],
+        boc_motif_ecart=boc.get("motif_ecart") or "",
         indices=boc.get("indices") or {}, synthese=boc.get("synthese") or {},
         sika_perf=sika.get("releve_perf") or sika.get("releve_le"),
         sika_fond=sika.get("releve_fondamentaux") or sika.get("releve_le"),
