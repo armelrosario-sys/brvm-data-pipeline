@@ -119,6 +119,19 @@ button.dt-button{background:#fff!important;border:1px solid var(--trait)!importa
   font-family:var(--mono)!important;font-size:11px!important;letter-spacing:.09em;text-transform:uppercase;
   color:var(--encre)!important;padding:7px 13px!important;margin:0 0 0 6px!important}
 button.dt-button:hover:not(.disabled){background:var(--encre)!important;color:#fff!important;border-color:var(--encre)!important}
+/* --- sélection de titres à comparer --- */
+.barre-sel{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:11px 18px;
+  background:#FFF9EC;border-top:1px solid var(--or-clair);border-bottom:1px solid var(--or-clair)}
+.sel-compte{font-family:var(--mono);font-size:12px;color:var(--gris)}
+.sel-compte b{color:var(--encre);font-size:14px}
+.barre-sel .raz{align-self:auto;height:30px}
+.barre-sel .bascule{height:30px;align-self:auto}
+input.pick{width:14px;height:14px;margin:0 7px 0 0;vertical-align:-2px;
+  accent-color:var(--or);cursor:pointer}
+table.dataTable tbody tr.choisi td{background:#FFF4D6}
+table.dataTable tbody tr.choisi td.dtfc-fixed-left,
+table.dataTable tbody tr.choisi td.dtfc-fixed-start{background:#FFF4D6}
+table.dataTable tbody tr.choisi:hover td{background:#FFEDBE}
 .zone-graphe{padding:16px 18px}
 #graphe svg{width:100%;height:auto;display:block}
 .gr-grille{stroke:#EDF0F5;stroke-width:1}
@@ -190,7 +203,7 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
 
   <section class="carte">
     <div class="carte-tete"><h2>Filtres et mode de lecture</h2>
-      <span class="compte"><b id="compte">—</b> titres affichés sur <span id="total">—</span></span></div>
+      <span class="compte"><b id="compte">—</b> <span id="compteMot">titres affichés</span> sur <span id="total">—</span></span></div>
     <div class="filtres">
       <div class="champ champ--large"><label for="q">Recherche globale</label>
         <input id="q" type="search" placeholder="code, titre, secteur…" autocomplete="off"></div>
@@ -243,6 +256,12 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
   <section class="carte">
     <div class="carte-tete"><h2>Cote comparative</h2>
       <span class="compte">Bouton <b>Colonnes</b> pour afficher ou masquer · <span class="alerte">▲</span> signalement au survol</span></div>
+    <div class="barre-sel" id="barreSelection" hidden>
+      <span class="sel-compte"><b id="selN">0</b> <span id="selMot">titre sélectionné</span></span>
+      <label class="bascule"><input type="checkbox" id="selSeule"> N'afficher que la sélection</label>
+      <button class="raz" id="selEvol" type="button">Comparer les chemins de cours</button>
+      <button class="raz" id="selVider" type="button">Tout désélectionner</button>
+    </div>
     <div class="zone-table"><table id="cote" class="display" style="width:100%"></table></div>
   </section>
 
@@ -388,7 +407,7 @@ function majEntete(origine){
   const manquants = Object.entries(c).filter(([k,v]) => v < total).length;
   const hs = m.hors_seance || [];
   const suffixe = hs.length
-    ? ' · ' + hs.length + ' titre(s) non coté(s) cette séance : '
+    ? ' · ' + hs.length + ' ' + pl(hs.length,'titre') + ' ' + pl(hs.length,'non coté') + ' cette séance : '
       + hs.map(x => x.symbole + ' (clôture du ' + jolieDate(x.derniere_cotation) + ')').join(', ')
     : '';
   $('#kSrc').text(origine + (m.boc_reconcilie === false ? ' · réconciliation BOC en échec'
@@ -459,6 +478,11 @@ function bmk(prefixe){
 const TEINTES = ['#1D3567','#C02A28','#0B7A47','#E4A11B','#6B4E9B','#0E7490',
                  '#B45309','#9D174D','#3F6212','#1E40AF','#7C2D12','#155E75'];
 const MAX_COURBES = 12;
+
+/* Titres cochés pour comparaison. Vit hors du tableau : la sélection survit aux
+   filtres, aux tris et aux changements de mode de lecture. */
+const selection = new Set();
+const pl = (n, mot) => n > 1 ? mot + 's' : mot;
 let eteints = new Set();
 
 function jour(t){ return Date.parse(t + 'T00:00:00Z'); }
@@ -482,7 +506,13 @@ function spark(r){
 
 const COLS = [
  {title:'Code',data:'sym',className:'code',
-  render:(v,t,r)=>t==='display'?v+(r.flags.length?'<span class="alerte" title="'+r.flags.join(' — ').replace(/"/g,'&quot;')+'">▲</span>':''):v},
+  render:(v,t,r)=>{
+    if(t!=='display') return v;
+    /* la case vit dans la colonne figée : elle reste visible au défilement */
+    return '<input type="checkbox" class="pick" data-sym="'+v+'"'+
+           (selection.has(v)?' checked':'')+' aria-label="Comparer '+v+'">'+v+
+           (r.flags.length?'<span class="alerte" title="'+r.flags.join(' — ').replace(/"/g,'&quot;')+'">▲</span>':'');
+  }},
  {title:'Sect.',data:'sect',render:(v,t,r)=>t==='display'?'<span class="sect" title="'+r.sectLib+'">'+v+'</span>':v},
  {title:'Titre',data:'titre'},
  {title:'Comp.',data:'comp',render:(v,t)=>t==='display'?'<span class="comp '+v.toLowerCase()+'">'+v+'</span>':v},
@@ -525,6 +555,11 @@ majEntete(origine);
 const table = $('#cote').DataTable({
   data:ROWS, columns:COLS, language:LANG, order:[[9,'desc']],
   lengthMenu:[[10,25,50,-1],[10,25,50,'Tout']], pageLength:25,
+  infoCallback:function(st,debut,fin,max,total){
+    if(!total) return 'Aucun titre';
+    return debut+' à '+fin+' sur '+total+' '+pl(total,'titre')+
+           (total!==max ? ' (filtré à partir de '+max+')' : '');
+  },
   scrollX:true, autoWidth:false, dom:'<"haut"lB>rtip',
   fixedColumns:{start:1},          /* la colonne Code reste visible au défilement */
   buttons:[
@@ -533,21 +568,31 @@ const table = $('#cote').DataTable({
     {extend:'excelHtml5',text:'Excel',title:'BRVM_comparatif_2026-08-10',exportOptions:{orthogonal:'export'}},
     {extend:'colvis',text:'Colonnes'}
   ],
-  createdRow:(tr,d)=>{if(d.flags.length)tr.classList.add('signale')}
+  createdRow:(tr,d)=>{
+    if(d.flags.length) tr.classList.add('signale');
+    if(selection.has(d.sym)) tr.classList.add('choisi');
+  }
 });
 
 function tracerEvolution(){
-  const lignes = table.rows({search:'applied'}).data().toArray()
-                  .filter(r => (r.serie || []).length >= 3);
+  /* Une sélection explicite l'emporte sur le filtrage : c'est elle qui dit quels
+     titres comparer, et elle porte au-delà des lignes actuellement affichées. */
+  const source = selection.size
+    ? ROWS.filter(r => selection.has(r.sym))
+    : table.rows({search:'applied'}).data().toArray();
+  const lignes = source.filter(r => (r.serie || []).length >= 3);
   const total = lignes.length;
   const retenus = lignes.slice(0, MAX_COURBES);
   $('#evolCompte').text(total
-    ? (retenus.length + ' courbe(s) tracée(s)' +
-       (total > MAX_COURBES ? ' sur ' + total + ' — affiner les filtres pour les voir toutes' : ''))
+    ? (retenus.length + ' ' + pl(retenus.length,'courbe') + ' ' + pl(retenus.length,'tracée') +
+       (selection.size ? ' — sélection' : '') +
+       (total > MAX_COURBES ? ' sur ' + total + ' — restreindre la sélection pour les voir toutes' : ''))
     : 'aucune série disponible');
 
   if (!retenus.length){
-    $('#graphe').html('<p class="vide-graphe">Aucun titre filtré ne dispose d\'un chemin de cours reconstituable.</p>');
+    $('#graphe').html('<p class="vide-graphe">' + (selection.size
+      ? 'Aucun titre sélectionné ne dispose d\'un chemin de cours reconstituable.'
+      : 'Aucun titre filtré ne dispose d\'un chemin de cours reconstituable.') + '</p>');
     $('#legende').empty();
     return;
   }
@@ -686,9 +731,59 @@ $.fn.dataTable.ext.search.push(function(st,d,i){
   if($s.val()&&r.sect!==$s.val()) return false;
   if($c.val()&&r.comp!==$c.val()) return false;
   if($f.prop('checked')&&!r.flags.length) return false;
+  /* la sélection vide ne masque rien : sans ce garde-fou, une case restée
+     cochée viderait le tableau sans que rien ne l'explique */
+  if($('#selSeule').prop('checked')&&selection.size&&!selection.has(r.sym)) return false;
   return true;
 });
-function maj(){table.draw();$('#compte').text(table.rows({search:'applied'}).count());$('#total').text(ROWS.length)}
+function maj(){
+  table.draw();
+  const n = table.rows({search:'applied'}).count();
+  $('#compte').text(n);
+  $('#compteMot').text(pl(n,'titre') + ' ' + pl(n,'affiché'));
+  $('#total').text(ROWS.length);
+}
+
+/* --- sélection de titres --------------------------------------------------- */
+function majSelection(){
+  const n = selection.size;
+  $('#selN').text(n);
+  $('#selMot').text(pl(n,'titre') + ' ' + pl(n,'sélectionné'));
+  $('#barreSelection').prop('hidden', n === 0);
+  if(!n && $('#selSeule').prop('checked')) $('#selSeule').prop('checked', false);
+}
+
+$(document).on('change', 'input.pick', function(){
+  const sym = $(this).data('sym');
+  if(this.checked) selection.add(sym); else selection.delete(sym);
+  $(this).closest('tr').toggleClass('choisi', this.checked);
+  majSelection();
+  /* on ne redessine la table que si l'affichage en dépend : sans cela, chaque
+     clic ferait sauter la page sous le curseur */
+  if($('#selSeule').prop('checked')) maj();
+  if(VUE === 'evolution') tracerEvolution();
+});
+
+$('#selSeule').on('change', maj);
+
+$('#selVider').on('click', function(){
+  selection.clear();
+  $('#selSeule').prop('checked', false);
+  $('#cote tbody input.pick').prop('checked', false);
+  $('#cote tbody tr').removeClass('choisi');
+  majSelection();
+  maj();
+  if(VUE === 'evolution') tracerEvolution();
+});
+
+$('#selEvol').on('click', function(){
+  $('.vues button').attr('aria-pressed','false');
+  $('.vues button[data-vue="evolution"]').attr('aria-pressed','true');
+  VUE = 'evolution';
+  appliqueVue();
+  const c = document.getElementById('carteEvol');
+  if(c && c.scrollIntoView) c.scrollIntoView({behavior:'smooth', block:'start'});
+});
 $q.on('input',()=>{table.search($q.val());maj()});
 $s.on('change',maj);$c.on('change',maj);$f.on('change',maj);
 $m.on('change',()=>{MET=$m.val();majSecteurs();appliqueVue();table.draw(false)});
@@ -700,6 +795,7 @@ $('.vues button').on('click',function(){
 $('#raz').on('click',()=>{
   $q.val('');$s.val('');$c.val('');$f.prop('checked',false);$m.val('per');MET='per';
   VUE='brut';$('.vues button').attr('aria-pressed','false').first().attr('aria-pressed','true');
+  selection.clear();$('#selSeule').prop('checked',false);majSelection();
   table.search('').order([[9,'desc']]);majSecteurs();appliqueVue();maj();
 });
 table.on('draw',()=>{$('#compte').text(table.rows({search:'applied'}).count());$('#total').text(ROWS.length)});
@@ -769,7 +865,7 @@ $('#videImport').on('click',()=>{
 });
 
 etat((META.couverture&&META.couverture.ca||0)+' / '+(META.total||ROWS.length)+' sociétés documentées');
-majCrans(); majSecteurs(); appliqueVue(); maj();
+majSelection(); majCrans(); majSecteurs(); appliqueVue(); maj();
 $(window).on('resize',()=>table.columns.adjust());
 }
 
