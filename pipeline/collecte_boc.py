@@ -182,10 +182,10 @@ def lignes_actions(txt):
                 pos, m_date = k, m
                 break
         if pos is None:
-            # Une valeur qui n'a encore payé aucun dividende — une première
-            # cotation, typiquement — n'a pas de date sur sa ligne. L'ancrage
-            # habituel la laisserait passer sans bruit.
-            intro = ligne_sans_dividende(champs)
+            # Une valeur qui n'a encore payé aucun dividende n'a pas de date sur sa
+            # ligne, et une première cotation n'a même pas de variation du jour :
+            # l'ancrage habituel laisserait l'une et l'autre passer sans bruit.
+            intro = ligne_premiere_cotation(champs) or ligne_sans_dividende(champs)
             if intro is None:
                 continue
             sym, titre = intro["symbole"], intro["titre"]
@@ -193,6 +193,7 @@ def lignes_actions(txt):
             vol, val, ref = intro["vol"], intro["val"], intro["ref"]
             vara = divm = None
             apres = []
+            per_intro = intro.get("per")
         else:
             # « 616 15-sept.-25 » : le montant du dividende précède la date sans double espace
             reste = champs[pos][:m_date.start()].strip()
@@ -210,6 +211,7 @@ def lignes_actions(txt):
                 continue
             prec, ouv, clot, varj, vol, val, ref, vara, divm = chiffres
             titre = " ".join(avant[1:-9]).strip()
+            per_intro = None
 
         # Une valeur transigée trop large pour sa colonne est renvoyée à la ligne
         # par pdftotext : « 1 389 733 920 » devient « 1 389 733 » suivi de « 920 »
@@ -229,6 +231,10 @@ def lignes_actions(txt):
         m_per = re.search(r"(-?[\d ]+,\d+|-?\d+)\s*$", queue.strip())
         if m_per:
             per = nombre(m_per.group(1))
+        if per is None:
+            # sur une première cotation, le PER est le dernier nombre de la ligne,
+            # les colonnes de dividende et de rendement restant vides
+            per = per_intro
 
         # le code secteur et la suite du libellé figurent sur la ligne suivante
         secteur = None
@@ -315,6 +321,62 @@ def totaux(txt):
         inchange=cherche(r"Nombre de titres inchangés\s+(\d+)\s{2,}"),
         per_moyen=cherche(r"PER moyen du marché\s+\(\*\*\)\s+([\d,]+)"),
         rendement_moyen=cherche(r"Taux de rendement moyen du marché\s+([\d,]+)"))
+
+
+def ligne_premiere_cotation(champs):
+    """Première séance de cotation d'une valeur nouvellement introduite.
+
+    Une telle ligne n'a ni cours précédent, ni variation du jour, ni dividende,
+    ni rendement : la BRVM laisse ces colonnes vides, faute de passé. Il ne reste
+    donc aucun repère de mise en page — ni date, ni pourcentage — sur lequel
+    s'ancrer. Observé sur BBGC au bulletin n° 181 du 24 septembre 2026 :
+
+        BBGC  BRIDGE BANK GROUP CI   7 255  7 255   20 926  151 818 130  7 255   13,34
+
+    Le seul invariant qui subsiste est arithmétique : la valeur transigée divisée
+    par le volume retombe sur le cours de référence, qui suit immédiatement. Ici
+    151 818 130 / 20 926 = 7 255 exactement, et 7 255 est bien le champ suivant.
+    Trois nombres consécutifs vérifiant cette identité ne se rencontrent pas par
+    hasard, ce qui rend l'ancrage plus solide que la mise en page elle-même — dont
+    les colonnes varient d'ailleurs d'une page du bulletin à l'autre.
+
+    Les cours qui précèdent le volume sont lus de droite à gauche — clôture, puis
+    ouverture, puis cours précédent s'il existe. Ce qui manque reste vide : au
+    premier jour, une variation du jour n'a pas de sens, et la déduire de
+    l'égalité entre ouverture et clôture serait l'inventer.
+    """
+    sym = champs[0].strip() if champs else ""
+    if not re.match(r"^[A-Z]{3,6}$", sym):
+        return None
+    # Un pourcentage ou une date signalent une ligne ordinaire, traitée ailleurs.
+    if any(c.strip().endswith("%") or RE_DATE_PARTOUT.search(c) for c in champs):
+        return None
+    nums = [(k, nombre(c)) for k, c in enumerate(champs)]
+    nums = [(k, v) for k, v in nums if v is not None]
+    if len(nums) < 4:
+        return None
+
+    for i in range(len(nums) - 2):
+        (kv, vol), (kl, val), (kr, ref) = nums[i], nums[i + 1], nums[i + 2]
+        if kl != kv + 1 or kr != kl + 1:      # les trois champs doivent se suivre
+            continue
+        if not vol or vol <= 0 or not val or val <= 0 or not ref or ref <= 0:
+            continue
+        if abs(val / vol - ref) > 0.51:       # tolérance d'un arrondi au franc près
+            continue
+        cours = [v for _, v in nums[:i]]
+        if not cours:                         # aucun cours : ce n'est pas une cotation
+            return None
+        titre = " ".join(champs[1:nums[0][0]]).strip()
+        if not titre:
+            return None
+        suite = [v for _, v in nums[i + 3:]]
+        return dict(symbole=sym, titre=titre,
+                    prec=cours[-3] if len(cours) >= 3 else None,
+                    ouv=cours[-2] if len(cours) >= 2 else None,
+                    clot=cours[-1], varj=None, vol=vol, val=val, ref=ref,
+                    per=suite[-1] if suite else None)
+    return None
 
 
 def ligne_sans_dividende(champs):
@@ -472,7 +534,7 @@ def ecart_par_manque(txt, valeurs, tot, rapport):
             return False, [], f"{cle} en échec : les lignes lues sont elles-mêmes fausses"
 
     manquants = {}
-    for cle in ("volume", "valeur", "titres"):
+    for cle in ("volume", "valeur"):
         r = coherence.get(cle)
         if not r or r["concorde"]:
             continue
@@ -485,48 +547,61 @@ def ecart_par_manque(txt, valeurs, tot, rapport):
     if not manquants:
         return False, [], "aucun écart par défaut à expliquer"
 
+    # Le porteur de l'écart doit être nommé. Sans symbole absent, l'écart ne vient
+    # pas d'une ligne oubliée mais d'une ligne présente et mal lue.
     absents = sorted(roster_carnet(txt) - {v["symbole"] for v in valeurs})
     if not absents:
         return False, [], ("écart sans porteur : aucun symbole du carnet ne manque au "
                            "tableau, donc l'écart vient d'une ligne mal lue")
+    if len(absents) > LIGNES_MANQUANTES_MAX:
+        return False, [], (f"{len(absents)} symboles absents du tableau : trop pour une "
+                           "omission ponctuelle")
 
-    n = manquants.get("titres")
-    if n is None:
-        return False, [], ("le nombre de titres transigés concorde alors que les volumes "
-                           "non : une ligne a donc été lue avec un mauvais volume")
-    if n > LIGNES_MANQUANTES_MAX:
-        return False, [], f"{n} lignes manquantes : trop pour une omission ponctuelle"
-    if n > len(absents):
-        return False, [], (f"{n} lignes manquantes pour seulement {len(absents)} symbole(s) "
-                           "absent(s) du tableau : le compte ne se fait pas")
+    # Volume et valeur partent ensemble avec la ligne : l'un sans l'autre désigne
+    # un chiffre faussé, non une ligne oubliée.
+    dv, dval = manquants.get("volume"), manquants.get("valeur")
+    if not dv or not dval:
+        return False, [], ("le volume et la valeur ne manquent pas ensemble : une ligne "
+                           "oubliée les emporterait tous les deux")
 
-    if n > 1:
+    # Le cours que le manque implique est journalisé, jamais opposé. Il serait
+    # tentant d'exiger qu'il tienne dans la fourchette des lignes lues, mais c'est
+    # un raisonnement circulaire : le titre absent est parfois celui qui porte
+    # l'extrême de la cote. ETIT, coté 67 FCFA le 10 août 2026 quand les autres
+    # commençaient à 1 500, aurait ainsi été rejeté pour son propre cours.
+    m = dval / dv
+    cours = [v["cloture"] for v in valeurs if v["cloture"]]
+    doute = "" if not cours or min(cours) / 2 <= m <= max(cours) * 2 else \
+            " — hors de la fourchette des lignes lues, à vérifier"
+
+    if len(absents) > 1:
         for cle in ("volume", "valeur"):
             if cle in manquants and tot.get(cle):
                 part = manquants[cle] / tot[cle]
                 if part > PART_MANQUANTE_MAX:
-                    return False, [], (f"{n} lignes manquantes emportant {part:.0%} du {cle} "
-                                       "de la séance : c'est le format qui a changé")
+                    return False, [], (f"{len(absents)} symboles absents emportant {part:.0%} "
+                                       f"du {cle} de la séance : c'est le format qui a changé")
 
-    # Le cours que le manque implique : hors de la cote, il désigne une seconde cause.
-    implicite = ""
-    dv, dval = manquants.get("volume"), manquants.get("valeur")
-    if dv and dval:
-        cours = [v["cloture"] for v in valeurs if v["cloture"]]
-        m = dval / dv
-        borne = "" if not cours or min(cours) / 2 <= m <= max(cours) * 2 else \
-                " — hors de la fourchette de la cote, donc suspect"
-        implicite = f" ; cours implicite du manque {m:,.0f} FCFA{borne}".replace(",", " ")
-    return True, absents, (f"{n} ligne(s) non lue(s) parmi {', '.join(absents)} ; "
-                           "les lignes extraites sont cohérentes entre elles" + implicite)
+    return True, absents, (f"{', '.join(absents)} absent(s) du tableau de cotation ; "
+                           f"cours implicite du manque {m:,.0f} FCFA".replace(",", " ")
+                           + doute + " ; les lignes extraites sont cohérentes entre elles")
 
 
 # Contrôles bloquants : une divergence signale une extraction fausse.
+#
 # Le dénombrement hausse/baisse/inchangé est seulement indicatif — la BRVM le
 # calcule sur le cours de référence, ajusté les jours de détachement de dividende
 # ou d'opération sur titres, alors que la colonne « Variation jour » du bulletin
 # se rapporte au cours précédent. Les deux bases divergent alors d'un titre ou deux.
-BLOQUANTS = ("volume", "valeur", "titres", "variation_jour_recalculee",
+#
+# Le nombre de titres transigés a rejoint les indicatifs le 24 septembre 2026 : le
+# bulletin n° 181 en annonce 45 alors que 46 lignes portent un volume — la première
+# cotation de BBGC, 20 926 titres pour 151 818 130 FCFA, entre bien dans les totaux
+# de volume et de valeur mais pas dans ce dénombrement. Le bulletin se contredit
+# donc lui-même, et un contrôle qu'une source démentie fait échouer ne protège plus
+# de rien. Le volume, la valeur et la cohérence interne de chaque ligne suffisent :
+# ils portent sur des montants, non sur un décompte.
+BLOQUANTS = ("volume", "valeur", "variation_jour_recalculee",
              "coherence_valeur_volume")
 
 
@@ -554,12 +629,16 @@ def indices(txt):
 
 def controle(valeurs, tot):
     """Réconcilie les lignes extraites avec la page de synthèse du bulletin."""
-    calc = dict(volume=sum(v["volume"] for v in valeurs),
-                valeur=sum(v["valeur"] for v in valeurs),
-                titres=len(valeurs),
-                hausse=sum(1 for v in valeurs if v["variation_jour"] > 0),
-                baisse=sum(1 for v in valeurs if v["variation_jour"] < 0),
-                inchange=sum(1 for v in valeurs if v["variation_jour"] == 0))
+    # Une première cotation n'a pas de variation du jour : elle ne se range donc
+    # ni en hausse, ni en baisse, ni parmi les inchangés. La BRVM, elle, la compte
+    # avec les inchangés, d'où un écart d'une unité le jour d'une introduction.
+    varie = [v for v in valeurs if v["variation_jour"] is not None]
+    calc = dict(volume=sum(v["volume"] or 0 for v in valeurs),
+                valeur=sum(v["valeur"] or 0 for v in valeurs),
+                titres=sum(1 for v in valeurs if v["volume"]),
+                hausse=sum(1 for v in varie if v["variation_jour"] > 0),
+                baisse=sum(1 for v in varie if v["variation_jour"] < 0),
+                inchange=sum(1 for v in varie if v["variation_jour"] == 0))
     rapport = []
     for cle, attendu in tot.items():
         if cle not in calc or attendu is None:
@@ -576,12 +655,18 @@ def controle(valeurs, tot):
                         concorde=not incoherents, bloquant=True,
                         titres_en_ecart=incoherents))
 
-    # variations du jour recalculées depuis le cours précédent
-    ecarts = [v["symbole"] for v in valeurs
+    # variations du jour recalculées depuis le cours précédent — seules les lignes
+    # qui portent les deux valeurs sont vérifiables, une introduction n'ayant pas
+    # de cours de la veille auquel se comparer
+    verifiables = [v for v in valeurs
+                   if v["variation_jour"] is not None and v["cours_precedent"]
+                   and v["cloture"] is not None]
+    ecarts = [v["symbole"] for v in verifiables
               if abs((v["cloture"] - v["cours_precedent"]) / v["cours_precedent"] * 100
                      - v["variation_jour"]) > 0.05]
-    rapport.append(dict(controle="variation_jour_recalculee", calcule=len(valeurs) - len(ecarts),
-                        bulletin=len(valeurs), concorde=not ecarts, bloquant=True,
+    rapport.append(dict(controle="variation_jour_recalculee",
+                        calcule=len(verifiables) - len(ecarts),
+                        bulletin=len(verifiables), concorde=not ecarts, bloquant=True,
                         titres_en_ecart=ecarts))
     ok = all(r["concorde"] for r in rapport if r["bloquant"])
     return rapport, ok
