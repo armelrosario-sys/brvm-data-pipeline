@@ -32,7 +32,7 @@ body{background:var(--papier);color:var(--encre);font-family:var(--sans);font-si
 .provenance dt{text-align:right;white-space:nowrap}
 .provenance dt::after{content:" :"}
 .provenance dd{margin:0;text-align:left;color:#fff;font-weight:500;white-space:nowrap}
-.seance .src{margin-top:5px;font-size:10.5px;color:#8B9BBA;text-align:right;max-width:62ch;margin-left:auto;line-height:1.6;white-space:normal}
+.bandeau-int .src{flex:1 1 100%;margin:9px 0 0;font-size:10.5px;color:#8B9BBA;line-height:1.65;text-align:left}
 .reglette{background:var(--encre2);border-top:1px solid rgba(255,255,255,.12)}
 .reglette-int{max-width:1680px;margin:0 auto;display:flex;flex-wrap:wrap}
 .bandeau .reglette{margin-top:18px;margin-left:-20px;margin-right:-20px}
@@ -177,7 +177,6 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
   .titre-doc{font-size:22px}
   .provenance{justify-content:start}
   .provenance dt{text-align:left}
-  .seance .src{text-align:left;margin-left:0}
   .champ{flex:1 1 100%}.champ input,.champ select{min-width:100%;width:100%}
   .note{border-right:0;border-bottom:1px solid var(--trait)}
 }
@@ -196,8 +195,8 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
         <dt>Performances multi-horizons</dt><dd id="kPerf">—</dd>
         <dt>Fondamentaux</dt><dd id="kFond">—</dd>
       </dl>
-      <div class="src" id="kSrc">—</div>
     </div>
+    <div class="src" id="kSrc">—</div>
   </div>
   <div class="reglette"><div class="reglette-int">
     <div class="cran"><div class="cran-lib">BRVM Composite</div><div class="cran-val" id="iComp">—</div><div class="cran-note" id="iCompA">—</div></div>
