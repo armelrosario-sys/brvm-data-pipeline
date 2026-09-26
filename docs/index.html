@@ -31,7 +31,11 @@ body{background:var(--papier);color:var(--encre);font-family:var(--sans);font-si
 .provenance{display:grid;grid-template-columns:auto auto;gap:0 7px;justify-content:end;align-items:baseline;margin:0}
 .provenance dt{text-align:right;white-space:nowrap}
 .provenance dt::after{content:" :"}
-.provenance dd{margin:0;text-align:left;color:#fff;font-weight:500;white-space:nowrap}
+/* Valeurs calées à droite : les trois lignes se terminent au même endroit,
+   et les deux-points restent en colonne grâce aux libellés alignés à droite.
+   L'espace qui s'ouvre après le deux-points sur les lignes courtes est le prix
+   de ce bord droit net — c'est le compromis retenu. */
+.provenance dd{margin:0;text-align:right;color:#fff;font-weight:500;white-space:nowrap}
 .bandeau-int .src{flex:1 1 100%;margin:9px 0 0;font-size:10.5px;color:#8B9BBA;line-height:1.65;text-align:left}
 .reglette{background:var(--encre2);border-top:1px solid rgba(255,255,255,.12)}
 .reglette-int{max-width:1680px;margin:0 auto;display:flex;flex-wrap:wrap}
