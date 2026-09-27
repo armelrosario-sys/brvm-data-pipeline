@@ -475,6 +475,55 @@ COLONNES = ["ticker", "societe_brvm", "date_annonce", "agence", "note_lt", "rang
             "score_total", "statut_extraction", "url_pdf", "date_collecte"]
 
 
+
+# ----------------------------------------------------------------------
+# Reprise cumulative (27/09/2026)
+# ----------------------------------------------------------------------
+# DIAGNOSTIC. L'extracteur ne defaillait pas : il etait plafonne. Chaque
+# execution prenait les --pdf annonces les PLUS RECENTES, les extrayait, puis
+# REECRIVAIT tout le fichier — remettant les autres a NON_EXTRAIT. Les 29 OK
+# etaient donc, mois apres mois, les 29 memes ; les 355 restantes n'ont jamais
+# ete TENTEES, et le mot NON_EXTRAIT le disait sans qu'on l'entende (un seul
+# ECHEC reel sur 385). Pire : une ligne extraite qui sortait du peloton de tete
+# perdait ses donnees au passage suivant.
+#
+# Verification du 27/09 : les 30 lignes portant un statut autre que
+# NON_EXTRAIT sont EXACTEMENT les 30 annonces les plus recentes, et la coupure
+# tombe au jour pres (28/10/2025 tentee, 23/10/2025 jamais tentee).
+#
+# CORRECTIF. On relit l'acquis, on ne re-extrait jamais ce qui est deja
+# exploite, et on depense le budget de PDF sur ce qui n'a jamais ete tente.
+# Chaque execution avance donc le front, au lieu de repasser sur ses pas.
+
+STATUTS_ACQUIS = ("OK", "SANS_NOTE")
+
+
+def lire_acquis(chemin=None):
+    """Lignes deja collectees, indexees par URL de PDF."""
+    chemin = Path(chemin) if chemin else SORTIE
+    if not chemin.exists():
+        return {}
+    with chemin.open(encoding="utf-8", newline="") as f:
+        return {r["url_pdf"]: r for r in csv.DictReader(f) if r.get("url_pdf")}
+
+
+def a_extraire(candidats, acquis, budget, reessayer_echecs=True):
+    """Choisit sur quoi depenser le budget de PDF.
+
+    Priorite aux annonces JAMAIS TENTEES, des plus recentes aux plus anciennes
+    — une notation recente vaut plus qu'une ancienne, mais aucune n'est
+    abandonnee : ce qui ne tient pas dans le budget d'aujourd'hui passe en tete
+    demain, puisque l'acquis n'est plus efface.
+    """
+    jamais = [c for c in candidats
+              if (acquis.get(c["url_pdf"], {}).get("statut_extraction")
+                  in (None, "", "NON_EXTRAIT"))]
+    echecs = [c for c in candidats
+              if acquis.get(c["url_pdf"], {}).get("statut_extraction") == "ECHEC"]
+    file = jamais + (echecs if reessayer_echecs else [])
+    return file[:budget], len(jamais), len(echecs)
+
+
 def autotest():
     """Rejoue les analyseurs sur les echantillons capturés (collecte/echantillons/),
     sans acces reseau. Sert de garde-fou : si la BRVM change le format de sa page
@@ -563,8 +612,16 @@ def main():
           % (len(actions), len({x["ticker"] for x in actions})))
 
     # ordre : plus recentes d'abord ; une notation ancienne a peu de valeur
-    candidats = sorted(actions if not args.tout else lignes,
-                       key=lambda x: x["date_annonce"], reverse=True)[:args.pdf]
+    tous = sorted(actions if not args.tout else lignes,
+                  key=lambda x: x["date_annonce"], reverse=True)
+    acquis = lire_acquis()
+    candidats, n_jamais, n_echecs = a_extraire(tous, acquis, args.pdf)
+    deja = sum(1 for x in tous
+               if acquis.get(x["url_pdf"], {}).get("statut_extraction") in STATUTS_ACQUIS)
+    print("  -> acquis : %d deja exploitees, %d jamais tentees, %d en echec"
+          % (deja, n_jamais, n_echecs))
+    print("  -> budget de %d PDF : %d a extraire maintenant, %d reportees"
+          % (args.pdf, len(candidats), max(0, n_jamais + n_echecs - len(candidats))))
 
     resultats = []
     for i, ligne in enumerate(candidats, 1):
@@ -581,11 +638,23 @@ def main():
         resultats.append(ligne)
         time.sleep(0.8)
 
-    # les annonces non extraites sont conservees (URL + date) : l'index seul a
-    # deja de la valeur (savoir QUAND une societe a ete notee).
+    # Fusion avec l'acquis. Une ligne deja exploitee n'est JAMAIS rejouee ni
+    # remise a NON_EXTRAIT : c'est ce qui rendait la collecte sterile.
+    traites = {x["url_pdf"] for x in resultats}
     for ligne in (actions if not args.tout else lignes):
-        if ligne not in resultats:
-            ligne["statut_extraction"] = "NON_EXTRAIT"
+        if ligne["url_pdf"] in traites:
+            continue
+        ancienne = acquis.get(ligne["url_pdf"])
+        if ancienne and ancienne.get("statut_extraction") in STATUTS_ACQUIS:
+            # on reprend les donnees extraites, en rafraichissant l'index
+            fusion = dict(ancienne)
+            for cle in ("societe_brvm", "date_annonce", "ticker", "url_pdf"):
+                if ligne.get(cle):
+                    fusion[cle] = ligne[cle]
+            resultats.append(fusion)
+        else:
+            ligne["statut_extraction"] = (ancienne or {}).get("statut_extraction") \
+                                         or "NON_EXTRAIT"
             resultats.append(ligne)
 
     aujourdhui = date.today().isoformat()
@@ -598,7 +667,17 @@ def main():
             w.writerow(ligne)
 
     ok = sum(1 for x in resultats if x.get("statut_extraction") == "OK")
+    exploitees = sum(1 for x in resultats
+                     if x.get("statut_extraction") in STATUTS_ACQUIS)
+    restantes = sum(1 for x in resultats
+                    if x.get("statut_extraction") in (None, "", "NON_EXTRAIT"))
     print("\n%s : %d lignes (%d avec note extraite)" % (SORTIE.name, len(resultats), ok))
+    print("PROGRESSION : %d exploitees, %d encore jamais tentees (%d %% du fonds "
+          "couvert)." % (exploitees, restantes,
+                         100 * exploitees // max(len(resultats), 1)))
+    if restantes:
+        print("Relancer ce workflow autant de fois que necessaire : l'acquis "
+              "n'est plus efface, chaque passage avance le front.")
     print("RAPPEL : une notation mesure le risque de CREDIT, pas l'attractivite")
     print("actionnaire. Une note A+ n'est jamais un profil GARP.")
 
