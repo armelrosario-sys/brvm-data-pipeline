@@ -1,0 +1,100 @@
+name: Migration - donnees de reference vers CSV
+
+# Workflow A USAGE UNIQUE (27/09/2026). Il sort les 449 lignes de donnees
+# codees en dur de moteur/peupler.py vers 8 CSV dans donnees/base/, corrige
+# les cinq scripts qui dependaient du TEXTE de ce fichier, verifie que la
+# base reconstruite est identique a l'originale, rejoue toute la chaine de
+# tests, et ne committe QUE si tout passe.
+#
+# Il ne se declenche jamais tout seul : uniquement sur demande explicite
+# (onglet Actions -> Run workflow). Une fois la migration faite, une seconde
+# execution constate qu'il n'y a rien a faire et s'arrete. Ce fichier et
+# outils/migration_csv.py peuvent alors etre supprimes du depot.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dependances
+        run: |
+          pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas
+          pip install -r requirements.txt
+
+      - name: Migration (echoue si la base reconstruite differe)
+        run: python3 outils/migration_csv.py
+
+      - name: Chaine complete - peuplement, cours, golden tests, profils
+        run: |
+          cd moteur
+          python3 peupler.py
+          python3 ../collecte/charger_cours.py brvm.db
+          python3 ../collecte/charger_cours_quotidien.py brvm.db
+          python3 ../collecte/charger_dividendes_exercice.py brvm.db
+          python3 ../collecte/charger_liquidite_quotidienne.py brvm.db
+          python3 tester.py
+          python3 profils.py
+
+      - name: Tests de non-regression (donnees et application)
+        run: |
+          # bash -e : une sortie non nulle interrompt l'etape sur-le-champ,
+          # d'ou le '|| code=$?' qui neutralise -e sur cette ligne seule.
+          code=0
+          python3 moteur/tester_donnees.py || code=$?
+          if [ $code -eq 1 ]; then
+            echo "::error::Incoherence bloquante — migration NON commitee"
+            exit 1
+          elif [ $code -eq 2 ]; then
+            echo "::warning::Alertes de fraicheur seules — le code est sain"
+          fi
+
+      - name: Garde-fous hors ligne des collecteurs
+        run: |
+          python3 collecte/avis_brvm.py --test
+          python3 collecte/notations.py --test
+
+      - name: Generer le dashboard (test de fumee)
+        run: python3 dashboard/generer_dashboard.py
+
+      - name: Commit
+        run: |
+          rm -f dashboard_brvm.xlsx moteur/brvm.db
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Rien a committer — la migration avait deja ete appliquee."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit \
+            -m "Sort les donnees de reference de peupler.py vers donnees/base/" \
+            -m "449 lignes de donnees codees en dur (184 etats financiers, 50 societes, 167 URL sources) passent de tuples Python a 8 CSV. peupler.py tombe de 975 a 190 lignes et ne contient plus aucune donnee. Base reconstruite identique sur les 12 tables, colonne par colonne — verifie par le workflow avant tout commit." \
+            -m "Cinq scripts dependaient du TEXTE de peupler.py. fusionner_fondamentaux.py y injectait des tuples et levait ValueError en premiere etape de P4. avis_brvm.py y lisait la table des tickers par expression reguliere et rendait un dictionnaire VIDE sans rien signaler : la veille P13 aurait tourne chaque jour sans reconnaitre aucun titre. Les cinq lisent desormais les CSV, et avis_brvm.py echoue bruyamment plutot que de continuer a vide." \
+            -m "Les 129 notes de provenance sont reprises integralement, y compris les commentaires multilignes. Empreinte de cache d app.py etendue aux CSV. Section 13 de tester_donnees.py : 25 controles sur la base de reference."
+          git pull --rebase --autostash origin main
+          git push
+
+      - name: Resume
+        run: |
+          {
+            echo "## Migration des donnees de reference"
+            echo ""
+            echo "| Fichier | Lignes |"
+            echo "| --- | --- |"
+            for f in donnees/base/*.csv; do
+              echo "| \`$f\` | $(($(wc -l < "$f") - 1)) |"
+            done
+            echo ""
+            echo "\`moteur/peupler.py\` : $(wc -l < moteur/peupler.py) lignes."
+          } >> $GITHUB_STEP_SUMMARY
