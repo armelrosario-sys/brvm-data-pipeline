@@ -1,0 +1,100 @@
+name: Garde-fou BOC - figer un echantillon
+
+# Workflow A USAGE UNIQUE (27/09/2026). pipeline/collecte_boc.py etait le seul
+# collecteur du projet sans garde-fou hors ligne : avis_brvm.py et notations.py
+# rejouent leurs analyseurs sur un echantillon fige AVANT toute collecte, lui
+# non. Si la BRVM change la mise en page du bulletin, la seule alarme etait la
+# reconciliation des totaux — qui protege la publication, mais ne dit rien au
+# moment ou le code change.
+#
+# Ce workflow telecharge un bulletin, en fige le texte (pdftotext -layout,
+# exactement ce que lit texte_pdf) et les resultats que le parseur en tire,
+# verifie que --test passe sur cet echantillon, et ne committe qu'ensuite.
+#
+# L'echantillon par defaut est la seance du 18/09/2026, parce qu'elle contient
+# le cas SONATEL : la valeur transigee, 2 755 487 715 FCFA, y court sur DEUX
+# lignes du PDF, et c'est recoud_valeur() qui la recompose. Figer cette seance,
+# c'est proteger cette reparation pour de bon.
+
+on:
+  workflow_dispatch:
+    inputs:
+      seance:
+        description: "Seance a figer (AAAA-MM-JJ)"
+        required: false
+        default: "2026-09-18"
+
+permissions:
+  contents: write
+
+jobs:
+  figer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer les dependances
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          pip install requests beautifulsoup4
+
+      - name: Compatibilite Python 3.11
+        run: python pipeline/lint_fstring.py pipeline/*.py
+
+      - name: Telecharger le bulletin et le figer
+        run: |
+          python - <<'PY'
+          import importlib.util, tempfile
+          from datetime import date
+          s = importlib.util.spec_from_file_location("cb", "pipeline/collecte_boc.py")
+          m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
+          jour = "${{ github.event.inputs.seance || '2026-09-18' }}".strip()
+          pdf = m.telecharge(date.fromisoformat(jour) if jour else None)
+          t = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+          t.write(pdf); t.close()
+          m.figer(t.name)
+          PY
+
+      - name: Garde-fou hors ligne (doit passer sur l'echantillon fige)
+        run: python pipeline/collecte_boc.py --test
+
+      - name: Commit
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Rien a committer."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit \
+            -m "Garde-fou hors ligne pour le collecteur du BOC" \
+            -m "collecte_boc.py etait le seul collecteur sans --test : avis_brvm.py et notations.py rejouent leurs analyseurs sur un echantillon fige avant toute collecte, lui non. Un changement de mise en page n'aurait eu pour seule alarme que la reconciliation des totaux, qui protege la publication mais ne dit rien au moment ou le code change." \
+            -m "L'echantillon fige la seance du 18/09/2026, qui contient le cas SONATEL : la valeur transigee de 2 755 487 715 FCFA y court sur DEUX lignes du PDF et c'est recoud_valeur() qui la recompose. Verification independante du 27/09 : les 37 cotations de ce bulletin concordent avec la base au cours et au PER." \
+            -m "Ce que le garde-fou prouve : une regression du parseur. Ce qu'il ne prouve pas : l'exactitude, qui reste etablie par la reconciliation des totaux avec le bulletin."
+          git pull --rebase --autostash origin main
+          git push
+
+      - name: Resume
+        run: |
+          {
+            echo "## Garde-fou du collecteur BOC"
+            echo ""
+            for f in pipeline/echantillons/boc_*.attendu.json; do
+              python - "$f" <<'PY'
+          import json, sys
+          d = json.load(open(sys.argv[1]))
+          print("- **Seance %s** (BOC n° %s) : %d cotations, reconcilie = %s"
+                % (d["seance"], d["numero"], d["nb_valeurs"], d["reconcilie"]))
+          for c in d.get("controles", []):
+              if isinstance(c, dict) and c.get("bloquant"):
+                  print("  - %s : calcule %s, bulletin %s — %s"
+                        % (c.get("controle"), c.get("calcule"), c.get("bulletin"),
+                           "concorde" if c.get("concorde") else "**ECART**"))
+          PY
+            done
+          } >> $GITHUB_STEP_SUMMARY
