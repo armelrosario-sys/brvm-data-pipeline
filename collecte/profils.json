@@ -78,7 +78,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -12.15 % en base contre -11.08 % chez l'agregateur (ecart 1.1 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 43,
+  "decote_pctl": 43,
   "croissance_pctl": 34,
   "reference_axes": "marche (n=36)",
   "g": 1.5,
@@ -207,7 +207,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -20.24 % en base contre -20.30 % chez l'agregateur (ecart 0.1 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 46,
+  "decote_pctl": 46,
   "croissance_pctl": null,
   "reference_axes": "secteur (n=14)",
   "g": null,
@@ -242,7 +242,7 @@
   "dy": 3.62,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P43)",
+  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P43)",
   "comparaisons": {
    "per": {
     "titre": 14.6,
@@ -301,7 +301,7 @@
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": {
@@ -309,7 +309,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +39.25 % en base contre +39.25 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 43,
+  "decote_pctl": 43,
   "croissance_pctl": 92,
   "reference_axes": "secteur (n=14)",
   "g": 43.4,
@@ -386,7 +386,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +205.17 % en base contre +205.18 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": -48.7,
@@ -499,7 +499,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -2.29 % en base contre +2.34 % chez l'agregateur (ecart 4.6 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 57,
+  "decote_pctl": 57,
   "croissance_pctl": 38,
   "reference_axes": "secteur (n=14)",
   "g": 3.3,
@@ -615,7 +615,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -14.13 % en base contre -14.13 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 39,
+  "decote_pctl": 39,
   "croissance_pctl": 15,
   "reference_axes": "secteur (n=14)",
   "g": -8.9,
@@ -727,7 +727,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.91 % en base contre +10.91 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 79,
+  "decote_pctl": 79,
   "croissance_pctl": 77,
   "reference_axes": "secteur (n=14)",
   "g": 21.0,
@@ -786,7 +786,7 @@
   "dy": 4.85,
   "confiance": "FAIBLE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 44.3 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P46)",
+  "motif": "croissance de 44.3 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P46)",
   "comparaisons": {
    "per": {
     "titre": 15.58,
@@ -852,7 +852,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +21.46 % en base contre +21.46 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 46,
+  "decote_pctl": 46,
   "croissance_pctl": 100,
   "reference_axes": "secteur (n=14)",
   "g": 44.3,
@@ -929,7 +929,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -91.82 % en base contre -91.82 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": -70.7,
@@ -974,7 +974,7 @@
   "dy": 5.56,
   "confiance": "FAIBLE",
   "profil": "VALUE",
-  "motif": "decote marquee (cherte P78) sur des benefices etablis, croissance de -2.1 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P78 sur l'axe decote) sur des benefices etablis, croissance de -2.1 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 13.31,
@@ -1038,7 +1038,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +9.62 % en base contre +9.61 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 78,
+  "decote_pctl": 78,
   "croissance_pctl": 23,
   "reference_axes": "secteur (n=14)",
   "g": -2.1,
@@ -1139,7 +1139,7 @@
    "drapeau": "ECART_AGREGATEUR",
    "detail": "glissement +4.68 % en base (ligne certifiee) contre +39.16 % chez l'agregateur : ecart de 34.5 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
-  "cherte_pctl": 56,
+  "decote_pctl": 56,
   "croissance_pctl": 83,
   "reference_axes": "marche (n=36)",
   "g": 21.9,
@@ -1197,7 +1197,7 @@
   "dy": 2.86,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P28) ni rendement distinctifs",
+  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P28) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 15.39,
@@ -1265,7 +1265,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +36.44 % en base contre +36.63 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 28,
+  "decote_pctl": 28,
   "croissance_pctl": 46,
   "reference_axes": "secteur (n=14)",
   "g": 5.1,
@@ -1397,7 +1397,7 @@
    "drapeau": "FONDAMENTAL_EN_RETARD",
    "detail": "exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
   },
-  "cherte_pctl": 18,
+  "decote_pctl": 18,
   "croissance_pctl": 23,
   "reference_axes": "marche (n=36)",
   "g": -5.3,
@@ -1510,7 +1510,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +29.70 % en base contre +29.96 % chez l'agregateur (ecart 0.3 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 16,
+  "decote_pctl": 16,
   "croissance_pctl": 57,
   "reference_axes": "marche (n=36)",
   "g": 10.1,
@@ -1568,7 +1568,7 @@
   "dy": 4.65,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 30.8 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P54)",
+  "motif": "croissance de 30.8 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P54)",
   "comparaisons": {
    "per": {
     "titre": 14.57,
@@ -1628,7 +1628,7 @@
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": {
@@ -1636,7 +1636,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.45 % en base contre +10.45 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 54,
+  "decote_pctl": 54,
   "croissance_pctl": 85,
   "reference_axes": "secteur (n=14)",
   "g": 30.8,
@@ -1762,7 +1762,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +15.29 % en base contre +15.29 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 54,
+  "decote_pctl": 54,
   "croissance_pctl": 62,
   "reference_axes": "secteur (n=14)",
   "g": 14.7,
@@ -1829,7 +1829,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -97.49 % en base contre -97.49 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": -61.1,
@@ -1879,7 +1879,7 @@
   "dy": 4.12,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P40)",
+  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P40)",
   "comparaisons": {
    "per": {
     "titre": 17.22,
@@ -1953,7 +1953,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -35.56 % en base contre -35.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 40,
+  "decote_pctl": 40,
   "croissance_pctl": 100,
   "reference_axes": "marche (n=36)",
   "g": 60.0,
@@ -2067,7 +2067,7 @@
    "drapeau": "FONDAMENTAL_EN_RETARD",
    "detail": "exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
   },
-  "cherte_pctl": 70,
+  "decote_pctl": 70,
   "croissance_pctl": 74,
   "reference_axes": "marche (n=36)",
   "g": 18.9,
@@ -2112,7 +2112,7 @@
   "dy": 3.0,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 7.9 %/an sous la fenetre GARP (8 %) — a 0.1 point de la fenetre, a revoir a la prochaine publication, sans decote (cherte P46) ni rendement distinctifs",
+  "motif": "croissance de 7.9 %/an sous la fenetre GARP (8 %) — a 0.1 point de la fenetre, a revoir a la prochaine publication, sans decote (rang de decote P46) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 13.67,
@@ -2174,7 +2174,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +6.82 % en base contre +6.82 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 46,
+  "decote_pctl": 46,
   "croissance_pctl": 54,
   "reference_axes": "secteur (n=14)",
   "g": 7.9,
@@ -2232,7 +2232,7 @@
   "dy": 2.42,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 3.5 %/an sous la fenetre GARP (8 %), sans decote (cherte P18) ni rendement distinctifs",
+  "motif": "croissance de 3.5 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P18) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 18.33,
@@ -2294,7 +2294,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +1.53 % en base contre +1.53 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 18,
+  "decote_pctl": 18,
   "croissance_pctl": 46,
   "reference_axes": "marche (n=36)",
   "g": 3.5,
@@ -2415,7 +2415,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -26.01 % en base contre -26.01 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 65,
+  "decote_pctl": 65,
   "croissance_pctl": 6,
   "reference_axes": "marche (n=36)",
   "g": -13.4,
@@ -2473,7 +2473,7 @@
   "dy": 3.3099999999999996,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 4.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P22) ni rendement distinctifs",
+  "motif": "croissance de 4.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P22) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 19.12,
@@ -2536,7 +2536,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +6.07 % en base contre +6.07 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 22,
+  "decote_pctl": 22,
   "croissance_pctl": 49,
   "reference_axes": "marche (n=36)",
   "g": 4.1,
@@ -2595,7 +2595,7 @@
   "dy": 1.95,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 3.0 %/an sous la fenetre GARP (8 %), sans decote (cherte P54) ni rendement distinctifs",
+  "motif": "croissance de 3.0 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P54) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 9.78,
@@ -2653,7 +2653,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": null,
-  "cherte_pctl": 54,
+  "decote_pctl": 54,
   "croissance_pctl": 31,
   "reference_axes": "secteur (n=14)",
   "g": 3.0,
@@ -2758,7 +2758,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -2.23 % en base contre -2.23 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 89,
+  "decote_pctl": 89,
   "croissance_pctl": 11,
   "reference_axes": "marche (n=36)",
   "g": -10.5,
@@ -2822,7 +2822,7 @@
   "dy": 4.34,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 2.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P40) ni rendement distinctifs",
+  "motif": "croissance de 2.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P40) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 18.15,
@@ -2887,7 +2887,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +0.99 % en base contre +0.86 % chez l'agregateur (ecart 0.1 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 40,
+  "decote_pctl": 40,
   "croissance_pctl": 37,
   "reference_axes": "marche (n=36)",
   "g": 2.1,
@@ -2961,7 +2961,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": null,
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": null,
@@ -3044,7 +3044,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": null,
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": 13.1,
@@ -3132,7 +3132,7 @@
   "dy": 3.88,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "ni decote (cherte P34), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
+  "motif": "ni decote (rang P34), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
   "comparaisons": {
    "per": {
     "titre": 18.21,
@@ -3200,7 +3200,7 @@
    "drapeau": "ECART_AGREGATEUR",
    "detail": "glissement +17.78 % en base (ligne certifiee) contre +30.96 % chez l'agregateur : ecart de 13.2 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
-  "cherte_pctl": 34,
+  "decote_pctl": 34,
   "croissance_pctl": 26,
   "reference_axes": "marche (n=36)",
   "g": -2.6,
@@ -3290,7 +3290,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -96.27 % en base contre -96.27 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": -57.2,
@@ -3417,7 +3417,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": null,
-  "cherte_pctl": 3,
+  "decote_pctl": 3,
   "croissance_pctl": 3,
   "reference_axes": "marche (n=36)",
   "g": -24.8,
@@ -3473,7 +3473,7 @@
   "dy": 5.91,
   "confiance": "MOYENNE",
   "profil": "VALUE",
-  "motif": "decote marquee (cherte P90) sur des benefices etablis, croissance de 15.9 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P90 sur l'axe decote) sur des benefices etablis, croissance de 15.9 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 11.94,
@@ -3541,7 +3541,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -0.12 % en base contre +0.12 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 90,
+  "decote_pctl": 90,
   "croissance_pctl": 69,
   "reference_axes": "secteur (n=14)",
   "g": 15.9,
@@ -3654,7 +3654,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +12.59 % en base contre +12.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 21,
+  "decote_pctl": 21,
   "croissance_pctl": 77,
   "reference_axes": "marche (n=36)",
   "g": 19.3,
@@ -3774,7 +3774,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.73 % en base contre +10.73 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 36,
+  "decote_pctl": 36,
   "croissance_pctl": 8,
   "reference_axes": "secteur (n=14)",
   "g": -11.5,
@@ -3855,7 +3855,7 @@
    "drapeau": "FONDAMENTAL_EN_RETARD",
    "detail": "exercice 2024 disponible chez l'agregateur (resultat net -129.00) alors que la base s'arrete a 2021 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
   },
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": 4.3,
@@ -3952,7 +3952,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -52.44 % en base contre -52.44 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": -23.6,
@@ -4010,7 +4010,7 @@
   "dy": 4.93,
   "confiance": "HAUTE",
   "profil": "VALUE",
-  "motif": "decote marquee (cherte P70) sur des benefices etablis, croissance de 60.0 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P70 sur l'axe decote) sur des benefices etablis, croissance de 60.0 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 13.66,
@@ -4071,7 +4071,7 @@
    "CAP_60 : croissance plafonnee",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": {
@@ -4079,7 +4079,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +113.21 % en base contre +113.21 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 70,
+  "decote_pctl": 70,
   "croissance_pctl": 100,
   "reference_axes": "marche (n=36)",
   "g": 60.0,
@@ -4207,7 +4207,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +50.32 % en base contre +50.32 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 71,
+  "decote_pctl": 71,
   "croissance_pctl": 60,
   "reference_axes": "marche (n=36)",
   "g": 11.5,
@@ -4339,7 +4339,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +5.06 % en base contre +5.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 62,
+  "decote_pctl": 62,
   "croissance_pctl": 63,
   "reference_axes": "marche (n=36)",
   "g": 14.0,
@@ -4403,7 +4403,7 @@
   "dy": 6.35,
   "confiance": "HAUTE",
   "profil": "VALUE",
-  "motif": "decote marquee (cherte P82) sur des benefices etablis, croissance de -7.2 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P82 sur l'axe decote) sur des benefices etablis, croissance de -7.2 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 13.66,
@@ -4465,7 +4465,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -4.71 % en base contre -4.71 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 82,
+  "decote_pctl": 82,
   "croissance_pctl": 20,
   "reference_axes": "marche (n=36)",
   "g": -7.2,
@@ -4570,7 +4570,7 @@
    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
    "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": {
@@ -4578,7 +4578,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +32.90 % en base contre +32.90 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 88,
+  "decote_pctl": 88,
   "croissance_pctl": 66,
   "reference_axes": "marche (n=36)",
   "g": 14.4,
@@ -4660,7 +4660,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": null,
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": 9.0,
@@ -4700,7 +4700,7 @@
   "dy": 7.980000000000001,
   "confiance": "HAUTE",
   "profil": "VALUE",
-  "motif": "decote marquee (cherte P92) sur des benefices etablis, croissance de 46.9 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P92 sur l'axe decote) sur des benefices etablis, croissance de 46.9 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 10.54,
@@ -4763,7 +4763,7 @@
    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": {
@@ -4771,7 +4771,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -17.45 % en base contre -17.45 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 92,
+  "decote_pctl": 92,
   "croissance_pctl": 94,
   "reference_axes": "marche (n=36)",
   "g": 46.9,
@@ -4911,7 +4911,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -3.06 % en base contre -3.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 36,
+  "decote_pctl": 36,
   "croissance_pctl": 14,
   "reference_axes": "marche (n=36)",
   "g": -9.5,
@@ -4969,7 +4969,7 @@
   "dy": 4.65,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 1.1 %/an sous la fenetre GARP (8 %), sans decote (cherte P44) ni rendement distinctifs",
+  "motif": "croissance de 1.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P44) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 18.24,
@@ -5033,7 +5033,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -5.06 % en base contre -13.31 % chez l'agregateur (ecart 8.3 pt) : transcription corroboree par une source independante"
   },
-  "cherte_pctl": 44,
+  "decote_pctl": 44,
   "croissance_pctl": 31,
   "reference_axes": "marche (n=36)",
   "g": 1.1,
@@ -5107,7 +5107,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": null,
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": -52.8,
@@ -5172,7 +5172,7 @@
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": null,
-  "cherte_pctl": null,
+  "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
   "g": -23.2,

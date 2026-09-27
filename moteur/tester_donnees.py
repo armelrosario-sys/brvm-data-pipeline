@@ -598,7 +598,7 @@ def test_integrite_app():
     sections = {
         "onglets": 'st.tabs(',
         "repartition des profils": "Repartition des profils",
-        "plan cherte x croissance": "Plan cherte",
+        "plan decote x croissance": "Plan decote",
         "taux sans risque": "Taux sans risque",
         "onglet Explorer": "Telecharger (CSV)",
         "fiche titre": "Pourquoi ce profil",
@@ -612,6 +612,16 @@ def test_integrite_app():
     lignes = code.count("\n")
     verifie(lignes >= 700,
             f"app.py fait {lignes} lignes (une chute nette signale une troncature)")
+
+    # Sens de l'axe de valorisation (27/09/2026). La variable montait quand le
+    # titre etait BON MARCHE mais s'appelait "cherte" : la fiche affichait
+    # "decote marquee (cherte P90)" pour SGBC, a PER 11,94 contre 14,79 de
+    # mediane de marche. Le calcul etait juste, le nom disait l'inverse.
+    verifie("cherte_pctl" not in code,
+            "app.py n'utilise plus cherte_pctl (nom qui disait l'inverse de ce "
+            "que la variable mesure)")
+    verifie("decote_pctl" in code,
+            "app.py lit bien decote_pctl")
 
 
 

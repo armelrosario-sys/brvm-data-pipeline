@@ -138,7 +138,7 @@ def charger(_empreinte):
             secteur=v.get("secteur"), per=v.get("per"), dy=v.get("dy"),
             croissance=v.get("g"), source=v.get("source_croissance"),
             pegy=v.get("pegy"), payout=v.get("payout"), roe=v.get("roe"),
-            cherte_pctl=v.get("cherte_pctl"), croissance_pctl=v.get("croissance_pctl"),
+            decote_pctl=v.get("decote_pctl"), croissance_pctl=v.get("croissance_pctl"),
             reference=v.get("reference_axes"), drapeaux=", ".join(v.get("drapeaux") or []),
             arbitrage=((v.get("arbitrage") or {}).get("drapeau") or ""),
             arbitrage_detail=((v.get("arbitrage") or {}).get("detail") or ""),
@@ -320,7 +320,7 @@ GLOSSAIRE = {
              "Piege classique : une croissance passee tiree par un rebond ponctuel — "
              "les drapeaux 'rattrapage' signalent ce cas."),
     "VALUE": ("Decote sur benefices etablis.",
-              "Cherte dans le tercile superieur (decote), croissance faible ou nulle, "
+              "Decote dans le tercile superieur, croissance faible ou nulle, "
               "distribution couverte.",
               "L'histoire : la revalorisation, pas l'expansion.",
               "Piege classique : la value trap — une decote peut etre meritee. "
@@ -526,16 +526,17 @@ with o1:
         st.info("Aucun avis BRVM collecte pour l'instant. Lancer le workflow "
                 "**P13 - Veille des avis BRVM** depuis l'onglet Actions de GitHub.")
 
-    st.markdown("#### Plan cherte × croissance")
-    n_plan = int((vue.cherte_pctl.notna() & vue.croissance_pctl.notna()).sum())
+    st.markdown("#### Plan decote × croissance")
+    n_plan = int((vue.decote_pctl.notna() & vue.croissance_pctl.notna()).sum())
     st.caption(f"**{n_plan} titres sur {len(vue)} positionnes.** Percentiles au sein du "
                "secteur si celui-ci compte au moins 8 titres, sinon au sein du marche "
                "(reference indiquee dans la fiche titre). Des rangs voisins ne sont pas "
                "significativement differents : lire des zones, pas des positions.")
-    plan = vue.dropna(subset=["cherte_pctl", "croissance_pctl"])
+    plan = vue.dropna(subset=["decote_pctl", "croissance_pctl"])
     if len(plan):
         base = alt.Chart(plan).mark_circle(size=220, opacity=.85).encode(
-            x=alt.X("cherte_pctl:Q", title="← plus cher     CHERTE (percentile)     moins cher →",
+            x=alt.X("decote_pctl:Q",
+                    title="← plus cher          DECOTE (percentile)          moins cher →",
                     scale=alt.Scale(domain=[0, 100])),
             y=alt.Y("croissance_pctl:Q", title="CROISSANCE (percentile) →",
                     scale=alt.Scale(domain=[0, 100])),
@@ -600,14 +601,14 @@ with o1:
                        "comme un verdict : les rangs voisins ne sont pas "
                        "significativement differents.")
             plan2 = plan.copy()
-            plan2["_q"] = [quadrant(r.cherte_pctl, r.croissance_pctl)[1]
+            plan2["_q"] = [quadrant(r.decote_pctl, r.croissance_pctl)[1]
                            for _, r in plan2.iterrows()]
             noms_q = ["Decote ET croissance (quadrant favorable)",
                       "Croissance deja payee (haut a gauche)",
                       "Bon marche mais sans dynamique (bas a droite)",
                       "Ni decote ni croissance (bas a gauche)"]
             for q in range(4):
-                sous = plan2[plan2._q == q].sort_values("cherte_pctl", ascending=False)
+                sous = plan2[plan2._q == q].sort_values("decote_pctl", ascending=False)
                 if not len(sous):
                     continue
                 st.markdown(f"**{noms_q[q]}** — {len(sous)} titre(s)")
@@ -629,9 +630,9 @@ with o1:
 
         plan2 = plan.copy()
         plan2["zone"] = plan2.apply(
-            lambda r: ("Decote ET croissance" if r.cherte_pctl >= 67 and r.croissance_pctl >= 67
+            lambda r: ("Decote ET croissance" if r.decote_pctl >= 67 and r.croissance_pctl >= 67
                        else "Croissance deja payee" if r.croissance_pctl >= 67
-                       else "Bon marche sans dynamique" if r.cherte_pctl >= 67
+                       else "Bon marche sans dynamique" if r.decote_pctl >= 67
                        else "Ni l'un ni l'autre"), axis=1)
 
         ZONES = {
@@ -653,7 +654,7 @@ with o1:
         }
         for zone in ["Decote ET croissance", "Croissance deja payee",
                      "Bon marche sans dynamique", "Ni l'un ni l'autre"]:
-            sub = plan2[plan2.zone == zone].sort_values("cherte_pctl", ascending=False)
+            sub = plan2[plan2.zone == zone].sort_values("decote_pctl", ascending=False)
             if not len(sub):
                 continue
             st.markdown(ZONES[zone] + f"  ({len(sub)} titre(s))")
@@ -690,7 +691,7 @@ with o1:
         # Les titres hors axes ne doivent pas DISPARAITRE du tableau de bord :
         # un plan qui n'affiche que 34 titres sur 47 laisse croire que les 13
         # autres n'existent pas, alors qu'ils portent un diagnostic explicite.
-        hors = vue[vue.cherte_pctl.isna() | vue.croissance_pctl.isna()]
+        hors = vue[vue.decote_pctl.isna() | vue.croissance_pctl.isna()]
         if len(hors):
             with st.expander(f"{len(hors)} titre(s) hors du plan — pourquoi",
                              expanded=False):
@@ -699,11 +700,11 @@ with o1:
                            "Non analysable sont hors perimetre par construction ; "
                            "les autres ont un axe manquant, ce qui est une lacune de "
                            "donnees et non un diagnostic.")
-                h = hors[["ticker", "nom", "profil", "grade", "cherte_pctl",
+                h = hors[["ticker", "nom", "profil", "grade", "decote_pctl",
                           "croissance_pctl", "motif"]].copy()
                 h["Axe manquant"] = h.apply(
-                    lambda r: "les deux" if pd.isna(r.cherte_pctl) and pd.isna(r.croissance_pctl)
-                    else ("croissance" if pd.isna(r.croissance_pctl) else "cherte"), axis=1)
+                    lambda r: "les deux" if pd.isna(r.decote_pctl) and pd.isna(r.croissance_pctl)
+                    else ("croissance" if pd.isna(r.croissance_pctl) else "decote"), axis=1)
                 h = h[["ticker", "nom", "profil", "grade", "Axe manquant", "motif"]]
                 h.columns = ["Ticker", "Societe", "Profil", "Grade", "Axe manquant",
                              "Motif"]
@@ -931,8 +932,8 @@ with o3:
         st.caption("**Origine du resultat** — non disponible : le resultat "
                    "d'exploitation n'est pas encore extrait pour ce titre.")
 
-    if pd.notna(r.cherte_pctl):
-        st.markdown(f"**Positionnement** — cherte P{int(r.cherte_pctl)} · "
+    if pd.notna(r.decote_pctl):
+        st.markdown(f"**Positionnement** — decote P{int(r.decote_pctl)} · "
                     f"croissance P{int(r.croissance_pctl) if pd.notna(r.croissance_pctl) else '—'} "
                     f"· reference : {r.reference}")
 

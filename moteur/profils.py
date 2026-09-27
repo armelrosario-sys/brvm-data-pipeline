@@ -56,6 +56,15 @@ Compatibilite : les cles "dominant", "mixte", "alerte_peg", "peg", "dy",
 "VALUE"/"GROWTH"/"GARP" sont conservees a None (depreciees) pour que les
 consommateurs n'affichent plus de score sans planter.
 
+RENOMMAGE DU 27/09/2026 : la variable s'appelait "cherte" alors qu'elle
+MONTE quand le titre est bon marche. SGBC, a PER 11,94 contre une mediane de
+marche a 14,79, recevait "chertee P90" ; ORAC, a PER 19,12, recevait P22. La
+fiche affichait donc "decote marquee (cherte P90)", une phrase qui se
+contredit elle-meme. Le calcul etait juste, le nom disait l'inverse. La cle
+de sortie est desormais "decote_pctl" : P100 = le moins cher de sa reference,
+P0 = le plus cher. L'ancienne cle "cherte_pctl" n'est plus emise -- aucun
+consommateur ne la lisait (verifie sur tout le depot avant renommage).
+
 Sortie : collecte/profils.json
 """
 import sqlite3
@@ -592,7 +601,7 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
 # ----------------------------------------------------------------------
 
 
-def profil_par_signature(ing, cherte, croissance, sp):
+def profil_par_signature(ing, decote, croissance, sp):
     """Deduction du profil par correspondance de signature. Aucun score.
     Retourne (principal, secondaire, notes)."""
     g = ing["g"]
@@ -632,7 +641,7 @@ def profil_par_signature(ing, cherte, croissance, sp):
             and payout_ok and not bloc)
     growth = (croissance is not None and croissance >= sp["growth_pctl_min"]
               and g is not None and g > sp["growth_g_min"] * 100 and not bloc)
-    value = (cherte is not None and cherte >= sp["value_pctl_min"]
+    value = (decote is not None and decote >= sp["value_pctl_min"]
              and payout_ok
              and (g is None or g > -sp["contraction_seuil"] * 100))
     rendement = (dy is not None and dy >= sp["rendement_dy_min"] * 100
@@ -720,7 +729,7 @@ def per_normalise(cur, ticker, per, fenetre=4):
     return per * (dernier / moyenne), (dernier / moyenne - 1), len(vals)
 
 
-def motif_du_profil(profil, ing, cherte, croissance, sp):
+def motif_du_profil(profil, ing, decote, croissance, sp):
     """Phrase en clair : pourquoi CE profil, ou pourquoi aucun.
     Repond au constat d'usage : 'AUCUN PROFIL' sans motif est illisible, alors
     qu'il recouvre au moins cinq causes distinctes (croissance artefactuelle,
@@ -738,9 +747,10 @@ def motif_du_profil(profil, ing, cherte, croissance, sp):
         return "croissance de %.1f %%/an dans le tercile superieur (P%s), reguliere" % (
             g, croissance)
     if profil == "VALUE":
-        return ("decote marquee (cherte P%s) sur des benefices etablis%s — "
+        return ("decote marquee (rang P%s sur l'axe decote) sur des benefices "
+                "etablis%s — "
                 "l'histoire est la revalorisation, pas l'expansion"
-                % (cherte, "" if g is None else ", croissance de %.1f %%/an" % g))
+                % (decote, "" if g is None else ", croissance de %.1f %%/an" % g))
     if profil == "RENDEMENT":
         return ("rendement de %.1f %% avec une distribution couverte (payout %.0f %%) "
                 "et une croissance quasi nulle (%.1f %%/an) : profil de revenu"
@@ -771,8 +781,8 @@ def motif_du_profil(profil, ing, cherte, croissance, sp):
                 "l'axe croissance manque, ce n'est pas un diagnostic mais une lacune")
     if "BASE_ECRASEE" in dra or any(d.startswith("CAP_") for d in dra) or g > sp["rattrapage_bloquant"] * 100:
         return ("croissance de %.1f %%/an issue d'un rattrapage depuis un creux : "
-                "non extrapolable, et decote insuffisante par ailleurs (cherte P%s)"
-                % (g, cherte))
+                "non extrapolable, et decote insuffisante par ailleurs (rang P%s)"
+                % (g, decote))
     if payout is not None and payout > sp["payout_max"]:
         return ("distribution non couverte (payout %.0f %%) : le rendement de %.1f %% "
                 "ne qualifie pas un profil de revenu" % (payout * 100, dy or 0))
@@ -784,10 +794,11 @@ def motif_du_profil(profil, ing, cherte, croissance, sp):
         proximite = (" — a %.1f point de la fenetre, a revoir a la prochaine publication"
                      % ecart) if ecart <= 1.5 else ""
         return ("croissance de %.1f %%/an sous la fenetre GARP (%.0f %%)%s, sans decote "
-                "(cherte P%s) ni rendement distinctifs" % (g, gmin, proximite, cherte))
-    return ("ni decote (cherte P%s), ni croissance dans le tercile superieur (P%s), "
+                "(rang de decote P%s) ni rendement distinctifs"
+                % (g, gmin, proximite, decote))
+    return ("ni decote (rang P%s), ni croissance dans le tercile superieur (P%s), "
             "ni rendement superieur : coeur de cote correctement paye"
-            % (cherte, croissance))
+            % (decote, croissance))
 
 
 def sensible_brut_net(profil, ing, sp):
@@ -834,7 +845,7 @@ def grade_confiance(profil, ing, faits_titre):
                                  "cycle, pas sur une phase",
         "BENEFICE_NON_REPRESENTATIF": "le dernier benefice depasse nettement la moyenne des "
                                       "exercices precedents : le PER affiche SOUS-ESTIME la "
-                                      "chertee reelle du titre (comparer au PER normalise)",
+                                      "cherte reelle du titre (comparer au PER normalise)",
         "DONNEES_PERIMEES": "les capitaux propres en base ont plus de trois ans : le ROE "
                             "n'est plus calculable de facon fiable et n'est pas affiche",
         "CONTREDIT_PAR_INTERMEDIAIRE": "la derniere publication trimestrielle ou "
@@ -983,8 +994,12 @@ def calculer():
             p_dy = pctl(marche_dy, v["dy"])
             p_g = pctl(marche_g, v["g"])
         dispo = [x for x in (p_ep, p_dy) if x is not None]
-        cherte = round(sum(dispo) / len(dispo)) if dispo else None
-        return cherte, p_g, ref
+        # Percentile de DECOTE : il monte quand le titre est bon marche (P100 =
+        # le moins cher de sa reference). Moyenne des rangs de rendement
+        # benefice/prix et de rendement du dividende, tous deux croissants avec
+        # le bon marche.
+        decote = round(sum(dispo) / len(dispo)) if dispo else None
+        return decote, p_g, ref
 
     # --- Medianes de reference (secteur et marche) pour la mise en contexte ---
     # Un PER de 14 ne dit rien seul ; "14,0 contre 13,2 en mediane bancaire et
@@ -1025,11 +1040,11 @@ def calculer():
                     "PER absent ou > %d : benefices nuls ou residuels" % sp["per_max_analysable"]]
             else:
                 principal, secondaire, notes = "NON_ANALYSABLE", None, []
-            cherte = croissance = None
+            decote = croissance = None
             ref = "hors axes"
         else:
-            cherte, croissance, ref = axes(t, v)
-            principal, secondaire, notes = profil_par_signature(v, cherte, croissance, sp)
+            decote, croissance, ref = axes(t, v)
+            principal, secondaire, notes = profil_par_signature(v, decote, croissance, sp)
 
         # --- Avis officiels : suspension, fractionnement, operation sur capital ---
         avis_titre = avis.get(t, [])
@@ -1092,7 +1107,7 @@ def calculer():
                 if "CONTREDIT_PAR_INTERMEDIAIRE" not in v["drapeaux"]:
                     v["drapeaux"] = v["drapeaux"] + ["CONTREDIT_PAR_INTERMEDIAIRE"]
 
-        motif = motif_du_profil(principal, v, cherte, croissance, sp)
+        motif = motif_du_profil(principal, v, decote, croissance, sp)
         if v.get("arbitrage_bloquant"):
             motif = ("profil suspendu : la base est en desaccord avec une source "
                      "exterieure sur le dernier exercice (%s) — voir la note "
@@ -1199,7 +1214,7 @@ def calculer():
                            "drapeau": v.get("arbitrage_drapeau"),
                            "detail": v.get("arbitrage_detail")}
                           if v.get("arbitrage_drapeau") else None),
-            "cherte_pctl": cherte,
+            "decote_pctl": decote,
             "croissance_pctl": croissance,
             "reference_axes": ref,
             "g": round(v["g"], 1) if v["g"] is not None else None,
