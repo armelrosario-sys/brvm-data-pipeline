@@ -672,13 +672,140 @@ def controle(valeurs, tot):
     return rapport, ok
 
 
+
+# ----------------------------------------------------------------------
+# Garde-fou hors ligne (27/09/2026)
+# ----------------------------------------------------------------------
+# collecte_boc.py etait le seul collecteur du projet sans garde-fou : avis_brvm.py
+# et notations.py rejouent leurs analyseurs sur un echantillon fige AVANT toute
+# collecte, lui non. Si la BRVM change la mise en page du bulletin, la seule
+# alarme est la reconciliation des totaux -- qui protege la publication mais ne
+# dit rien au moment ou le code change.
+#
+# Deux modes :
+#   --figer <pdf>  fige le texte du bulletin (pdftotext -layout, exactement ce
+#                  que lit texte_pdf) et les resultats que le parseur en tire
+#   --test         rejoue les analyseurs sur chaque echantillon fige et compare
+#
+# Ce que le garde-fou prouve, et ce qu'il ne prouve pas : il capture le
+# comportement ACTUEL, donc il attrape une regression, pas une erreur de
+# conception. La preuve d'exactitude, elle, est la reconciliation des totaux
+# avec le bulletin -- volume, valeur, nombre de titres -- que --test rejoue
+# aussi, et qui a ete verifiee independamment sur la seance du 18/09/2026 :
+# les 37 cotations du bulletin concordaient avec la base au cours et au PER.
+
+ECHANTILLONS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "echantillons")
+
+
+def _resume_parse(txt):
+    """Ce qu'on fige : le resultat des quatre analyseurs, sous forme comparable."""
+    numero, jour = entete(txt)
+    valeurs = lignes_actions(txt)
+    tot = totaux(txt)
+    rapport, ok = controle(valeurs, tot)
+    return {
+        "numero": numero,
+        "seance": jour,
+        "nb_valeurs": len(valeurs),
+        "indices": indices(txt),
+        "totaux": tot,
+        "reconcilie": ok,
+        "controles": rapport,
+        "valeurs": {v["symbole"]: {c: v.get(c) for c in
+                                   ("cours", "volume", "valeur", "per", "rendement")}
+                    for v in valeurs},
+    }
+
+
+def figer(chemin_pdf):
+    """Fige un bulletin comme echantillon de reference."""
+    txt = texte_pdf(chemin_pdf)
+    resume = _resume_parse(txt)
+    jour = resume["seance"] or "inconnu"
+    os.makedirs(ECHANTILLONS, exist_ok=True)
+    base = os.path.join(ECHANTILLONS, "boc_%s" % jour.replace("-", ""))
+    with open(base + ".txt", "w", encoding="utf-8") as f:
+        f.write(txt)
+    with open(base + ".attendu.json", "w", encoding="utf-8") as f:
+        json.dump(resume, f, ensure_ascii=False, indent=1, sort_keys=True)
+    print("Echantillon fige : %s.txt (%d octets), %d cotations, reconcilie=%s"
+          % (base, len(txt), resume["nb_valeurs"], resume["reconcilie"]))
+    return base
+
+
+def autotest():
+    """Rejoue les analyseurs sur chaque echantillon fige. Code 1 si divergence."""
+    if not os.path.isdir(ECHANTILLONS):
+        print("AUTOTEST : aucun echantillon fige (%s absent) — lancer --figer d'abord"
+              % ECHANTILLONS)
+        return 1
+    attendus = sorted(f for f in os.listdir(ECHANTILLONS) if f.endswith(".attendu.json"))
+    if not attendus:
+        print("AUTOTEST : aucun echantillon fige dans %s" % ECHANTILLONS)
+        return 1
+    echecs = []
+    for nom in attendus:
+        socle = os.path.join(ECHANTILLONS, nom[:-len(".attendu.json")])
+        with open(socle + ".txt", encoding="utf-8") as f:
+            txt = f.read()
+        with open(socle + ".attendu.json", encoding="utf-8") as f:
+            attendu = json.load(f)
+        # Un changement de mise en page fait lever les analyseurs (« bloc
+        # introuvable »). C'est le cas que ce garde-fou existe pour attraper :
+        # on le RAPPORTE, on ne laisse pas l'exception interrompre la serie.
+        try:
+            obtenu = json.loads(json.dumps(_resume_parse(txt)))  # normalise les tuples
+        except SystemExit as e:
+            echecs.append("%s : les analyseurs refusent l'echantillon — %s" % (nom, e))
+            continue
+        except Exception as e:  # noqa: BLE001
+            echecs.append("%s : %s — %s" % (nom, type(e).__name__, e))
+            continue
+        if obtenu == attendu:
+            print("  [OK] %s : %d cotations, reconcilie=%s"
+                  % (nom[:-len(".attendu.json")], attendu["nb_valeurs"],
+                     attendu["reconcilie"]))
+            continue
+        for cle in sorted(set(attendu) | set(obtenu)):
+            if attendu.get(cle) != obtenu.get(cle):
+                if cle == "valeurs":
+                    a, o = attendu[cle], obtenu.get(cle) or {}
+                    for sym in sorted(set(a) | set(o)):
+                        if a.get(sym) != o.get(sym):
+                            echecs.append("%s / %s : attendu %s, obtenu %s"
+                                          % (nom, sym, a.get(sym), o.get(sym)))
+                else:
+                    echecs.append("%s / %s : attendu %r, obtenu %r"
+                                  % (nom, cle, attendu.get(cle), obtenu.get(cle)))
+    if echecs:
+        print("AUTOTEST : %d divergence(s)" % len(echecs))
+        for e in echecs[:25]:
+            print("  [ECHEC]", e)
+        if len(echecs) > 25:
+            print("  ... et %d autre(s)" % (len(echecs) - 25))
+        return 1
+    print("AUTOTEST : tous les analyseurs passent (%d echantillon(s))" % len(attendus))
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", help="séance précise au format AAAA-MM-JJ ; "
                                     "sans cette option, le dernier bulletin publié")
     ap.add_argument("--pdf", help="PDF local, sans téléchargement")
     ap.add_argument("--sortie", default=os.path.join(DOSSIER, "boc.json"))
+    ap.add_argument("--figer", metavar="PDF",
+                    help="fige ce bulletin comme echantillon de reference")
+    ap.add_argument("--test", action="store_true",
+                    help="rejoue les analyseurs sur les echantillons figes, "
+                         "sans reseau")
     a = ap.parse_args()
+
+    if a.test:
+        raise SystemExit(autotest())
+    if a.figer:
+        figer(a.figer)
+        raise SystemExit(autotest())
 
     if a.pdf:
         chemin, tmp = a.pdf, None
