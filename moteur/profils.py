@@ -1164,12 +1164,16 @@ def calculer():
         if note:
             var = note.get("variation_crans")
             var = int(var) if (var or "").lstrip("-").isdigit() else None
-            # Deux agences agreees UEMOA coexistent : GCR (notes suffixees WU)
-            # et Bloomfield (notes nues). Leurs echelles sont toutes deux
-            # REGIONALES et NON comparables entre elles ni a une echelle
-            # internationale. On ne compare donc JAMAIS deux titres notes par
-            # des agences differentes : seule la VARIATION d'une revue a
-            # l'autre, chez la meme agence, est exploitee.
+            # TROIS agences agreees UEMOA coexistent dans le fonds, mesure du
+            # 27/09/2026 apres reprise : Bloomfield Investment Corporation
+            # (243 rapports, notes nues), WARA (82, notes nues) et GCR (43,
+            # notes suffixees WU). Le commentaire d'origine n'en citait que
+            # deux, WARA n'etant pas encore apparue dans le fonds collecte.
+            # Leurs echelles sont toutes REGIONALES et NON comparables entre
+            # elles ni a une echelle internationale. On ne compare donc JAMAIS
+            # deux titres notes par des agences differentes : seule la
+            # VARIATION d'une revue a l'autre, chez la meme agence, est
+            # exploitee — regle qui protege deja l'arrivee de WARA.
             persp = (note.get("perspective") or "").lower()
             defavorable = principal in ("VIGILANCE_CONTRACTION", "RETOURNEMENT")
             favorable = principal in ("GARP", "GROWTH")

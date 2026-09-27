@@ -20,6 +20,7 @@ TTLC,TOTAL,2020-07-13,Bloomfield Investment Corporation,AA+,20,AA,1,A1,stable,No
 TTLC,TOTAL,2019-03-18,Bloomfield Investment Corporation,AA,19,A,3,A1,stable,Novembre 2018 a Octobre 2019,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20190318_-_notation_financiere_-_total_ci_0.pdf,2026-09-27
 TTLC,,2015-11-18,WARA,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20151118_-_nf_wara_-_total_sn_-_novembre_2015_version_anglaise.pdf,2026-09-27
 TTLC,,2015-11-16,WARA,A-,15,,,,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20151116_-_nf_wara_-_total_sn_-_novembre_2015.pdf,2026-09-27
+STBC,SITAB,2026-05-05,Bloomfield Investment Corporation,AA+,20,A,,A1+,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/fiche_de_notation_-_sitab_2025.pdf,2026-09-03
 STBC,SITAB,2025-03-24,GCR,AA-,18,,,A1+,stable,,rehausse,,,393.0;18.7;14.4,2023,4.5,2.75,10.5,OK,https://www.brvm.org/sites/default/files/20250324_-_notation_financiere_-_sitab_ci.pdf,2026-09-27
 STBC,SITAB,2024-12-06,GCR,AA-(WU),18,,,A1+(WU),,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20241206_-_notation_financiere_-_sitab_ci.pdf,2026-09-27
 STBC,SITAB,2023-12-13,GCR,BBB(WU),13,,,A1+(WU),positive,,rehausse,,,,2019;2020;2021;2022,4.5,2.75,9.5,OK,https://www.brvm.org/sites/default/files/20231213_-_notation_financiere_-_sitab_ci.pdf,2026-09-27
@@ -142,7 +143,7 @@ PALC,PALM CI,2018-08-20,Bloomfield Investment Corporation,A,16,,,A1,stable,Juin 
 PALC,PALM CI,2017-10-17,Bloomfield Investment Corporation,A,16,A-,1,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20171017-fiche_de_notation_-_palmci_sa_2017.pdf,2026-09-27
 PALC,PALM CI,2015-10-09,Bloomfield Investment Corporation,A-,15,,,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20151009_-_nf_bloomfield_-_palm_ci_-_septembre_2015.pdf,2026-09-27
 PALC,PALM CI,2014-12-01,,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20141201_-_nf_bloomfield_-_palm_ci_-_novembre_2014_version_anglaise.pdf,2026-09-27
-PALC,PALM CI,2014-11-27,,A-,15,,,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20141127_-_nf_bloomfield_-_palm_ci_-_novembre_2014.pdf,2026-09-27
+PALC,PALM CI,2014-11-27,Bloomfield Investment Corporation,A-,15,,,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20141127_-_nf_bloomfield_-_palm_ci_-_novembre_2014.pdf,2026-09-27
 PALC,PALM CI,2013-12-03,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20131203_-_nf_bloomfield_-_palm_ci_-_novembre_2013_version_anglaise.pdf,2026-09-27
 PALC,PALM CI,2013-11-29,Bloomfield Investment Corporation,A-,15,BBB+,1,A1,positive,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20131129_-_nf_bloomfield_-_palm_ci_-_novembre_2013.pdf,2026-09-27
 PALC,PALM CI,2013-04-24,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20130424_-_nf_bloomfield_-_palm_ci_-_avril_2013_version_anglaise.pdf,2026-09-27
@@ -234,11 +235,11 @@ CIEC,CIE CI,2022-02-17,Bloomfield Investment Corporation,AA+,20,,,A1+,stable,Ao�
 CIEC,CIE CI,2020-11-30,Bloomfield Investment Corporation,AA+,20,,,A1+,stable,Ao청t 2020 a juillet 2021,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20201130_-_notation_financiere_-_cie.pdf,2026-09-27
 CIEC,CIE CI,2019-11-27,Bloomfield Investment Corporation,AA+,20,,,A1+,stable,Ao청t 2019 a Juillet 2020,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20191121_-_notation_financiere-_cie_2019_1.pdf,2026-09-27
 CIEC,CIE CI,2019-11-21,Bloomfield Investment Corporation,AA+,20,,,A1+,stable,Ao청t 2019 a Juillet 2020,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20191121_-_notation_financiere-_cie_2019.pdf,2026-09-27
-CIEC,CIE CI,2018-10-30,Bloomfield,AA+,20,,,A1+,stable,Ao청t 2018 a Juillet 2019,,,,14.0,,,,,OK,https://www.brvm.org/sites/default/files/20181030_-_fiche_de_notation_financiere_-_cie_2018.pdf,2026-09-27
-CIEC,CIE CI,2018-01-11,Bloomfield,AA+,20,,,A1+,stable,,,,,14.0,,,,,OK,https://www.brvm.org/sites/default/files/20180111_-_fiche_de_notation_-cie_ci_2017.pdf,2026-09-27
-CIEC,CIE CI,2016-10-25,Bloomfield,AA+,20,,,A1+,stable,,,,,14.0,,,,,OK,https://www.brvm.org/sites/default/files/20161025_-_notation_financiere_-_cie.pdf,2026-09-27
+CIEC,CIE CI,2018-10-30,Bloomfield Investment Corporation,AA+,20,,,A1+,stable,Ao청t 2018 a Juillet 2019,,,,14.0,,,,,OK,https://www.brvm.org/sites/default/files/20181030_-_fiche_de_notation_financiere_-_cie_2018.pdf,2026-09-27
+CIEC,CIE CI,2018-01-11,Bloomfield Investment Corporation,AA+,20,,,A1+,stable,,,,,14.0,,,,,OK,https://www.brvm.org/sites/default/files/20180111_-_fiche_de_notation_-cie_ci_2017.pdf,2026-09-27
+CIEC,CIE CI,2016-10-25,Bloomfield Investment Corporation,AA+,20,,,A1+,stable,,,,,14.0,,,,,OK,https://www.brvm.org/sites/default/files/20161025_-_notation_financiere_-_cie.pdf,2026-09-27
 CIEC,CIE CI,2014-09-30,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20140930_-_nf_bloomfield_-_sode_ci_-_aout_2014_version_anglaise.pdf,2026-09-27
-CIEC,CIE CI,2014-09-22,,AA+,20,AA,1,A1+,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20140922_-_nf_bloomfield_-_cie_ci_-_aout_2014.pdf,2026-09-27
+CIEC,CIE CI,2014-09-22,Bloomfield Investment Corporation,AA+,20,AA,1,A1+,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20140922_-_nf_bloomfield_-_cie_ci_-_aout_2014.pdf,2026-09-27
 CIEC,CIE CI,2013-10-10,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20131010_-_nf_bloomfield_-_cie_ci_-_septembre_2013_version_anglaise.pdf,2026-09-27
 CIEC,CIE CI,2013-10-08,Bloomfield Investment Corporation,AA,19,,,A1,positive,,,,,14.0,,,,,OK,https://www.brvm.org/sites/default/files/20131008_-_nf_bloomfield_-_cie_ci_-_septembre_2013.pdf,2026-09-27
 CIEC,CIE CI,2013-05-02,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20130502_-_nf_bloomfield_-_cie_ci_-_octobre_2012_version_anglaise.pdf,2026-09-27
@@ -286,9 +287,9 @@ BOAS,BANK OF AFRICA SN,2022-01-17,Bloomfield Investment Corporation,A-,15,,,A2,s
 BOAS,BANK OF AFRICA SN,2020-11-05,Bloomfield Investment Corporation,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20201105-_notation_financiere_-_boa_senegal.pdf,2026-09-27
 BOAS,BANK OF AFRICA SN,2019-10-03,Bloomfield Investment Corporation,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/bank_of_africa_senegal.pdf,2026-09-27
 BOAS,BANK OF AFRICA SN,2018-07-06,Bloomfield Investment Corporation,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_senegal_2018.pdf,2026-09-27
-BOAS,BANK OF AFRICA SN,2016-06-30,Bloomfield,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20160630_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2016.pdf,2026-09-27
-BOAS,BANK OF AFRICA SN,2015-06-17,Bloomfield,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20150617_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2015_version_anglaise.pdf,2026-09-27
-BOAS,BANK OF AFRICA SN,2015-06-08,Bloomfield,A-,15,,,A2,positive,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20150608_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2015.pdf,2026-09-27
+BOAS,BANK OF AFRICA SN,2016-06-30,Bloomfield Investment Corporation,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20160630_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2016.pdf,2026-09-27
+BOAS,BANK OF AFRICA SN,2015-06-17,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20150617_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2015_version_anglaise.pdf,2026-09-27
+BOAS,BANK OF AFRICA SN,2015-06-08,Bloomfield Investment Corporation,A-,15,,,A2,positive,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20150608_-_nf_bloomfield_-_bank_of_africa_sn_-_mai_2015.pdf,2026-09-27
 BOAN,BANK OF AFRICA NG,2025-11-18,Bloomfield Investment Corporation,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20251117_-_notation_financiere_-_boa_ng.pdf,2026-09-27
 BOAN,BANK OF AFRICA NG,2024-09-16,Bloomfield Investment Corporation,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20240916_-_notation_financiere_-_boa_ng.pdf,2026-09-27
 BOAN,BANK OF AFRICA NG,2024-02-13,Bloomfield Investment Corporation,A-,15,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_boa_niger.pdf,2026-09-27
@@ -325,7 +326,7 @@ BOAC,BANK OF AFRICA CI,2017-06-16,Bloomfield Investment Corporation,A,16,,,A2,po
 BOAC,BANK OF AFRICA CI,2017-06-15,Bloomfield Investment Corporation,A,16,,,A2,positive,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20170615-fiche_de_notation-boa_cote-d-ivoire_2017.pdf,2026-09-27
 BOAC,BANK OF AFRICA CI,2016-06-22,Bloomfield Investment Corporation,A,16,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20160622_-_nf_bloomfield_-_bank_of_africa_ci_-_avril_2016.pdf,2026-09-27
 BOAC,BANK OF AFRICA CI,2015-07-01,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20150701_-_nf_bloomfield_-_bank_of_africa_ci_-_mai_2015_version_anglaise.pdf,2026-09-27
-BOAC,BANK OF AFRICA CI,2015-06-30,,A,16,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20150630_-_nf_bloomfield_-_bank_of_africa_ci_-_mai_2015.pdf,2026-09-27
+BOAC,BANK OF AFRICA CI,2015-06-30,Bloomfield Investment Corporation,A,16,,,A2,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20150630_-_nf_bloomfield_-_bank_of_africa_ci_-_mai_2015.pdf,2026-09-27
 BOABF,BANK OF AFRICA BF,2026-08-26,Bloomfield Investment Corporation,A+,17,,,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20260826_-_notation_financiere_-_boa_bf.pdf,2026-09-27
 BOABF,BANK OF AFRICA BF,2025-06-30,Bloomfield Investment Corporation,A+,17,,,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20250630_-_notation_financiere_-_boa_bf.pdf,2026-09-27
 BOABF,BANK OF AFRICA BF,2024-02-13,Bloomfield Investment Corporation,A,16,A+,-1,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20240213_-_notation_financiere_-_boa_bf.pdf,2026-09-27
@@ -350,7 +351,7 @@ BOAB,BANK OF AFRICA BN,2020-06-17,Bloomfield Investment Corporation,A+,17,,,A1,s
 BOAB,BANK OF AFRICA BN,2019-08-28,Bloomfield Investment Corporation,A+,17,,,A1,stable,Mai 2019 a Avril 2020,,,,,,,,,OK,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_benin_2019.pdf,2026-09-27
 BOAB,BANK OF AFRICA BN,2018-06-26,Bloomfield Investment Corporation,A+,17,,,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_benin_2018.pdf,2026-09-27
 BOAB,BANK OF AFRICA BN,2017-06-14,Bloomfield Investment Corporation,A+,17,A,1,A1,stable,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/fiche_de_notation_-_boa_benin_2017.pdf,2026-09-27
-BOAB,BANK OF AFRICA BN,2016-11-22,Bloomfield,A,16,,,A1,positive,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/notation_financiere_boa_benin_-_avril_2016.pdf,2026-09-27
+BOAB,BANK OF AFRICA BN,2016-11-22,Bloomfield Investment Corporation,A,16,,,A1,positive,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/notation_financiere_boa_benin_-_avril_2016.pdf,2026-09-27
 BOAB,BANK OF AFRICA BN,2015-06-12,Bloomfield Investment Corporation,,,,,,,,,,,,,,,,SANS_NOTE,https://www.brvm.org/sites/default/files/20150612_-_nf_bloomfield_-_bank_of_africa_bn_-_avril_2015_version_anglaise.pdf,2026-09-27
 BOAB,BANK OF AFRICA BN,2015-06-03,Bloomfield Investment Corporation,A,16,,,A1,positive,,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20150603_-_nf_bloomfield_-_bank_of_africa_bn_-_avril_2015.pdf,2026-09-27
 BNBC,BERNABE CI,2025-08-22,Bloomfield Investment Corporation,A+,17,,,A1,stable,Juillet 2025 a Juin 2026,,,,,,,,,OK,https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_bernabe_ci.pdf,2026-09-27

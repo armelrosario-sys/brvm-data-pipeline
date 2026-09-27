@@ -154,6 +154,38 @@ RE_AGENCE = re.compile(
     r"\b(GCR Ratings|GCR|WARA|Bloomfield Investment Corporation|Bloomfield|"
     r"Moody'?s|Fitch|S&P)\b")
 
+# Une meme agence signe sous plusieurs raisons sociales selon les rapports.
+# Mesure du 27/09/2026 apres reprise du fonds : "Bloomfield Investment
+# Corporation" 235 fois, "Bloomfield" 7 fois. Le moteur ne compare que les
+# variations de note CHEZ LA MEME AGENCE — deux orthographes casseraient
+# silencieusement ce rapprochement sur les titres concernes.
+AGENCES_CANONIQUES = {
+    "Bloomfield": "Bloomfield Investment Corporation",
+    "GCR Ratings": "GCR",
+}
+
+
+def agence_canonique(nom):
+    return AGENCES_CANONIQUES.get((nom or "").strip(), (nom or "").strip() or None)
+
+
+def agence_depuis_url(url):
+    """Repli : l'agence lue dans le NOM DE FICHIER de la BRVM.
+
+    Trois rapports Bloomfield de 2014-2015 portent une note exploitable mais
+    aucune mention de l'agence dans leur texte — mise en page ancienne. Leur
+    nom de fichier, lui, la donne sans ambiguite
+    ("20141127_-_nf_bloomfield_-_palm_ci_-_novembre_2014.pdf"). C'est la BRVM
+    qui nomme ces fichiers, pas nous : la lecture est sure, et elle n'est
+    utilisee QUE si le texte n'a rien donne.
+    """
+    f = (url or "").rsplit("/", 1)[-1].lower()
+    for motif, agence in (("bloomfield", "Bloomfield Investment Corporation"),
+                          ("wara", "WARA"), ("gcr", "GCR")):
+        if motif in f:
+            return agence
+    return None
+
 
 # ----------------------------------------------------------------------
 # Echantillons de reference pour le mode --test
@@ -442,7 +474,7 @@ def _analyser_texte(txt):
     annees = re.findall(r"\b(20[12]\d)\s*:", plat)
 
     return dict(
-        agence=agence.group(1) if agence else None,
+        agence=agence_canonique(agence.group(1)) if agence else None,
         note_lt=note_lt, note_ct=note_ct,
         perspective=(persp.group(1).lower() if persp else None),
         action=(re.sub(r"\s+", " ", action.group(1)).lower() if action else None),
@@ -504,7 +536,15 @@ def lire_acquis(chemin=None):
     if not chemin.exists():
         return {}
     with chemin.open(encoding="utf-8", newline="") as f:
-        return {r["url_pdf"]: r for r in csv.DictReader(f) if r.get("url_pdf")}
+        acquis = {}
+        for r in csv.DictReader(f):
+            if not r.get("url_pdf"):
+                continue
+            # rattrape les orthographes d'agence ecrites avant le 27/09/2026
+            if r.get("agence"):
+                r["agence"] = agence_canonique(r["agence"])
+            acquis[r["url_pdf"]] = r
+        return acquis
 
 
 def a_extraire(candidats, acquis, budget, reessayer_echecs=True):
@@ -629,6 +669,8 @@ def main():
                                    ligne["ticker"] or ligne["societe_brvm"][:28]))
         try:
             donnees = extraire_pdf(session, ligne["url_pdf"])
+            if not donnees.get("agence"):
+                donnees["agence"] = agence_depuis_url(ligne["url_pdf"])
             ligne.update(donnees)
             ligne["statut_extraction"] = "OK" if donnees["note_lt"] else "SANS_NOTE"
             ligne["rang_lt"] = rang(donnees["note_lt"])
@@ -656,6 +698,26 @@ def main():
             ligne["statut_extraction"] = (ancienne or {}).get("statut_extraction") \
                                          or "NON_EXTRAIT"
             resultats.append(ligne)
+
+    # Une annonce peut SORTIR de l'index de la BRVM (page reorganisee, rapport
+    # remplace). Sans cette reprise, sa ligne disparaissait du fichier — et avec
+    # elle des donnees deja extraites. Cas mesure le 27/09/2026 : STBC du
+    # 05/05/2026, note AA+, statut OK, evaporee entre deux passages. On conserve
+    # donc tout ce qui a ete exploite, meme hors index, en le signalant.
+    vus = {x["url_pdf"] for x in resultats}
+    conserves = 0
+    for url, ancienne in acquis.items():
+        if url in vus:
+            continue
+        if ancienne.get("statut_extraction") not in STATUTS_ACQUIS:
+            continue  # une ligne jamais exploitee et sortie de l'index : on l'oublie
+        garde = dict(ancienne)
+        garde["statut_extraction"] = ancienne["statut_extraction"]
+        resultats.append(garde)
+        conserves += 1
+    if conserves:
+        print("  -> %d ligne(s) exploitee(s) conservee(s) bien que sortie(s) de "
+              "l'index BRVM" % conserves)
 
     aujourdhui = date.today().isoformat()
     with SORTIE.open("w", encoding="utf-8", newline="") as f:
