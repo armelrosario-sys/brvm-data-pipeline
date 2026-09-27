@@ -73,6 +73,9 @@ AVIS = RACINE / "collecte" / "avis_brvm.csv"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scoring import charger_seuils, charger_marche, appliquer_gate  # noqa: E402
+from arbitrage import (  # noqa: E402
+    charger_agregateur, arbitrer, ecrire_rapport,
+    EXPLICATIONS as EXPLICATIONS_ARBITRAGE)
 
 # ----------------------------------------------------------------------
 # Utilitaires
@@ -273,7 +276,7 @@ def charger_faits():
 
 
 def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap,
-                  base_gonflee_max=1.5, fenetre_max=8):
+                  base_gonflee_max=1.5, fenetre_max=8, correctifs=None):
     """Croissance annualisee sur les RN transcrits en base.
 
     Retourne (g, statut, n_exercices, drapeaux). g=None si non calculable.
@@ -296,6 +299,13 @@ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap,
                 serie_dict[ex] = (rn, st, "CONFLIT")  # ligne prioritaire, conflit signale
             else:
                 serie_dict[ex] = (rn, st, "LIGNE")
+    # Correctifs d'arbitrage (26/09/2026) : un resultat net repris d'une source
+    # exterieure parce que la ligne en base provient d'un OCR a source unique,
+    # jamais certifiable. Applique APRES la construction de la serie pour que la
+    # detection de CONFLIT sur le comparatif N-1 porte sur la donnee d'origine.
+    for _ex, _rn in (correctifs or {}).items():
+        if _ex in serie_dict:
+            serie_dict[_ex] = (_rn, serie_dict[_ex][1], "ARBITRE")
     lignes = [(ex, v[0], v[1]) for ex, v in sorted(serie_dict.items(), reverse=True)]
     origines = {ex: v[2] for ex, v in serie_dict.items()}
     serie = []
@@ -425,7 +435,7 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
 
 
 def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
-                sp_age_max_cp=3):
+                sp_age_max_cp=3, arb=None):
     table, col = source_cours(cur)
     per_row = cur.execute(
         f"SELECT per, {col} FROM {table} WHERE ticker=? AND per IS NOT NULL "
@@ -496,10 +506,12 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
     rn_dispo = [(e, rn) for e, rn, _c, _p in etats if rn is not None]
     dernier_rn = rn_dispo[0][1] if rn_dispo else None
 
+    arb = arb or {}
     g, statut_g, n_ex, drapeaux = croissance_rn(
         cur, ticker, sp["fenetre_exercices_max"], sp["pic_yoy_max"],
         sp["base_ecrasee_min"], sp["croissance_cap"],
-        sp["base_gonflee_max"], sp["fenetre_exercices_etendue"])
+        sp["base_gonflee_max"], sp["fenetre_exercices_etendue"],
+        correctifs=arb.get("correctif") or None)
     if g is not None:
         source_g = "RN_%s(%dex)" % (statut_g, n_ex)
     else:
@@ -533,6 +545,19 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
     if g is not None and g > sp["rattrapage_min"] and "RATTRAPAGE" not in drapeaux:
         drapeaux = drapeaux + ["RATTRAPAGE"]
 
+    # --- Arbitrage contre une source exterieure (26/09/2026, moteur/arbitrage.py).
+    # Les tests existants verifient la coherence INTERNE de la base ; une base peut
+    # etre coherente avec elle-meme et fausse. Cas fondateurs : ECOC et BOAS, dont
+    # les colonnes resultat_net / resultat_net_n1 etaient permutees a la saisie,
+    # ce qui produisait un profil GARP et un profil VALUE sur des series inversees.
+    if arb.get("drapeau") and arb["drapeau"] not in drapeaux:
+        drapeaux = drapeaux + [arb["drapeau"]]
+    if arb.get("axe_retire"):
+        # On retire l'axe plutot que de profiler sur un chiffre contested : g=None
+        # exclut aussi le titre des pools de percentiles, donc il ne deplace plus
+        # les medianes des autres.
+        g, source_g = None, "ARBITRAGE_BLOQUANT"
+
     peg = per / (g * 100) if (per and g and g > 0) else None
     base_pegy = (g + (dy or 0)) * 100 if g is not None else None
     pegy = per / base_pegy if (per and base_pegy and base_pegy > 0) else None
@@ -546,7 +571,12 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
     if roe_perime:
         drapeaux = drapeaux + ["DONNEES_PERIMEES"]
 
-    return dict(per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
+    return dict(arbitrage_regle=arb.get("regle", 0),
+                arbitrage_drapeau=arb.get("drapeau"),
+                arbitrage_detail=arb.get("detail"),
+                arbitrage_corroboree=bool(arb.get("corroboree")),
+                arbitrage_bloquant=bool(arb.get("bloquant")),
+                per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
                 payout_source=payout_source, part_operationnelle=part_operationnelle,
                 date_cours=date_cours, table_cours=table,
                 roe_exercice=roe_exercice, roe_perime=roe_perime,
@@ -815,6 +845,11 @@ def grade_confiance(profil, ing, faits_titre):
                                      "ou de l'exceptionnel : la croissance affichee ne mesure "
                                      "PAS la dynamique du metier (jurisprudence AGL CI)",
     }
+    # Arbitrage contre une source exterieure (26/09/2026) : les libelles vivent
+    # dans moteur/arbitrage.py, aux cotes des regles qui les produisent.
+    EXPLICATIONS = dict(EXPLICATIONS, **EXPLICATIONS_ARBITRAGE)
+    if ing.get("arbitrage_detail") and ing.get("arbitrage_regle") not in (0, 1):
+        reserves.append("ARBITRAGE : %s" % ing["arbitrage_detail"])
     for d in ing["drapeaux"]:
         base = d.split("_")[0] if d.startswith("CAP_") else d
         if base in EXPLICATIONS:
@@ -834,11 +869,23 @@ def grade_confiance(profil, ing, faits_titre):
         return "C", reserves
     critiques = {"CONTRADICTION_RN_BPA", "AUCUN_RN_EN_BASE", "BASE_GONFLEE", "CONFLIT_N1",
                  "RESULTAT_NON_OPERATIONNEL", "INFLEXION_RECENTE",
-                 "DONNEES_PERIMEES", "CONTREDIT_PAR_INTERMEDIAIRE"}
+                 "DONNEES_PERIMEES", "CONTREDIT_PAR_INTERMEDIAIRE",
+                 # Arbitrage (26/09/2026) : un desaccord avec une source exterieure
+                 # ou un exercice manquant rendent le profil non exploitable tel quel.
+                 "PERMUTATION_PROBABLE", "PERMUTATION_SUSPECTEE",
+                 "CROISSANCE_CONTESTEE", "FONDAMENTAL_EN_RETARD"}
     if critiques & set(ing["drapeaux"]):
         return "C", reserves
     if profil in ("VALUE", "RENDEMENT") and ing["payout"] is None:
         return "B", reserves
+    # Corroboration (regle 1, 26/09/2026) : deux lectures independantes des memes
+    # comptes publies concordent. C'est la seule situation ou le grade MONTE, et
+    # elle exige une ligne certifiee -- une concordance entre deux sources faibles
+    # ne prouve rien de plus que leur accord. Placee APRES le controle du payout
+    # pour ne jamais effacer une reserve deja etablie.
+    if (ing.get("arbitrage_corroboree") and "VERIFIE" in source
+            and set(ing["drapeaux"]) <= {"CROISSANCE_CORROBOREE", "SERIE_COMPLETEE_N1"}):
+        return "A", reserves
     if "VERIFIE" in source and not ing["drapeaux"]:
         return "A", reserves
     if "VERIFIE" in source or source == "RN_PROBABLE" or source.startswith("RN_"):
@@ -862,6 +909,7 @@ def calculer():
     faits = charger_faits()
     notations = charger_notations()
     avis = charger_avis()
+    agregateur = charger_agregateur()
 
     par_defaut = dict(
         fenetre_exercices_max=4, pic_yoy_max=3.5, base_ecrasee_min=0.30,
@@ -881,7 +929,7 @@ def calculer():
     tickers = [r[0] for r in cur.execute(
         "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
 
-    brut = {}
+    brut, verdicts = {}, {}
     for t in tickers:
         # un titre sans aucune cotation n'est pas encore cote (ex. IPO annoncee)
         _tbl, _c = source_cours(cur)
@@ -889,8 +937,11 @@ def calculer():
             f"SELECT COUNT(*) FROM {_tbl} WHERE ticker=?", (t,)).fetchone()[0]
         if not cote:
             continue
+        verdict = arbitrer(cur, t, agregateur) if agregateur else None
+        verdicts[t] = verdict or {}
         ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"],
-                          sp["ecart_benefice_max"], sp["age_max_capitaux_propres"])
+                          sp["ecart_benefice_max"], sp["age_max_capitaux_propres"],
+                          arb=verdict)
         statut_gate, _motifs = appliquer_gate(cur, t, secteurs.get(t, ""), seuils, marche)
         brut[t] = dict(ing, gate=statut_gate, secteur=secteurs.get(t, ""))
 
@@ -899,7 +950,8 @@ def calculer():
         fait = (faits.get(t) or {}).get("profil")
         per = v["per"]
         v["analysable"] = bool(
-            fait is None and per is not None and per <= sp["per_max_analysable"])
+            fait is None and per is not None and per <= sp["per_max_analysable"]
+            and not v.get("arbitrage_bloquant"))
     analysables = {t: v for t, v in brut.items() if v["analysable"]}
 
     # --- Axes : double lecture secteur (n>=8) / marche, reference etiquetee
@@ -965,6 +1017,9 @@ def calculer():
         if not v["analysable"]:
             if fait.get("profil"):
                 principal, secondaire, notes = fait["profil"], None, []
+            elif v.get("arbitrage_bloquant"):
+                principal, secondaire, notes = "NON_ANALYSABLE", None, [
+                    "PROFIL SUSPENDU par arbitrage : " + (v.get("arbitrage_detail") or "")]
             elif v["per"] is None or v["per"] > sp["per_max_analysable"]:
                 principal, secondaire, notes = "NON_ANALYSABLE", None, [
                     "PER absent ou > %d : benefices nuls ou residuels" % sp["per_max_analysable"]]
@@ -1038,6 +1093,10 @@ def calculer():
                     v["drapeaux"] = v["drapeaux"] + ["CONTREDIT_PAR_INTERMEDIAIRE"]
 
         motif = motif_du_profil(principal, v, cherte, croissance, sp)
+        if v.get("arbitrage_bloquant"):
+            motif = ("profil suspendu : la base est en desaccord avec une source "
+                     "exterieure sur le dernier exercice (%s) — voir la note "
+                     "d'arbitrage" % (v.get("arbitrage_drapeau") or "arbitrage"))
         if sensible_brut_net(principal, v, sp):
             notes = notes + [
                 "profil SENSIBLE a la convention brut/net du rendement : avec un "
@@ -1136,6 +1195,10 @@ def calculer():
             "grade": grade,
             "notes": notes,
             "reserves": reserves,
+            "arbitrage": ({"regle": v.get("arbitrage_regle"),
+                           "drapeau": v.get("arbitrage_drapeau"),
+                           "detail": v.get("arbitrage_detail")}
+                          if v.get("arbitrage_drapeau") else None),
             "cherte_pctl": cherte,
             "croissance_pctl": croissance,
             "reference_axes": ref,
@@ -1171,6 +1234,8 @@ def calculer():
         }
 
     SORTIE.write_text(json.dumps(profils, ensure_ascii=False, indent=1), encoding="utf-8")
+    if agregateur:
+        ecrire_rapport(verdicts)
     repartition = {}
     for v in profils.values():
         repartition[v["profil"]] = repartition.get(v["profil"], 0) + 1
@@ -1181,6 +1246,16 @@ def calculer():
     print("  repartition : %s" % ", ".join(
         "%s=%d" % (k, n) for k, n in sorted(repartition.items(), key=lambda kv: -kv[1])))
     print("  grades      : %s" % ", ".join("%s=%d" % (k, grades[k]) for k in sorted(grades)))
+    arbitrages = {}
+    for v in profils.values():
+        d = (v.get("arbitrage") or {}).get("drapeau")
+        if d:
+            arbitrages[d] = arbitrages.get(d, 0) + 1
+    if arbitrages:
+        print("  arbitrage   : %s" % ", ".join(
+            "%s=%d" % (k, n) for k, n in sorted(arbitrages.items(), key=lambda kv: -kv[1])))
+    elif not agregateur:
+        print("  arbitrage   : docs/data_brvm.json absent — aucune confrontation")
     return profils
 
 
