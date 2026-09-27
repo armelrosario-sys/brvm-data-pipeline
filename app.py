@@ -140,6 +140,8 @@ def charger(_empreinte):
             pegy=v.get("pegy"), payout=v.get("payout"), roe=v.get("roe"),
             cherte_pctl=v.get("cherte_pctl"), croissance_pctl=v.get("croissance_pctl"),
             reference=v.get("reference_axes"), drapeaux=", ".join(v.get("drapeaux") or []),
+            arbitrage=((v.get("arbitrage") or {}).get("drapeau") or ""),
+            arbitrage_detail=((v.get("arbitrage") or {}).get("detail") or ""),
             confiance=v.get("confiance"), gate=v.get("gate"),
             motif=v.get("motif"), payout_source=v.get("payout_source"),
             part_op=v.get("part_operationnelle"),
@@ -721,10 +723,11 @@ with o2:
                "**C** travail complementaire requis avant tout usage.")
     aff = vue[["ticker", "nom", "secteur", "profil", "secondaire", "grade", "per", "dy",
                "croissance", "source", "pegy", "payout", "drapeaux",
-               "notation", "contradiction", "motif"]].copy()
+               "arbitrage", "notation", "contradiction", "motif"]].copy()
     aff.columns = ["Ticker", "Societe", "Secteur", "Profil", "Secondaire", "Grade",
                    "PER", "Rdt %", "Croiss. %/an", "Source croissance", "PEGY",
-                   "Payout", "Drapeaux", "Notation", "Contradiction", "Motif"]
+                   "Payout", "Drapeaux", "Arbitrage", "Notation", "Contradiction",
+                   "Motif"]
     st.dataframe(
         aff.sort_values(["Grade", "Profil", "Ticker"]), hide_index=True,
         width='stretch', height=560,
@@ -805,6 +808,48 @@ with o3:
 
     if v.get("motif"):
         st.info(f"**Pourquoi ce profil** — {v['motif']}")
+
+    # Arbitrage contre une source exterieure (26/09/2026). Le croisement ne se
+    # contente pas de signaler : il retient une valeur et nomme sa source. On
+    # affiche donc les trois -- verdict, consequence, detail chiffre -- au lieu
+    # de laisser le lecteur deviner ce que le drapeau a change.
+    arb = v.get("arbitrage") or {}
+    if arb.get("drapeau"):
+        TITRES = {
+            "CROISSANCE_CORROBOREE": (
+                st.success, "Croissance corroboree",
+                "Une source exterieure independante lit le meme glissement sur le "
+                "dernier exercice. La transcription des comptes est confirmee ; "
+                "cela ne dit rien de l'origine du benefice."),
+            "ECART_AGREGATEUR": (
+                st.warning, "Ecart avec une source exterieure",
+                "La valeur certifiee est CONSERVEE, mais le perimetre (consolide "
+                "ou part du groupe) reste a verifier sur le document."),
+            "VALEUR_REPRISE_AGREGATEUR": (
+                st.warning, "Valeur reprise d'une source exterieure",
+                "La ligne en base venait d'un OCR a source unique, jamais "
+                "certifiable : c'est la source exterieure qui a ete retenue."),
+            "FONDAMENTAL_EN_RETARD": (
+                st.warning, "Exercice publie manquant en base",
+                "Le profil ci-dessous porte sur des comptes perimes."),
+            "PERMUTATION_PROBABLE": (
+                st.error, "Profil suspendu — colonnes permutees",
+                "Le resultat net et son comparatif N-1 sont inverses en base. "
+                "Aucun profil n'est publie tant que la saisie n'est pas corrigee."),
+            "PERMUTATION_SUSPECTEE": (
+                st.error, "Profil suspendu — permutation suspectee",
+                "Une seule des deux identites de controle est verifiee. A arbitrer "
+                "sur le document avant tout usage."),
+            "CROISSANCE_CONTESTEE": (
+                st.error, "Axe croissance retire",
+                "Deux sources donnent des glissements inconciliables et aucune "
+                "regle ne peut trancher."),
+        }
+        afficher, titre, consequence = TITRES.get(
+            arb["drapeau"], (st.info, arb["drapeau"], ""))
+        afficher(f"**{titre}** — {consequence}")
+        if arb.get("detail"):
+            st.caption(f"Regle {arb.get('regle')} : {arb['detail']}")
 
     notation = v.get("notation")
     if notation and notation.get("note"):
