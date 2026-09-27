@@ -76,7 +76,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add collecte/avis_brvm.csv collecte/avis_echecs.jsonl \
-                  collecte/profils.json || true
+                  collecte/profils.json \
+                  collecte/arbitrage_croissance.csv || true
           git commit -m "Veille avis BRVM $(date -u +%F)" || echo "rien a committer"
           git pull --rebase --autostash origin main
           git push || echo "push impossible"
