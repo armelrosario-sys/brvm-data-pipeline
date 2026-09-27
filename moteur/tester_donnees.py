@@ -614,6 +614,201 @@ def test_integrite_app():
             f"app.py fait {lignes} lignes (une chute nette signale une troncature)")
 
 
+
+# ----------------------------------------------------------------------
+# 12. ARBITRAGE CONTRE UNE SOURCE EXTERIEURE (bloquant)
+# ----------------------------------------------------------------------
+def test_arbitrage():
+    """Les onze sections precedentes verifient la coherence INTERNE de la base.
+
+    POURQUOI CETTE SECTION EXISTE (26/09/2026). Une base peut etre parfaitement
+    coherente avec elle-meme et fausse. Mesure fondatrice : sur les 37 titres ou
+    les deux chaines du projet donnent le glissement du MEME exercice, l'ecart
+    median est de 0,0 point -- la saisie manuelle est fiable. Mais deux titres
+    avaient les colonnes resultat_net et resultat_net_n1 PERMUTEES, ce qui
+    produisait un profil GARP (ECOC, +26,5 %/an affiche) et un profil VALUE
+    (BOAS) sur des series au dernier point inverse. Aucun des 28 golden tests ni
+    des 11 sections de ce fichier ne l'avait vu, parce qu'aucun ne confronte la
+    base a une source EXTERIEURE.
+
+    Trois familles de verifications :
+      (a) les regles d'arbitrage sur des cas SYNTHETIQUES, pour qu'elles restent
+          vraies independamment de l'etat des donnees du jour ;
+      (b) la permutation d'ECOC et de BOAS rejouee sur les chiffres reels, en
+          test de non-regression : si quelqu'un re-permute les colonnes, ce test
+          tombe ;
+      (c) l'etat de la base du jour : aucune permutation ne doit rester ouverte,
+          et aucun titre suspendu par arbitrage ne doit porter un profil de style.
+    """
+    print("\n=== 12. Arbitrage contre une source exterieure (bloquant) ===")
+    sys.path.insert(0, str(ICI))
+    try:
+        import arbitrage as arb
+    except ImportError as e:
+        verifie(False, f"moteur/arbitrage.py introuvable ou non importable : {e}")
+        return
+
+    # --- (a) Les regles, sur des cas synthetiques -----------------------------
+    # Une base en memoire : on teste les regles, pas les donnees du jour.
+    conn = sqlite3.connect(":memory:")
+    conn.execute("CREATE TABLE etats_financiers (ticker TEXT, exercice INTEGER, "
+                 "resultat_net REAL, resultat_net_n1 REAL, statut_donnee TEXT, "
+                 "source_type TEXT)")
+    cas = [
+        # ticker, exercice, rn, rn_n1, statut, source_type
+        ("CONCORDE", 2025, 110.0, 100.0, "VALIDE", "NATIF"),
+        ("CERTIFIE", 2025, 150.0, 100.0, "VALIDE", "NATIF"),
+        ("OCRSEUL", 2025, 150.0, 100.0, "PROBABLE", "OCR"),
+        ("PERMUTE", 2025, 100.0, 110.0, "VALIDE", "NATIF"),
+        ("PERMUTE1", 2025, 100.0, 110.0, "VALIDE", "NATIF"),
+        ("RETARD", 2024, 110.0, 100.0, "VALIDE", "NATIF"),
+        ("CONTESTE", 2025, 200.0, 100.0, "PROBABLE", "NATIF"),
+    ]
+    conn.executemany("INSERT INTO etats_financiers VALUES (?,?,?,?,?,?)", cas)
+    agr = {
+        # concordance : 10,0 % en base contre 9,5 % publie -> ecart 0,5 pt
+        "CONCORDE": {"exercice": 2025, "rn": 110.0, "ca": 1000.0,
+                     "croissance_rn": 9.5, "marge_nette": 11.0, "seance": None},
+        # ligne certifiee en ecart de 30 pts : la base est conservee
+        "CERTIFIE": {"exercice": 2025, "rn": 120.0, "ca": 1000.0,
+                     "croissance_rn": 20.0, "marge_nette": 12.0, "seance": None},
+        # meme ecart, mais la ligne vient d'un OCR a source unique
+        "OCRSEUL": {"exercice": 2025, "rn": 120.0, "ca": 1000.0,
+                    "croissance_rn": 20.0, "marge_nette": 12.0, "seance": None},
+        # permutation confirmee par les DEUX identites (taux + marge)
+        "PERMUTE": {"exercice": 2025, "rn": 110.0, "ca": 1100.0,
+                    "croissance_rn": 10.0, "marge_nette": 10.0, "seance": None},
+        # permutation confirmee par le seul taux : marge incoherente
+        "PERMUTE1": {"exercice": 2025, "rn": 110.0, "ca": 1100.0,
+                     "croissance_rn": 10.0, "marge_nette": 33.0, "seance": None},
+        # l'agregateur a un exercice de plus que la base
+        "RETARD": {"exercice": 2025, "rn": 130.0, "ca": 1000.0,
+                   "croissance_rn": 18.2, "marge_nette": 13.0, "seance": None},
+        # ecart de 100 pts, ligne non certifiee, pas de permutation plausible
+        "CONTESTE": {"exercice": 2025, "rn": 100.0, "ca": 1000.0,
+                     "croissance_rn": 0.0, "marge_nette": 10.0, "seance": None},
+    }
+    cur = conn.cursor()
+    attendu = {
+        "CONCORDE": (1, "CROISSANCE_CORROBOREE"),
+        "CERTIFIE": (2, "ECART_AGREGATEUR"),
+        "OCRSEUL": (3, "VALEUR_REPRISE_AGREGATEUR"),
+        "RETARD": (4, "FONDAMENTAL_EN_RETARD"),
+        "PERMUTE": (5, "PERMUTATION_PROBABLE"),
+        "PERMUTE1": (5, "PERMUTATION_SUSPECTEE"),
+        "CONTESTE": (6, "CROISSANCE_CONTESTEE"),
+    }
+    for ticker, (regle, drapeau) in sorted(attendu.items(), key=lambda kv: kv[1][0]):
+        v = arb.arbitrer(cur, ticker, agr)
+        verifie(v["regle"] == regle and v["drapeau"] == drapeau,
+                f"regle {regle} ({drapeau}) : {ticker} -> regle {v['regle']} "
+                f"/ {v['drapeau']}")
+
+    # Proprietes que les regles doivent respecter, quel que soit le cas
+    v_ocr = arb.arbitrer(cur, "OCRSEUL", agr)
+    verifie(v_ocr["correctif"] == {2025: 120.0},
+            f"regle 3 : la substitution est explicite et journalisee, "
+            f"obtenu {v_ocr['correctif']}")
+    v_cert = arb.arbitrer(cur, "CERTIFIE", agr)
+    verifie(not v_cert["correctif"] and not v_cert["bloquant"],
+            "regle 2 : une ligne certifiee n'est JAMAIS reecrite au demarrage "
+            "et ne bloque pas le profil")
+    for t in ("PERMUTE", "PERMUTE1"):
+        v = arb.arbitrer(cur, t, agr)
+        verifie(v["bloquant"] and v["axe_retire"] and not v["correctif"],
+                f"regle 5 : {t} bloque le profil et retire l'axe sans reecrire "
+                f"la base (bloquant={v['bloquant']}, correctif={v['correctif']})")
+        verifie("peupler.py" in (v["detail"] or ""),
+                f"regle 5 : le detail de {t} nomme la correction a porter dans peupler.py")
+    verifie(arb.arbitrer(cur, "CONCORDE", {})["regle"] == 0,
+            "agregateur absent : l'arbitrage se retire sans bloquer le moteur")
+    verifie(arb.arbitrer(cur, "INCONNU", agr)["regle"] == 0,
+            "titre absent de l'agregateur : aucun verdict, aucune erreur")
+    conn.close()
+
+    # --- (b) ECOC et BOAS, non-regression sur les chiffres reels -------------
+    # Les deux identites qui ont etabli la permutation le 26/09/2026. Si ces
+    # egalites cessent d'etre vraies, c'est que les colonnes ont bouge.
+    for ticker, rn_2025, rn_2024, ca, croi, marge in (
+            ("ECOC", 63482.0, 57477.0, 132725.0, 10.45, 47.83),
+            ("BOAS", 21906.0, 19984.0, 51926.0, 9.61, 42.19)):
+        glissement = 100.0 * (rn_2025 - rn_2024) / rn_2024
+        verifie(abs(glissement - croi) <= 0.15,
+                f"{ticker} : le glissement du bon sens ({glissement:+.2f} %) egale "
+                f"celui publie ({croi:+.2f} %)")
+        verifie(abs(100.0 * rn_2025 / ca - marge) <= 0.06,
+                f"{ticker} : le resultat net 2025 rapporte au chiffre d'affaires donne "
+                f"{100.0 * rn_2025 / ca:.2f} %, soit la marge publiee ({marge:.2f} %)")
+
+    if not DB.exists():
+        verifie(False, "brvm.db absente : impossible de verifier l'etat du jour",
+                bloquant=False)
+        return
+
+    # --- (c) Etat de la base du jour ----------------------------------------
+    agregateur = arb.charger_agregateur()
+    if not agregateur:
+        verifie(False, "docs/data_brvm.json absent : aucune confrontation possible "
+                       "(verifier les workflows boc_quotidien et sikafinance)",
+                bloquant=False)
+        return
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    tickers = [r[0] for r in cur.execute(
+        "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
+    verdicts = {t: arb.arbitrer(cur, t, agregateur) for t in tickers}
+    conn.close()
+
+    confrontes = [t for t, v in verdicts.items() if v["regle"]]
+    verifie(len(confrontes) >= 30,
+            f"{len(confrontes)} titres confrontes a l'agregateur (sous 30, "
+            f"la confrontation ne couvre plus le marche)")
+
+    corrobores = [t for t, v in verdicts.items() if v["regle"] == 1]
+    verifie(len(corrobores) >= 0.6 * max(len(confrontes), 1),
+            f"{len(corrobores)}/{len(confrontes)} titres corrobores "
+            f"({100 * len(corrobores) // max(len(confrontes), 1)} %) — une chute nette "
+            f"signale une derive de saisie ou un changement de format de l'agregateur")
+
+    permutations = sorted(t for t, v in verdicts.items()
+                          if v["drapeau"] in ("PERMUTATION_PROBABLE",
+                                              "PERMUTATION_SUSPECTEE"))
+    verifie(not permutations,
+            "aucune permutation de colonnes ouverte — a corriger dans "
+            f"moteur/peupler.py : {permutations}" if permutations
+            else "aucune permutation de colonnes ouverte dans la base")
+
+    retards = sorted(t for t, v in verdicts.items()
+                     if v["drapeau"] == "FONDAMENTAL_EN_RETARD")
+    verifie(not retards,
+            "aucun exercice publie manquant en base — a saisir dans "
+            f"moteur/peupler.py : {retards}" if retards
+            else "aucun exercice publie manquant en base",
+            bloquant=False)
+
+    # Un titre suspendu par arbitrage ne doit porter aucun profil de style :
+    # c'est tout l'objet du blocage.
+    profils_json = RACINE / "collecte" / "profils.json"
+    if profils_json.exists():
+        import json
+        profils = json.loads(profils_json.read_text(encoding="utf-8"))
+        STYLES = {"GARP", "VALUE", "GROWTH", "RENDEMENT"}
+        fautifs = sorted(
+            t for t, v in verdicts.items()
+            if v["bloquant"] and (profils.get(t) or {}).get("profil") in STYLES)
+        verifie(not fautifs,
+                f"aucun titre suspendu par arbitrage ne porte un profil de style "
+                f"(fautifs : {fautifs})")
+        # Le drapeau doit etre visible, pas seulement calcule.
+        muets = sorted(
+            t for t, v in verdicts.items()
+            if v["drapeau"] and v["drapeau"] not in (
+                (profils.get(t) or {}).get("drapeaux") or []))
+        verifie(not muets,
+                f"tous les verdicts d'arbitrage remontent dans profils.json "
+                f"(absents : {muets})")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -629,6 +824,7 @@ def main():
     test_fondamentaux_a_jour()
     test_statuts_cotation()
     test_integrite_app()
+    test_arbitrage()
     if not sans_app:
         test_application()
 
