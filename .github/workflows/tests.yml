@@ -48,8 +48,14 @@ jobs:
       #   un commit de code pour autant).
       - name: Tests de non-regression (donnees et application)
         run: |
-          python3 moteur/tester_donnees.py
-          code=$?
+          # GitHub Actions execute ce bloc avec 'bash -e' : une commande qui
+          # sort en non-zero interrompt l'etape SUR-LE-CHAMP. Ecrit tel quel,
+          # 'python3 ... ; code=$?' ne s'executait donc jamais, et le code 2
+          # (alertes de fraicheur seules) faisait echouer P4 comme une erreur.
+          # Defaut present depuis le 04/09/2026, revele le 27/09 par le premier
+          # retour 2 reel. Le '|| code=$?' neutralise -e sur cette ligne seule.
+          code=0
+          python3 moteur/tester_donnees.py || code=$?
           if [ $code -eq 1 ]; then
             echo "::error::Incoherence bloquante detectee — ne pas deployer"
             exit 1
