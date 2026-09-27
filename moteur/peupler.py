@@ -401,8 +401,13 @@ ETATS = [
      "NATIF", "VALIDE", "2024-05-02"),  # chaine coherente : 2021=9603->2022=12391->2023=16694->2024=26226->2025=36520
     ("BICC", 2021, 9603, 4672, 847724, 847724, 71522, None, None, None,
      "NATIF", "VALIDE", "2022-04-06"),
-    ("ECOC", 2025, 57477, 63482, None, None, None, None, None, None,
-     "NATIF", "VALIDE", "2026-04-14"),  # Ecobank CI, bilan non recoupe
+    ("ECOC", 2025, 63482, 57477, None, None, None, None, None, None,
+     "NATIF", "VALIDE", "2026-04-14"),  # Ecobank CI. Colonnes resultat_net et
+    # resultat_net_n1 PERMUTEES a la saisie, corrige le 26/09/2026 par
+    # moteur/arbitrage.py (regle 5). Deux identites independantes :
+    # 63482/57477 = +10,45 % = glissement publie ; 63482/132725 = 47,83 % =
+    # marge nette publiee. La saisie erronee donnait -9,5 %/an et fondait un
+    # profil GARP a +26,5 %/an sur une serie au dernier point inverse.
     ("SIBC", 2025, 55623, 50234, 1881733, 1685249, 204765, None, None, None,
      "NATIF", "VALIDE", "2026-04-21"),  # Societe Ivoirienne de Banque, croissance +11% confirmee par le document
     ("ORAC", 2025, 167800, 158200, 2554100, 2554100, 616300, None, None, None,
@@ -417,8 +422,13 @@ ETATS = [
      "OCR", "PROBABLE", "2026-04-15"),  # BOA Benin, bilan non recoupe (OCR)
     ("BOAB", 2021, 13312.371256, 16663.938680, 902792.134544, 902792.134544, 89836.969716, None, None, None,
      "OCR", "PROBABLE", "2022-03-22"),  # 1er succes OCR sur ce titre (tentative precedente sans OCR avait echoue)
-    ("BOAS", 2025, 19984, 21906, None, None, None, None, None, None,
-     "OCR", "PROBABLE", "2026-03-17"),  # BOA Senegal, bilan illisible a l'OCR
+    ("BOAS", 2025, 21906, 19984, None, None, None, None, None, None,
+     "DEUX_SOURCE", "VALIDE", "2026-03-17"),  # BOA Senegal, bilan illisible a
+    # l'OCR. Colonnes resultat_net et resultat_net_n1 PERMUTEES a la saisie,
+    # corrige le 26/09/2026 par moteur/arbitrage.py (regle 5). Deux identites :
+    # 21906/19984 = +9,62 % contre +9,61 % publie ; 21906/51926 = 42,19 % =
+    # marge nette publiee. Le statut passe de PROBABLE/OCR a VALIDE/DEUX_SOURCE
+    # puisque la seconde source confirme desormais la lecture.
     ("ONTBF", 2025, 15886.921152, 21471.148928, 324902.379845, 324902.379845, 57541.603762, None, None, None,
      "NATIF", "VALIDE", "2026-06-11"),  # Onatel BF, identite exacte, recul -26%
     ("CIEC", 2025, 13100, 10100, None, None, None, None, 1.0, None,
