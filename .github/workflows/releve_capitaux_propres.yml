@@ -1,0 +1,121 @@
+name: Releve manuel des capitaux propres (7 titres hors de portee)
+
+# Workflow A USAGE UNIQUE (27/09/2026). Il installe les capitaux propres
+# releves a la main dans les documents publies par la BRVM, pour les titres
+# qu'aucun des deux extracteurs n'atteignait :
+#
+#   SOGC 2025 · SHEC 2025 · SLBC 2025 · CFAC 2024 · SICC 2024
+#
+# Il corrige au passage un defaut existant (BNBC 2023, capitaux propres 3.0
+# pour un resultat net de 36.0, soit un ROE de 1200 %) et le nom de la
+# societe CFAC, que son propre document appelle CFAO Mobility Cote d'Ivoire.
+#
+# UNXC reste volontairement sans valeur : la conversion du document Uniwax
+# 2024 ne restitue rien d'exploitable, et une valeur approchee serait pire
+# qu'une case vide.
+#
+# Il ne se declenche jamais tout seul : uniquement sur demande explicite
+# (onglet Actions -> Run workflow). Il ne committe QUE si les golden tests,
+# les tests de donnees, les garde-fous des collecteurs et le demarrage de
+# l'application passent tous.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  releve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dependances
+        run: |
+          pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas
+          pip install -r requirements.txt
+
+      - name: Installation du releve
+        run: python3 outils/releve_capitaux_propres.py
+
+      - name: Chaine complete - peuplement, cours, golden tests, profils
+        run: |
+          cd moteur
+          python3 peupler.py
+          python3 ../collecte/charger_cours.py brvm.db
+          python3 ../collecte/charger_cours_quotidien.py brvm.db
+          python3 ../collecte/charger_dividendes_exercice.py brvm.db
+          python3 ../collecte/charger_liquidite_quotidienne.py brvm.db
+          python3 tester.py
+          python3 profils.py
+
+      - name: Tests de non-regression (donnees et application)
+        run: |
+          # bash -e : une sortie non nulle interrompt l'etape sur-le-champ,
+          # d'ou le '|| code=$?' qui neutralise -e sur cette ligne seule.
+          code=0
+          python3 moteur/tester_donnees.py || code=$?
+          if [ $code -eq 1 ]; then
+            echo "::error::Incoherence bloquante — releve NON commite"
+            exit 1
+          elif [ $code -eq 2 ]; then
+            echo "::warning::Alertes de fraicheur seules — le code est sain"
+          fi
+
+      - name: Garde-fous hors ligne des collecteurs
+        run: |
+          python3 collecte/avis_brvm.py --test
+          python3 collecte/notations.py --test
+
+      - name: Generer le dashboard (test de fumee)
+        run: python3 dashboard/generer_dashboard.py
+
+      - name: Commit
+        run: |
+          rm -f dashboard_brvm.xlsx moteur/brvm.db
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Rien a committer — le releve avait deja ete applique."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit \
+            -m "Releve manuel des capitaux propres de cinq titres hors de portee des extracteurs" \
+            -m "Sept titres n avaient ni etats financiers structures en base ni rapport de notation recent chez l agregateur : la seule voie restante etait d ouvrir les documents publies par la BRVM et de lire les valeurs. Cinq sont desormais renseignes, chacun avec l unite imprimee sur son document et le detail de la derivation quand le bilan n affiche pas de ligne totale : SOGC 68430.361 (milliers), SHEC 27158.717963 (FCFA, somme du passif recoupee a l unite), SLBC 195142 (millions, ligne explicite), CFAC 19452.985667 (FCFA), SICC 2975.325212 (FCFA). Le ROE passe de 39 a 44 titres, tous sur des etats financiers certifies et non sur une source exterieure." \
+            -m "Trois constats que le releve a ramenes. CFAC : le bilan recoupe au franc, l ecart d environ 4 pour cent qui maintenait la ligne en PROBABLE est leve, et le document est signe CFAO Mobility Cote d Ivoire, nom corrige dans societes.csv. SICC : le document depose le 12/06/2026 sous l intitule exercice 2025 porte en realite sur l exercice 2024, avec une opinion des commissaires aux comptes AVEC RESERVES, dont un ajustement de stocks non justifie de 131695250 qui divise par deux la perte arretee par le conseil d administration ; la ligne reste PROBABLE pour cette raison et Sicor n a toujours pas publie 2025. SHEC : le payout certifie du projet d affectation (1.0103) depasse de justesse le plafond de 1.0, la ou le payout implicite rendement x PER l estimait a 0.8902 ; le titre passe de GARP a GROWTH." \
+            -m "BNBC 2023 portait 3.0 millions de capitaux propres pour 36.0 millions de resultat net, soit un ROE de 1200 pour cent, alors que la meme societe en porte 17769.95 en 2025 : un fragment d extraction que quinze sections de tests n avaient pas vu, faute de confronter les deux colonnes. La case est remise a vide et la section 13 gagne deux controles : un plancher de plausibilite sur le couple resultat net et capitaux propres, et la non-regression des cinq valeurs relevees, qu aucun extracteur ne saurait reconstituer si une reecriture les effacait."
+          git pull --rebase --autostash origin main
+          git push
+
+      - name: Resume
+        run: |
+          python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import csv, json, pathlib
+          p = json.load(open("collecte/profils.json"))
+          etats = list(csv.DictReader(open("donnees/base/etats_financiers.csv")))
+          print("## Releve manuel des capitaux propres\n")
+          print("| Titre | Exercice | Capitaux propres (M FCFA) | ROE |")
+          print("| --- | --- | --- | --- |")
+          for t, ex in (("SOGC", "2025"), ("SHEC", "2025"), ("SLBC", "2025"),
+                        ("CFAC", "2024"), ("SICC", "2024")):
+              cp = next((r["capitaux_propres"] for r in etats
+                         if r["ticker"] == t and r["exercice"] == ex), "")
+              roe = p.get(t, {}).get("roe")
+              print("| %s | %s | %s | %s |"
+                    % (t, ex, cp or "(vide)",
+                       "%.1f %%" % roe if roe is not None else "—"))
+          n = len(p)
+          avec = sum(1 for v in p.values() if v.get("roe") is not None)
+          print("\nROE disponibles : **%d / %d** titres." % (avec, n))
+          sans = sorted(t for t, v in p.items() if v.get("roe") is None)
+          print("\nToujours sans ROE : %s" % (", ".join(sans) or "aucun"))
+          print("\nUNXC reste sans capitaux propres : la conversion du document "
+                "Uniwax 2024 ne restitue que le capital social de l'en-tete. "
+                "SICC 2025 reste a publier par la societe.")
+          PY
