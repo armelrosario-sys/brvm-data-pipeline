@@ -84,7 +84,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add collecte/notations_financieres.csv collecte/notations_echecs.jsonl \
-                  collecte/profils.json || true
+                  collecte/profils.json \
+                  collecte/arbitrage_croissance.csv || true
           git commit -m "Notations financieres $(date -u +%F)" || echo "rien a committer"
           git push || echo "push impossible"
 
