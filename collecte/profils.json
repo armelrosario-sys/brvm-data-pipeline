@@ -1384,7 +1384,7 @@
    "croissance non exploitable (rattrapage extreme ou base ecrasee)"
   ],
   "reserves": [
-   "ARBITRAGE : exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py",
+   "ARBITRAGE : exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv",
    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
@@ -1395,7 +1395,7 @@
   "arbitrage": {
    "regle": 4,
    "drapeau": "FONDAMENTAL_EN_RETARD",
-   "detail": "exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
+   "detail": "exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv"
   },
   "decote_pctl": 18,
   "croissance_pctl": 23,
@@ -2058,14 +2058,14 @@
   "notes": [],
   "reserves": [
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
-   "ARBITRAGE : exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py",
+   "ARBITRAGE : exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv",
    "FONDAMENTAL_EN_RETARD : un exercice plus recent est publie et absent de la base : le profil porte sur des comptes perimes",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "arbitrage": {
    "regle": 4,
    "drapeau": "FONDAMENTAL_EN_RETARD",
-   "detail": "exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
+   "detail": "exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv"
   },
   "decote_pctl": 70,
   "croissance_pctl": 74,
@@ -3841,7 +3841,7 @@
    "COTATION SUSPENDUE depuis le 2026-09-17 — le titre ne peut etre ni achete ni vendu. Le profil ci-dessous reste une lecture des comptes, pas une opportunite accessible. Motif : SICOR S.A : Suspension de la cotation"
   ],
   "reserves": [
-   "ARBITRAGE : exercice 2024 disponible chez l'agregateur (resultat net -129.00) alors que la base s'arrete a 2021 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py",
+   "ARBITRAGE : exercice 2024 disponible chez l'agregateur (resultat net -129.00) alors que la base s'arrete a 2021 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv",
    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
    "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
    "FENETRE_ELARGIE : fenetre etendue au-dela de 4 exercices car elle demarrait sur un pic — la tendance de fond remplace l'effet de base",
@@ -3853,7 +3853,7 @@
   "arbitrage": {
    "regle": 4,
    "drapeau": "FONDAMENTAL_EN_RETARD",
-   "detail": "exercice 2024 disponible chez l'agregateur (resultat net -129.00) alors que la base s'arrete a 2021 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
+   "detail": "exercice 2024 disponible chez l'agregateur (resultat net -129.00) alors que la base s'arrete a 2021 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv"
   },
   "decote_pctl": null,
   "croissance_pctl": null,

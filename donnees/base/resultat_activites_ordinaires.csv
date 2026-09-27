@@ -1,0 +1,12 @@
+ticker,exercice,resultat_activites_ordinaires,note
+FTSC,2025,142.325,"trouve directement dans le document, complete la serie 2023-2025"
+FTSC,2024,4340.0,"confirme (croissanceafrique.com) : RAO +26% a 4,34 Mds vs RN +504.7%"
+FTSC,2023,3444.4,derive de la meme source (4340/1.26)
+TTLC,2024,13178.0,"RAO directement dans le document source (colonne ""Resultat des activites ordinaires"")"
+TTLC,2023,12033.0,
+TTLC,2022,16109.0,
+TTLC,2021,15778.0,
+STBC,2024,56541.0,"confirme (allafrica.com, 05/2026) : RAO vs 16 800 en 2023"
+STBC,2023,16800.0,
+SOGC,2025,17161.525,extrait directement du document source (compte de resultat complet)
+SOGC,2024,18040.224,

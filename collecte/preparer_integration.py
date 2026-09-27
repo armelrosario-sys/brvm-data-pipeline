@@ -20,22 +20,33 @@ Regles d'exclusion, strictes :
 
 Usage : python3 collecte/preparer_integration.py
 """
+import csv
 import json
 import re
 from pathlib import Path
 
 RACINE = Path(__file__).resolve().parent.parent
 PROPOSITIONS = RACINE / "collecte" / "propositions_extraction"
-PEUPLER = RACINE / "moteur" / "peupler.py"
+PEUPLER = RACINE / "moteur" / "peupler.py"  # conserve : cite dans les messages
+ETATS_CSV = RACINE / "donnees" / "base" / "etats_financiers.csv"
 SORTIE = RACINE / "collecte" / "candidats_integration.txt"
 
 
 def charger_exercices_existants():
-    """(ticker, exercice) deja presents dans ETATS -- jamais ecrases."""
-    src = PEUPLER.read_text(encoding="utf-8")
-    m = re.search(r"^ETATS = \[(.*?)\n\]", src, re.S | re.M)
-    lignes = re.findall(r'\("([A-Z_]+)",\s*(\d{4}),', m.group(1))
-    return {(t, int(e)) for t, e in lignes}
+    """(ticker, exercice) deja presents en base -- jamais ecrases.
+
+    27/09/2026 : lu depuis donnees/base/etats_financiers.csv, ou les donnees
+    ont ete sorties de peupler.py."""
+    if not ETATS_CSV.exists():
+        raise SystemExit("Referentiel des etats financiers introuvable : %s" % ETATS_CSV)
+    with ETATS_CSV.open(encoding="utf-8", newline="") as f:
+        out = set()
+        for r in csv.DictReader(f):
+            try:
+                out.add((r["ticker"], int(r["exercice"])))
+            except (TypeError, ValueError, KeyError):
+                continue
+        return out
 
 
 def date_depuis_nom_fichier(nom):

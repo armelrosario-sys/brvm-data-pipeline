@@ -82,10 +82,18 @@ def empreinte_donnees():
          conteneur vivait : la base construite au premier lancement restait en
          place indefiniment, meme apres l'arrivee de nouvelles donnees.
     """
+    # Ajout du 27/09/2026 : les donnees de reference du projet (etats
+    # financiers, societes, dividendes) sont sorties de peupler.py vers
+    # donnees/base/. Sans elles dans l'empreinte, corriger un resultat net
+    # dans un CSV ne reconstruirait pas la base : le tableau de bord
+    # afficherait l'ancienne valeur jusqu'au prochain redemarrage du
+    # conteneur. C'est exactement le defaut du 03/09 decrit ci-dessus.
     parties = []
+    base_ref = sorted((RACINE / "donnees" / "base").glob("*.csv"))
     for f in (QUOTIDIEN, RACINE / "collecte" / "cours_extraits.csv",
               RACINE / "collecte" / "dividendes_par_exercice.csv",
-              RACINE / "collecte" / "notations_financieres.csv"):
+              RACINE / "collecte" / "notations_financieres.csv",
+              *base_ref):
         parties.append(f"{f.name}:{int(f.stat().st_mtime)}" if f.exists() else f"{f.name}:0")
     return "|".join(parties)
 

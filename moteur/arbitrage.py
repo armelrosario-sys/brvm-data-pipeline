@@ -175,7 +175,8 @@ def arbitrer(cur, ticker, agregateur):
         return dict(vide, regle=4, drapeau="FONDAMENTAL_EN_RETARD", mesures=mesures,
                     detail="exercice %d disponible chez l'agregateur (resultat net %s) "
                            "alors que la base s'arrete a %d : le profil porte sur des "
-                           "comptes perimes, saisir l'exercice manquant dans peupler.py"
+                           "comptes perimes, saisir l'exercice manquant dans "
+                           "donnees/base/etats_financiers.csv"
                            % (ex_agr, _fr(agr["rn"]), ex_base))
 
     if croi_agr is None:
@@ -215,11 +216,11 @@ def arbitrer(cur, ticker, agregateur):
                         axe_retire=True, mesures=mesures,
                         detail="colonnes resultat_net et resultat_net_n1 vraisemblablement "
                                "permutees sur l'exercice %d : %s. CORRECTION A PORTER dans "
-                               "moteur/peupler.py : remplacer (\"%s\", %d, %s, %s, ...) par "
-                               "(\"%s\", %d, %s, %s, ...) apres verification du document "
-                               "source."
+                               "donnees/base/etats_financiers.csv : sur la ligne %s/%d, "
+                               "echanger resultat_net (%s) et resultat_net_n1 (%s) apres "
+                               "verification du document source."
                                % (ex_base, " ; ".join(preuves), ticker, ex_base,
-                                  _py(rn), _py(rn_n1), ticker, ex_base, _py(rn_n1), _py(rn)))
+                                  _py(rn), _py(rn_n1)))
 
     # --- Regle 1 : concordance. Deux lectures independantes des memes comptes
     # publies se rejoignent : la transcription est corroboree.
@@ -277,7 +278,7 @@ def _fr(x):
 
 
 def _py(x):
-    """Reproduit le litteral Python tel qu'il figure dans peupler.py."""
+    """Reproduit la valeur telle qu'elle figure dans le CSV de reference."""
     if x is None:
         return "None"
     return str(int(x)) if float(x).is_integer() else repr(x)

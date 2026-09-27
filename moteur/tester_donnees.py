@@ -81,7 +81,7 @@ def jours_ouvres(depuis, jusqua):
 def test_fraicheur():
     print("\n=== 1. Fraicheur des donnees (non bloquant) ===")
     if not DB.exists():
-        verifie(False, "brvm.db absente — lancer peupler.py puis charger_cours*.py",
+        verifie(False, "brvm.db absente — lancer moteur/peupler.py puis charger_cours*.py",
                 bloquant=False)
         return
     cur = sqlite3.connect(DB).cursor()
@@ -728,8 +728,8 @@ def test_arbitrage():
         verifie(v["bloquant"] and v["axe_retire"] and not v["correctif"],
                 f"regle 5 : {t} bloque le profil et retire l'axe sans reecrire "
                 f"la base (bloquant={v['bloquant']}, correctif={v['correctif']})")
-        verifie("peupler.py" in (v["detail"] or ""),
-                f"regle 5 : le detail de {t} nomme la correction a porter dans peupler.py")
+        verifie("etats_financiers.csv" in (v["detail"] or ""),
+                f"regle 5 : le detail de {t} nomme le fichier ou porter la correction")
     verifie(arb.arbitrer(cur, "CONCORDE", {})["regle"] == 0,
             "agregateur absent : l'arbitrage se retire sans bloquer le moteur")
     verifie(arb.arbitrer(cur, "INCONNU", agr)["regle"] == 0,
@@ -785,14 +785,14 @@ def test_arbitrage():
                                               "PERMUTATION_SUSPECTEE"))
     verifie(not permutations,
             "aucune permutation de colonnes ouverte — a corriger dans "
-            f"moteur/peupler.py : {permutations}" if permutations
+            f"donnees/base/etats_financiers.csv : {permutations}" if permutations
             else "aucune permutation de colonnes ouverte dans la base")
 
     retards = sorted(t for t, v in verdicts.items()
                      if v["drapeau"] == "FONDAMENTAL_EN_RETARD")
     verifie(not retards,
             "aucun exercice publie manquant en base — a saisir dans "
-            f"moteur/peupler.py : {retards}" if retards
+            f"donnees/base/etats_financiers.csv : {retards}" if retards
             else "aucun exercice publie manquant en base",
             bloquant=False)
 
@@ -834,6 +834,142 @@ def test_arbitrage():
                 f"(absents : {muets})")
 
 
+
+# ----------------------------------------------------------------------
+# 13. BASE DE REFERENCE EN CSV (bloquant)
+# ----------------------------------------------------------------------
+def test_base_reference():
+    """Les donnees de reference du projet vivent dans donnees/base/.
+
+    POURQUOI CETTE SECTION EXISTE (27/09/2026). Jusqu'a cette date, les 449
+    lignes de reference etaient des tuples Python codes en dur dans
+    moteur/peupler.py (83 Ko, 975 lignes). Quatre scripts en tiraient leurs
+    correspondances par EXPRESSION REGULIERE sur le texte du fichier --
+    dont collecte/avis_brvm.py, qui tourne tous les jours dans P13 et qui
+    rendait un dictionnaire VIDE, sans rien signaler, si la structure
+    changeait. La veille aurait alors tourne quotidiennement en ne
+    reconnaissant aucun titre.
+
+    Ces tests verifient que la base de reference est lisible, complete et
+    coherente, et qu'aucune donnee n'est revenue se loger dans le code.
+    """
+    print("\n=== 13. Base de reference en CSV (bloquant) ===")
+    base = RACINE / "donnees" / "base"
+    if not base.exists():
+        verifie(False, f"dossier {base} absent : la base de reference a disparu")
+        return
+
+    # Effectifs attendus au moment de la migration. Ces nombres NE SONT PAS
+    # figes : ils doivent croitre (exercices ajoutes, societes nouvelles).
+    # Le test attrape une CHUTE, qui signalerait une troncature ou un
+    # ecrasement de fichier -- pas une augmentation, qui est le but.
+    PLANCHERS = {
+        "societes.csv": 50,
+        "etats_financiers.csv": 184,
+        "resultat_activites_ordinaires.csv": 11,
+        "resultat_exploitation.csv": 3,
+        "resultats_intermediaires.csv": 3,
+        "source_urls.csv": 167,
+        "dividendes.csv": 15,
+        "avis_reglementaires.csv": 16,
+    }
+    import csv as _csv
+    contenus = {}
+    for fichier, plancher in sorted(PLANCHERS.items()):
+        chemin = base / fichier
+        if not chemin.exists():
+            verifie(False, f"{fichier} absent de donnees/base/")
+            continue
+        with chemin.open(encoding="utf-8", newline="") as f:
+            lignes = list(_csv.DictReader(f))
+        contenus[fichier] = lignes
+        verifie(len(lignes) >= plancher,
+                f"{fichier} : {len(lignes)} lignes (plancher {plancher} — "
+                f"une chute signale une troncature)")
+
+    # L'en-tete doit correspondre a ce que peupler.py attend. Une colonne
+    # renommee, ajoutee ou deplacee decalerait silencieusement toutes les
+    # valeurs d'une colonne : c'est le mode de defaillance le plus couteux
+    # du projet (cf. permutation ECOC/BOAS, section 12).
+    sys.path.insert(0, str(ICI))
+    try:
+        import peupler
+    except Exception as e:  # noqa: BLE001
+        verifie(False, f"moteur/peupler.py non importable : {e}")
+        return
+    for fichier, attendu in sorted(peupler.SCHEMA_CSV.items()):
+        lignes = contenus.get(fichier)
+        if lignes is None:
+            continue
+        entete = [c for c in (lignes[0].keys() if lignes else []) if c != "note"]
+        verifie(entete == attendu,
+                f"{fichier} : en-tete conforme au schema attendu"
+                + ("" if entete == attendu else f" — trouve {entete}"))
+
+    # Une cle dupliquee ferait qu'INSERT OR REPLACE garde silencieusement la
+    # DERNIERE ligne lue, en perdant la premiere sans rien dire.
+    etats = contenus.get("etats_financiers.csv") or []
+    cles = [(r["ticker"], r["exercice"]) for r in etats]
+    doublons = sorted({c for c in cles if cles.count(c) > 1})
+    verifie(not doublons,
+            f"aucun couple (ticker, exercice) en double dans etats_financiers.csv"
+            + ("" if not doublons else f" — doublons : {doublons}"))
+
+    societes = contenus.get("societes.csv") or []
+    tickers = [r["ticker"] for r in societes]
+    doublons_t = sorted({t for t in tickers if tickers.count(t) > 1})
+    verifie(not doublons_t,
+            "aucun ticker en double dans societes.csv"
+            + ("" if not doublons_t else f" — doublons : {doublons_t}"))
+
+    # Integrite referentielle : un etat financier sans societe correspondante
+    # viole la contrainte du schema et ferait echouer le peuplement.
+    connus = set(tickers)
+    orphelins = sorted({r["ticker"] for r in etats if r["ticker"] not in connus})
+    verifie(not orphelins,
+            "tout etat financier se rattache a une societe declaree"
+            + ("" if not orphelins else f" — orphelins : {orphelins}"))
+
+    # Les notes de provenance sont l'essentiel de la valeur de la saisie
+    # manuelle : document source, correction datee, reserve de lecture. Une
+    # chute brutale signalerait une reecriture du fichier qui les aurait
+    # perdues (c'est ce qu'une extraction naive aurait fait le 27/09).
+    avec_note = sum(1 for r in etats if (r.get("note") or "").strip())
+    verifie(avec_note >= 120,
+            f"{avec_note} lignes d'etats financiers portent une note de provenance "
+            f"(plancher 120 — une chute signale une perte de tracabilite)")
+
+    # Aucune donnee ne doit etre revenue dans le code. Le motif cherche est
+    # celui d'un tuple de saisie : ("XXXX", 2025, ...
+    code_peupler = (ICI / "peupler.py").read_text(encoding="utf-8")
+    import re as _re
+    tuples = _re.findall(r'\("[A-Z][A-Z0-9_]{2,6}",\s*(?:19|20)\d{2},', code_peupler)
+    verifie(not tuples,
+            f"moteur/peupler.py ne contient plus de donnees codees en dur"
+            + ("" if not tuples else f" — {len(tuples)} tuple(s) retrouve(s)"))
+
+    # Les quatre scripts qui lisaient le TEXTE de peupler.py doivent lire le CSV.
+    for chemin_rel, fonction in (
+            ("collecte/avis_brvm.py", "charger_tickers"),
+            ("moteur/calendrier.py", "construire_mapping"),
+            ("collecte/extraire_lot.py", "charger_referentiels"),
+            ("collecte/preparer_integration.py", "charger_exercices_existants")):
+        chemin = RACINE / chemin_rel
+        if not chemin.exists():
+            verifie(False, f"{chemin_rel} absent", bloquant=False)
+            continue
+        code = chemin.read_text(encoding="utf-8")
+        bloc = code.split("def %s(" % fonction, 1)
+        if len(bloc) < 2:
+            verifie(False, f"{chemin_rel} : fonction {fonction}() introuvable")
+            continue
+        corps = bloc[1].split("\ndef ", 1)[0]
+        verifie("peupler.py" not in corps.replace("peupler.py, d'ou", "")
+                or "societes.csv" in corps or "etats_financiers.csv" in corps,
+                f"{chemin_rel} : {fonction}() lit un CSV de reference, "
+                f"plus le texte de peupler.py")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -850,6 +986,7 @@ def main():
     test_statuts_cotation()
     test_integrite_app()
     test_arbitrage()
+    test_base_reference()
     if not sans_app:
         test_application()
 

@@ -122,21 +122,30 @@ RE_DATE_SEULE = re.compile(r"(\d{2}/\d{2}/\d{4})")
 
 
 def charger_tickers():
-    """Correspondance nom BRVM -> ticker, lue depuis peupler.py pour rester
-    l'unique source de verite du projet (pas de second dictionnaire a maintenir)."""
-    src = (ICI.parent / "moteur" / "peupler.py").read_text(encoding="utf-8")
-    m = re.search(r"^SOCIETES\s*=\s*\[(.*?)^\]", src, re.S | re.M)
+    """Correspondance nom BRVM -> ticker, lue depuis donnees/base/societes.csv,
+    unique source de verite du projet (pas de second dictionnaire a maintenir).
+
+    27/09/2026 : lisait auparavant le TEXTE de peupler.py par expression
+    reguliere, et rendait un dictionnaire VIDE si la structure du fichier
+    changeait -- sans rien signaler. La veille P13 aurait alors tourne tous
+    les jours en ne reconnaissant aucun titre, donc en n'enregistrant aucun
+    avis, sans qu'aucune erreur n'apparaisse. On echoue desormais bruyamment."""
+    import csv
+    chemin = ICI.parent / "donnees" / "base" / "societes.csv"
+    if not chemin.exists():
+        raise SystemExit("Referentiel des societes introuvable : %s" % chemin)
     table = {}
-    if not m:
-        return table
-    for ligne in m.group(1).split("\n"):
-        t = re.match(r'\s*\("([A-Z0-9]+)"\s*,\s*"([^"]+)"', ligne)
-        if t:
-            nom = t.group(2)
-            table[reduire(nom)] = t.group(1)
+    with chemin.open(encoding="utf-8", newline="") as f:
+        for ligne in csv.DictReader(f):
+            ticker, nom = ligne.get("ticker"), ligne.get("nom")
+            if not ticker or not nom or ticker.startswith("TEST_"):
+                continue  # les fixtures synthetiques ne sont pas des titres cotes
+            table[reduire(nom)] = ticker
             sans_parenthese = re.sub(r"\s*\([^)]*\)", "", nom).strip()
             if sans_parenthese and sans_parenthese != nom:
-                table[reduire(sans_parenthese)] = t.group(1)
+                table[reduire(sans_parenthese)] = ticker
+    if not table:
+        raise SystemExit("Referentiel des societes vide : %s" % chemin)
     return table
 
 

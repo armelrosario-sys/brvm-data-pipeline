@@ -77,13 +77,19 @@ def _categoriser(libelle):
     return "autre"
 
 
-def construire_mapping(peupler_path):
-    """Derive ticker -> slug de fichier depuis SOCIETES (peupler.py) et les
-    slugs reellement observes dans le MANIFESTE. Jamais fige en dur."""
-    src = peupler_path.read_text()
-    m = re.search(r"SOCIETES = \[(.*?)\n\]", src, re.S)
-    lignes = re.findall(r'\("([A-Z_]+)",\s*"([^"]+)"', m.group(1))
-    noms = {t: n for t, n in lignes if not t.startswith("TEST_")}
+def construire_mapping(_peupler_path=None):
+    """Derive ticker -> slug de fichier depuis donnees/base/societes.csv et les
+    slugs reellement observes dans le MANIFESTE. Jamais fige en dur.
+
+    27/09/2026 : lisait le TEXTE de peupler.py, d'ou les donnees ont ete
+    sorties. Le parametre est conserve pour ne pas casser les appelants ;
+    il n'est plus utilise."""
+    chemin = RACINE / "donnees" / "base" / "societes.csv"
+    if not chemin.exists():
+        raise SystemExit("Referentiel des societes introuvable : %s" % chemin)
+    with chemin.open(encoding="utf-8", newline="") as f:
+        noms = {r["ticker"]: r["nom"] for r in csv.DictReader(f)
+                if r.get("ticker") and not r["ticker"].startswith("TEST_")}
 
     rows = list(csv.DictReader(open(MANIFESTE, encoding="utf-8")))
     slugs_fichiers = Counter()

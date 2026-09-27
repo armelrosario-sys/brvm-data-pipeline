@@ -1,0 +1,16 @@
+ticker,montant_net,date_paiement,exercice_couvert,note
+SDSC,82.8,,2022,92 FCFA brut confirme (resolutions AG) -> net apres IRVM 10%
+SDSC,90.0,,2021,100 FCFA brut reconstruit (voir note ci-dessus) -> net
+SDSC,90.0,,2020,"idem ticker, montant_net, date_paiement, exercice_couvert REGLE D'INTEGRITE : montant renseigne UNIQUEMENT si source dans la conversation ; sinon None (date seule, issue du BOC) — la saisie manuelle suit les memes regles que l'extraction automatique."
+SNTS,1740,2026-05-25,2025,source : Sika Finance 02/2026 (1933 brut / 1740 net)
+STBC,,2025-08-29,2024,date BOC ; montant a re-sourcer
+NSBC,,2026-06-30,2025,AGO 30/06/2026 : 19 Mds FCFA approuves (Ecofin) ; par action a sourcer
+SMBC,,2025-09-15,2024,date BOC ; montant a re-sourcer
+BOABF,397.25,2026-04-23,2025,"source : Ecofin 03/2026 (dividende net apres IRVM 12,5%)"
+CBIBF,900,2026-06-19,2025,source : avis BRVM + presse 06/2026
+CBIBF,555,2025-06-01,2024,source : presse (croissance +62% documentee)
+SICC,0,2000-09-25,1999,"marqueur d'obsolescence, date BOC"
+ORGT,0,2020-07-17,2019,5e annee sans dividende confirmee presse 05/2026
+TEST_EXCLU,0,2019-01-01,2018,
+TEST_VIGIL,300,2025-09-01,2024,
+TEST_VIGIL,310,2024-09-01,2023,

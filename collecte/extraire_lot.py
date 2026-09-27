@@ -46,12 +46,16 @@ REPO = "armelrosario-sys/brvm-data-pipeline"
 
 
 def charger_referentiels():
-    """ticker -> referentiel_comptable, lu directement dans SOCIETES
-    (peupler.py) -- evite de dependre d'une base SQLite deja construite."""
-    src = (RACINE / "moteur" / "peupler.py").read_text(encoding="utf-8")
-    m = re.search(r"SOCIETES = \[(.*?)\n\]", src, re.S)
-    lignes = re.findall(r'\("([A-Z_]+)",\s*"[^"]*",\s*"[^"]*",\s*"([A-Z_]+)"', m.group(1))
-    return dict(lignes)
+    """ticker -> referentiel_comptable, lu dans donnees/base/societes.csv --
+    evite de dependre d'une base SQLite deja construite.
+
+    27/09/2026 : lisait le TEXTE de peupler.py, d'ou les donnees ont ete sorties."""
+    chemin = RACINE / "donnees" / "base" / "societes.csv"
+    if not chemin.exists():
+        raise SystemExit("Referentiel des societes introuvable : %s" % chemin)
+    with chemin.open(encoding="utf-8", newline="") as f:
+        return {r["ticker"]: r["referentiel"] for r in csv.DictReader(f)
+                if r.get("ticker") and r.get("referentiel")}
 
 
 def documents_a_traiter(mapping, traites_set):
