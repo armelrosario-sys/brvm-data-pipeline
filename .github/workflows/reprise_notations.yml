@@ -1,0 +1,104 @@
+name: P12 - Reprise du fonds des notations
+
+# Rattrapage du fonds historique des notations financieres.
+#
+# DIAGNOSTIC DU 27/09/2026. L'audit lisait "356 rapports NON_EXTRAIT sur 385"
+# comme un echec de l'extracteur. C'en etait l'inverse : un seul ECHEC reel,
+# les 355 autres n'avaient JAMAIS ETE TENTEES. collecte/notations.py etait
+# plafonne a --pdf annonces, prenait les plus recentes, puis REECRIVAIT tout le
+# fichier — remettant les autres a NON_EXTRAIT. Les 30 lignes portant un statut
+# etaient exactement les 30 annonces les plus recentes, coupure au jour pres
+# (28/10/2025 tentee, 23/10/2025 jamais tentee), et chaque passage mensuel
+# repassait sur les memes. L'extracteur, lui, fonctionne : ses analyseurs
+# passent 10/10 sur les PDF GCR et 6/6 sur les Bloomfield.
+#
+# La collecte est desormais CUMULATIVE : l'acquis est relu, jamais re-extrait,
+# jamais remis a zero, et le budget de PDF va a ce qui n'a jamais ete tente.
+# Ce workflow depense un budget par execution. A 120 PDF, trois passages
+# suffisent a couvrir les 385 rapports. Le relancer est sans risque : il ne
+# retraite rien.
+#
+# Ce que cela debloque : les capitaux propres. L'audit a etabli que 19 titres
+# sur 47 n'avaient aucun ROE, faute de fonds propres en base. Ces rapports en
+# contiennent — c'est deja d'eux que viennent les 11 ROE repris par le
+# branchement de l'agregateur.
+
+on:
+  workflow_dispatch:
+    inputs:
+      budget:
+        description: "Nombre de PDF a extraire lors de ce passage"
+        required: false
+        default: "120"
+      pages:
+        description: "Pages d'index a parcourir"
+        required: false
+        default: "40"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: notations-brvm
+  cancel-in-progress: false
+
+jobs:
+  reprise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dependances
+        run: pip install requests==2.32.3 pdfplumber==0.11.4 pyyaml==6.0.2
+
+      - name: Garde-fou hors ligne (avant toute collecte)
+        run: python3 collecte/notations.py --test
+
+      - name: Reprise du fonds
+        run: |
+          python3 collecte/notations.py \
+            --pdf "${{ github.event.inputs.budget || 120 }}" \
+            --pages "${{ github.event.inputs.pages || 40 }}"
+
+      - name: Commit
+        run: |
+          if [ -z "$(git status --porcelain collecte/notations_financieres.csv)" ]; then
+            echo "Aucune nouvelle extraction."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add collecte/notations_financieres.csv collecte/notations_echecs.jsonl || true
+          git commit -m "P12 : reprise du fonds des notations ($(date -u +%F))"
+          git pull --rebase --autostash origin main
+          git push
+
+      - name: Resume
+        run: |
+          python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import collections, csv
+          lignes = list(csv.DictReader(open("collecte/notations_financieres.csv")))
+          st = collections.Counter(r["statut_extraction"] or "VIDE" for r in lignes)
+          exploitees = st["OK"] + st["SANS_NOTE"]
+          print("## Fonds des notations financieres\n")
+          print("| Statut | Rapports |")
+          print("| --- | --- |")
+          for k, n in sorted(st.items()):
+              print("| %s | %d |" % (k, n))
+          print("\n**%d rapports exploites sur %d** (%d %% du fonds)."
+                % (exploitees, len(lignes), 100 * exploitees // max(len(lignes), 1)))
+          if st["NON_EXTRAIT"]:
+              print("\n%d rapports restent a traiter : relancer ce workflow. "
+                    "L'acquis n'est plus efface, chaque passage avance le front."
+                    % st["NON_EXTRAIT"])
+          ag = collections.Counter(r["agence"] for r in lignes if r.get("agence"))
+          if ag:
+              print("\nAgences : " + ", ".join("%s (%d)" % kv for kv in ag.most_common()))
+          cp = sum(1 for r in lignes if r.get("statut_extraction") == "OK")
+          print("\n%d rapports portent une note exploitable." % cp)
+          PY
