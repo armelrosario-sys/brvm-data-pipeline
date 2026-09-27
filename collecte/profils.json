@@ -44,8 +44,8 @@
     "titre": 26.28,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -53,8 +53,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2023,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0211,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0182,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -181,20 +181,20 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "titre": 26.82,
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": null,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0437,
+  "roe_exercice": 2025,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0408,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -205,19 +205,20 @@
   "notes": [],
   "reserves": [
    "aucune source de croissance exploitable",
-   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "ARBITRAGE : glissement +24.71 % en base (ligne certifiee) contre -20.30 % chez l'agregateur : ecart de 45.0 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier",
+   "ECART_AGREGATEUR : une source exterieure donne un glissement sensiblement different sur le meme exercice — la ligne certifiee est conservee, mais le perimetre (consolide ou part du groupe) reste a verifier sur le document",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 51739.0,
   "marge_nette": 46.74,
   "croissance_ca": 14.45,
   "reference_31_decembre": 4975,
-  "roe_source": null,
+  "roe_source": "ETATS_FINANCIERS",
   "source_capitaux_propres": null,
   "arbitrage": {
-   "regle": 1,
-   "drapeau": "CROISSANCE_CORROBOREE",
-   "detail": "glissement -20.24 % en base contre -20.30 % chez l'agregateur (ecart 0.1 pt) : transcription corroboree par une source independante"
+   "regle": 2,
+   "drapeau": "ECART_AGREGATEUR",
+   "detail": "glissement +24.71 % en base (ligne certifiee) contre -20.30 % chez l'agregateur : ecart de 45.0 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
   "decote_pctl": 46,
   "croissance_pctl": null,
@@ -225,11 +226,11 @@
   "g": null,
   "source_croissance": "AUCUNE",
   "drapeaux": [
-   "CROISSANCE_CORROBOREE"
+   "ECART_AGREGATEUR"
   ],
   "per": 13.56,
   "payout": 0.4054440000000001,
-  "roe": null,
+  "roe": 26.8,
   "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -286,10 +287,10 @@
    },
    "roe": {
     "titre": 30.29,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -297,11 +298,11 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0374,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0345,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 28.5,
-  "ecart_benefice": 0.95,
+  "per_normalise": 24.0,
+  "ecart_benefice": 0.64,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
   "secondaire": null,
@@ -379,8 +380,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": 0.001,
+  "taux_reference": 0.0707,
+  "prime_rendement": 0.0039,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 15.4,
   "ecart_benefice": -0.97,
@@ -496,10 +497,10 @@
    },
    "roe": {
     "titre": 17.11,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -507,8 +508,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0082,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0053,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -619,10 +620,10 @@
    },
    "roe": {
     "titre": 34.29,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -630,8 +631,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0246,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0217,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 15.0,
   "ecart_benefice": -0.19,
@@ -740,10 +741,10 @@
    },
    "roe": {
     "titre": 27.92,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -751,8 +752,8 @@
   "tendance_intermediaire": 0.0092,
   "periode_intermediaire": "T1 2026",
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0221,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0192,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 16.3,
   "ecart_benefice": 0.25,
@@ -780,7 +781,7 @@
    "detail": "glissement +10.91 % en base contre +10.91 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 79,
-  "croissance_pctl": 77,
+  "croissance_pctl": 85,
   "reference_axes": "secteur (n=14)",
   "g": 21.0,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -870,10 +871,10 @@
    },
    "roe": {
     "titre": 22.24,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -881,8 +882,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0251,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0222,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -965,8 +966,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0328,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0299,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1074,10 +1075,10 @@
    },
    "roe": {
     "titre": 24.72,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1085,8 +1086,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.018,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0151,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1194,8 +1195,8 @@
     "titre": 15.4,
     "mediane_secteur": 7.87,
     "n_secteur": 2,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1203,8 +1204,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0289,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.026,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 17.0,
   "ecart_benefice": 0.21,
@@ -1232,7 +1233,7 @@
    "detail": "glissement +4.68 % en base (ligne certifiee) contre +39.16 % chez l'agregateur : ecart de 34.5 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
   "decote_pctl": 56,
-  "croissance_pctl": 83,
+  "croissance_pctl": 86,
   "reference_axes": "marche (n=36)",
   "g": 21.9,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -1321,10 +1322,10 @@
    },
    "roe": {
     "titre": 19.81,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1332,8 +1333,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.045,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0421,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1458,8 +1459,8 @@
     "titre": 24.13,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1467,8 +1468,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0379,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.035,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -1596,8 +1597,8 @@
     "titre": 26.36,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1605,8 +1606,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0416,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0387,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 32.0,
   "ecart_benefice": 0.16,
@@ -1678,17 +1679,17 @@
   ]
  },
  "ECOC": {
-  "dominant": "AUCUN_PROFIL",
+  "dominant": "GARP",
   "mixte": false,
   "VALUE": null,
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.47,
+  "peg": 1.17,
   "dy": 4.65,
   "confiance": "MOYENNE",
-  "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 30.8 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P54)",
+  "profil": "GARP",
+  "motif": "croissance de 12.5 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.85 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
     "titre": 14.57,
@@ -1705,7 +1706,7 @@
     "n_marche": 36
    },
    "g": {
-    "titre": 30.77,
+    "titre": 12.49,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -1720,10 +1721,10 @@
    },
    "roe": {
     "titre": 31.84,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1731,24 +1732,21 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0271,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0242,
   "table_cours": "cours_quotidien_boc",
-  "per_normalise": 19.8,
-  "ecart_benefice": 0.36,
+  "per_normalise": 17.8,
+  "ecart_benefice": 0.22,
   "n_ex_normalise": 3,
   "part_operationnelle": null,
   "secondaire": null,
   "grade": "B",
   "notes": [
-   "croissance non exploitable (rattrapage extreme ou base ecrasee)",
    "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
   ],
   "reserves": [
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
-   "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
@@ -1764,21 +1762,19 @@
    "detail": "glissement +10.45 % en base contre +10.45 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 54,
-  "croissance_pctl": 85,
+  "croissance_pctl": 62,
   "reference_axes": "secteur (n=14)",
-  "g": 30.8,
+  "g": 12.5,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
    "SERIE_COMPLETEE_N1",
-   "RATTRAPAGE",
    "CROISSANCE_CORROBOREE",
-   "BENEFICE_NON_REPRESENTATIF",
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 14.57,
   "payout": 0.6775050000000001,
   "roe": 31.8,
-  "pegy": 0.41,
+  "pegy": 0.85,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
   "n_secteur": 14,
@@ -1816,7 +1812,7 @@
  },
  "ETIT": {
   "dominant": "GARP",
-  "mixte": false,
+  "mixte": true,
   "VALUE": null,
   "GROWTH": null,
   "GARP": null,
@@ -1857,10 +1853,10 @@
    },
    "roe": {
     "titre": 21.62,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1868,14 +1864,14 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0603,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0574,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
   "n_ex_normalise": 1,
   "part_operationnelle": null,
-  "secondaire": null,
+  "secondaire": "GROWTH",
   "grade": "B",
   "notes": [
    "PEGY < 0.25 : protocole de revue obligatoire (donnee erronee ? risque non capture ?)"
@@ -1897,7 +1893,7 @@
    "detail": "glissement +15.29 % en base contre +15.29 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 54,
-  "croissance_pctl": 62,
+  "croissance_pctl": 69,
   "reference_axes": "secteur (n=14)",
   "g": 14.7,
   "source_croissance": "BPA_IMPLICITE",
@@ -1938,8 +1934,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": 0.7897,
+  "taux_reference": 0.0707,
+  "prime_rendement": 0.7926,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 5.1,
   "ecart_benefice": -0.92,
@@ -2063,8 +2059,8 @@
     "titre": 19.57,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2072,8 +2068,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0324,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0295,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -2205,8 +2201,8 @@
     "titre": 54.79,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2214,8 +2210,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0149,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.012,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -2243,7 +2239,7 @@
    "detail": "exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv"
   },
   "decote_pctl": 70,
-  "croissance_pctl": 74,
+  "croissance_pctl": 77,
   "reference_axes": "marche (n=36)",
   "g": 18.9,
   "source_croissance": "BPA_IMPLICITE",
@@ -2320,10 +2316,10 @@
    },
    "roe": {
     "titre": 17.45,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2331,8 +2327,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0436,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0407,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 15.2,
   "ecart_benefice": 0.12,
@@ -2448,8 +2444,8 @@
     "titre": 62.98,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -2457,8 +2453,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0494,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0465,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 19.4,
   "ecart_benefice": 0.06,
@@ -2576,8 +2572,8 @@
     "titre": 27.61,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2585,8 +2581,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0245,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0216,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -2703,8 +2699,8 @@
     "titre": 27.23,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2712,8 +2708,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0405,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0376,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -2829,10 +2825,10 @@
    },
    "roe": {
     "titre": 19.15,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -2840,8 +2836,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0541,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0512,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 10.5,
   "ecart_benefice": 0.07,
@@ -2938,8 +2934,8 @@
     "titre": 11.74,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2947,8 +2943,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0192,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0163,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 7.4,
   "ecart_benefice": -0.08,
@@ -3070,8 +3066,8 @@
     "titre": 20.8,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3079,8 +3075,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0302,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0273,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 16.7,
   "ecart_benefice": -0.08,
@@ -3163,7 +3159,7 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
+  "taux_reference": 0.0707,
   "prime_rendement": null,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
@@ -3250,8 +3246,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0605,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0576,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -3398,8 +3394,8 @@
     "titre": 15.35,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3407,8 +3403,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0348,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0319,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 18.5,
   "ecart_benefice": 0.01,
@@ -3505,8 +3501,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0419,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.039,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 12.9,
   "ecart_benefice": -0.94,
@@ -3634,8 +3630,8 @@
     "titre": 0.34,
     "mediane_secteur": 7.87,
     "n_secteur": 2,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3643,8 +3639,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0642,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0613,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -3767,10 +3763,10 @@
    },
    "roe": {
     "titre": 22.44,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -3778,8 +3774,8 @@
   "tendance_intermediaire": 0.1308,
   "periode_intermediaire": "T2 2026",
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0145,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0116,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -3810,7 +3806,7 @@
    "detail": "glissement -0.12 % en base contre +0.12 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 90,
-  "croissance_pctl": 69,
+  "croissance_pctl": 77,
   "reference_axes": "secteur (n=14)",
   "g": 15.9,
   "source_croissance": "RN_PROBABLE(4ex)",
@@ -3870,7 +3866,7 @@
   "dy": 3.52,
   "confiance": "HAUTE",
   "profil": "GROWTH",
-  "motif": "croissance de 19.3 %/an dans le tercile superieur (P77), reguliere",
+  "motif": "croissance de 19.3 %/an dans le tercile superieur (P80), reguliere",
   "comparaisons": {
    "per": {
     "titre": 25.29,
@@ -3904,8 +3900,8 @@
     "titre": 22.2,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -3913,8 +3909,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0384,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0355,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 32.2,
   "ecart_benefice": 0.27,
@@ -3940,7 +3936,7 @@
    "detail": "glissement +12.59 % en base contre +12.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 21,
-  "croissance_pctl": 77,
+  "croissance_pctl": 80,
   "reference_axes": "marche (n=36)",
   "g": 19.3,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -4035,10 +4031,10 @@
    },
    "roe": {
     "titre": 27.16,
-    "mediane_secteur": 22.44,
-    "n_secteur": 13,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_secteur": 23.58,
+    "n_secteur": 14,
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4046,8 +4042,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.032,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0291,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -4128,7 +4124,7 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2024,
-  "taux_reference": 0.0736,
+  "taux_reference": 0.0707,
   "prime_rendement": null,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 54.7,
@@ -4220,8 +4216,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": 0.1945,
+  "taux_reference": 0.0707,
+  "prime_rendement": 0.1974,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -4342,8 +4338,8 @@
     "titre": 23.46,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -4351,8 +4347,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0243,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0214,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 29.9,
   "ecart_benefice": 1.19,
@@ -4481,8 +4477,8 @@
     "titre": 30.47,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4490,8 +4486,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0291,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0262,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 10.2,
   "ecart_benefice": 0.08,
@@ -4621,8 +4617,8 @@
     "titre": 29.56,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4630,8 +4626,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0327,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0298,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 12.0,
   "ecart_benefice": 0.17,
@@ -4656,7 +4652,7 @@
    "detail": "glissement +5.06 % en base contre +5.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 62,
-  "croissance_pctl": 63,
+  "croissance_pctl": 66,
   "reference_axes": "marche (n=36)",
   "g": 14.0,
   "source_croissance": "RN_PROBABLE(4ex)",
@@ -4753,8 +4749,8 @@
     "titre": 18.26,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4762,8 +4758,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0101,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0072,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 14.7,
   "ecart_benefice": 0.07,
@@ -4869,8 +4865,8 @@
     "titre": 18.1,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4878,14 +4874,14 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0191,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0162,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 12.6,
   "ecart_benefice": 0.56,
   "n_ex_normalise": 4,
   "part_operationnelle": 1.53,
-  "secondaire": "VALUE",
+  "secondaire": "GROWTH",
   "grade": "B",
   "notes": [],
   "reserves": [
@@ -4907,7 +4903,7 @@
    "detail": "glissement +32.90 % en base contre +32.90 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 88,
-  "croissance_pctl": 66,
+  "croissance_pctl": 69,
   "reference_axes": "marche (n=36)",
   "g": 14.4,
   "source_croissance": "RN_VERIFIE(4ex)",
@@ -4980,8 +4976,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0419,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.039,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -5078,8 +5074,8 @@
     "titre": 79.89,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -5087,8 +5083,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": 0.0062,
+  "taux_reference": 0.0707,
+  "prime_rendement": 0.0091,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 14.6,
   "ecart_benefice": 0.39,
@@ -5230,8 +5226,8 @@
     "titre": 25.1,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -5239,8 +5235,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2025,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0278,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0249,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 19.5,
   "ecart_benefice": -0.08,
@@ -5359,8 +5355,8 @@
     "titre": null,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 23.79,
-    "n_marche": 34
+    "mediane_marche": 24.13,
+    "n_marche": 35
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -5368,8 +5364,8 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": null,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0271,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0242,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 20.1,
   "ecart_benefice": 0.1,
@@ -5460,7 +5456,7 @@
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
   "roe_exercice": 2023,
-  "taux_reference": 0.0736,
+  "taux_reference": 0.0707,
   "prime_rendement": null,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
@@ -5541,9 +5537,9 @@
   "date_cours": "2023-04-27",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": null,
-  "taux_reference": 0.0736,
-  "prime_rendement": -0.0477,
+  "roe_exercice": 2024,
+  "taux_reference": 0.0707,
+  "prime_rendement": -0.0448,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -5563,7 +5559,7 @@
   "marge_nette": -2.15,
   "croissance_ca": 6.21,
   "reference_31_decembre": 1400,
-  "roe_source": null,
+  "roe_source": "ETATS_FINANCIERS",
   "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": null,
@@ -5574,7 +5570,7 @@
   "drapeaux": [],
   "per": 11.11,
   "payout": 0.287749,
-  "roe": null,
+  "roe": -14.0,
   "pegy": null,
   "gate": "EXCLU",
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",

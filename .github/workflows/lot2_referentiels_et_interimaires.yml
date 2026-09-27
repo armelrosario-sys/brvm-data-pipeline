@@ -1,0 +1,132 @@
+name: Lot 2 - taux sans risque, referentiel BICB, Uniwax, rapports intermediaires
+
+# Workflow A USAGE UNIQUE (27/09/2026), A LANCER APRES le workflow
+# "Releve manuel des capitaux propres" : il patche tester_donnees.py sur une
+# ancre que ce premier workflow installe, et s'arrete proprement si elle est
+# absente.
+#
+# Il porte quatre chantiers et un garde-fou :
+#   A. taux de reference UEMOA : 7,36 % (Togo, 06/03/2026) -> 7,07 %
+#      (Cote d'Ivoire, 15/09/2026) ;
+#   B. BICB : passage du referentiel PCB OHADA au referentiel IFRS, sur
+#      lequel la BRVM calcule le PER qu'elle publie ;
+#   C. Uniwax : exercice 2024 certifie cree, exercice 2023 corrige de l'ecart
+#      d'audit, provenance de l'exercice 2025 rectifiee ;
+#   D. ECOC 2022 et BICC 2024 : rapports intermediaires pris pour des comptes
+#      annuels, reconstitues depuis la colonne N-1 des exercices suivants ;
+#   E. un controle qui interdit desormais a un resultat annuel de reposer sur
+#      un document publie avant la cloture de son exercice.
+#
+# Il ne se declenche jamais tout seul : uniquement sur demande explicite
+# (onglet Actions -> Run workflow). Il ne committe QUE si les golden tests,
+# les tests de donnees, les garde-fous des collecteurs et le demarrage de
+# l'application passent tous.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lot2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dependances
+        run: |
+          pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas
+          pip install -r requirements.txt
+
+      - name: Application du lot 2
+        run: python3 outils/lot2_referentiels_et_interimaires.py
+
+      - name: Chaine complete - peuplement, cours, golden tests, profils
+        run: |
+          cd moteur
+          python3 peupler.py
+          python3 ../collecte/charger_cours.py brvm.db
+          python3 ../collecte/charger_cours_quotidien.py brvm.db
+          python3 ../collecte/charger_dividendes_exercice.py brvm.db
+          python3 ../collecte/charger_liquidite_quotidienne.py brvm.db
+          python3 tester.py
+          python3 profils.py
+
+      - name: Tests de non-regression (donnees et application)
+        run: |
+          # bash -e : une sortie non nulle interrompt l'etape sur-le-champ,
+          # d'ou le '|| code=$?' qui neutralise -e sur cette ligne seule.
+          code=0
+          python3 moteur/tester_donnees.py || code=$?
+          if [ $code -eq 1 ]; then
+            echo "::error::Incoherence bloquante — lot 2 NON commite"
+            exit 1
+          elif [ $code -eq 2 ]; then
+            echo "::warning::Alertes de fraicheur seules — le code est sain"
+          fi
+
+      - name: Garde-fous hors ligne des collecteurs
+        run: |
+          python3 collecte/avis_brvm.py --test
+          python3 collecte/notations.py --test
+
+      - name: Generer le dashboard (test de fumee)
+        run: python3 dashboard/generer_dashboard.py
+
+      - name: Commit
+        run: |
+          rm -f dashboard_brvm.xlsx moteur/brvm.db
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Rien a committer — le lot 2 avait deja ete applique."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit \
+            -m "Taux sans risque actualise, BICB passe en IFRS, Uniwax certifie, rapports intermediaires ecartes" \
+            -m "Le taux de reference datait du 06/03/2026 et servait de prime de rendement aux 47 fiches, soit 205 jours de retard. Il passe de 7.36 pour cent a 7.07 pour cent, et l emetteur de reference devient la Cote d Ivoire : un taux sans risque ne doit pas transporter de prime de credit, or la Cote d Ivoire est le mieux note des huit Tresors de l union, le plus profond, et le pays de domiciliation de la grande majorite des societes cotees. L ecart n est pas theorique : meme semaine, meme maturite, Cote d Ivoire 7.07 pour cent contre Burkina Faso 7.50 pour cent. La prime de rendement gagne 0.29 point sur les 47 titres, et quatre seulement restent au dessus de zero." \
+            -m "BICB passe du referentiel PCB OHADA au referentiel IFRS. La note de la ligne disait statut PROBABLE tant que la source du double reporting n est pas expertisee ; elle l est, par trois identites concordantes. Le rapport IFRS publie son propre resultat par action de 627 FCFA, notre chaine calcule depuis le BOC un bnpa de 627.58, et la capitalisation publiee implique 57.76 millions d actions, qui rendent 627.4 sur le resultat IFRS et 418.97 sur le PCB OHADA. Le PER publie par la BRVM est donc bati sur l IFRS ; garder le PCB OHADA revenait a afficher cote a cote un PER calcule sur un resultat et une croissance calculee sur un autre. Le titre gagne un ROE de 26.8 pour cent et le drapeau ECART_AGREGATEUR, qui signale desormais le desaccord au lecteur au lieu de le taire." \
+            -m "Uniwax : les etats financiers 2024 certifies, releves a la main, creent un exercice absent de la base (resultat -2188.937902, capitaux propres 15591.475518, trois identites fermees au franc) et corrigent l exercice 2023, dont la seule source etait un document dont le nom porte non verifies par les CAC. L ecart d audit est de 18.6 millions sur le resultat et de 28.7 millions sur le bilan, et le report a nouveau 2024 ne se ferme qu avec la valeur corrigee." \
+            -m "Trois lignes reposaient sur un rapport trimestriel pris pour des comptes annuels. Deux se refutaient d elles memes par la colonne N-1 de l exercice suivant : ECOC 2022 portait 28386 quand la ligne 2023 en annoncait 44598, BICC 2024 portait 12061 quand la ligne 2025 en annoncait 26226 et que la note de la ligne 2023 ecrivait la chaine certifiee en toutes lettres. Elles sont reconstituees depuis ces colonnes. Le faux creux d ECOC en 2022 gonflait sa croissance a 30.8 pour cent et declenchait RATTRAPAGE et BENEFICE_NON_REPRESENTATIF : les drapeaux anti artefact signalaient notre propre defaut de collecte et non la societe. Croissance ramenee a 12.5 pour cent, drapeaux eteints, le titre ressort GARP." \
+            -m "UNXC 2025 n est PAS mis en quarantaine : sa date pointait bien un rapport de troisieme trimestre, mais config/faits_qualitatifs.yaml documente le resultat -624.0 comme le resultat annuel approuve, source resolutions AGO du 16/07/2026. C etait la provenance qui etait fausse, pas la valeur ; la date est rectifiee et le comparatif aligne sur le 2024 certifie, que la note qualitative utilisait deja. Section 13 : un resultat annuel ne peut plus reposer sur un document publie avant la cloture de son exercice."
+          git pull --rebase --autostash origin main
+          git push
+
+      - name: Resume
+        run: |
+          python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import json, yaml
+          p = json.load(open("collecte/profils.json"))
+          macro = yaml.safe_load(open("config/seuils.yaml"))["macro"]
+          n = len(p)
+          print("## Lot 2\n")
+          print("**Taux de reference** : %.2f %% — %s\n"
+                % (100 * macro["taux_reference"], macro["source"]))
+          avec = sum(1 for v in p.values() if v.get("roe") is not None)
+          print("**ROE disponibles** : %d / %d titres." % (avec, n))
+          sans = sorted(t for t, v in p.items() if v.get("roe") is None)
+          print("Toujours sans ROE : %s\n" % (", ".join(sans) or "aucun"))
+          print("| Titre | Profil | Grade | ROE | Drapeaux |")
+          print("| --- | --- | --- | --- | --- |")
+          for t in ("BICB", "ECOC", "BICC", "UNXC"):
+              v = p.get(t, {})
+              roe = v.get("roe")
+              print("| %s | %s | %s | %s | %s |"
+                    % (t, v.get("profil"), v.get("grade"),
+                       "%.1f %%" % roe if roe is not None else "—",
+                       ", ".join(v.get("drapeaux") or []) or "—"))
+          pos = sorted((t for t, v in p.items()
+                        if (v.get("prime_rendement") or 0) > 0),
+                       key=lambda t: -p[t]["prime_rendement"])
+          print("\n**Prime de rendement positive** (rendement superieur au "
+                "Tresor ivoirien) : %d titre(s) — %s"
+                % (len(pos), ", ".join("%s %+.2f pt"
+                                       % (t, 100 * p[t]["prime_rendement"])
+                                       for t in pos) or "aucun"))
+          PY

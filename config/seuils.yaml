@@ -150,11 +150,17 @@ collecte:
 # 8,5 %, et son dividende n'est pas couvert par son benefice). Acheter une
 # action BRVM pour son revenu n'a donc plus de sens a ce niveau de marche.
 # A actualiser trimestriellement depuis umoatitres.org.
+# Emetteur de reference : COTE D'IVOIRE (changement du 27/09/2026, auparavant
+# Togo). Un taux « sans risque » ne doit pas transporter de prime de credit :
+# on prend donc le mieux note des huit Tresors de l'union, qui est aussi le
+# plus profond et le pays ou reside la grande majorite des societes cotees.
+# L'ecart n'est pas theorique -- meme semaine, meme maturite : Cote d'Ivoire
+# 7,07 % (15/09/2026) contre Burkina Faso 7,50 % (23/09/2026).
 macro:
-  taux_oat_3ans: 0.0718        # rendement moyen pondere, adjudication Togo 06/03/2026
-  taux_oat_5ans: 0.0736        # idem, maturite 5 ans
-  taux_reference: 0.0736       # celui utilise pour les comparaisons de rendement
-  source: "UMOA-Titres, adjudication Togo du 06/03/2026 (rendements moyens ponderes)"
-  date_releve: "2026-03-06"
+  taux_oat_3ans: 0.0629        # rendement moyen pondere, adjudication Cote d'Ivoire 15/09/2026
+  taux_oat_5ans: 0.0707        # idem, maturite 5 ans (7 ans : 7,15 %)
+  taux_reference: 0.0707       # celui utilise pour les comparaisons de rendement
+  source: "UMOA-Titres, adjudication Cote d'Ivoire du 15/09/2026 (rendements moyens ponderes ; 3 ans 6,29 %, 5 ans 7,07 %, 7 ans 7,15 %) ; le 5 ans est corrobore par l'adjudication CI du 17/06/2026, deja a 7,07 %"
+  date_releve: "2026-09-15"
   # Seuils de lecture d'un rendement action, rapportes au taux de reference :
   prime_exigee_min: 0.00       # au-dessous du taux sans risque : le revenu ne justifie pas l'achat

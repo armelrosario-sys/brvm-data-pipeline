@@ -1033,6 +1033,43 @@ def test_base_reference():
             f"27/09/2026 sont toujours en base"
             + ("" if not perdus else " — " + " ; ".join(perdus)))
 
+    # Un document publie AVANT la cloture de l'exercice qu'il pretend porter
+    # n'est pas des comptes annuels : c'est un rapport trimestriel ou
+    # semestriel.
+    #
+    # POURQUOI (27/09/2026). La fusion automatique du 27/07/2026 en avait
+    # ingere trois comme s'il s'agissait d'exercices clos, et deux se
+    # refutaient d'elles-memes par la colonne N-1 de l'exercice suivant :
+    # ECOC 2022 portait 28386 quand la ligne 2023 en annoncait 44598, BICC
+    # 2024 portait 12061 quand la ligne 2025 en annoncait 26226. Un resultat
+    # a neuf mois compare a une annee pleine creuse un faux trou, puis fait
+    # lire un faux RATTRAPAGE l'annee suivante -- c'est exactement ce que les
+    # drapeaux anti-artefact signalaient sur ECOC et BICC, sur notre propre
+    # defaut de collecte et non sur les societes. Chez UNXC, le meme mecanisme
+    # affichait un RETOURNEMENT la ou les comptes certifies montrent une
+    # troisieme perte aggravee.
+    #
+    # Le test ne porte que sur les lignes PORTEUSES D'UN RESULTAT : une ligne
+    # vide adossee a un rapport intermediaire ne trompe personne.
+    INTERIMAIRES_TOLERES = set()
+    intermediaires = []
+    for r in etats:
+        if r["ticker"].startswith("TEST"):
+            continue
+        publie = (r.get("date_publication") or "").strip()
+        if not publie or not (r.get("resultat_net") or "").strip():
+            continue
+        if (r["ticker"], r["exercice"]) in INTERIMAIRES_TOLERES:
+            continue
+        if publie < "%s-12-31" % r["exercice"]:
+            intermediaires.append(
+                "%s %s : resultat %s adosse a un document du %s, anterieur a la "
+                "cloture" % (r["ticker"], r["exercice"], r["resultat_net"], publie))
+    verifie(not intermediaires,
+            "aucun resultat annuel ne repose sur un document publie avant la "
+            "cloture de son exercice"
+            + ("" if not intermediaires else " — " + " ; ".join(intermediaires)))
+
 
 
 # ----------------------------------------------------------------------
