@@ -970,6 +970,69 @@ def test_base_reference():
                 f"{chemin_rel} : {fonction}() lit un CSV de reference, "
                 f"plus le texte de peupler.py")
 
+    # Plancher de plausibilite sur le couple (resultat net, capitaux propres).
+    #
+    # POURQUOI (27/09/2026). En passant au crible les 76 couples renseignes,
+    # un seul etait impossible : BNBC 2023 portait 3.0 millions de capitaux
+    # propres pour 36.0 millions de resultat net, soit un ROE de 1200 %, alors
+    # que la meme societe porte 17769.95 millions de capitaux propres en 2025.
+    # C'etait un fragment d'extraction, pas une grandeur -- et il avait
+    # traverse quinze sections de tests sans etre vu, parce qu'aucune ne
+    # confrontait les deux colonnes entre elles. Le seuil est volontairement
+    # large : le plus haut ROE legitime de la base est celui de STBC (79.9 %),
+    # une societe qui distribue presque tout ce qu'elle gagne.
+    SEUIL_ROE_ABSURDE = 200.0
+    absurdes = []
+    for r in etats:
+        try:
+            rn = float(r["resultat_net"])
+            cp = float(r["capitaux_propres"])
+        except (TypeError, ValueError):
+            continue
+        if cp == 0 or r["ticker"].startswith("TEST"):
+            continue
+        roe = 100.0 * rn / cp
+        if abs(roe) > SEUIL_ROE_ABSURDE:
+            absurdes.append(f"{r['ticker']} {r['exercice']} : ROE {roe:.0f} % "
+                            f"(RN {rn}, CP {cp})")
+    verifie(not absurdes,
+            f"aucun couple (resultat net, capitaux propres) n'implique un ROE "
+            f"superieur a {SEUIL_ROE_ABSURDE:.0f} % en valeur absolue"
+            + ("" if not absurdes else " — " + " ; ".join(absurdes)))
+
+    # Non-regression du releve manuel du 27/09/2026 (outils/releve_capitaux_propres.py).
+    #
+    # Ces cinq valeurs ne viennent d'aucun extracteur : elles ont ete lues a
+    # la main dans les documents publies par la BRVM, apres que les deux
+    # chaines de collecte ont echoue sur ces titres. Aucune n'est
+    # reconstituable automatiquement : si une reecriture du CSV les efface,
+    # rien ne les ramenera. D'ou ce test.
+    RELEVE_MANUEL = {
+        ("SOGC", "2025"): 68430.361,       # milliers FCFA -> millions
+        ("SHEC", "2025"): 27158.717963,    # FCFA -> millions
+        ("SLBC", "2025"): 195142.0,        # millions FCFA, ligne explicite
+        ("CFAC", "2024"): 19452.985667,    # FCFA -> millions
+        ("SICC", "2024"): 2975.325212,     # FCFA -> millions
+    }
+    perdus = []
+    for (ticker, exercice), attendu in sorted(RELEVE_MANUEL.items()):
+        ligne = next((r for r in etats if r["ticker"] == ticker
+                      and r["exercice"] == exercice), None)
+        if ligne is None:
+            perdus.append(f"{ticker} {exercice} : ligne absente")
+            continue
+        try:
+            reel = float(ligne["capitaux_propres"])
+        except (TypeError, ValueError):
+            perdus.append(f"{ticker} {exercice} : capitaux propres vides")
+            continue
+        if abs(reel - attendu) > 0.001:
+            perdus.append(f"{ticker} {exercice} : {reel} au lieu de {attendu}")
+    verifie(not perdus,
+            f"les {len(RELEVE_MANUEL)} capitaux propres releves a la main le "
+            f"27/09/2026 sont toujours en base"
+            + ("" if not perdus else " — " + " ; ".join(perdus)))
+
 
 
 # ----------------------------------------------------------------------
