@@ -1,0 +1,1718 @@
+diff --git a/.github/workflows/avis_brvm.yml b/.github/workflows/avis_brvm.yml
+index e9a589d..23bf9d7 100644
+--- a/.github/workflows/avis_brvm.yml
++++ b/.github/workflows/avis_brvm.yml
+@@ -76,7 +76,8 @@ jobs:
+           git config user.name "github-actions[bot]"
+           git config user.email "github-actions[bot]@users.noreply.github.com"
+           git add collecte/avis_brvm.csv collecte/avis_echecs.jsonl \
+-                  collecte/profils.json || true
++                  collecte/profils.json \
++                  collecte/arbitrage_croissance.csv || true
+           git commit -m "Veille avis BRVM $(date -u +%F)" || echo "rien a committer"
+           git pull --rebase --autostash origin main
+           git push || echo "push impossible"
+diff --git a/.github/workflows/notations.yml b/.github/workflows/notations.yml
+index a817a07..1191e6e 100644
+--- a/.github/workflows/notations.yml
++++ b/.github/workflows/notations.yml
+@@ -84,7 +84,8 @@ jobs:
+           git config user.name "github-actions[bot]"
+           git config user.email "github-actions[bot]@users.noreply.github.com"
+           git add collecte/notations_financieres.csv collecte/notations_echecs.jsonl \
+-                  collecte/profils.json || true
++                  collecte/profils.json \
++                  collecte/arbitrage_croissance.csv || true
+           git commit -m "Notations financieres $(date -u +%F)" || echo "rien a committer"
+           git push || echo "push impossible"
+ 
+diff --git a/app.py b/app.py
+index 89011af..a929d4d 100644
+--- a/app.py
++++ b/app.py
+@@ -140,6 +140,8 @@ def charger(_empreinte):
+             pegy=v.get("pegy"), payout=v.get("payout"), roe=v.get("roe"),
+             cherte_pctl=v.get("cherte_pctl"), croissance_pctl=v.get("croissance_pctl"),
+             reference=v.get("reference_axes"), drapeaux=", ".join(v.get("drapeaux") or []),
++            arbitrage=((v.get("arbitrage") or {}).get("drapeau") or ""),
++            arbitrage_detail=((v.get("arbitrage") or {}).get("detail") or ""),
+             confiance=v.get("confiance"), gate=v.get("gate"),
+             motif=v.get("motif"), payout_source=v.get("payout_source"),
+             part_op=v.get("part_operationnelle"),
+@@ -721,10 +723,11 @@ with o2:
+                "**C** travail complementaire requis avant tout usage.")
+     aff = vue[["ticker", "nom", "secteur", "profil", "secondaire", "grade", "per", "dy",
+                "croissance", "source", "pegy", "payout", "drapeaux",
+-               "notation", "contradiction", "motif"]].copy()
++               "arbitrage", "notation", "contradiction", "motif"]].copy()
+     aff.columns = ["Ticker", "Societe", "Secteur", "Profil", "Secondaire", "Grade",
+                    "PER", "Rdt %", "Croiss. %/an", "Source croissance", "PEGY",
+-                   "Payout", "Drapeaux", "Notation", "Contradiction", "Motif"]
++                   "Payout", "Drapeaux", "Arbitrage", "Notation", "Contradiction",
++                   "Motif"]
+     st.dataframe(
+         aff.sort_values(["Grade", "Profil", "Ticker"]), hide_index=True,
+         width='stretch', height=560,
+@@ -806,6 +809,48 @@ with o3:
+     if v.get("motif"):
+         st.info(f"**Pourquoi ce profil** — {v['motif']}")
+ 
++    # Arbitrage contre une source exterieure (26/09/2026). Le croisement ne se
++    # contente pas de signaler : il retient une valeur et nomme sa source. On
++    # affiche donc les trois -- verdict, consequence, detail chiffre -- au lieu
++    # de laisser le lecteur deviner ce que le drapeau a change.
++    arb = v.get("arbitrage") or {}
++    if arb.get("drapeau"):
++        TITRES = {
++            "CROISSANCE_CORROBOREE": (
++                st.success, "Croissance corroboree",
++                "Une source exterieure independante lit le meme glissement sur le "
++                "dernier exercice. La transcription des comptes est confirmee ; "
++                "cela ne dit rien de l'origine du benefice."),
++            "ECART_AGREGATEUR": (
++                st.warning, "Ecart avec une source exterieure",
++                "La valeur certifiee est CONSERVEE, mais le perimetre (consolide "
++                "ou part du groupe) reste a verifier sur le document."),
++            "VALEUR_REPRISE_AGREGATEUR": (
++                st.warning, "Valeur reprise d'une source exterieure",
++                "La ligne en base venait d'un OCR a source unique, jamais "
++                "certifiable : c'est la source exterieure qui a ete retenue."),
++            "FONDAMENTAL_EN_RETARD": (
++                st.warning, "Exercice publie manquant en base",
++                "Le profil ci-dessous porte sur des comptes perimes."),
++            "PERMUTATION_PROBABLE": (
++                st.error, "Profil suspendu — colonnes permutees",
++                "Le resultat net et son comparatif N-1 sont inverses en base. "
++                "Aucun profil n'est publie tant que la saisie n'est pas corrigee."),
++            "PERMUTATION_SUSPECTEE": (
++                st.error, "Profil suspendu — permutation suspectee",
++                "Une seule des deux identites de controle est verifiee. A arbitrer "
++                "sur le document avant tout usage."),
++            "CROISSANCE_CONTESTEE": (
++                st.error, "Axe croissance retire",
++                "Deux sources donnent des glissements inconciliables et aucune "
++                "regle ne peut trancher."),
++        }
++        afficher, titre, consequence = TITRES.get(
++            arb["drapeau"], (st.info, arb["drapeau"], ""))
++        afficher(f"**{titre}** — {consequence}")
++        if arb.get("detail"):
++            st.caption(f"Regle {arb.get('regle')} : {arb['detail']}")
++
+     notation = v.get("notation")
+     if notation and notation.get("note"):
+         n_prec = notation.get("note_precedente")
+diff --git a/collecte/profils.json b/collecte/profils.json
+index f7a2f0e..c6791de 100644
+--- a/collecte/profils.json
++++ b/collecte/profils.json
+@@ -69,9 +69,15 @@
+   "reserves": [
+    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -12.15 % en base contre -11.08 % chez l'agregateur (ecart 1.1 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 43,
+   "croissance_pctl": 34,
+   "reference_axes": "marche (n=36)",
+@@ -79,7 +85,8 @@
+   "source_croissance": "RN_VERIFIE(4ex)",
+   "drapeaux": [
+    "INFLEXION_RECENTE",
+-   "SERIE_COMPLETEE_N1"
++   "SERIE_COMPLETEE_N1",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 32.22,
+   "payout": 1.6915499999999999,
+@@ -192,14 +199,22 @@
+   "notes": [],
+   "reserves": [
+    "aucune source de croissance exploitable",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -20.24 % en base contre -20.30 % chez l'agregateur (ecart 0.1 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 46,
+   "croissance_pctl": null,
+   "reference_axes": "secteur (n=14)",
+   "g": null,
+   "source_croissance": "AUCUNE",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 13.56,
+   "payout": 0.4054440000000001,
+   "roe": null,
+@@ -285,9 +300,15 @@
+   "reserves": [
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
+    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +39.25 % en base contre +39.25 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 43,
+   "croissance_pctl": 92,
+   "reference_axes": "secteur (n=14)",
+@@ -296,6 +317,7 @@
+   "drapeaux": [
+    "SERIE_COMPLETEE_N1",
+    "RATTRAPAGE",
++   "CROISSANCE_CORROBOREE",
+    "BENEFICE_NON_REPRESENTATIF"
+   ],
+   "per": 14.6,
+@@ -355,9 +377,15 @@
+    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
+    "FENETRE_ELARGIE : fenetre etendue au-dela de 4 exercices car elle demarrait sur un pic — la tendance de fond remplace l'effet de base",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +205.17 % en base contre +205.18 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -365,7 +393,8 @@
+   "source_croissance": "RN_PROBABLE(6ex)",
+   "drapeaux": [
+    "FENETRE_ELARGIE",
+-   "SERIE_COMPLETEE_N1"
++   "SERIE_COMPLETEE_N1",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 596.57,
+   "payout": 44.504122,
+@@ -460,10 +489,16 @@
+   "reserves": [
+    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "DONNEES_PERIMEES : les capitaux propres en base ont plus de trois ans : le ROE n'est plus calculable de facon fiable et n'est pas affiche",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -2.29 % en base contre +2.34 % chez l'agregateur (ecart 4.6 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 57,
+   "croissance_pctl": 38,
+   "reference_axes": "secteur (n=14)",
+@@ -472,6 +507,7 @@
+   "drapeaux": [
+    "SERIE_TROUEE",
+    "SERIE_COMPLETEE_N1",
++   "CROISSANCE_CORROBOREE",
+    "DONNEES_PERIMEES"
+   ],
+   "per": 18.05,
+@@ -570,9 +606,15 @@
+   "reserves": [
+    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -14.13 % en base contre -14.13 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 39,
+   "croissance_pctl": 15,
+   "reference_axes": "secteur (n=14)",
+@@ -580,7 +622,8 @@
+   "source_croissance": "RN_PROBABLE(4ex)",
+   "drapeaux": [
+    "INFLEXION_RECENTE",
+-   "SERIE_COMPLETEE_N1"
++   "SERIE_COMPLETEE_N1",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 18.51,
+   "payout": 1.037,
+@@ -675,15 +718,22 @@
+    "CONTREDIT PAR L'EXERCICE EN COURS — le profil affiche une croissance de 21.0 %/an, mais la derniere publication (T1 2026) ressort a +0.9 %. Non audite. Resultat net +0,91 % seulement, tres loin du +21 %/an certifie sur 2022-2025. Signaux de fond : depots +21,4 % mais credits nets -0,29 % (la banque collecte sans preter), cout du risque multiplie par 4,2 (652"
+   ],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "CONTREDIT_PAR_INTERMEDIAIRE : la derniere publication trimestrielle ou semestrielle contredit la croissance annuelle affichee : l'exercice en cours ne suit pas la tendance des exercices clos",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +10.91 % en base contre +10.91 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 79,
+   "croissance_pctl": 77,
+   "reference_axes": "secteur (n=14)",
+   "g": 21.0,
+   "source_croissance": "RN_VERIFIE(4ex)",
+   "drapeaux": [
++   "CROISSANCE_CORROBOREE",
+    "CONTREDIT_PAR_INTERMEDIAIRE"
+   ],
+   "per": 13.05,
+@@ -794,15 +844,22 @@
+   "reserves": [
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +21.46 % en base contre +21.46 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 46,
+   "croissance_pctl": 100,
+   "reference_axes": "secteur (n=14)",
+   "g": 44.3,
+   "source_croissance": "BPA_IMPLICITE",
+   "drapeaux": [
+-   "RATTRAPAGE"
++   "RATTRAPAGE",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 15.58,
+   "payout": 0.7556299999999999,
+@@ -863,15 +920,23 @@
+   "reserves": [
+    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -91.82 % en base contre -91.82 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+   "g": -70.7,
+   "source_croissance": "BPA_IMPLICITE",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 260.72,
+   "payout": 10.637376000000001,
+   "roe": null,
+@@ -960,18 +1025,28 @@
+   "n_ex_normalise": 1,
+   "part_operationnelle": null,
+   "secondaire": "RENDEMENT",
+-  "grade": "B",
++  "grade": "C",
+   "notes": [],
+   "reserves": [
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
++   "CONTRADICTION_RN_BPA : les resultats nets en base et le BPA implicite evoluent en sens OPPOSE — la croissance affichee n'est pas fiable, trancher avant tout usage",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +9.62 % en base contre +9.61 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 78,
+   "croissance_pctl": 23,
+   "reference_axes": "secteur (n=14)",
+   "g": -2.1,
+   "source_croissance": "BPA_IMPLICITE",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CONTRADICTION_RN_BPA",
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 13.31,
+   "payout": 0.740036,
+   "roe": null,
+@@ -1050,19 +1125,28 @@
+   "n_ex_normalise": 4,
+   "part_operationnelle": null,
+   "secondaire": "GROWTH",
+-  "grade": "A",
++  "grade": "B",
+   "notes": [
+    "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
+   ],
+   "reserves": [
++   "ARBITRAGE : glissement +4.68 % en base (ligne certifiee) contre +39.16 % chez l'agregateur : ecart de 34.5 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier",
++   "ECART_AGREGATEUR : une source exterieure donne un glissement sensiblement different sur le meme exercice — la ligne certifiee est conservee, mais le perimetre (consolide ou part du groupe) reste a verifier sur le document",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 2,
++   "drapeau": "ECART_AGREGATEUR",
++   "detail": "glissement +4.68 % en base (ligne certifiee) contre +39.16 % chez l'agregateur : ecart de 34.5 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
++  },
+   "cherte_pctl": 56,
+   "croissance_pctl": 83,
+   "reference_axes": "marche (n=36)",
+   "g": 21.9,
+   "source_croissance": "RN_VERIFIE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "ECART_AGREGATEUR"
++  ],
+   "per": 13.98,
+   "payout": 0.527,
+   "roe": 15.4,
+@@ -1172,9 +1256,15 @@
+   "reserves": [
+    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "DONNEES_PERIMEES : les capitaux propres en base ont plus de trois ans : le ROE n'est plus calculable de facon fiable et n'est pas affiche",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +36.44 % en base contre +36.63 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 28,
+   "croissance_pctl": 46,
+   "reference_axes": "secteur (n=14)",
+@@ -1183,6 +1273,7 @@
+   "drapeaux": [
+    "SERIE_TROUEE",
+    "SERIE_COMPLETEE_N1",
++   "CROISSANCE_CORROBOREE",
+    "DONNEES_PERIMEES"
+   ],
+   "per": 15.39,
+@@ -1293,12 +1384,19 @@
+    "croissance non exploitable (rattrapage extreme ou base ecrasee)"
+   ],
+   "reserves": [
++   "ARBITRAGE : exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py",
+    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
+    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "FONDAMENTAL_EN_RETARD : un exercice plus recent est publie et absent de la base : le profil porte sur des comptes perimes",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 4,
++   "drapeau": "FONDAMENTAL_EN_RETARD",
++   "detail": "exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
++  },
+   "cherte_pctl": 18,
+   "croissance_pctl": 23,
+   "reference_axes": "marche (n=36)",
+@@ -1307,7 +1405,8 @@
+   "drapeaux": [
+    "SERIE_TROUEE",
+    "INFLEXION_RECENTE",
+-   "SERIE_COMPLETEE_N1"
++   "SERIE_COMPLETEE_N1",
++   "FONDAMENTAL_EN_RETARD"
+   ],
+   "per": 33.51,
+   "payout": 1.1963069999999998,
+@@ -1403,14 +1502,22 @@
+   "grade": "B",
+   "notes": [],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +29.70 % en base contre +29.96 % chez l'agregateur (ecart 0.3 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 16,
+   "croissance_pctl": 57,
+   "reference_axes": "marche (n=36)",
+   "g": 10.1,
+   "source_croissance": "RN_PROBABLE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 27.47,
+   "payout": 1.0,
+   "roe": 26.4,
+@@ -1451,17 +1558,17 @@
+   ]
+  },
+  "ECOC": {
+-  "dominant": "GARP",
+-  "mixte": true,
++  "dominant": "AUCUN_PROFIL",
++  "mixte": false,
+   "VALUE": null,
+   "GROWTH": null,
+   "GARP": null,
+   "alerte_peg": false,
+-  "peg": 0.55,
++  "peg": 0.47,
+   "dy": 4.65,
+   "confiance": "MOYENNE",
+-  "profil": "GARP",
+-  "motif": "croissance de 26.5 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.47 — la croissance n'est pas encore dans le prix",
++  "profil": "AUCUN_PROFIL",
++  "motif": "croissance de 30.8 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (cherte P54)",
+   "comparaisons": {
+    "per": {
+     "titre": 14.57,
+@@ -1478,7 +1585,7 @@
+     "n_marche": 36
+    },
+    "g": {
+-    "titre": 26.51,
++    "titre": 30.77,
+     "mediane_secteur": 7.93,
+     "n_secteur": 13,
+     "mediane_marche": 5.06,
+@@ -1507,34 +1614,43 @@
+   "taux_reference": 0.0736,
+   "prime_rendement": -0.0271,
+   "table_cours": "cours_quotidien_boc",
+-  "per_normalise": 18.8,
+-  "ecart_benefice": 0.29,
++  "per_normalise": 19.8,
++  "ecart_benefice": 0.36,
+   "n_ex_normalise": 3,
+   "part_operationnelle": null,
+-  "secondaire": "GROWTH",
++  "secondaire": null,
+   "grade": "B",
+   "notes": [
+-   "croissance de rattrapage — non extrapolable",
++   "croissance non exploitable (rattrapage extreme ou base ecrasee)",
+    "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
+   ],
+   "reserves": [
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
+    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
++   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +10.45 % en base contre +10.45 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 54,
+   "croissance_pctl": 85,
+   "reference_axes": "secteur (n=14)",
+-  "g": 26.5,
++  "g": 30.8,
+   "source_croissance": "RN_PROBABLE(4ex)",
+   "drapeaux": [
+    "SERIE_COMPLETEE_N1",
+-   "RATTRAPAGE"
++   "RATTRAPAGE",
++   "CROISSANCE_CORROBOREE",
++   "BENEFICE_NON_REPRESENTATIF"
+   ],
+   "per": 14.57,
+   "payout": 0.6775050000000001,
+   "roe": null,
+-  "pegy": 0.47,
++  "pegy": 0.41,
+   "gate": "ELIGIBLE",
+   "secteur": "SERVICES_FINANCIERS",
+   "n_secteur": 14,
+@@ -1638,14 +1754,22 @@
+   ],
+   "reserves": [
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +15.29 % en base contre +15.29 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 54,
+   "croissance_pctl": 62,
+   "reference_axes": "secteur (n=14)",
+   "g": 14.7,
+   "source_croissance": "BPA_IMPLICITE",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 3.61,
+   "payout": 0.048013,
+   "roe": 21.6,
+@@ -1696,9 +1820,15 @@
+    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
+    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -97.49 % en base contre -97.49 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -1706,7 +1836,8 @@
+   "source_croissance": "RN_VERIFIE(3ex)",
+   "drapeaux": [
+    "PIC_YOY",
+-   "INFLEXION_RECENTE"
++   "INFLEXION_RECENTE",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 60.53,
+   "payout": 52.255548999999995,
+@@ -1814,8 +1945,14 @@
+    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
+    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -35.56 % en base contre -35.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 40,
+   "croissance_pctl": 100,
+   "reference_axes": "marche (n=36)",
+@@ -1829,7 +1966,8 @@
+    "CAP_60",
+    "INFLEXION_RECENTE",
+    "SERIE_COMPLETEE_N1",
+-   "RATTRAPAGE"
++   "RATTRAPAGE",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 17.22,
+   "payout": 0.709464,
+@@ -1916,18 +2054,27 @@
+   "n_ex_normalise": 0,
+   "part_operationnelle": null,
+   "secondaire": "GROWTH",
+-  "grade": "B",
++  "grade": "C",
+   "notes": [],
+   "reserves": [
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
++   "ARBITRAGE : exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py",
++   "FONDAMENTAL_EN_RETARD : un exercice plus recent est publie et absent de la base : le profil porte sur des comptes perimes",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 4,
++   "drapeau": "FONDAMENTAL_EN_RETARD",
++   "detail": "exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
++  },
+   "cherte_pctl": 70,
+   "croissance_pctl": 74,
+   "reference_axes": "marche (n=36)",
+   "g": 18.9,
+   "source_croissance": "BPA_IMPLICITE",
+-  "drapeaux": [],
++  "drapeaux": [
++   "FONDAMENTAL_EN_RETARD"
++  ],
+   "per": 14.98,
+   "payout": 0.879326,
+   "roe": null,
+@@ -2019,14 +2166,22 @@
+   "grade": "A",
+   "notes": [],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +6.82 % en base contre +6.82 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 46,
+   "croissance_pctl": 54,
+   "reference_axes": "secteur (n=14)",
+   "g": 7.9,
+   "source_croissance": "RN_VERIFIE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 13.67,
+   "payout": 0.41009999999999996,
+   "roe": 17.5,
+@@ -2131,14 +2286,22 @@
+   "grade": "A",
+   "notes": [],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +1.53 % en base contre +1.53 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 18,
+   "croissance_pctl": 46,
+   "reference_axes": "marche (n=36)",
+   "g": 3.5,
+   "source_croissance": "RN_VERIFIE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 18.33,
+   "payout": 0.503,
+   "roe": null,
+@@ -2244,14 +2407,22 @@
+   "notes": [],
+   "reserves": [
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -26.01 % en base contre -26.01 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 65,
+   "croissance_pctl": 6,
+   "reference_axes": "marche (n=36)",
+   "g": -13.4,
+   "source_croissance": "BPA_IMPLICITE",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 13.86,
+   "payout": 0.6805260000000001,
+   "roe": 27.6,
+@@ -2357,15 +2528,22 @@
+   "notes": [],
+   "reserves": [
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +6.07 % en base contre +6.07 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 22,
+   "croissance_pctl": 49,
+   "reference_axes": "marche (n=36)",
+   "g": 4.1,
+   "source_croissance": "RN_PROBABLE(3ex)",
+   "drapeaux": [
+-   "SERIE_COMPLETEE_N1"
++   "SERIE_COMPLETEE_N1",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 19.12,
+   "payout": 0.632872,
+@@ -2474,6 +2652,7 @@
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": null,
+   "cherte_pctl": 54,
+   "croissance_pctl": 31,
+   "reference_axes": "secteur (n=14)",
+@@ -2571,14 +2750,22 @@
+   "grade": "B",
+   "notes": [],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -2.23 % en base contre -2.23 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 89,
+   "croissance_pctl": 11,
+   "reference_axes": "marche (n=36)",
+   "g": -10.5,
+   "source_croissance": "RN_PROBABLE(3ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 8.07,
+   "payout": 0.43900800000000006,
+   "roe": 11.7,
+@@ -2692,15 +2879,22 @@
+   ],
+   "reserves": [
+    "FENETRE_ELARGIE : fenetre etendue au-dela de 4 exercices car elle demarrait sur un pic — la tendance de fond remplace l'effet de base",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +0.99 % en base contre +0.86 % chez l'agregateur (ecart 0.1 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 40,
+   "croissance_pctl": 37,
+   "reference_axes": "marche (n=36)",
+   "g": 2.1,
+   "source_croissance": "RN_VERIFIE(8ex)",
+   "drapeaux": [
+-   "FENETRE_ELARGIE"
++   "FENETRE_ELARGIE",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 18.15,
+   "payout": 0.7877099999999999,
+@@ -2766,6 +2960,7 @@
+    "payout non disponible — soutenabilite du dividende non verifiee",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": null,
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -2848,6 +3043,7 @@
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": null,
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -2993,10 +3189,17 @@
+    "croissance non exploitable (rattrapage extreme ou base ecrasee)"
+   ],
+   "reserves": [
++   "ARBITRAGE : glissement +17.78 % en base (ligne certifiee) contre +30.96 % chez l'agregateur : ecart de 13.2 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier",
+    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "ECART_AGREGATEUR : une source exterieure donne un glissement sensiblement different sur le meme exercice — la ligne certifiee est conservee, mais le perimetre (consolide ou part du groupe) reste a verifier sur le document",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 2,
++   "drapeau": "ECART_AGREGATEUR",
++   "detail": "glissement +17.78 % en base (ligne certifiee) contre +30.96 % chez l'agregateur : ecart de 13.2 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
++  },
+   "cherte_pctl": 34,
+   "croissance_pctl": 26,
+   "reference_axes": "marche (n=36)",
+@@ -3004,7 +3207,8 @@
+   "source_croissance": "RN_PROBABLE(4ex)",
+   "drapeaux": [
+    "SERIE_TROUEE",
+-   "SERIE_COMPLETEE_N1"
++   "SERIE_COMPLETEE_N1",
++   "ECART_AGREGATEUR"
+   ],
+   "per": 18.21,
+   "payout": 0.7065480000000001,
+@@ -3077,9 +3281,15 @@
+   ],
+   "reserves": [
+    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "RESULTAT_NON_OPERATIONNEL : le resultat net provient majoritairement du financier ou de l'exceptionnel : la croissance affichee ne mesure PAS la dynamique du metier (jurisprudence AGL CI)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -96.27 % en base contre -96.27 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -3087,13 +3297,14 @@
+   "source_croissance": "RN_PROBABLE(4ex)",
+   "drapeaux": [
+    "INFLEXION_RECENTE",
++   "CROISSANCE_CORROBOREE",
+    "RESULTAT_NON_OPERATIONNEL"
+   ],
+   "per": 201.11,
+   "payout": 0.6935,
+   "roe": 1.1,
+   "pegy": null,
+-  "gate": "ELIGIBLE",
++  "gate": "EXCLU",
+   "secteur": "INDUSTRIELS",
+   "n_secteur": 2,
+   "source_fait": null,
+@@ -3205,6 +3416,7 @@
+    "AUCUN_RN_EN_BASE : aucun resultat net transcrit : la croissance repose integralement sur le BPA implicite, invérifiable en l'etat",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": null,
+   "cherte_pctl": 3,
+   "croissance_pctl": 3,
+   "reference_axes": "marche (n=36)",
+@@ -3320,9 +3532,15 @@
+   "reserves": [
+    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "DONNEES_PERIMEES : les capitaux propres en base ont plus de trois ans : le ROE n'est plus calculable de facon fiable et n'est pas affiche",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -0.12 % en base contre +0.12 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 90,
+   "croissance_pctl": 69,
+   "reference_axes": "secteur (n=14)",
+@@ -3331,6 +3549,7 @@
+   "drapeaux": [
+    "SERIE_TROUEE",
+    "SERIE_COMPLETEE_N1",
++   "CROISSANCE_CORROBOREE",
+    "DONNEES_PERIMEES"
+   ],
+   "per": 11.94,
+@@ -3427,14 +3646,22 @@
+   "grade": "A",
+   "notes": [],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +12.59 % en base contre +12.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 21,
+   "croissance_pctl": 77,
+   "reference_axes": "marche (n=36)",
+   "g": 19.3,
+   "source_croissance": "RN_VERIFIE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 25.29,
+   "payout": 0.890208,
+   "roe": null,
+@@ -3539,15 +3766,22 @@
+   "reserves": [
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+    "CONTRADICTION_RN_BPA : les resultats nets en base et le BPA implicite evoluent en sens OPPOSE — la croissance affichee n'est pas fiable, trancher avant tout usage",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +10.73 % en base contre +10.73 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 36,
+   "croissance_pctl": 8,
+   "reference_axes": "secteur (n=14)",
+   "g": -11.5,
+   "source_croissance": "BPA_IMPLICITE",
+   "drapeaux": [
+-   "CONTRADICTION_RN_BPA"
++   "CONTRADICTION_RN_BPA",
++   "CROISSANCE_CORROBOREE"
+   ],
+   "per": 16.19,
+   "payout": 0.673504,
+@@ -3607,13 +3841,20 @@
+    "COTATION SUSPENDUE depuis le 2026-09-17 — le titre ne peut etre ni achete ni vendu. Le profil ci-dessous reste une lecture des comptes, pas une opportunite accessible. Motif : SICOR S.A : Suspension de la cotation"
+   ],
+   "reserves": [
++   "ARBITRAGE : exercice 2024 disponible chez l'agregateur (resultat net -129.00) alors que la base s'arrete a 2021 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py",
+    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+    "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
+    "FENETRE_ELARGIE : fenetre etendue au-dela de 4 exercices car elle demarrait sur un pic — la tendance de fond remplace l'effet de base",
+    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
++   "FONDAMENTAL_EN_RETARD : un exercice plus recent est publie et absent de la base : le profil porte sur des comptes perimes",
+    "payout non disponible — soutenabilite du dividende non verifiee",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 4,
++   "drapeau": "FONDAMENTAL_EN_RETARD",
++   "detail": "exercice 2024 disponible chez l'agregateur (resultat net -129.00) alors que la base s'arrete a 2021 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans peupler.py"
++  },
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -3623,7 +3864,8 @@
+    "PIC_YOY",
+    "CYCLE_SERIE_RESTAUREE",
+    "FENETRE_ELARGIE",
+-   "SERIE_COMPLETEE_N1"
++   "SERIE_COMPLETEE_N1",
++   "FONDAMENTAL_EN_RETARD"
+   ],
+   "per": 139.98,
+   "payout": null,
+@@ -3701,15 +3943,23 @@
+   "reserves": [
+    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -52.44 % en base contre -52.44 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+   "g": -23.6,
+   "source_croissance": "BPA_IMPLICITE",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 97.43,
+   "payout": 26.120983000000003,
+   "roe": 7.1,
+@@ -3820,9 +4070,15 @@
+    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+    "CAP_60 : croissance plafonnee",
+    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +113.21 % en base contre +113.21 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 70,
+   "croissance_pctl": 100,
+   "reference_axes": "marche (n=36)",
+@@ -3832,6 +4088,7 @@
+    "PIC_YOY",
+    "CAP_60",
+    "RATTRAPAGE",
++   "CROISSANCE_CORROBOREE",
+    "BENEFICE_NON_REPRESENTATIF"
+   ],
+   "per": 13.66,
+@@ -3942,14 +4199,22 @@
+    "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
+   ],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +50.32 % en base contre +50.32 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 71,
+   "croissance_pctl": 60,
+   "reference_axes": "marche (n=36)",
+   "g": 11.5,
+   "source_croissance": "RN_VERIFIE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 9.43,
+   "payout": 0.41963500000000004,
+   "roe": 30.5,
+@@ -4066,14 +4331,22 @@
+   "grade": "B",
+   "notes": [],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +5.06 % en base contre +5.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 62,
+   "croissance_pctl": 63,
+   "reference_axes": "marche (n=36)",
+   "g": 14.0,
+   "source_croissance": "RN_PROBABLE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 10.28,
+   "payout": 0.42045199999999994,
+   "roe": 29.6,
+@@ -4184,14 +4457,22 @@
+   "grade": "B",
+   "notes": [],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -4.71 % en base contre -4.71 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 82,
+   "croissance_pctl": 20,
+   "reference_axes": "marche (n=36)",
+   "g": -7.2,
+   "source_croissance": "RN_PROBABLE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 13.66,
+   "payout": 0.86741,
+   "roe": null,
+@@ -4288,9 +4569,15 @@
+   "reserves": [
+    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
+    "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement +32.90 % en base contre +32.90 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 88,
+   "croissance_pctl": 66,
+   "reference_axes": "marche (n=36)",
+@@ -4299,6 +4586,7 @@
+   "drapeaux": [
+    "PIC_YOY",
+    "CYCLE_SERIE_RESTAUREE",
++   "CROISSANCE_CORROBOREE",
+    "BENEFICE_NON_REPRESENTATIF"
+   ],
+   "per": 8.09,
+@@ -4371,6 +4659,7 @@
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": null,
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -4473,9 +4762,15 @@
+    "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
+    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
+    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la chertee reelle du titre (comparer au PER normalise)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -17.45 % en base contre -17.45 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 92,
+   "croissance_pctl": 94,
+   "reference_axes": "marche (n=36)",
+@@ -4486,6 +4781,7 @@
+    "CYCLE_SERIE_RESTAUREE",
+    "INFLEXION_RECENTE",
+    "RATTRAPAGE",
++   "CROISSANCE_CORROBOREE",
+    "BENEFICE_NON_REPRESENTATIF"
+   ],
+   "per": 10.54,
+@@ -4606,15 +4902,23 @@
+    "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
+   ],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "payout > 100 % — distribution non couverte ou decalage de donnees",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -3.06 % en base contre -3.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 36,
+   "croissance_pctl": 14,
+   "reference_axes": "marche (n=36)",
+   "g": -9.5,
+   "source_croissance": "RN_VERIFIE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 21.13,
+   "payout": 1.1,
+   "roe": 25.1,
+@@ -4721,14 +5025,22 @@
+    "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
+   ],
+   "reserves": [
++   "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": {
++   "regle": 1,
++   "drapeau": "CROISSANCE_CORROBOREE",
++   "detail": "glissement -5.06 % en base contre -13.31 % chez l'agregateur (ecart 8.3 pt) : transcription corroboree par une source independante"
++  },
+   "cherte_pctl": 44,
+   "croissance_pctl": 31,
+   "reference_axes": "marche (n=36)",
+   "g": 1.1,
+   "source_croissance": "RN_PROBABLE(4ex)",
+-  "drapeaux": [],
++  "drapeaux": [
++   "CROISSANCE_CORROBOREE"
++  ],
+   "per": 18.24,
+   "payout": 0.84816,
+   "roe": null,
+@@ -4794,6 +5106,7 @@
+    "payout non disponible — soutenabilite du dividende non verifiee",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": null,
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+@@ -4858,6 +5171,7 @@
+    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+   ],
++  "arbitrage": null,
+   "cherte_pctl": null,
+   "croissance_pctl": null,
+   "reference_axes": "hors axes",
+diff --git a/moteur/peupler.py b/moteur/peupler.py
+index 2ddd029..eaff281 100644
+--- a/moteur/peupler.py
++++ b/moteur/peupler.py
+@@ -401,8 +401,13 @@ ETATS = [
+      "NATIF", "VALIDE", "2024-05-02"),  # chaine coherente : 2021=9603->2022=12391->2023=16694->2024=26226->2025=36520
+     ("BICC", 2021, 9603, 4672, 847724, 847724, 71522, None, None, None,
+      "NATIF", "VALIDE", "2022-04-06"),
+-    ("ECOC", 2025, 57477, 63482, None, None, None, None, None, None,
+-     "NATIF", "VALIDE", "2026-04-14"),  # Ecobank CI, bilan non recoupe
++    ("ECOC", 2025, 63482, 57477, None, None, None, None, None, None,
++     "NATIF", "VALIDE", "2026-04-14"),  # Ecobank CI. Colonnes resultat_net et
++    # resultat_net_n1 PERMUTEES a la saisie, corrige le 26/09/2026 par
++    # moteur/arbitrage.py (regle 5). Deux identites independantes :
++    # 63482/57477 = +10,45 % = glissement publie ; 63482/132725 = 47,83 % =
++    # marge nette publiee. La saisie erronee donnait -9,5 %/an et fondait un
++    # profil GARP a +26,5 %/an sur une serie au dernier point inverse.
+     ("SIBC", 2025, 55623, 50234, 1881733, 1685249, 204765, None, None, None,
+      "NATIF", "VALIDE", "2026-04-21"),  # Societe Ivoirienne de Banque, croissance +11% confirmee par le document
+     ("ORAC", 2025, 167800, 158200, 2554100, 2554100, 616300, None, None, None,
+@@ -417,8 +422,13 @@ ETATS = [
+      "OCR", "PROBABLE", "2026-04-15"),  # BOA Benin, bilan non recoupe (OCR)
+     ("BOAB", 2021, 13312.371256, 16663.938680, 902792.134544, 902792.134544, 89836.969716, None, None, None,
+      "OCR", "PROBABLE", "2022-03-22"),  # 1er succes OCR sur ce titre (tentative precedente sans OCR avait echoue)
+-    ("BOAS", 2025, 19984, 21906, None, None, None, None, None, None,
+-     "OCR", "PROBABLE", "2026-03-17"),  # BOA Senegal, bilan illisible a l'OCR
++    ("BOAS", 2025, 21906, 19984, None, None, None, None, None, None,
++     "DEUX_SOURCE", "VALIDE", "2026-03-17"),  # BOA Senegal, bilan illisible a
++    # l'OCR. Colonnes resultat_net et resultat_net_n1 PERMUTEES a la saisie,
++    # corrige le 26/09/2026 par moteur/arbitrage.py (regle 5). Deux identites :
++    # 21906/19984 = +9,62 % contre +9,61 % publie ; 21906/51926 = 42,19 % =
++    # marge nette publiee. Le statut passe de PROBABLE/OCR a VALIDE/DEUX_SOURCE
++    # puisque la seconde source confirme desormais la lecture.
+     ("ONTBF", 2025, 15886.921152, 21471.148928, 324902.379845, 324902.379845, 57541.603762, None, None, None,
+      "NATIF", "VALIDE", "2026-06-11"),  # Onatel BF, identite exacte, recul -26%
+     ("CIEC", 2025, 13100, 10100, None, None, None, None, 1.0, None,
+diff --git a/moteur/profils.py b/moteur/profils.py
+index 0c7a314..fbd990d 100644
+--- a/moteur/profils.py
++++ b/moteur/profils.py
+@@ -73,6 +73,9 @@ AVIS = RACINE / "collecte" / "avis_brvm.csv"
+ 
+ sys.path.insert(0, str(Path(__file__).resolve().parent))
+ from scoring import charger_seuils, charger_marche, appliquer_gate  # noqa: E402
++from arbitrage import (  # noqa: E402
++    charger_agregateur, arbitrer, ecrire_rapport,
++    EXPLICATIONS as EXPLICATIONS_ARBITRAGE)
+ 
+ # ----------------------------------------------------------------------
+ # Utilitaires
+@@ -273,7 +276,7 @@ def charger_faits():
+ 
+ 
+ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap,
+-                  base_gonflee_max=1.5, fenetre_max=8):
++                  base_gonflee_max=1.5, fenetre_max=8, correctifs=None):
+     """Croissance annualisee sur les RN transcrits en base.
+ 
+     Retourne (g, statut, n_exercices, drapeaux). g=None si non calculable.
+@@ -296,6 +299,13 @@ def croissance_rn(cur, ticker, fenetre, pic_max, base_min, cap,
+                 serie_dict[ex] = (rn, st, "CONFLIT")  # ligne prioritaire, conflit signale
+             else:
+                 serie_dict[ex] = (rn, st, "LIGNE")
++    # Correctifs d'arbitrage (26/09/2026) : un resultat net repris d'une source
++    # exterieure parce que la ligne en base provient d'un OCR a source unique,
++    # jamais certifiable. Applique APRES la construction de la serie pour que la
++    # detection de CONFLIT sur le comparatif N-1 porte sur la donnee d'origine.
++    for _ex, _rn in (correctifs or {}).items():
++        if _ex in serie_dict:
++            serie_dict[_ex] = (_rn, serie_dict[_ex][1], "ARBITRE")
+     lignes = [(ex, v[0], v[1]) for ex, v in sorted(serie_dict.items(), reverse=True)]
+     origines = {ex: v[2] for ex, v in serie_dict.items()}
+     serie = []
+@@ -425,7 +435,7 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
+ 
+ 
+ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
+-                sp_age_max_cp=3):
++                sp_age_max_cp=3, arb=None):
+     table, col = source_cours(cur)
+     per_row = cur.execute(
+         f"SELECT per, {col} FROM {table} WHERE ticker=? AND per IS NOT NULL "
+@@ -496,10 +506,12 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
+     rn_dispo = [(e, rn) for e, rn, _c, _p in etats if rn is not None]
+     dernier_rn = rn_dispo[0][1] if rn_dispo else None
+ 
++    arb = arb or {}
+     g, statut_g, n_ex, drapeaux = croissance_rn(
+         cur, ticker, sp["fenetre_exercices_max"], sp["pic_yoy_max"],
+         sp["base_ecrasee_min"], sp["croissance_cap"],
+-        sp["base_gonflee_max"], sp["fenetre_exercices_etendue"])
++        sp["base_gonflee_max"], sp["fenetre_exercices_etendue"],
++        correctifs=arb.get("correctif") or None)
+     if g is not None:
+         source_g = "RN_%s(%dex)" % (statut_g, n_ex)
+     else:
+@@ -533,6 +545,19 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
+     if g is not None and g > sp["rattrapage_min"] and "RATTRAPAGE" not in drapeaux:
+         drapeaux = drapeaux + ["RATTRAPAGE"]
+ 
++    # --- Arbitrage contre une source exterieure (26/09/2026, moteur/arbitrage.py).
++    # Les tests existants verifient la coherence INTERNE de la base ; une base peut
++    # etre coherente avec elle-meme et fausse. Cas fondateurs : ECOC et BOAS, dont
++    # les colonnes resultat_net / resultat_net_n1 etaient permutees a la saisie,
++    # ce qui produisait un profil GARP et un profil VALUE sur des series inversees.
++    if arb.get("drapeau") and arb["drapeau"] not in drapeaux:
++        drapeaux = drapeaux + [arb["drapeau"]]
++    if arb.get("axe_retire"):
++        # On retire l'axe plutot que de profiler sur un chiffre contested : g=None
++        # exclut aussi le titre des pools de percentiles, donc il ne deplace plus
++        # les medianes des autres.
++        g, source_g = None, "ARBITRAGE_BLOQUANT"
++
+     peg = per / (g * 100) if (per and g and g > 0) else None
+     base_pegy = (g + (dy or 0)) * 100 if g is not None else None
+     pegy = per / base_pegy if (per and base_pegy and base_pegy > 0) else None
+@@ -546,7 +571,12 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
+     if roe_perime:
+         drapeaux = drapeaux + ["DONNEES_PERIMEES"]
+ 
+-    return dict(per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
++    return dict(arbitrage_regle=arb.get("regle", 0),
++                arbitrage_drapeau=arb.get("drapeau"),
++                arbitrage_detail=arb.get("detail"),
++                arbitrage_corroboree=bool(arb.get("corroboree")),
++                arbitrage_bloquant=bool(arb.get("bloquant")),
++                per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
+                 payout_source=payout_source, part_operationnelle=part_operationnelle,
+                 date_cours=date_cours, table_cours=table,
+                 roe_exercice=roe_exercice, roe_perime=roe_perime,
+@@ -815,6 +845,11 @@ def grade_confiance(profil, ing, faits_titre):
+                                      "ou de l'exceptionnel : la croissance affichee ne mesure "
+                                      "PAS la dynamique du metier (jurisprudence AGL CI)",
+     }
++    # Arbitrage contre une source exterieure (26/09/2026) : les libelles vivent
++    # dans moteur/arbitrage.py, aux cotes des regles qui les produisent.
++    EXPLICATIONS = dict(EXPLICATIONS, **EXPLICATIONS_ARBITRAGE)
++    if ing.get("arbitrage_detail") and ing.get("arbitrage_regle") not in (0, 1):
++        reserves.append("ARBITRAGE : %s" % ing["arbitrage_detail"])
+     for d in ing["drapeaux"]:
+         base = d.split("_")[0] if d.startswith("CAP_") else d
+         if base in EXPLICATIONS:
+@@ -834,11 +869,23 @@ def grade_confiance(profil, ing, faits_titre):
+         return "C", reserves
+     critiques = {"CONTRADICTION_RN_BPA", "AUCUN_RN_EN_BASE", "BASE_GONFLEE", "CONFLIT_N1",
+                  "RESULTAT_NON_OPERATIONNEL", "INFLEXION_RECENTE",
+-                 "DONNEES_PERIMEES", "CONTREDIT_PAR_INTERMEDIAIRE"}
++                 "DONNEES_PERIMEES", "CONTREDIT_PAR_INTERMEDIAIRE",
++                 # Arbitrage (26/09/2026) : un desaccord avec une source exterieure
++                 # ou un exercice manquant rendent le profil non exploitable tel quel.
++                 "PERMUTATION_PROBABLE", "PERMUTATION_SUSPECTEE",
++                 "CROISSANCE_CONTESTEE", "FONDAMENTAL_EN_RETARD"}
+     if critiques & set(ing["drapeaux"]):
+         return "C", reserves
+     if profil in ("VALUE", "RENDEMENT") and ing["payout"] is None:
+         return "B", reserves
++    # Corroboration (regle 1, 26/09/2026) : deux lectures independantes des memes
++    # comptes publies concordent. C'est la seule situation ou le grade MONTE, et
++    # elle exige une ligne certifiee -- une concordance entre deux sources faibles
++    # ne prouve rien de plus que leur accord. Placee APRES le controle du payout
++    # pour ne jamais effacer une reserve deja etablie.
++    if (ing.get("arbitrage_corroboree") and "VERIFIE" in source
++            and set(ing["drapeaux"]) <= {"CROISSANCE_CORROBOREE", "SERIE_COMPLETEE_N1"}):
++        return "A", reserves
+     if "VERIFIE" in source and not ing["drapeaux"]:
+         return "A", reserves
+     if "VERIFIE" in source or source == "RN_PROBABLE" or source.startswith("RN_"):
+@@ -862,6 +909,7 @@ def calculer():
+     faits = charger_faits()
+     notations = charger_notations()
+     avis = charger_avis()
++    agregateur = charger_agregateur()
+ 
+     par_defaut = dict(
+         fenetre_exercices_max=4, pic_yoy_max=3.5, base_ecrasee_min=0.30,
+@@ -881,7 +929,7 @@ def calculer():
+     tickers = [r[0] for r in cur.execute(
+         "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
+ 
+-    brut = {}
++    brut, verdicts = {}, {}
+     for t in tickers:
+         # un titre sans aucune cotation n'est pas encore cote (ex. IPO annoncee)
+         _tbl, _c = source_cours(cur)
+@@ -889,8 +937,11 @@ def calculer():
+             f"SELECT COUNT(*) FROM {_tbl} WHERE ticker=?", (t,)).fetchone()[0]
+         if not cote:
+             continue
++        verdict = arbitrer(cur, t, agregateur) if agregateur else None
++        verdicts[t] = verdict or {}
+         ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"],
+-                          sp["ecart_benefice_max"], sp["age_max_capitaux_propres"])
++                          sp["ecart_benefice_max"], sp["age_max_capitaux_propres"],
++                          arb=verdict)
+         statut_gate, _motifs = appliquer_gate(cur, t, secteurs.get(t, ""), seuils, marche)
+         brut[t] = dict(ing, gate=statut_gate, secteur=secteurs.get(t, ""))
+ 
+@@ -899,7 +950,8 @@ def calculer():
+         fait = (faits.get(t) or {}).get("profil")
+         per = v["per"]
+         v["analysable"] = bool(
+-            fait is None and per is not None and per <= sp["per_max_analysable"])
++            fait is None and per is not None and per <= sp["per_max_analysable"]
++            and not v.get("arbitrage_bloquant"))
+     analysables = {t: v for t, v in brut.items() if v["analysable"]}
+ 
+     # --- Axes : double lecture secteur (n>=8) / marche, reference etiquetee
+@@ -965,6 +1017,9 @@ def calculer():
+         if not v["analysable"]:
+             if fait.get("profil"):
+                 principal, secondaire, notes = fait["profil"], None, []
++            elif v.get("arbitrage_bloquant"):
++                principal, secondaire, notes = "NON_ANALYSABLE", None, [
++                    "PROFIL SUSPENDU par arbitrage : " + (v.get("arbitrage_detail") or "")]
+             elif v["per"] is None or v["per"] > sp["per_max_analysable"]:
+                 principal, secondaire, notes = "NON_ANALYSABLE", None, [
+                     "PER absent ou > %d : benefices nuls ou residuels" % sp["per_max_analysable"]]
+@@ -1038,6 +1093,10 @@ def calculer():
+                     v["drapeaux"] = v["drapeaux"] + ["CONTREDIT_PAR_INTERMEDIAIRE"]
+ 
+         motif = motif_du_profil(principal, v, cherte, croissance, sp)
++        if v.get("arbitrage_bloquant"):
++            motif = ("profil suspendu : la base est en desaccord avec une source "
++                     "exterieure sur le dernier exercice (%s) — voir la note "
++                     "d'arbitrage" % (v.get("arbitrage_drapeau") or "arbitrage"))
+         if sensible_brut_net(principal, v, sp):
+             notes = notes + [
+                 "profil SENSIBLE a la convention brut/net du rendement : avec un "
+@@ -1136,6 +1195,10 @@ def calculer():
+             "grade": grade,
+             "notes": notes,
+             "reserves": reserves,
++            "arbitrage": ({"regle": v.get("arbitrage_regle"),
++                           "drapeau": v.get("arbitrage_drapeau"),
++                           "detail": v.get("arbitrage_detail")}
++                          if v.get("arbitrage_drapeau") else None),
+             "cherte_pctl": cherte,
+             "croissance_pctl": croissance,
+             "reference_axes": ref,
+@@ -1171,6 +1234,8 @@ def calculer():
+         }
+ 
+     SORTIE.write_text(json.dumps(profils, ensure_ascii=False, indent=1), encoding="utf-8")
++    if agregateur:
++        ecrire_rapport(verdicts)
+     repartition = {}
+     for v in profils.values():
+         repartition[v["profil"]] = repartition.get(v["profil"], 0) + 1
+@@ -1181,6 +1246,16 @@ def calculer():
+     print("  repartition : %s" % ", ".join(
+         "%s=%d" % (k, n) for k, n in sorted(repartition.items(), key=lambda kv: -kv[1])))
+     print("  grades      : %s" % ", ".join("%s=%d" % (k, grades[k]) for k in sorted(grades)))
++    arbitrages = {}
++    for v in profils.values():
++        d = (v.get("arbitrage") or {}).get("drapeau")
++        if d:
++            arbitrages[d] = arbitrages.get(d, 0) + 1
++    if arbitrages:
++        print("  arbitrage   : %s" % ", ".join(
++            "%s=%d" % (k, n) for k, n in sorted(arbitrages.items(), key=lambda kv: -kv[1])))
++    elif not agregateur:
++        print("  arbitrage   : docs/data_brvm.json absent — aucune confrontation")
+     return profils
+ 
+ 
+diff --git a/moteur/tester_donnees.py b/moteur/tester_donnees.py
+index a27cb16..158dcaf 100644
+--- a/moteur/tester_donnees.py
++++ b/moteur/tester_donnees.py
+@@ -614,6 +614,201 @@ def test_integrite_app():
+             f"app.py fait {lignes} lignes (une chute nette signale une troncature)")
+ 
+ 
++
++# ----------------------------------------------------------------------
++# 12. ARBITRAGE CONTRE UNE SOURCE EXTERIEURE (bloquant)
++# ----------------------------------------------------------------------
++def test_arbitrage():
++    """Les onze sections precedentes verifient la coherence INTERNE de la base.
++
++    POURQUOI CETTE SECTION EXISTE (26/09/2026). Une base peut etre parfaitement
++    coherente avec elle-meme et fausse. Mesure fondatrice : sur les 37 titres ou
++    les deux chaines du projet donnent le glissement du MEME exercice, l'ecart
++    median est de 0,0 point -- la saisie manuelle est fiable. Mais deux titres
++    avaient les colonnes resultat_net et resultat_net_n1 PERMUTEES, ce qui
++    produisait un profil GARP (ECOC, +26,5 %/an affiche) et un profil VALUE
++    (BOAS) sur des series au dernier point inverse. Aucun des 28 golden tests ni
++    des 11 sections de ce fichier ne l'avait vu, parce qu'aucun ne confronte la
++    base a une source EXTERIEURE.
++
++    Trois familles de verifications :
++      (a) les regles d'arbitrage sur des cas SYNTHETIQUES, pour qu'elles restent
++          vraies independamment de l'etat des donnees du jour ;
++      (b) la permutation d'ECOC et de BOAS rejouee sur les chiffres reels, en
++          test de non-regression : si quelqu'un re-permute les colonnes, ce test
++          tombe ;
++      (c) l'etat de la base du jour : aucune permutation ne doit rester ouverte,
++          et aucun titre suspendu par arbitrage ne doit porter un profil de style.
++    """
++    print("\n=== 12. Arbitrage contre une source exterieure (bloquant) ===")
++    sys.path.insert(0, str(ICI))
++    try:
++        import arbitrage as arb
++    except ImportError as e:
++        verifie(False, f"moteur/arbitrage.py introuvable ou non importable : {e}")
++        return
++
++    # --- (a) Les regles, sur des cas synthetiques -----------------------------
++    # Une base en memoire : on teste les regles, pas les donnees du jour.
++    conn = sqlite3.connect(":memory:")
++    conn.execute("CREATE TABLE etats_financiers (ticker TEXT, exercice INTEGER, "
++                 "resultat_net REAL, resultat_net_n1 REAL, statut_donnee TEXT, "
++                 "source_type TEXT)")
++    cas = [
++        # ticker, exercice, rn, rn_n1, statut, source_type
++        ("CONCORDE", 2025, 110.0, 100.0, "VALIDE", "NATIF"),
++        ("CERTIFIE", 2025, 150.0, 100.0, "VALIDE", "NATIF"),
++        ("OCRSEUL", 2025, 150.0, 100.0, "PROBABLE", "OCR"),
++        ("PERMUTE", 2025, 100.0, 110.0, "VALIDE", "NATIF"),
++        ("PERMUTE1", 2025, 100.0, 110.0, "VALIDE", "NATIF"),
++        ("RETARD", 2024, 110.0, 100.0, "VALIDE", "NATIF"),
++        ("CONTESTE", 2025, 200.0, 100.0, "PROBABLE", "NATIF"),
++    ]
++    conn.executemany("INSERT INTO etats_financiers VALUES (?,?,?,?,?,?)", cas)
++    agr = {
++        # concordance : 10,0 % en base contre 9,5 % publie -> ecart 0,5 pt
++        "CONCORDE": {"exercice": 2025, "rn": 110.0, "ca": 1000.0,
++                     "croissance_rn": 9.5, "marge_nette": 11.0, "seance": None},
++        # ligne certifiee en ecart de 30 pts : la base est conservee
++        "CERTIFIE": {"exercice": 2025, "rn": 120.0, "ca": 1000.0,
++                     "croissance_rn": 20.0, "marge_nette": 12.0, "seance": None},
++        # meme ecart, mais la ligne vient d'un OCR a source unique
++        "OCRSEUL": {"exercice": 2025, "rn": 120.0, "ca": 1000.0,
++                    "croissance_rn": 20.0, "marge_nette": 12.0, "seance": None},
++        # permutation confirmee par les DEUX identites (taux + marge)
++        "PERMUTE": {"exercice": 2025, "rn": 110.0, "ca": 1100.0,
++                    "croissance_rn": 10.0, "marge_nette": 10.0, "seance": None},
++        # permutation confirmee par le seul taux : marge incoherente
++        "PERMUTE1": {"exercice": 2025, "rn": 110.0, "ca": 1100.0,
++                     "croissance_rn": 10.0, "marge_nette": 33.0, "seance": None},
++        # l'agregateur a un exercice de plus que la base
++        "RETARD": {"exercice": 2025, "rn": 130.0, "ca": 1000.0,
++                   "croissance_rn": 18.2, "marge_nette": 13.0, "seance": None},
++        # ecart de 100 pts, ligne non certifiee, pas de permutation plausible
++        "CONTESTE": {"exercice": 2025, "rn": 100.0, "ca": 1000.0,
++                     "croissance_rn": 0.0, "marge_nette": 10.0, "seance": None},
++    }
++    cur = conn.cursor()
++    attendu = {
++        "CONCORDE": (1, "CROISSANCE_CORROBOREE"),
++        "CERTIFIE": (2, "ECART_AGREGATEUR"),
++        "OCRSEUL": (3, "VALEUR_REPRISE_AGREGATEUR"),
++        "RETARD": (4, "FONDAMENTAL_EN_RETARD"),
++        "PERMUTE": (5, "PERMUTATION_PROBABLE"),
++        "PERMUTE1": (5, "PERMUTATION_SUSPECTEE"),
++        "CONTESTE": (6, "CROISSANCE_CONTESTEE"),
++    }
++    for ticker, (regle, drapeau) in sorted(attendu.items(), key=lambda kv: kv[1][0]):
++        v = arb.arbitrer(cur, ticker, agr)
++        verifie(v["regle"] == regle and v["drapeau"] == drapeau,
++                f"regle {regle} ({drapeau}) : {ticker} -> regle {v['regle']} "
++                f"/ {v['drapeau']}")
++
++    # Proprietes que les regles doivent respecter, quel que soit le cas
++    v_ocr = arb.arbitrer(cur, "OCRSEUL", agr)
++    verifie(v_ocr["correctif"] == {2025: 120.0},
++            f"regle 3 : la substitution est explicite et journalisee, "
++            f"obtenu {v_ocr['correctif']}")
++    v_cert = arb.arbitrer(cur, "CERTIFIE", agr)
++    verifie(not v_cert["correctif"] and not v_cert["bloquant"],
++            "regle 2 : une ligne certifiee n'est JAMAIS reecrite au demarrage "
++            "et ne bloque pas le profil")
++    for t in ("PERMUTE", "PERMUTE1"):
++        v = arb.arbitrer(cur, t, agr)
++        verifie(v["bloquant"] and v["axe_retire"] and not v["correctif"],
++                f"regle 5 : {t} bloque le profil et retire l'axe sans reecrire "
++                f"la base (bloquant={v['bloquant']}, correctif={v['correctif']})")
++        verifie("peupler.py" in (v["detail"] or ""),
++                f"regle 5 : le detail de {t} nomme la correction a porter dans peupler.py")
++    verifie(arb.arbitrer(cur, "CONCORDE", {})["regle"] == 0,
++            "agregateur absent : l'arbitrage se retire sans bloquer le moteur")
++    verifie(arb.arbitrer(cur, "INCONNU", agr)["regle"] == 0,
++            "titre absent de l'agregateur : aucun verdict, aucune erreur")
++    conn.close()
++
++    # --- (b) ECOC et BOAS, non-regression sur les chiffres reels -------------
++    # Les deux identites qui ont etabli la permutation le 26/09/2026. Si ces
++    # egalites cessent d'etre vraies, c'est que les colonnes ont bouge.
++    for ticker, rn_2025, rn_2024, ca, croi, marge in (
++            ("ECOC", 63482.0, 57477.0, 132725.0, 10.45, 47.83),
++            ("BOAS", 21906.0, 19984.0, 51926.0, 9.61, 42.19)):
++        glissement = 100.0 * (rn_2025 - rn_2024) / rn_2024
++        verifie(abs(glissement - croi) <= 0.15,
++                f"{ticker} : le glissement du bon sens ({glissement:+.2f} %) egale "
++                f"celui publie ({croi:+.2f} %)")
++        verifie(abs(100.0 * rn_2025 / ca - marge) <= 0.06,
++                f"{ticker} : le resultat net 2025 rapporte au chiffre d'affaires donne "
++                f"{100.0 * rn_2025 / ca:.2f} %, soit la marge publiee ({marge:.2f} %)")
++
++    if not DB.exists():
++        verifie(False, "brvm.db absente : impossible de verifier l'etat du jour",
++                bloquant=False)
++        return
++
++    # --- (c) Etat de la base du jour ----------------------------------------
++    agregateur = arb.charger_agregateur()
++    if not agregateur:
++        verifie(False, "docs/data_brvm.json absent : aucune confrontation possible "
++                       "(verifier les workflows boc_quotidien et sikafinance)",
++                bloquant=False)
++        return
++    conn = sqlite3.connect(DB)
++    cur = conn.cursor()
++    tickers = [r[0] for r in cur.execute(
++        "SELECT ticker FROM societes WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker")]
++    verdicts = {t: arb.arbitrer(cur, t, agregateur) for t in tickers}
++    conn.close()
++
++    confrontes = [t for t, v in verdicts.items() if v["regle"]]
++    verifie(len(confrontes) >= 30,
++            f"{len(confrontes)} titres confrontes a l'agregateur (sous 30, "
++            f"la confrontation ne couvre plus le marche)")
++
++    corrobores = [t for t, v in verdicts.items() if v["regle"] == 1]
++    verifie(len(corrobores) >= 0.6 * max(len(confrontes), 1),
++            f"{len(corrobores)}/{len(confrontes)} titres corrobores "
++            f"({100 * len(corrobores) // max(len(confrontes), 1)} %) — une chute nette "
++            f"signale une derive de saisie ou un changement de format de l'agregateur")
++
++    permutations = sorted(t for t, v in verdicts.items()
++                          if v["drapeau"] in ("PERMUTATION_PROBABLE",
++                                              "PERMUTATION_SUSPECTEE"))
++    verifie(not permutations,
++            "aucune permutation de colonnes ouverte — a corriger dans "
++            f"moteur/peupler.py : {permutations}" if permutations
++            else "aucune permutation de colonnes ouverte dans la base")
++
++    retards = sorted(t for t, v in verdicts.items()
++                     if v["drapeau"] == "FONDAMENTAL_EN_RETARD")
++    verifie(not retards,
++            "aucun exercice publie manquant en base — a saisir dans "
++            f"moteur/peupler.py : {retards}" if retards
++            else "aucun exercice publie manquant en base",
++            bloquant=False)
++
++    # Un titre suspendu par arbitrage ne doit porter aucun profil de style :
++    # c'est tout l'objet du blocage.
++    profils_json = RACINE / "collecte" / "profils.json"
++    if profils_json.exists():
++        import json
++        profils = json.loads(profils_json.read_text(encoding="utf-8"))
++        STYLES = {"GARP", "VALUE", "GROWTH", "RENDEMENT"}
++        fautifs = sorted(
++            t for t, v in verdicts.items()
++            if v["bloquant"] and (profils.get(t) or {}).get("profil") in STYLES)
++        verifie(not fautifs,
++                f"aucun titre suspendu par arbitrage ne porte un profil de style "
++                f"(fautifs : {fautifs})")
++        # Le drapeau doit etre visible, pas seulement calcule.
++        muets = sorted(
++            t for t, v in verdicts.items()
++            if v["drapeau"] and v["drapeau"] not in (
++                (profils.get(t) or {}).get("drapeaux") or []))
++        verifie(not muets,
++                f"tous les verdicts d'arbitrage remontent dans profils.json "
++                f"(absents : {muets})")
++
++
+ def main():
+     sans_app = "--sans-app" in sys.argv
+     print("=" * 60)
+@@ -629,6 +824,7 @@ def main():
+     test_fondamentaux_a_jour()
+     test_statuts_cotation()
+     test_integrite_app()
++    test_arbitrage()
+     if not sans_app:
+         test_application()
