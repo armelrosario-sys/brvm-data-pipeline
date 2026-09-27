@@ -1020,6 +1020,10 @@ def test_fondamentaux_agregateur():
     if not profils_json.exists():
         verifie(False, "collecte/profils.json absent", bloquant=False)
         return
+    if not DB.exists():
+        verifie(False, "brvm.db absente : coherence non verifiable (lancer "
+                       "moteur/peupler.py puis charger_cours*.py)", bloquant=False)
+        return
     if profils_json.stat().st_mtime < DB.stat().st_mtime:
         verifie(False, "collecte/profils.json plus ancien que la base : relancer "
                        "python3 moteur/profils.py avant ce test", bloquant=False)
@@ -1111,9 +1115,16 @@ def test_fonds_notations():
     exploitees = statuts.get("OK", 0) + statuts.get("SANS_NOTE", 0)
     print("       statuts : %s" % ", ".join("%s=%d" % kv for kv in sorted(statuts.items())))
 
-    # Plancher a la valeur du 27/09/2026, jour du correctif. Il doit MONTER a
-    # chaque passage de P12 ; on ne l'abaisse que si la BRVM retire des rapports.
-    PLANCHER_EXPLOITEES = 29
+    # Plancher releve le 27/09/2026 apres quatre passages de reprise : le fonds
+    # est passe de 29 a 378 rapports exploites. Il doit MONTER a chaque passage
+    # de P12 ; on ne l'abaisse que si la BRVM retire reellement des rapports.
+    #
+    # Ce plancher a une raison d'etre precise : au cours de la reprise, UNE
+    # ligne deja extraite (STBC du 05/05/2026, note AA+) a disparu du fichier
+    # parce qu'elle etait sortie de l'index de la BRVM et que la fusion ne
+    # conservait que les lignes encore indexees. Corrige dans notations.py, et
+    # ce plancher est le filet.
+    PLANCHER_EXPLOITEES = 370
     verifie(exploitees >= PLANCHER_EXPLOITEES,
             f"{exploitees} rapports exploites (plancher {PLANCHER_EXPLOITEES}) — "
             f"une baisse signale que le fichier a ete reecrit a zero")
@@ -1138,6 +1149,20 @@ def test_fonds_notations():
     code = (RACINE / "collecte" / "notations.py").read_text(encoding="utf-8")
     verifie("lire_acquis" in code and "STATUTS_ACQUIS" in code,
             "collecte/notations.py relit l'acquis avant d'extraire")
+    verifie("agence_canonique" in code,
+            "collecte/notations.py normalise le nom des agences")
+
+    # Une meme agence sous deux orthographes casserait le rapprochement des
+    # variations de note, que le moteur ne fait QUE chez une meme agence.
+    # Mesure du 27/09 : "Bloomfield Investment Corporation" 235 fois,
+    # "Bloomfield" 7 fois, pour la meme agence.
+    VARIANTES = {"Bloomfield": "Bloomfield Investment Corporation",
+                 "GCR Ratings": "GCR"}
+    trouvees = sorted({r["agence"] for r in lignes if r.get("agence")})
+    fautives = sorted(a for a in trouvees if a in VARIANTES)
+    verifie(not fautives,
+            f"les agences portent un nom canonique (trouve : {trouvees})"
+            + ("" if not fautives else f" — a normaliser : {fautives}"))
 
     restantes = statuts.get("NON_EXTRAIT", 0)
     if restantes:
