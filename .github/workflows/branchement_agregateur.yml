@@ -1,0 +1,105 @@
+name: Branchement - fondamentaux de la chaine pipeline
+
+# Workflow A USAGE UNIQUE (27/09/2026). Il branche docs/data_brvm.json comme
+# source de fondamentaux du moteur : chiffre d'affaires, marge nette et
+# croissance du CA pour 47 titres sur 47, et capitaux propres sources pour
+# 25 titres, d'ou 11 ROE jusque-la manquants.
+#
+# Il ne se declenche jamais tout seul : uniquement sur demande explicite
+# (onglet Actions -> Run workflow). Il ne committe QUE si les golden tests,
+# les tests de donnees, les garde-fous des collecteurs et le demarrage de
+# l'application passent tous.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dependances
+        run: |
+          pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas
+          pip install -r requirements.txt
+
+      - name: Branchement de l'agregateur
+        run: python3 outils/branchement_agregateur.py
+
+      - name: Chaine complete - peuplement, cours, golden tests, profils
+        run: |
+          cd moteur
+          python3 peupler.py
+          python3 ../collecte/charger_cours.py brvm.db
+          python3 ../collecte/charger_cours_quotidien.py brvm.db
+          python3 ../collecte/charger_dividendes_exercice.py brvm.db
+          python3 ../collecte/charger_liquidite_quotidienne.py brvm.db
+          python3 tester.py
+          python3 profils.py
+
+      - name: Tests de non-regression (donnees et application)
+        run: |
+          # bash -e : une sortie non nulle interrompt l'etape sur-le-champ,
+          # d'ou le '|| code=$?' qui neutralise -e sur cette ligne seule.
+          code=0
+          python3 moteur/tester_donnees.py || code=$?
+          if [ $code -eq 1 ]; then
+            echo "::error::Incoherence bloquante — migration NON commitee"
+            exit 1
+          elif [ $code -eq 2 ]; then
+            echo "::warning::Alertes de fraicheur seules — le code est sain"
+          fi
+
+      - name: Garde-fous hors ligne des collecteurs
+        run: |
+          python3 collecte/avis_brvm.py --test
+          python3 collecte/notations.py --test
+
+      - name: Generer le dashboard (test de fumee)
+        run: python3 dashboard/generer_dashboard.py
+
+      - name: Commit
+        run: |
+          rm -f dashboard_brvm.xlsx moteur/brvm.db
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Rien a committer — la migration avait deja ete appliquee."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit \
+            -m "Branche docs/data_brvm.json comme source de fondamentaux" \
+            -m "La chaine pipeline/ tient, pour 47 titres sur 47, le chiffre d affaires, la marge nette et la croissance du CA — trois grandeurs absentes du moteur — et, pour 25 titres, des capitaux propres avec leur millesime et l URL du rapport de notation dont ils sont tires. Le tableau de bord lisait jusqu ici la moins riche des deux chaines du projet." \
+            -m "Le ROE se replie sur ces capitaux propres quand la base n en a pas, ou quand les siens depassent trois ans — auquel cas il n etait de toute facon plus affiche. Il n ecrase jamais une valeur certifiee encore lisible. Onze ROE deviennent calculables (28 -> 39), chacun avec sa source citee et le drapeau ROE_SOURCE_EXTERIEURE. BOAB, CBIBF et SGBC gagnent un grade, sur des fonds propres de 2021, 2022 et 2021 qui ne donnaient plus rien." \
+            -m "Alias de ticker BBGC -> BBGCI : sans lui Bridge Bank reste invisible a l arbitrage alors que les deux chaines la connaissent, chacune sous son code. Section 14 de tester_donnees.py : 11 controles sur le branchement."
+          git pull --rebase --autostash origin main
+          git push
+
+      - name: Resume
+        run: |
+          python3 - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import json
+          p = json.load(open("collecte/profils.json"))
+          n = len(p)
+          print("## Branchement des fondamentaux\n")
+          print("| Grandeur | Titres renseignes |")
+          print("| --- | --- |")
+          for cle, lib in (("chiffre_affaires", "Chiffre d'affaires"),
+                           ("marge_nette", "Marge nette"),
+                           ("croissance_ca", "Croissance du CA"),
+                           ("roe", "ROE")):
+              print("| %s | %d / %d |" % (lib, sum(1 for v in p.values()
+                                                   if v.get(cle) is not None), n))
+          ext = [t for t, v in p.items() if v.get("roe_source") == "AGREGATEUR"]
+          print("\n%d ROE calcules sur des capitaux propres repris d'un rapport "
+                "de notation : %s" % (len(ext), ", ".join(sorted(ext))))
+          PY
