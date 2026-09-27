@@ -603,6 +603,7 @@ def test_integrite_app():
         "onglet Explorer": "Telecharger (CSV)",
         "fiche titre": "Pourquoi ce profil",
         "qualite des donnees": "Limites permanentes",
+        "activite (CA, marge)": "Chiffre d'affaires",
     }
     manquantes = [nom for nom, motif in sections.items() if motif not in code]
     verifie(not manquantes,
@@ -970,6 +971,110 @@ def test_base_reference():
                 f"plus le texte de peupler.py")
 
 
+
+# ----------------------------------------------------------------------
+# 14. FONDAMENTAUX REPRIS DE LA CHAINE pipeline/ (bloquant)
+# ----------------------------------------------------------------------
+def test_fondamentaux_agregateur():
+    """docs/data_brvm.json est branche comme source de fondamentaux.
+
+    POURQUOI CETTE SECTION EXISTE (27/09/2026). L'audit du 26/09 avait etabli
+    que le projet maintenait DEUX chaines de collecte, et que le tableau de
+    bord lisait la moins riche. La chaine pipeline/ tient, pour 47 titres sur
+    47, le chiffre d'affaires, la marge nette et la croissance du chiffre
+    d'affaires -- trois grandeurs absentes du moteur -- et, pour 25 titres,
+    des capitaux propres avec leur millesime et l'URL du rapport de notation
+    dont ils sont tires. Onze ROE manquants en sont devenus calculables.
+
+    Ces tests verifient que le branchement tient : les grandeurs remontent,
+    le ROE d'origine exterieure est signale et n'ecrase jamais une valeur
+    certifiee, et l'alias de ticker de Bridge Bank est en place.
+    """
+    print("\n=== 14. Fondamentaux repris de la chaine pipeline/ (bloquant) ===")
+    sys.path.insert(0, str(ICI))
+    try:
+        import arbitrage as arb
+    except ImportError as e:
+        verifie(False, f"moteur/arbitrage.py non importable : {e}")
+        return
+    agr = arb.charger_agregateur()
+    if not agr:
+        verifie(False, "docs/data_brvm.json absent : les fondamentaux exterieurs ne "
+                       "sont plus alimentes (verifier boc_quotidien et sikafinance)",
+                bloquant=False)
+        return
+
+    # L'alias existe parce que les deux chaines ne nomment pas Bridge Bank de
+    # la meme facon. Sans lui, le titre serait invisible a l'arbitrage alors
+    # que les deux chaines le connaissent.
+    verifie("BBGCI" in agr and "BBGC" not in agr,
+            "l'alias de ticker BBGC -> BBGCI est applique a la lecture")
+
+    for champ, plancher in (("ca", 40), ("marge_nette", 40), ("croissance_ca", 40),
+                            ("capitaux_propres", 20)):
+        n = sum(1 for v in agr.values() if v.get(champ) is not None)
+        verifie(n >= plancher,
+                f"agregateur : {champ} renseigne pour {n} titres (plancher {plancher})")
+
+    profils_json = RACINE / "collecte" / "profils.json"
+    if not profils_json.exists():
+        verifie(False, "collecte/profils.json absent", bloquant=False)
+        return
+    if profils_json.stat().st_mtime < DB.stat().st_mtime:
+        verifie(False, "collecte/profils.json plus ancien que la base : relancer "
+                       "python3 moteur/profils.py avant ce test", bloquant=False)
+        return
+    import json as _json
+    profils = _json.loads(profils_json.read_text(encoding="utf-8"))
+
+    for champ in ("chiffre_affaires", "marge_nette", "croissance_ca"):
+        n = sum(1 for v in profils.values() if v.get(champ) is not None)
+        verifie(n >= 0.8 * len(profils),
+                f"profils.json : {champ} expose pour {n}/{len(profils)} titres "
+                f"(sous 80 %, le branchement ne remonte plus)")
+
+    # Un ROE d'origine exterieure doit TOUJOURS etre signale : sans cela, rien
+    # ne distingue a l'affichage une valeur certifiee d'une valeur reprise.
+    exterieurs = [t for t, v in profils.items() if v.get("roe_source") == "AGREGATEUR"]
+    muets = sorted(t for t in exterieurs
+                   if "ROE_SOURCE_EXTERIEURE" not in (profils[t].get("drapeaux") or []))
+    verifie(not muets,
+            f"les {len(exterieurs)} ROE d'origine exterieure portent tous leur drapeau"
+            + ("" if not muets else f" — muets : {muets}"))
+    sans_source = sorted(t for t in exterieurs if not profils[t].get("source_capitaux_propres"))
+    verifie(not sans_source,
+            "chaque ROE d'origine exterieure cite le rapport dont il vient"
+            + ("" if not sans_source else f" — sans source : {sans_source}"))
+
+    # Le repli ne doit JAMAIS ecraser des capitaux propres certifies ENCORE
+    # LISIBLES. Il n'intervient que si la base n'a rien, ou si ce qu'elle a
+    # depasse les trois ans — auquel cas le ROE n'etait de toute facon plus
+    # calculable et n'etait pas affiche.
+    #
+    # Ce controle a d'abord ete ecrit a l'envers : il cherchait le drapeau
+    # DONNEES_PERIMEES, que le repli efface justement quand il reussit. Il
+    # accusait donc BOAB, CBIBF et SGBC d'ecrasement alors que leurs fonds
+    # propres en base datent de 2021, 2022 et 2021. On interroge desormais
+    # l'exercice, pas le drapeau.
+    AGE_MAX = 3
+    conn = sqlite3.connect(DB)
+    dernier_cp = dict(conn.execute(
+        "SELECT ticker, MAX(exercice) FROM etats_financiers "
+        "WHERE capitaux_propres IS NOT NULL GROUP BY ticker"))
+    conn.close()
+    annee = date.today().year
+    ecrases = sorted(t for t in exterieurs
+                     if t in dernier_cp and (annee - dernier_cp[t]) <= AGE_MAX)
+    verifie(not ecrases,
+            f"le repli n'ecrase aucun capital propre certifie de moins de {AGE_MAX} ans"
+            + ("" if not ecrases else
+               f" — ecrases : {[(t, dernier_cp[t]) for t in ecrases]}"))
+    remplaces = sorted((t, dernier_cp[t]) for t in exterieurs if t in dernier_cp)
+    if remplaces:
+        print("       (repli legitime sur des fonds propres perimes : %s)"
+              % ", ".join("%s %d" % x for x in remplaces))
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -987,6 +1092,7 @@ def main():
     test_integrite_app()
     test_arbitrage()
     test_base_reference()
+    test_fondamentaux_agregateur()
     if not sans_app:
         test_application()
 

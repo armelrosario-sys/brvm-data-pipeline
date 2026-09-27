@@ -43,9 +43,9 @@
    "roe": {
     "titre": 26.28,
     "mediane_secteur": 23.54,
-    "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -73,6 +73,12 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 13298.0,
+  "marge_nette": 10.16,
+  "croissance_ca": 6.67,
+  "reference_31_decembre": 2900,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -176,10 +182,10 @@
    },
    "roe": {
     "titre": null,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -202,6 +208,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 51739.0,
+  "marge_nette": 46.74,
+  "croissance_ca": 14.45,
+  "reference_31_decembre": 4975,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -274,10 +286,10 @@
    },
    "roe": {
     "titre": 30.29,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -304,6 +316,12 @@
    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 79563.0,
+  "marge_nette": 45.9,
+  "croissance_ca": 16.9,
+  "reference_31_decembre": 19445,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -381,6 +399,12 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 42454.0,
+  "marge_nette": 0.05,
+  "croissance_ca": -6.31,
+  "reference_31_decembre": 1410,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -461,18 +485,18 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 17.11,
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": 2021,
+  "roe_exercice": 2025,
   "taux_reference": 0.0736,
   "prime_rendement": -0.0082,
   "table_cours": "cours_quotidien_boc",
@@ -481,7 +505,7 @@
   "n_ex_normalise": 2,
   "part_operationnelle": null,
   "secondaire": null,
-  "grade": "C",
+  "grade": "B",
   "notes": [
    "croissance calculee sur une serie A TROUS : des exercices manquent entre les bornes, le taux affiche relie deux points sans les annees intermediaires",
    "croissance non exploitable (rattrapage extreme ou base ecrasee)"
@@ -490,10 +514,16 @@
    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "DONNEES_PERIMEES : les capitaux propres en base ont plus de trois ans : le ROE n'est plus calculable de facon fiable et n'est pas affiche",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 51274.0,
+  "marge_nette": 39.21,
+  "croissance_ca": 10.2,
+  "reference_31_decembre": 5850,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2025 — https://www.brvm.org/sites/default/files/20260818_-_notation_financiere_-_boa_bn.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -508,11 +538,11 @@
    "SERIE_TROUEE",
    "SERIE_COMPLETEE_N1",
    "CROISSANCE_CORROBOREE",
-   "DONNEES_PERIMEES"
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 18.05,
   "payout": 1.1804700000000001,
-  "roe": null,
+  "roe": 17.1,
   "pegy": 1.83,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -579,10 +609,10 @@
    },
    "roe": {
     "titre": 34.29,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -610,6 +640,12 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 57820.0,
+  "marge_nette": 33.3,
+  "croissance_ca": 0.57,
+  "reference_31_decembre": 3750,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -694,10 +730,10 @@
    },
    "roe": {
     "titre": 27.92,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -722,6 +758,12 @@
    "CONTREDIT_PAR_INTERMEDIAIRE : la derniere publication trimestrielle ou semestrielle contredit la croissance annuelle affichee : l'exercice en cours ne suit pas la tendance des exercices clos",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 73545.0,
+  "marge_nette": 48.32,
+  "croissance_ca": 1.13,
+  "reference_31_decembre": 7180,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -817,18 +859,18 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 22.24,
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": null,
+  "roe_exercice": 2025,
   "taux_reference": 0.0736,
   "prime_rendement": -0.0251,
   "table_cours": "cours_quotidien_boc",
@@ -845,8 +887,15 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 37997.0,
+  "marge_nette": 29.16,
+  "croissance_ca": 5.09,
+  "reference_31_decembre": 4000,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2025 — https://www.brvm.org/sites/default/files/20260818_-_notation_financiere_-_boa_ml.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -859,11 +908,12 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
    "RATTRAPAGE",
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 15.58,
   "payout": 0.7556299999999999,
-  "roe": null,
+  "roe": 22.2,
   "pegy": 0.32,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -904,7 +954,7 @@
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": null,
+  "roe_exercice": 2024,
   "taux_reference": 0.0736,
   "prime_rendement": -0.0328,
   "table_cours": "cours_quotidien_boc",
@@ -921,9 +971,16 @@
    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 21125.0,
+  "marge_nette": 1.94,
+  "croissance_ca": -1.19,
+  "reference_31_decembre": 2610,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2024 — https://www.brvm.org/sites/default/files/20251117_-_notation_financiere_-_boa_ng.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -935,11 +992,12 @@
   "g": -70.7,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 260.72,
   "payout": 10.637376000000001,
-  "roe": null,
+  "roe": 1.1,
   "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -1005,11 +1063,11 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 24.72,
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1031,8 +1089,15 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "CONTRADICTION_RN_BPA : les resultats nets en base et le BPA implicite evoluent en sens OPPOSE — la croissance affichee n'est pas fiable, trancher avant tout usage",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 51926.0,
+  "marge_nette": 42.19,
+  "croissance_ca": 4.55,
+  "reference_31_decembre": 5240,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres d'exercice non identifié — https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_boa_sn.pdf — millésime des capitaux propres non confirmé dans le rapport",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -1045,11 +1110,12 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
    "CONTRADICTION_RN_BPA",
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 13.31,
   "payout": 0.740036,
-  "roe": null,
+  "roe": 24.7,
   "pegy": 3.88,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -1106,10 +1172,10 @@
    },
    "roe": {
     "titre": 15.4,
-    "mediane_secteur": 15.4,
-    "n_secteur": 1,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 7.87,
+    "n_secteur": 2,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1134,6 +1200,12 @@
    "ECART_AGREGATEUR : une source exterieure donne un glissement sensiblement different sur le meme exercice — la ligne certifiee est conservee, mais le perimetre (consolide ou part du groupe) reste a verifier sur le document",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 21263.0,
+  "marge_nette": 8.01,
+  "croissance_ca": 11.18,
+  "reference_31_decembre": 2360,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 2,
    "drapeau": "ECART_AGREGATEUR",
@@ -1228,18 +1300,18 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 19.81,
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": 2022,
+  "roe_exercice": 2025,
   "taux_reference": 0.0736,
   "prime_rendement": -0.045,
   "table_cours": "cours_quotidien_boc",
@@ -1248,7 +1320,7 @@
   "n_ex_normalise": 2,
   "part_operationnelle": null,
   "secondaire": null,
-  "grade": "C",
+  "grade": "B",
   "notes": [
    "croissance calculee sur une serie A TROUS : des exercices manquent entre les bornes, le taux affiche relie deux points sans les annees intermediaires",
    "croissance non exploitable (rattrapage extreme ou base ecrasee)"
@@ -1257,9 +1329,15 @@
    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "DONNEES_PERIMEES : les capitaux propres en base ont plus de trois ans : le ROE n'est plus calculable de facon fiable et n'est pas affiche",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 138986.0,
+  "marge_nette": 47.12,
+  "croissance_ca": 6.11,
+  "reference_31_decembre": 10780,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2025 — https://www.brvm.org/sites/default/files/20260826_-_notation_financiere_-_coris_bank_international_bf.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -1274,11 +1352,11 @@
    "SERIE_TROUEE",
    "SERIE_COMPLETEE_N1",
    "CROISSANCE_CORROBOREE",
-   "DONNEES_PERIMEES"
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 15.39,
   "payout": 0.44,
-  "roe": null,
+  "roe": 19.8,
   "pegy": 1.94,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -1359,9 +1437,9 @@
    "roe": {
     "titre": null,
     "mediane_secteur": 23.54,
-    "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1392,6 +1470,12 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 180545.0,
+  "marge_nette": 4.66,
+  "croissance_ca": 14.04,
+  "reference_31_decembre": 1430,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 4,
    "drapeau": "FONDAMENTAL_EN_RETARD",
@@ -1482,8 +1566,8 @@
     "titre": 26.36,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1505,6 +1589,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 302320.0,
+  "marge_nette": 4.34,
+  "croissance_ca": 14.82,
+  "reference_31_decembre": 2360,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -1599,18 +1689,18 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 31.84,
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": null,
+  "roe_exercice": 2024,
   "taux_reference": 0.0736,
   "prime_rendement": -0.0271,
   "table_cours": "cours_quotidien_boc",
@@ -1629,8 +1719,15 @@
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 132725.0,
+  "marge_nette": 47.83,
+  "croissance_ca": 8.51,
+  "reference_31_decembre": 16000,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2024 — https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_ecobank_ci.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -1645,11 +1742,12 @@
    "SERIE_COMPLETEE_N1",
    "RATTRAPAGE",
    "CROISSANCE_CORROBOREE",
-   "BENEFICE_NON_REPRESENTATIF"
+   "BENEFICE_NON_REPRESENTATIF",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 14.57,
   "payout": 0.6775050000000001,
-  "roe": null,
+  "roe": 31.8,
   "pegy": 0.41,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -1729,10 +1827,10 @@
    },
    "roe": {
     "titre": 21.62,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1757,6 +1855,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 1424261.0,
+  "marge_nette": 24.26,
+  "croissance_ca": 12.29,
+  "reference_31_decembre": 23,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -1824,6 +1928,12 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 32109.0,
+  "marge_nette": 1.45,
+  "croissance_ca": 4.61,
+  "reference_31_decembre": 2220,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -1910,18 +2020,18 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
+    "titre": 19.57,
     "mediane_secteur": 23.54,
-    "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": null,
+  "roe_exercice": 2024,
   "taux_reference": 0.0736,
   "prime_rendement": -0.0324,
   "table_cours": "cours_quotidien_boc",
@@ -1946,8 +2056,15 @@
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 98598.0,
+  "marge_nette": 4.69,
+  "croissance_ca": -3.85,
+  "reference_31_decembre": 4295,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2024 — https://www.brvm.org/sites/default/files/20250828_-_notation_financiere_-_lnb_bn.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -1967,11 +2084,12 @@
    "INFLEXION_RECENTE",
    "SERIE_COMPLETEE_N1",
    "RATTRAPAGE",
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 17.22,
   "payout": 0.709464,
-  "roe": null,
+  "roe": 19.6,
   "pegy": 0.27,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",
@@ -2034,11 +2152,11 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
+    "titre": 54.79,
     "mediane_secteur": 23.54,
-    "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2060,8 +2178,15 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "ARBITRAGE : exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv",
    "FONDAMENTAL_EN_RETARD : un exercice plus recent est publie et absent de la base : le profil porte sur des comptes perimes",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 5139.0,
+  "marge_nette": 39.64,
+  "croissance_ca": -23.8,
+  "reference_31_decembre": 1200,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres d'exercice non identifié — https://www.brvm.org/sites/default/files/20260303_-_notation_financiere_-_nei_ceda_ci.pdf — millésime des capitaux propres non confirmé dans le rapport",
   "arbitrage": {
    "regle": 4,
    "drapeau": "FONDAMENTAL_EN_RETARD",
@@ -2073,11 +2198,12 @@
   "g": 18.9,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
-   "FONDAMENTAL_EN_RETARD"
+   "FONDAMENTAL_EN_RETARD",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 14.98,
   "payout": 0.879326,
-  "roe": null,
+  "roe": 54.8,
   "pegy": 0.6,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DISCRETIONNAIRE",
@@ -2144,10 +2270,10 @@
    },
    "roe": {
     "titre": 17.45,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2169,6 +2295,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 112928.0,
+  "marge_nette": 36.05,
+  "croissance_ca": 15.45,
+  "reference_31_decembre": 11445,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -2263,18 +2395,18 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 18.1,
-    "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 62.98,
+    "mediane_secteur": 40.54,
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": null,
   "periode_intermediaire": null,
-  "roe_exercice": null,
+  "roe_exercice": 2024,
   "taux_reference": 0.0736,
   "prime_rendement": -0.0494,
   "table_cours": "cours_quotidien_boc",
@@ -2287,8 +2419,15 @@
   "notes": [],
   "reserves": [
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 233261.0,
+  "marge_nette": 7.9,
+  "croissance_ca": 5.97,
+  "reference_31_decembre": 10650,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2024 — https://www.brvm.org/sites/default/files/20260605_-_notation_financiere_-_nestle_ci.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -2300,11 +2439,12 @@
   "g": 3.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 18.33,
   "payout": 0.503,
-  "roe": null,
+  "roe": 63.0,
   "pegy": 3.1,
   "gate": "ELIGIBLE",
   "secteur": "CONSOMMATION_DE_BASE",
@@ -2386,8 +2526,8 @@
     "titre": 27.61,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2410,6 +2550,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 146177.0,
+  "marge_nette": 10.87,
+  "croissance_ca": 3.06,
+  "reference_31_decembre": 2485,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -2507,8 +2653,8 @@
     "titre": 27.23,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2531,6 +2677,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 1197100.0,
+  "marge_nette": 14.02,
+  "croissance_ca": 10.42,
+  "reference_31_decembre": 14250,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -2627,10 +2779,10 @@
    },
    "roe": {
     "titre": 19.15,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -2652,6 +2804,12 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 186609.0,
+  "marge_nette": 11.6,
+  "croissance_ca": -4.52,
+  "reference_31_decembre": 2400,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": 54,
   "croissance_pctl": 31,
@@ -2728,10 +2886,10 @@
    },
    "roe": {
     "titre": 11.74,
-    "mediane_secteur": 18.1,
-    "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 40.54,
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2753,6 +2911,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 197630.0,
+  "marge_nette": 7.85,
+  "croissance_ca": 14.78,
+  "reference_31_decembre": 8100,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -2855,9 +3019,9 @@
    "roe": {
     "titre": 20.8,
     "mediane_secteur": 23.54,
-    "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2882,6 +3046,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 81127.0,
+  "marge_nette": 2.92,
+  "croissance_ca": 8.64,
+  "reference_31_decembre": 3875,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -2960,6 +3130,12 @@
    "payout non disponible — soutenabilite du dividende non verifiee",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 5735.0,
+  "marge_nette": 12.22,
+  "croissance_ca": 44.1,
+  "reference_31_decembre": 3305,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": null,
   "croissance_pctl": null,
@@ -3043,6 +3219,12 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 80569.0,
+  "marge_nette": -7.61,
+  "croissance_ca": -7.62,
+  "reference_31_decembre": 1060,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": null,
   "croissance_pctl": null,
@@ -3166,8 +3348,8 @@
     "titre": 15.35,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3195,6 +3377,12 @@
    "ECART_AGREGATEUR : une source exterieure donne un glissement sensiblement different sur le meme exercice — la ligne certifiee est conservee, mais le perimetre (consolide ou part du groupe) reste a verifier sur le document",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 189430.0,
+  "marge_nette": 2.46,
+  "croissance_ca": 9.98,
+  "reference_31_decembre": 5800,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 2,
    "drapeau": "ECART_AGREGATEUR",
@@ -3285,6 +3473,12 @@
    "RESULTAT_NON_OPERATIONNEL : le resultat net provient majoritairement du financier ou de l'exceptionnel : la croissance affichee ne mesure PAS la dynamique du metier (jurisprudence AGL CI)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 92004.0,
+  "marge_nette": 0.85,
+  "croissance_ca": 7.43,
+  "reference_31_decembre": 1515,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -3387,11 +3581,11 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 15.4,
-    "n_secteur": 1,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 0.34,
+    "mediane_secteur": 7.87,
+    "n_secteur": 2,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3414,8 +3608,15 @@
   "reserves": [
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "AUCUN_RN_EN_BASE : aucun resultat net transcrit : la croissance repose integralement sur le BPA implicite, invérifiable en l'etat",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 23200.0,
+  "marge_nette": 0.19,
+  "croissance_ca": -16.77,
+  "reference_31_decembre": 700,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2024 rapporté aux capitaux propres d'exercice non identifié — https://www.brvm.org/sites/default/files/20250415_-_notation_financiere_-_eviosys_packaging_siem_ci.pdf — millésime des capitaux propres non confirmé dans le rapport",
   "arbitrage": null,
   "decote_pctl": 3,
   "croissance_pctl": 3,
@@ -3423,11 +3624,12 @@
   "g": -24.8,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
-   "AUCUN_RN_EN_BASE"
+   "AUCUN_RN_EN_BASE",
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 37.21,
   "payout": 0.349774,
-  "roe": null,
+  "roe": 0.3,
   "pegy": null,
   "gate": "EXCLU",
   "secteur": "INDUSTRIELS",
@@ -3504,18 +3706,18 @@
     "n_marche": 36
    },
    "roe": {
-    "titre": null,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "titre": 22.44,
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
   "date_cours": "2026-09-25",
   "tendance_intermediaire": 0.1308,
   "periode_intermediaire": "T2 2026",
-  "roe_exercice": 2021,
+  "roe_exercice": 2024,
   "taux_reference": 0.0736,
   "prime_rendement": -0.0145,
   "table_cours": "cours_quotidien_boc",
@@ -3524,7 +3726,7 @@
   "n_ex_normalise": 2,
   "part_operationnelle": null,
   "secondaire": null,
-  "grade": "C",
+  "grade": "B",
   "notes": [
    "croissance calculee sur une serie A TROUS : des exercices manquent entre les bornes, le taux affiche relie deux points sans les annees intermediaires",
    "croissance non exploitable (rattrapage extreme ou base ecrasee)"
@@ -3533,9 +3735,15 @@
    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "DONNEES_PERIMEES : les capitaux propres en base ont plus de trois ans : le ROE n'est plus calculable de facon fiable et n'est pas affiche",
+   "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 276048.0,
+  "marge_nette": 36.72,
+  "croissance_ca": 4.88,
+  "reference_31_decembre": 29895,
+  "roe_source": "AGREGATEUR",
+  "source_capitaux_propres": "résultat net 2025 rapporté aux capitaux propres 2024 — https://www.brvm.org/sites/default/files/20250915_-_notation_financiere_-_societe_generale_ci.pdf",
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -3550,11 +3758,11 @@
    "SERIE_TROUEE",
    "SERIE_COMPLETEE_N1",
    "CROISSANCE_CORROBOREE",
-   "DONNEES_PERIMEES"
+   "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 11.94,
   "payout": 0.513,
-  "roe": null,
+  "roe": 22.4,
   "pegy": 0.55,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
@@ -3626,8 +3834,8 @@
     "titre": null,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3649,6 +3857,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 604978.0,
+  "marge_nette": 1.0,
+  "croissance_ca": 0.71,
+  "reference_31_decembre": 1445,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -3740,10 +3954,10 @@
    },
    "roe": {
     "titre": 27.16,
-    "mediane_secteur": 27.16,
-    "n_secteur": 7,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 22.44,
+    "n_secteur": 13,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3769,6 +3983,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 108663.0,
+  "marge_nette": 51.19,
+  "croissance_ca": 5.74,
+  "reference_31_decembre": 5750,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -3850,6 +4070,12 @@
    "payout non disponible — soutenabilite du dividende non verifiee",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 547.0,
+  "marge_nette": -23.58,
+  "croissance_ca": -22.01,
+  "reference_31_decembre": 3300,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 4,
    "drapeau": "FONDAMENTAL_EN_RETARD",
@@ -3947,6 +4173,12 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 10075.0,
+  "marge_nette": 1.78,
+  "croissance_ca": 8.53,
+  "reference_31_decembre": 1580,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -4042,10 +4274,10 @@
    },
    "roe": {
     "titre": null,
-    "mediane_secteur": 18.1,
-    "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 40.54,
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4074,6 +4306,12 @@
    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 378123.0,
+  "marge_nette": 12.11,
+  "croissance_ca": 22.08,
+  "reference_31_decembre": 28900,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -4177,8 +4415,8 @@
     "titre": 30.47,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4202,6 +4440,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 206740.0,
+  "marge_nette": 6.32,
+  "croissance_ca": -9.74,
+  "reference_31_decembre": 9500,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -4311,8 +4555,8 @@
     "titre": 29.56,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4334,6 +4578,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 1923122.0,
+  "marge_nette": 21.51,
+  "croissance_ca": 8.26,
+  "reference_31_decembre": 26120,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -4435,10 +4685,10 @@
    },
    "roe": {
     "titre": null,
-    "mediane_secteur": 18.1,
-    "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 40.54,
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4460,6 +4710,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 98618.0,
+  "marge_nette": 12.67,
+  "croissance_ca": 10.29,
+  "reference_31_decembre": 7900,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -4545,10 +4801,10 @@
    },
    "roe": {
     "titre": 18.1,
-    "mediane_secteur": 18.1,
-    "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 40.54,
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4573,6 +4829,12 @@
    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 340831.0,
+  "marge_nette": 7.33,
+  "croissance_ca": 21.97,
+  "reference_31_decembre": 7900,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -4659,6 +4921,12 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 3878.0,
+  "marge_nette": -2.5,
+  "croissance_ca": 116.26,
+  "reference_31_decembre": 1325,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": null,
   "croissance_pctl": null,
@@ -4732,10 +5000,10 @@
    },
    "roe": {
     "titre": 79.89,
-    "mediane_secteur": 18.1,
-    "n_secteur": 3,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_secteur": 40.54,
+    "n_secteur": 4,
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -4766,6 +5034,12 @@
    "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 268537.0,
+  "marge_nette": 13.58,
+  "croissance_ca": 25.3,
+  "reference_31_decembre": 19780,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -4880,8 +5154,8 @@
     "titre": 25.1,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -4906,6 +5180,12 @@
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 588709.0,
+  "marge_nette": 1.54,
+  "croissance_ca": -5.21,
+  "reference_31_decembre": 2335,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -5003,8 +5283,8 @@
     "titre": null,
     "mediane_secteur": 27.78,
     "n_secteur": 2,
-    "mediane_marche": 26.32,
-    "n_marche": 20
+    "mediane_marche": 24.91,
+    "n_marche": 30
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -5028,6 +5308,12 @@
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 455209.0,
+  "marge_nette": 1.35,
+  "croissance_ca": -6.13,
+  "reference_31_decembre": 2500,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": {
    "regle": 1,
    "drapeau": "CROISSANCE_CORROBOREE",
@@ -5106,6 +5392,12 @@
    "payout non disponible — soutenabilite du dividende non verifiee",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 34682.0,
+  "marge_nette": 1.85,
+  "croissance_ca": -4.13,
+  "reference_31_decembre": 34226,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": null,
   "croissance_pctl": null,
@@ -5171,6 +5463,12 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
+  "chiffre_affaires": 29032.0,
+  "marge_nette": -2.15,
+  "croissance_ca": 6.21,
+  "reference_31_decembre": 1400,
+  "roe_source": null,
+  "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": null,
   "croissance_pctl": null,

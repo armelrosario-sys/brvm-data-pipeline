@@ -474,8 +474,25 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
     annee_courante = date.today().year
     roe_perime = (roe_exercice is not None
                   and (annee_courante - roe_exercice) > sp_age_max_cp)
+    roe_source = "ETATS_FINANCIERS" if roe is not None else None
     if roe_perime:
         roe = None
+    # Repli du 27/09/2026 : 19 titres sur 47 n'avaient AUCUN ROE, faute de
+    # capitaux propres en base. La chaine pipeline/ en tient 25, chacun avec son
+    # millesime et l'URL du rapport de notation dont il est tire. On les utilise
+    # quand la base n'a rien — jamais pour ECRASER une valeur certifiee — et la
+    # meme regle de peremption s'applique : des fonds propres de plus de trois
+    # ans ne donnent pas un ROE lisible, d'ou qu'ils viennent.
+    agr_titre = (arb or {}).get("agregateur") or {}
+    if roe is None and agr_titre.get("capitaux_propres"):
+        ex_cp = agr_titre.get("exercice_cp")
+        rn_agr = agr_titre.get("rn")
+        perime = ex_cp is not None and (annee_courante - ex_cp) > sp_age_max_cp
+        if rn_agr and not perime:
+            roe = 100.0 * rn_agr / agr_titre["capitaux_propres"]
+            roe_exercice = ex_cp
+            roe_source = "AGREGATEUR"
+            roe_perime = False
     payout, payout_source = None, None
     for _e, _rn, _cp, p in etats:
         if p is not None:
@@ -579,8 +596,16 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
         drapeaux = drapeaux + ["BENEFICE_NON_REPRESENTATIF"]
     if roe_perime:
         drapeaux = drapeaux + ["DONNEES_PERIMEES"]
+    if roe_source == "AGREGATEUR":
+        drapeaux = drapeaux + ["ROE_SOURCE_EXTERIEURE"]
 
-    return dict(arbitrage_regle=arb.get("regle", 0),
+    return dict(chiffre_affaires=agr_titre.get("ca"),
+                marge_nette=agr_titre.get("marge_nette"),
+                croissance_ca=agr_titre.get("croissance_ca"),
+                reference_31_decembre=agr_titre.get("reference_31_decembre"),
+                roe_source=roe_source, source_capitaux_propres=(
+                    agr_titre.get("source_roe") if roe_source == "AGREGATEUR" else None),
+                arbitrage_regle=arb.get("regle", 0),
                 arbitrage_drapeau=arb.get("drapeau"),
                 arbitrage_detail=arb.get("detail"),
                 arbitrage_corroboree=bool(arb.get("corroboree")),
@@ -852,6 +877,9 @@ def grade_confiance(profil, ing, faits_titre):
                                        "semestrielle contredit la croissance annuelle "
                                        "affichee : l'exercice en cours ne suit pas la "
                                        "tendance des exercices clos",
+        "ROE_SOURCE_EXTERIEURE": "les capitaux propres ne sont pas en base : le ROE est "
+                                 "calcule sur ceux d'un rapport de notation, dont l'URL "
+                                 "figure dans la fiche",
         "RESULTAT_NON_OPERATIONNEL": "le resultat net provient majoritairement du financier "
                                      "ou de l'exceptionnel : la croissance affichee ne mesure "
                                      "PAS la dynamique du metier (jurisprudence AGL CI)",
@@ -895,9 +923,10 @@ def grade_confiance(profil, ing, faits_titre):
     # ne prouve rien de plus que leur accord. Placee APRES le controle du payout
     # pour ne jamais effacer une reserve deja etablie.
     if (ing.get("arbitrage_corroboree") and "VERIFIE" in source
-            and set(ing["drapeaux"]) <= {"CROISSANCE_CORROBOREE", "SERIE_COMPLETEE_N1"}):
+            and set(ing["drapeaux"]) <= {"CROISSANCE_CORROBOREE", "SERIE_COMPLETEE_N1",
+                                         "ROE_SOURCE_EXTERIEURE"}):
         return "A", reserves
-    if "VERIFIE" in source and not ing["drapeaux"]:
+    if "VERIFIE" in source and set(ing["drapeaux"]) <= {"ROE_SOURCE_EXTERIEURE"}:
         return "A", reserves
     if "VERIFIE" in source or source == "RN_PROBABLE" or source.startswith("RN_"):
         return "B", reserves
@@ -949,6 +978,11 @@ def calculer():
         if not cote:
             continue
         verdict = arbitrer(cur, t, agregateur) if agregateur else None
+        if verdict is not None:
+            # La ligne de l'agregateur voyage avec le verdict : elle porte le
+            # chiffre d'affaires, la marge et les capitaux propres sources, que
+            # ingredients() utilise en repli quand la base n'a rien.
+            verdict["agregateur"] = (agregateur or {}).get(t) or {}
         verdicts[t] = verdict or {}
         ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"],
                           sp["ecart_benefice_max"], sp["age_max_capitaux_propres"],
@@ -1210,6 +1244,12 @@ def calculer():
             "grade": grade,
             "notes": notes,
             "reserves": reserves,
+            "chiffre_affaires": v.get("chiffre_affaires"),
+            "marge_nette": v.get("marge_nette"),
+            "croissance_ca": v.get("croissance_ca"),
+            "reference_31_decembre": v.get("reference_31_decembre"),
+            "roe_source": v.get("roe_source"),
+            "source_capitaux_propres": v.get("source_capitaux_propres"),
             "arbitrage": ({"regle": v.get("arbitrage_regle"),
                            "drapeau": v.get("arbitrage_drapeau"),
                            "detail": v.get("arbitrage_detail")}

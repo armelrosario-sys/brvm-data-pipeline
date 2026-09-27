@@ -146,6 +146,8 @@ def charger(_empreinte):
             secteur=v.get("secteur"), per=v.get("per"), dy=v.get("dy"),
             croissance=v.get("g"), source=v.get("source_croissance"),
             pegy=v.get("pegy"), payout=v.get("payout"), roe=v.get("roe"),
+            ca=v.get("chiffre_affaires"), marge=v.get("marge_nette"),
+            croissance_ca=v.get("croissance_ca"), roe_source=v.get("roe_source"),
             decote_pctl=v.get("decote_pctl"), croissance_pctl=v.get("croissance_pctl"),
             reference=v.get("reference_axes"), drapeaux=", ".join(v.get("drapeaux") or []),
             arbitrage=((v.get("arbitrage") or {}).get("drapeau") or ""),
@@ -906,8 +908,41 @@ with o3:
     m3.metric("Payout", f"{r.payout:.0%}" if pd.notna(r.payout) else "non disponible",
               help=(f"Source : {r.payout_source}\n\n" if pd.notna(r.payout_source) else "")
                    + contexte("payout", pct=True))
+    aide_roe = contexte("roe", " %") or ""
+    if r.roe_source == "AGREGATEUR" and v.get("source_capitaux_propres"):
+        aide_roe += ("\n\nCapitaux propres absents de la base : repris d'un rapport "
+                     "de notation.\n\n" + str(v["source_capitaux_propres"]))
     m4.metric("ROE", f"{r.roe:.1f} %" if pd.notna(r.roe) else "non disponible",
-              help=contexte("roe", " %"))
+              help=aide_roe)
+
+    # Activite (27/09/2026) : chiffre d'affaires, marge nette et croissance du
+    # chiffre d'affaires viennent de la chaine pipeline/, qui les tient pour 47
+    # titres sur 47. Le moteur ne les avait PAS DU TOUT. Ils repondent a une
+    # question que les ratios de valorisation ne posent jamais : l'entreprise
+    # vend-elle plus, et gagne-t-elle de l'argent en vendant ?
+    if pd.notna(r.ca):
+        a1, a2, a3 = st.columns(3)
+        a1.metric("Chiffre d'affaires", f"{r.ca:,.0f} M".replace(",", " "),
+                  help="Dernier exercice publie. Source : chaine pipeline/ "
+                       "(Sikafinance), recoupee avec le bulletin officiel.")
+        a2.metric("Marge nette", f"{r.marge:.1f} %" if pd.notna(r.marge) else "n/d",
+                  help="Resultat net rapporte au chiffre d'affaires. Se lit dans son "
+                       "secteur : une marge bancaire et une marge de distribution "
+                       "ne se comparent pas.")
+        a3.metric("Croissance du CA",
+                  f"{r.croissance_ca:+.1f} %" if pd.notna(r.croissance_ca) else "n/d",
+                  help="Glissement d'un exercice sur le precedent. A confronter a la "
+                       "croissance du resultat : un CA qui monte alors que le resultat "
+                       "recule signale une marge qui se comprime.")
+        if pd.notna(r.marge) and pd.notna(r.croissance_ca) and pd.notna(r.croissance):
+            if r.croissance_ca > 5 and r.croissance < 0:
+                st.caption("**Lecture** — le chiffre d'affaires progresse alors que le "
+                           "resultat recule : la marge se comprime. L'activite tient, "
+                           "la rentabilite non.")
+            elif r.croissance_ca < 0 and r.croissance > 5:
+                st.caption("**Lecture** — le resultat progresse alors que le chiffre "
+                           "d'affaires recule : la hausse vient des couts ou du bas du "
+                           "compte de resultat, pas des ventes.")
 
     # Representativite du benefice : un PER se calcule sur un benefice ; si ce
     # benefice est un pic, le PER parait bas alors que le titre est cher.

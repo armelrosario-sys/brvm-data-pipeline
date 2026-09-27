@@ -87,11 +87,23 @@ DRAPEAUX = (
 )
 
 
+# La chaine pipeline/ et le moteur ne nomment pas toujours le titre de la meme
+# facon. Sans cet alias, Bridge Bank serait invisible a l'arbitrage alors que
+# les deux chaines la connaissent — chacune sous son code.
+ALIAS_TICKERS = {"BBGC": "BBGCI"}
+
+
 def charger_agregateur(chemin=AGREGATEUR):
     """Lit docs/data_brvm.json (chaine pipeline/). Absent -> {} sans echouer.
 
     L'arbitrage est un garde-fou, jamais une dependance bloquante : si le
     fichier manque, le moteur doit continuer a profiler comme avant.
+
+    Complete le 27/09/2026 : le fichier ne sert plus seulement a confronter la
+    croissance. Il porte, pour 47 titres sur 47, le chiffre d'affaires, la
+    marge nette et la croissance du chiffre d'affaires — trois grandeurs que le
+    moteur n'avait PAS DU TOUT — et, pour 25 titres, des capitaux propres avec
+    leur millesime et l'URL du rapport de notation dont ils sont tires.
     """
     try:
         brut = json.loads(Path(chemin).read_text(encoding="utf-8"))
@@ -103,16 +115,26 @@ def charger_agregateur(chemin=AGREGATEUR):
         sym = r.get("sym")
         if not sym:
             continue
+        sym = ALIAS_TICKERS.get(sym, sym)
         try:
             exercice = int(str(r.get("exercice") or "").strip()[:4])
         except ValueError:
             exercice = None
+        try:
+            exercice_cp = int(str(r.get("cp_exercice") or "").strip()[:4])
+        except ValueError:
+            exercice_cp = None
         out[sym] = {
             "exercice": exercice,
             "rn": r.get("rn"),
             "ca": r.get("ca"),
             "croissance_rn": r.get("croiRN"),
+            "croissance_ca": r.get("croiCA"),
             "marge_nette": r.get("margeN"),
+            "capitaux_propres": r.get("cp"),
+            "exercice_cp": exercice_cp,
+            "source_roe": r.get("roe_src"),
+            "reference_31_decembre": r.get("ref31"),
             "seance": (brut.get("meta") or {}).get("boc_seance"),
         }
     return out
