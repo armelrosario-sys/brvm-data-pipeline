@@ -1,0 +1,403 @@
+{
+ "controles": [
+  {
+   "bloquant": true,
+   "bulletin": 1254753,
+   "calcule": 1254753,
+   "concorde": true,
+   "controle": "volume"
+  },
+  {
+   "bloquant": true,
+   "bulletin": 4627361186,
+   "calcule": 4627361186,
+   "concorde": true,
+   "controle": "valeur"
+  },
+  {
+   "bloquant": false,
+   "bulletin": 44,
+   "calcule": 44,
+   "concorde": true,
+   "controle": "titres"
+  },
+  {
+   "bloquant": false,
+   "bulletin": 8,
+   "calcule": 8,
+   "concorde": true,
+   "controle": "hausse"
+  },
+  {
+   "bloquant": false,
+   "bulletin": 30,
+   "calcule": 30,
+   "concorde": true,
+   "controle": "baisse"
+  },
+  {
+   "bloquant": false,
+   "bulletin": 6,
+   "calcule": 6,
+   "concorde": true,
+   "controle": "inchange"
+  },
+  {
+   "bloquant": true,
+   "bulletin": 44,
+   "calcule": 44,
+   "concorde": true,
+   "controle": "coherence_valeur_volume",
+   "titres_en_ecart": []
+  },
+  {
+   "bloquant": true,
+   "bulletin": 44,
+   "calcule": 44,
+   "concorde": true,
+   "controle": "variation_jour_recalculee",
+   "titres_en_ecart": []
+  }
+ ],
+ "indices": {
+  "brvm30": {
+   "niveau": 268.91,
+   "variation_annuelle": 61.76,
+   "variation_jour": 1.36
+  },
+  "composite": {
+   "niveau": 553.71,
+   "variation_annuelle": 60.15,
+   "variation_jour": 1.03
+  },
+  "prestige": {
+   "niveau": 203.01,
+   "variation_annuelle": 40.73,
+   "variation_jour": 1.8
+  }
+ },
+ "nb_valeurs": 44,
+ "numero": 177,
+ "reconcilie": true,
+ "seance": "2026-09-18",
+ "totaux": {
+  "baisse": 30,
+  "hausse": 8,
+  "inchange": 6,
+  "per_moyen": 17.74,
+  "rendement_moyen": 5.92,
+  "titres": 44,
+  "valeur": 4627361186,
+  "volume": 1254753
+ },
+ "valeurs": {
+  "ABJC": {
+   "cours": null,
+   "per": 32.22,
+   "rendement": null,
+   "valeur": 8903925,
+   "volume": 2297
+  },
+  "BICB": {
+   "cours": null,
+   "per": 16.11,
+   "rendement": null,
+   "valeur": 117736050,
+   "volume": 11342
+  },
+  "BICC": {
+   "cours": null,
+   "per": 14.46,
+   "rendement": null,
+   "valeur": 8182860,
+   "volume": 261
+  },
+  "BNBC": {
+   "cours": null,
+   "per": 593.6,
+   "rendement": null,
+   "valeur": 7274715,
+   "volume": 3592
+  },
+  "BOAB": {
+   "cours": null,
+   "per": 19.87,
+   "rendement": null,
+   "valeur": 25274900,
+   "volume": 2535
+  },
+  "BOABF": {
+   "cours": null,
+   "per": 17.83,
+   "rendement": null,
+   "valeur": 23490590,
+   "volume": 2979
+  },
+  "BOAC": {
+   "cours": null,
+   "per": 13.29,
+   "rendement": null,
+   "valeur": 66949965,
+   "volume": 5644
+  },
+  "BOAM": {
+   "cours": null,
+   "per": 16.61,
+   "rendement": null,
+   "valeur": 20299650,
+   "volume": 2976
+  },
+  "BOAN": {
+   "cours": null,
+   "per": 271.9,
+   "rendement": null,
+   "valeur": 31657965,
+   "volume": 5913
+  },
+  "BOAS": {
+   "cours": null,
+   "per": 13.23,
+   "rendement": null,
+   "valeur": 133092620,
+   "volume": 16495
+  },
+  "CABC": {
+   "cours": null,
+   "per": 14.0,
+   "rendement": null,
+   "valeur": 6707370,
+   "volume": 1959
+  },
+  "CBIBF": {
+   "cours": null,
+   "per": 16.53,
+   "rendement": null,
+   "valeur": 118763305,
+   "volume": 3531
+  },
+  "CFAC": {
+   "cours": null,
+   "per": 35.13,
+   "rendement": null,
+   "valeur": 1789400,
+   "volume": 1091
+  },
+  "CIEC": {
+   "cours": null,
+   "per": 27.52,
+   "rendement": null,
+   "valeur": 44038865,
+   "volume": 6782
+  },
+  "ECOC": {
+   "cours": null,
+   "per": 14.74,
+   "rendement": null,
+   "valeur": 41368665,
+   "volume": 2446
+  },
+  "ETIT": {
+   "cours": null,
+   "per": 3.66,
+   "rendement": null,
+   "valeur": 66796886,
+   "volume": 953585
+  },
+  "FTSC": {
+   "cours": null,
+   "per": 63.26,
+   "rendement": null,
+   "valeur": 6275210,
+   "volume": 3022
+  },
+  "LNBB": {
+   "cours": null,
+   "per": 17.65,
+   "rendement": null,
+   "valeur": 31084695,
+   "volume": 7755
+  },
+  "NEIC": {
+   "cours": null,
+   "per": 15.61,
+   "rendement": null,
+   "valeur": 9609545,
+   "volume": 4041
+  },
+  "NSBC": {
+   "cours": null,
+   "per": 14.88,
+   "rendement": null,
+   "valeur": 114580060,
+   "volume": 4674
+  },
+  "NTLC": {
+   "cours": null,
+   "per": 19.16,
+   "rendement": null,
+   "valeur": 66914115,
+   "volume": 4133
+  },
+  "ONTBF": {
+   "cours": null,
+   "per": 13.58,
+   "rendement": null,
+   "valeur": 32836440,
+   "volume": 11146
+  },
+  "ORAC": {
+   "cours": null,
+   "per": 19.93,
+   "rendement": null,
+   "valeur": 59003420,
+   "volume": 2672
+  },
+  "ORGT": {
+   "cours": null,
+   "per": 10.28,
+   "rendement": null,
+   "valeur": 20312910,
+   "volume": 6331
+  },
+  "PALC": {
+   "cours": null,
+   "per": 8.36,
+   "rendement": null,
+   "valeur": 89117070,
+   "volume": 10627
+  },
+  "PRSC": {
+   "cours": null,
+   "per": 18.62,
+   "rendement": null,
+   "valeur": 3552425,
+   "volume": 829
+  },
+  "SAFC": {
+   "cours": null,
+   "per": 84.32,
+   "rendement": null,
+   "valeur": 86036645,
+   "volume": 17533
+  },
+  "SDCC": {
+   "cours": null,
+   "per": 19.11,
+   "rendement": null,
+   "valeur": 23058675,
+   "volume": 1815
+  },
+  "SDSC": {
+   "cours": null,
+   "per": 201.8,
+   "rendement": null,
+   "valeur": 52418685,
+   "volume": 18376
+  },
+  "SGBC": {
+   "cours": null,
+   "per": 11.94,
+   "rendement": null,
+   "valeur": 168412815,
+   "volume": 4340
+  },
+  "SHEC": {
+   "cours": null,
+   "per": 28.85,
+   "rendement": null,
+   "valeur": 30154080,
+   "volume": 10208
+  },
+  "SIBC": {
+   "cours": null,
+   "per": 16.52,
+   "rendement": null,
+   "valeur": 85463735,
+   "volume": 9441
+  },
+  "SIVC": {
+   "cours": null,
+   "per": 105.95,
+   "rendement": null,
+   "valeur": 4083620,
+   "volume": 1872
+  },
+  "SLBC": {
+   "cours": null,
+   "per": 13.66,
+   "rendement": null,
+   "valeur": 13329250,
+   "volume": 351
+  },
+  "SMBC": {
+   "cours": null,
+   "per": 10.14,
+   "rendement": null,
+   "valeur": 21511435,
+   "volume": 1263
+  },
+  "SNTS": {
+   "cours": null,
+   "per": 10.2,
+   "rendement": null,
+   "valeur": 2755487715,
+   "volume": 65452
+  },
+  "SOGC": {
+   "cours": null,
+   "per": 13.58,
+   "rendement": null,
+   "valeur": 10304120,
+   "volume": 1309
+  },
+  "SPHC": {
+   "cours": null,
+   "per": 7.98,
+   "rendement": null,
+   "valeur": 42415670,
+   "volume": 5383
+  },
+  "STAC": {
+   "cours": null,
+   "per": null,
+   "rendement": null,
+   "valeur": 13630750,
+   "volume": 5894
+  },
+  "STBC": {
+   "cours": null,
+   "per": 10.81,
+   "rendement": null,
+   "valeur": 89555815,
+   "volume": 4105
+  },
+  "TTLC": {
+   "cours": null,
+   "per": 21.89,
+   "rendement": null,
+   "valeur": 16068830,
+   "volume": 4970
+  },
+  "TTLS": {
+   "cours": null,
+   "per": 18.98,
+   "rendement": null,
+   "valeur": 10073080,
+   "volume": 2533
+  },
+  "UNLC": {
+   "cours": null,
+   "per": 751.21,
+   "rendement": null,
+   "valeur": 515310,
+   "volume": 10
+  },
+  "UNXC": {
+   "cours": null,
+   "per": null,
+   "rendement": null,
+   "valeur": 49227335,
+   "volume": 21240
+  }
+ }
+}
