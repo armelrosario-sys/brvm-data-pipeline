@@ -786,12 +786,27 @@ def test_arbitrage():
             else "aucun exercice publie manquant en base",
             bloquant=False)
 
-    # Un titre suspendu par arbitrage ne doit porter aucun profil de style :
-    # c'est tout l'objet du blocage.
+    # --- Coherence avec profils.json --------------------------------------
+    # ATTENTION (27/09/2026, premier passage reel en integration continue) :
+    # ces deux controles comparent des verdicts calcules a chaud au contenu de
+    # profils.json. Ils n'ont de sens que si ce fichier a ete regenere APRES la
+    # base. Sinon ils comparent le present au passe et echouent sur tous les
+    # titres a la fois -- ce qui est exactement ce qui s'est produit, parce que
+    # tests.yml ne lancait pas profils.py. Le workflow le lance desormais ; ce
+    # garde-fou traite le cas ou quelqu'un execute ce fichier sans l'avoir fait.
     profils_json = RACINE / "collecte" / "profils.json"
-    if profils_json.exists():
+    if not profils_json.exists():
+        verifie(False, "collecte/profils.json absent : coherence non verifiable "
+                       "(lancer python3 moteur/profils.py)", bloquant=False)
+    elif profils_json.stat().st_mtime < DB.stat().st_mtime:
+        verifie(False, "collecte/profils.json est plus ancien que la base : "
+                       "coherence non verifiable, relancer python3 moteur/profils.py "
+                       "avant ce test", bloquant=False)
+    else:
         import json
         profils = json.loads(profils_json.read_text(encoding="utf-8"))
+        # Un titre suspendu par arbitrage ne doit porter aucun profil de style :
+        # c'est tout l'objet du blocage.
         STYLES = {"GARP", "VALUE", "GROWTH", "RENDEMENT"}
         fautifs = sorted(
             t for t, v in verdicts.items()
