@@ -1075,6 +1075,77 @@ def test_fondamentaux_agregateur():
               % ", ".join("%s %d" % x for x in remplaces))
 
 
+
+# ----------------------------------------------------------------------
+# 15. FONDS DES NOTATIONS FINANCIERES (bloquant)
+# ----------------------------------------------------------------------
+def test_fonds_notations():
+    """La collecte des notations doit AVANCER, jamais reculer.
+
+    POURQUOI CETTE SECTION EXISTE (27/09/2026). L'audit du 26/09 lisait
+    "356 rapports NON_EXTRAIT sur 385" comme un echec de l'extracteur. C'en
+    etait l'inverse : un seul ECHEC reel : les 355 autres n'avaient jamais ete
+    TENTEES. L'extracteur etait plafonne a --pdf annonces, prenait les plus
+    recentes, puis REECRIVAIT tout le fichier. Les 30 lignes portant un statut
+    etaient donc exactement les 30 annonces les plus recentes, coupure au jour
+    pres, et chaque passage mensuel repassait sur les memes.
+
+    Le correctif rend la collecte cumulative. Ce test garde la propriete qui
+    compte : le nombre de rapports exploites ne doit jamais DIMINUER. Si un
+    jour il baisse, c'est que le fichier a ete reecrit a zero — la panne
+    silencieuse d'origine.
+    """
+    print("\n=== 15. Fonds des notations financieres (bloquant) ===")
+    chemin = RACINE / "collecte" / "notations_financieres.csv"
+    if not chemin.exists():
+        verifie(False, "collecte/notations_financieres.csv absent : la collecte P12 "
+                       "n'a jamais tourne", bloquant=False)
+        return
+    import csv as _csv
+    with chemin.open(encoding="utf-8", newline="") as f:
+        lignes = list(_csv.DictReader(f))
+    statuts = {}
+    for r in lignes:
+        s = r.get("statut_extraction") or "VIDE"
+        statuts[s] = statuts.get(s, 0) + 1
+    exploitees = statuts.get("OK", 0) + statuts.get("SANS_NOTE", 0)
+    print("       statuts : %s" % ", ".join("%s=%d" % kv for kv in sorted(statuts.items())))
+
+    # Plancher a la valeur du 27/09/2026, jour du correctif. Il doit MONTER a
+    # chaque passage de P12 ; on ne l'abaisse que si la BRVM retire des rapports.
+    PLANCHER_EXPLOITEES = 29
+    verifie(exploitees >= PLANCHER_EXPLOITEES,
+            f"{exploitees} rapports exploites (plancher {PLANCHER_EXPLOITEES}) — "
+            f"une baisse signale que le fichier a ete reecrit a zero")
+
+    # L'acquis doit etre complet : une ligne exploitee porte son agence et sa note.
+    incompletes = sorted(
+        r["url_pdf"].rsplit("/", 1)[-1] for r in lignes
+        if r.get("statut_extraction") == "OK" and not (r.get("agence") and r.get("note_lt")))
+    verifie(not incompletes,
+            "chaque rapport marque OK porte son agence et sa note"
+            + ("" if not incompletes else f" — incomplets : {incompletes[:5]}"))
+
+    # Une URL ne doit apparaitre qu'une fois : un doublon signifierait que la
+    # fusion avec l'acquis a duplique au lieu de remplacer.
+    urls = [r.get("url_pdf") for r in lignes if r.get("url_pdf")]
+    doublons = sorted({u.rsplit("/", 1)[-1] for u in urls if urls.count(u) > 1})
+    verifie(not doublons,
+            "aucune URL en double dans le fonds"
+            + ("" if not doublons else f" — doublons : {doublons[:5]}"))
+
+    # Le code doit porter la reprise cumulative : sans elle, tout recommence.
+    code = (RACINE / "collecte" / "notations.py").read_text(encoding="utf-8")
+    verifie("lire_acquis" in code and "STATUTS_ACQUIS" in code,
+            "collecte/notations.py relit l'acquis avant d'extraire")
+
+    restantes = statuts.get("NON_EXTRAIT", 0)
+    if restantes:
+        verifie(False, f"{restantes} rapports jamais tentes — relancer le workflow P12 "
+                       f"(l'acquis n'est plus efface, chaque passage avance le front)",
+                bloquant=False)
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -1093,6 +1164,7 @@ def main():
     test_arbitrage()
     test_base_reference()
     test_fondamentaux_agregateur()
+    test_fonds_notations()
     if not sans_app:
         test_application()
 
