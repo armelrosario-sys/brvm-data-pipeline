@@ -123,8 +123,35 @@ sensible à cette convention** : en brut, le seuil du profil RENDEMENT serait
 franchi. Le `payout_ratio` saisi, lui, est uniformément brut (vérifié sur les
 29 lignes renseignées le 27/09/2026).
 
-**Terminé quand** : la convention est tranchée, écrite dans `config/`, appliquée
-partout, l'effet est mesuré titre par titre, et un test empêche le mélange.
+**Second axe, mesuré le 28/09/2026 — l'exercice de rattachement.** L'échelle de
+`payout_ratio` est saine : 29 valeurs réelles, toutes entre 0,000 et 1,258, donc
+uniformément des fractions, aucun mélange fraction/pourcentage. Mais le
+*rattachement* n'est pas uniforme. Testé par l'identité de variation des
+capitaux propres — distribution implicite = `RN(n) − ΔCP` — contre la
+distribution déclarée, sur les 11 paires où `payout_ratio` est disponible :
+
+| alignement | définition | BBGCI (4 paires) | CABC (6 paires) |
+|---|---|---|---|
+| A | `payout(n−1) × RN(n−1)` — proposé sur n−1, versé en n | 0,6 à 12,3 % | 7,1 à 79,3 % |
+| B | `payout(n) × RN(n)` — rattaché à l'exercice de versement | 5,4 à 48,6 % | 1,2 à 26,2 % |
+
+BBGCI ferme sous A, CABC sous B, et SDSC 2024 ferme sous B **à 0,0 %** (5 008,0
+implicite contre 5 008,1 déclaré — le même nombre). Le moteur, lui, prend le
+`payout_ratio` le plus récent non nul sans jamais regarder son exercice
+(`profils.py`, boucle `for _e, _rn, _cp, p in etats`), et s'en sert pour fermer
+les profils RENDEMENT et VALUE via `payout_ok = payout <= 1.00`. Un décalage
+d'un an peut donc basculer un profil.
+
+**Réserve explicite** : ce n'est pas une preuve, c'est un signal. L'identité ne
+se ferme exactement que si les seuls mouvements de capitaux propres sont le
+résultat et le dividende — une augmentation de capital, des écarts de
+conversion, des réserves reclassées ou des intérêts minoritaires la faussent
+aussi. Deux sources indépendantes ou un tableau de variation des capitaux
+propres trancheraient. À faire avant de corriger quoi que ce soit.
+
+**Terminé quand** : la convention est tranchée sur les DEUX axes (brut/net ET
+exercice de rattachement), écrite dans `config/`, appliquée partout, l'effet est
+mesuré titre par titre, et un test empêche le mélange.
 
 ## C3 — Journal des prédictions
 
@@ -233,6 +260,49 @@ se démontent ensemble ou pas du tout.
 **Terminé quand** : le code est retiré, aucune barrière ne s'appuie plus
 dessus, et la publication GitHub Pages fonctionne toujours.
 
+## C10 — `dividendes.date_paiement` n'est pas une colonne de dates
+
+- statut : À FAIRE
+- validation : —
+- autonomie : complète, aucune donnée extérieure nécessaire
+- priorité : 3 — **avant C3**, dont le journal datera ses lignes
+
+Trouvé le 28/09/2026 en cherchant à dater les dividendes. La colonne mélange
+**deux formats incompatibles**, comptés sur les 326 lignes de la base :
+
+- **296 lignes** (91 %) au format français abrégé, année sur deux chiffres :
+  `24-juil.-17`, `30-sept.-24`, `24-août-22`. Toutes issues de
+  `collecte/dividendes_par_exercice.csv (Piste D, confiance ELEVEE)` —
+  `charger_dividendes_exercice.py` insère la chaîne brute sans la normaliser.
+- **24 lignes** en ISO `aaaa-mm-jj`, venues de `donnees/base/dividendes.csv`.
+- **6 lignes** nulles (SDSC).
+
+Trois conséquences, dont une déjà armée :
+
+1. **Tri et comparaison faux.** `scoring.py::dividendes()` fait
+   `ORDER BY date_paiement DESC` : sur du français abrégé l'ordre est
+   alphabétique, pas chronologique.
+2. **Extraction d'année impossible.** `substr(date_paiement,1,4)` rend `24-j`.
+   C'est ce qui a fait échouer ma première tentative de mesurer le décalage
+   entre année de paiement et exercice couvert — mesure donc **non faite**,
+   elle reste à produire une fois la colonne normalisée.
+3. **Déduplication déjà cassée, en attente de se déclencher.**
+   `collecte_boc_quotidien.py` normalise en ISO (`date_dividende_vers_iso`)
+   puis déduplique par `SELECT 1 FROM dividendes WHERE ticker=? AND
+   montant_net=? AND date_paiement=?`. Une date ISO ne s'égalera jamais à la
+   forme française du même jour : le jour où le BOC réobserve un dividende déjà
+   chargé par la Piste D, il l'insère en double. Aucun doublon mixte
+   n'existe encore (vérifié : 0 sur 326) — le défaut est latent, pas actif.
+
+**Attention** : la conversion doit lever l'ambiguïté du siècle sur l'année à
+deux chiffres, et refuser plutôt que deviner sur un mois non reconnu. Un mois
+français abrégé mal orthographié doit échouer bruyamment.
+
+**Terminé quand** : la colonne est ISO sur les 326 lignes via un script de
+migration idempotent dans `outils/`, les chargeurs normalisent à l'entrée, la
+déduplication de `collecte_boc_quotidien.py` retrouve bien les lignes
+existantes, et un test refuse toute date non ISO dans la table.
+
 ---
 
 # Veille datée, hors file
@@ -246,6 +316,88 @@ dessus, et la publication GitHub Pages fonctionne toujours.
 # Journal
 
 Une entrée par cycle. La plus récente en haut.
+
+## 2026-09-28 — cycle 1
+
+**Aucun chantier exécuté.** C1 était le seul `PROPOSÉ` et sa validation est
+restée `EN ATTENTE` : rien n'a été touché dans la file, conformément au
+protocole. Le cycle a porté sur l'étape permanente, la chasse aux défauts.
+
+**Défaut trouvé et corrigé : `peupler.py` n'était pas idempotent, et la barrière
+corrompait la base qu'elle validait.**
+
+Le chemin, mesuré de bout en bout :
+
+1. `peupler.py` insérait `dividendes` et `avis_reglementaires` par un `INSERT`
+   simple. Ce sont les **seules** tables de la base de référence sans clef
+   unique — leur seule clef est un `id AUTOINCREMENT`. Les quatre autres
+   (`societes`, `etats_financiers`, `resultats_intermediaires` en
+   `INSERT OR REPLACE` sur clef unique ; `liste_suivi` en `DELETE` puis
+   insertion) étaient idempotentes. L'idempotence du chargeur reposait donc
+   entièrement sur la présence d'une clef unique, et deux tables n'en avaient
+   pas.
+2. Croissance mesurée, linéaire et non bornée : **+15 dividendes et +16 avis par
+   passage** — 311/16 → 326/32 → 341/48 → 356/64 → 371/80.
+3. `app.py::preparer_base()` relance `peupler.py` sur une base **existante** dès
+   que l'empreinte des sources change, en annonçant une « reconstruction » qui
+   n'en est pas une. Et `tester_donnees.py` démarre `app.py` en section 4 :
+   la barrière dupliquait donc les données à chaque exécution. Vérifié en
+   instrumentant la chaîne : `tester.py` et `profils.py` laissent la base à
+   311/16, `tester_donnees.py` la rendait à 326/32.
+4. **Ce n'était pas cosmétique.** `appliquer_gate()` **compte** les avis :
+   `if len(retards) >= defauts_max` avec `defauts_max: 2`. SDSC porte **un**
+   retard de publication (2025-04-30, confirmé par ses propres commissaires aux
+   comptes). Dupliqué, il en porte deux, le seuil tombe, et le titre passe de
+   `ELIGIBLE` à **`EXCLU`** — écarté de toute l'analyse sur la base d'un
+   manquement enregistré une fois et compté deux fois. Diff mesuré sur
+   `profils.json` entre base propre et base dupliquée : **1 titre sur 47
+   change, SDSC, sur le seul champ `gate`**.
+5. Le `collecte/profils.json` **commité portait ce verdict corrompu** : il avait
+   été produit sur une base dupliquée. Régénéré sur base propre dans ce commit,
+   SDSC repasse à `ELIGIBLE` (une ligne de diff).
+
+**Correctif.** Déduplication à l'insertion, avec l'opérateur `IS` (NULL-safe :
+trois dividendes SDSC ont une `date_paiement` nulle, et `NULL = NULL` est faux
+en SQL, ce qui laisserait passer le doublon). Pas de `DELETE` : 
+`charger_dividendes_exercice.py` (296 lignes) et `collecte_boc_quotidien.py`
+écrivent aussi dans `dividendes`, et `app.py` ne les relance pas — vider la
+table les effacerait sans les rebâtir. Clefs naturelles vérifiées uniques dans
+les deux CSV sources (0 doublon sur 15 et sur 16 lignes) avant d'y toucher.
+
+**Test.** Nouvelle **section 16** de `tester_donnees.py` : `peupler.main()` deux
+fois sur une base jetable (`tempfile`, jamais `brvm.db`), comparaison des six
+tables. Plus un garde-fou vérifiant que la base jetable est bien peuplée — une
+base vide serait trivialement stable — et un contrôle de doublons d'avis dans
+`brvm.db`, puisque c'est ce compte que lit le gate. **Vérifié dans les deux
+sens** : le test échoue sur le code d'avant (`dividendes : 15 -> 30 ;
+avis_reglementaires : 16 -> 32`) et passe sur le corrigé. Après correctif,
+`tester_donnees.py` laisse la base à 311/16.
+
+**Fausse piste, écartée.** `TEST_EXCLU` et `TEST_VIGIL` apparaissent dans
+`societes` et `etats_financiers` en production. Ce ne sont pas des fuites : ce
+sont des fixtures délibérées, marquées `[SYNTHETIQUE]`, utilisées par
+`tester.py` et `scoring.py`, et exclues du profilage (47 titres profilés sur 50
+sociétés). Signalé ici pour qu'un cycle suivant ne « corrige » pas ce qui est
+volontaire — mais elles doivent être exclues de toute mesure statistique sur la
+base, ce que fait le diagnostic ci-dessus.
+
+**Barrières** : toutes passent. `tester.py` 0, `tester_donnees.py` 2 (les deux
+mêmes alertes de fraîcheur qu'en référence, C4 et C5 — aucune nouvelle),
+`avis_brvm.py --test` 0, `notations.py --test` 0, `generer_dashboard.py` 0
+(48 titres), `app.py` démarre, 4 onglets.
+
+**C1 reste `PROPOSÉ` / `EN ATTENTE`, non touché.** Sa prémisse a été revérifiée
+sur données fraîches et tient : prime de rendement FTSC **+79,3 points**
+(rendement 86,33 %), SIVC **+19,7 points** (26,81 %), et le troisième du
+classement, STBC, à **+0,9 point** seulement. L'écrasement du classement est
+donc réel et intact.
+
+**C10 ouvert** (nouveau, `À FAIRE`) : `dividendes.date_paiement` mélange deux
+formats — 296 lignes en français abrégé à année sur deux chiffres, 24 en ISO,
+6 nulles. Le tri `ORDER BY date_paiement` de `scoring.py` est donc faux, et la
+déduplication de `collecte_boc_quotidien.py` est cassée en attente de se
+déclencher. **C2 enrichi** d'un second axe mesuré, l'exercice de rattachement du
+`payout_ratio` — avec sa réserve : signal, pas preuve.
 
 ## 2026-09-28 — cycle 0 (mise en place)
 

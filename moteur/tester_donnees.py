@@ -43,6 +43,7 @@ Usage :
 import sqlite3
 import subprocess
 import sys
+import tempfile
 from datetime import date, datetime
 from pathlib import Path
 
@@ -1073,6 +1074,107 @@ def test_base_reference():
 
 
 # ----------------------------------------------------------------------
+# 16. IDEMPOTENCE DE peupler.py (bloquant)
+# ----------------------------------------------------------------------
+def test_idempotence_peupler():
+    """Relancer peupler.py ne doit JAMAIS changer le nombre de lignes.
+
+    POURQUOI CETTE SECTION EXISTE (28/09/2026). Rien ne surveillait cette
+    famille de defauts, et elle mordait deja.
+
+    peupler.py inserait dividendes et avis_reglementaires par un INSERT simple.
+    Ces deux tables sont les SEULES de la base de reference sans clef unique --
+    leur seule clef est un id AUTOINCREMENT -- donc chaque passage y rejouait
+    la totalite du CSV. Les quatre autres tables (societes, etats_financiers,
+    resultats_intermediaires par INSERT OR REPLACE sur une clef unique,
+    liste_suivi par DELETE puis insertion) etaient, elles, idempotentes.
+    L'idempotence du chargeur reposait donc entierement sur la presence d'une
+    clef unique, et deux tables n'en avaient pas.
+
+    Ce n'etait pas theorique : app.py::preparer_base() relance peupler.py sur
+    une base EXISTANTE des que l'empreinte des sources change, en annoncant une
+    "reconstruction" qui n'en est pas une -- et tester_donnees.py demarre app.py
+    en section 4. La barriere corrompait donc la base qu'elle validait. Mesure
+    du 28/09/2026 : +15 dividendes et +16 avis par passage, croissance lineaire
+    non bornee (311/16 -> 326/32 -> 341/48 -> 356/64 -> 371/80).
+
+    Consequence mesuree, et c'est la qu'est l'enjeu : appliquer_gate() COMPTE
+    les avis reglementaires --
+        retards = avis(cur, ticker, "RETARD_PUBLICATION")
+        if len(retards) >= fx["retards_publication"]["defauts_max"]   # seuil 2
+    SDSC porte UN retard de publication (2025-04-30, confirme par ses propres
+    commissaires aux comptes). Duplique, il en porte deux : le seuil tombe et le
+    titre passe de ELIGIBLE a EXCLU, sortant de toute l'analyse sur la base d'un
+    manquement enregistre une fois et compte deux fois. Le collecte/profils.json
+    commite portait ce verdict corrompu.
+
+    Le test compte les lignes de chaque table apres un premier peuplement, puis
+    apres un second, sur une base jetable -- jamais sur brvm.db.
+    """
+    print("\n=== 16. Idempotence de peupler.py (bloquant) ===")
+    sys.path.insert(0, str(ICI))
+    try:
+        import peupler
+    except Exception as e:  # pragma: no cover
+        verifie(False, f"moteur/peupler.py non importable : {e}")
+        return
+
+    tables = ("societes", "etats_financiers", "dividendes", "avis_reglementaires",
+              "liste_suivi", "resultats_intermediaires")
+
+    def comptes(chemin):
+        conn = sqlite3.connect(chemin)
+        try:
+            return {t: conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+                    for t in tables}
+        finally:
+            conn.close()
+
+    db_origine = peupler.DB
+    with tempfile.TemporaryDirectory() as tmp:
+        jetable = str(Path(tmp) / "idempotence.db")
+        peupler.DB = jetable
+        try:
+            peupler.main()
+            premier = comptes(jetable)
+            peupler.main()
+            second = comptes(jetable)
+        except Exception as e:  # pragma: no cover
+            verifie(False, f"peupler.main() a echoue sur une base jetable : {e}")
+            return
+        finally:
+            peupler.DB = db_origine
+
+    derives = [f"{t} : {premier[t]} -> {second[t]}"
+               for t in tables if premier[t] != second[t]]
+    verifie(not derives,
+            "relancer peupler.py ne cree aucune ligne supplementaire"
+            + ("" if not derives else " — DERIVE : " + " ; ".join(derives)))
+
+    # Garde-fou de second niveau : le test ci-dessus ne vaut que si le
+    # peuplement a bien eu lieu. Une base vide serait trivialement stable.
+    verifie(premier["societes"] >= 40 and premier["etats_financiers"] >= 150,
+            f"la base jetable est bien peuplee ({premier['societes']} societes, "
+            f"{premier['etats_financiers']} lignes d'etats) — sans quoi la "
+            f"stabilite ci-dessus ne prouverait rien")
+
+    # Le compte des avis par (ticker, type) doit rester a 1 pour les avis
+    # venus du CSV de reference : c'est ce compte que lit le gate.
+    conn = sqlite3.connect(DB) if Path(DB).exists() else None
+    if conn is not None:
+        try:
+            trop = conn.execute(
+                "SELECT ticker, type, COUNT(*) FROM avis_reglementaires "
+                "GROUP BY ticker, type, date_avis HAVING COUNT(*) > 1").fetchall()
+        finally:
+            conn.close()
+        verifie(not trop,
+                "aucun avis reglementaire en double dans brvm.db (le gate les "
+                "COMPTE : un doublon exclut un titre a tort)"
+                + ("" if not trop else " — trouve : " + str(trop)))
+
+
+# ----------------------------------------------------------------------
 # 14. FONDAMENTAUX REPRIS DE LA CHAINE pipeline/ (bloquant)
 # ----------------------------------------------------------------------
 def test_fondamentaux_agregateur():
@@ -1290,6 +1392,7 @@ def main():
     test_base_reference()
     test_fondamentaux_agregateur()
     test_fonds_notations()
+    test_idempotence_peupler()
     if not sans_app:
         test_application()
 

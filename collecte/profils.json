@@ -3544,7 +3544,7 @@
   "payout": 0.6935,
   "roe": 1.1,
   "pegy": null,
-  "gate": "EXCLU",
+  "gate": "ELIGIBLE",
   "secteur": "INDUSTRIELS",
   "n_secteur": 2,
   "source_fait": null,

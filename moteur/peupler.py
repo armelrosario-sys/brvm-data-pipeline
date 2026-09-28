@@ -159,12 +159,40 @@ def main():
     cur.executemany(
         "UPDATE etats_financiers SET source_url=? WHERE ticker=? AND exercice=?",
         [(url, t, e) for t, e, url in source_urls])
+    # Idempotence (28/09/2026) : ces deux tables n'ont PAS de cle unique -- leur
+    # seule clef est un id AUTOINCREMENT. Un INSERT simple y rejouait donc la
+    # totalite du CSV a chaque passage, et app.py::preparer_base() relance
+    # peupler.py sur une base EXISTANTE des que l'empreinte des sources change,
+    # en annoncant une "reconstruction" qui n'en est pas une. Mesure du
+    # 28/09/2026 : +15 dividendes et +16 avis par passage, croissance lineaire
+    # non bornee (311/16 -> 326/32 -> 341/48 -> 356/64 -> 371/80).
+    #
+    # Ce n'etait pas cosmetique. appliquer_gate() COMPTE les avis :
+    #   retards = avis(cur, ticker, "RETARD_PUBLICATION")
+    #   if len(retards) >= fx["retards_publication"]["defauts_max"]  # seuil 2
+    # SDSC porte UN retard de publication (2025-04-30, confirme par ses propres
+    # commissaires aux comptes). Duplique, il en porte deux : le seuil tombe et
+    # le titre passe de ELIGIBLE a EXCLU. Le collecte/profils.json commite
+    # portait ce verdict corrompu.
+    #
+    # Le correctif deduplique a l'insertion plutot que de vider les tables :
+    # charger_dividendes_exercice.py (296 lignes) et collecte_boc_quotidien.py
+    # ecrivent dans dividendes eux aussi, et app.py ne les relance PAS -- un
+    # DELETE ici les effacerait sans les rebatir. L'operateur IS est retenu
+    # plutot que = parce qu'il est NULL-safe : trois dividendes SDSC ont une
+    # date_paiement nulle, et "NULL = NULL" est faux en SQL, ce qui laisserait
+    # passer le doublon. Clefs naturelles verifiees uniques dans les deux CSV.
     cur.executemany(
         "INSERT INTO dividendes (ticker,montant_net,date_paiement,exercice_couvert) "
-        "VALUES (?,?,?,?)", dividendes)
+        "SELECT ?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM dividendes "
+        "WHERE ticker IS ? AND montant_net IS ? AND date_paiement IS ? "
+        "AND exercice_couvert IS ?)",
+        [d + d for d in dividendes])
     cur.executemany(
-        "INSERT INTO avis_reglementaires (ticker,type,date_avis,note) VALUES (?,?,?,?)",
-        avis)
+        "INSERT INTO avis_reglementaires (ticker,type,date_avis,note) "
+        "SELECT ?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM avis_reglementaires "
+        "WHERE ticker IS ? AND type IS ? AND date_avis IS ?)",
+        [a + a[:3] for a in avis])
 
     # Liste de suivi (15/07/2026) : lue depuis config/liste_suivi.yaml --
     # CODES SEULS, jamais de quantite ni de prix (doctrine du projet).
