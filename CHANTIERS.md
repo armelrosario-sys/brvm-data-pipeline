@@ -58,6 +58,21 @@ Chacune vient d'une erreur réelle du 27/09/2026.
   la note et le message de commit, et laisser la révocation possible d'un
   `git revert`.
 - **Un chantier par cycle, un commit par chantier.**
+- **Refaire `git fetch origin main` juste avant de committer, et relire ce qui
+  est arrivé.** Si un cycle concurrent a poussé entre-temps : reprendre son
+  travail par rebase, repasser les barrières **après** la fusion, et surtout
+  **abandonner ce qui est devenu redondant** plutôt que de le fusionner. Deux
+  contrôles sur la même identité, avec deux registres d'exceptions listant les
+  mêmes cas, se désynchronisent et ne surveillent plus rien. Cette règle vient
+  d'un gâchis réel du 28/09/2026 : trois sessions ont tourné en parallèle, deux
+  ont attribué le libellé `C10` au même moment, et deux ont écrit **le même
+  contrôle du comparatif N-1** dans la même heure.
+- **Annoncer la famille de défauts chassée dès le début du cycle**, en tête du
+  journal, et pousser cette annonce seule avant de travailler. C'est le seul
+  moyen qu'a une session concurrente de ne pas refaire le même travail : la
+  chasse aux défauts est l'étape la plus coûteuse du cycle et la plus facile à
+  dupliquer, parce que deux sessions qui lisent le même fichier arrivent aux
+  mêmes soupçons.
 - **Jamais de commit si une barrière tombe** : golden tests, `tester_donnees.py`,
   garde-fous des collecteurs, génération du dashboard, démarrage de `app.py`.
   En cas d'échec : tout annuler, et committer le seul constat d'échec.
@@ -225,6 +240,11 @@ le motif de leur maintien est documenté.
 
 46 titres sur 47 ont un ROE depuis le 27/09/2026. TotalEnergies Marketing
 Sénégal est le dernier. Ses capitaux propres manquent.
+
+**À traiter d'une seule main avec C11** : le cycle qui ouvrira les documents TTLS
+pour y lire les capitaux propres y lira aussi le référentiel comptable des
+exercices 2024 et 2025 — c'est exactement ce que C11 réclame, et la divergence de
+comparatif TTLS 2025 se tranche alors sans second accès à brvm.org.
 
 **Terminé quand** : 47/47, ou l'impossibilité est documentée.
 
@@ -406,6 +426,76 @@ et la ligne repasse de VALIDE à PROBABLE.
 # Journal
 
 Une entrée par cycle. La plus récente en haut.
+
+## 2026-09-28 — cycle 3 (session concurrente du cycle 2 — travail abandonné)
+
+**Ce cycle n'a rien ajouté au code, et c'est le bon résultat.** Il a démarré sur
+`cf63b14`, en parallèle des cycles 1 et 2, et a chassé **la même famille de
+défauts que le cycle 2** : le comparatif N-1 republié par chaque document,
+confronté à la ligne N-1 de la base. Il l'a trouvée par le même raisonnement,
+et est arrivé aux **mêmes nombres** : 95 paires confrontables, 4 divergences
+(STBC 2025, CIEC 2025, CIEC 2023, TTLS 2025), avec les mêmes écarts au franc.
+Il avait écrit son propre contrôle en section 13 et l'avait validé par
+contre-essai. En faisant son `git fetch` avant de pousser, il a découvert
+`a6ec1ca` : le cycle 2 avait écrit le même contrôle une demi-heure plus tôt, et
+**mieux diagnostiqué** — il nomme la cause, la rupture de référentiel
+IFRS/SYSCOHADA lisible dans l'URL de la source, là où ce cycle-ci n'avait qu'une
+hypothèse. Son contrôle a donc été **abandonné plutôt que fusionné** : deux
+contrôles sur la même identité, avec deux registres listant les mêmes quatre
+cas, se désynchronisent et finissent par ne plus rien surveiller.
+
+**Ce que la double mesure vaut quand même.** Deux sessions sans aucun contact ont
+mesuré séparément 95 paires, 89 fermetures au franc et les mêmes 4 divergences
+aux mêmes montants. C'est une corroboration indépendante du diagnostic du
+cycle 2, pas une redite : ces nombres sont sûrs.
+
+**Une correction au cycle 2, mesurée ici.** Son entrée écrit « 4 divergent, dont
+deux entre lignes toutes deux marquées VALIDE ». C'est **trois**, pas deux :
+CIEC 2025, STBC 2025 et TTLS 2025 ont leurs deux lignes `VALIDE` ; seule
+CIEC 2023 s'appuie sur une ligne 2022 `PROBABLE`. La nuance compte, parce qu'une
+divergence entre deux lignes certifiées est le cas le plus gênant des quatre.
+
+**Un apport à C11, que le cycle 2 n'avait pas mesuré : l'effet sur les sorties.**
+En substituant les quatre comparatifs aux lignes N-1 et en relançant `peupler.py`
+puis `profils.py`, **4 titres sur 47** voient une sortie bouger : CIEC (ROE
+26,4 → 25,2 ; PER normalisé 32,0 → 32,3 ; écart bénéfice 0,16 → 0,18), SDCC
+(médiane sectorielle de ROE 20,85 → 20,29, par ricochet — CIEC est l'autre titre
+de son secteur), STBC et TTLS (une décimale de PER normalisé). **Aucun `profil`,
+`grade`, `gate`, drapeau, croissance, PEG ni PEGY ne change, sur aucun des 47**,
+vérifié champ par champ. Autrement dit, la divergence des comparatifs seule est
+un défaut de traçabilité ; c'est bien la rupture de référentiel de C11, et ses
+3,40 points de croissance sur CIEC, qui porte l'enjeu de notation.
+
+**Une erreur de ce cycle, dite pour ce qu'elle est.** Sa première mesure de cet
+effet annonçait « une seule sortie bouge sur 47 titres ». Elle était fausse : la
+comparaison ne portait que sur une liste restreinte de champs et laissait de côté
+`per_normalise`, `ecart_benefice` et `comparaisons`. Refaite sur l'intégralité
+des champs, elle donne 4 titres. Seule la conclusion sur les champs décisionnels
+tient des deux mesures.
+
+**Option documentée pour le contrôle du cycle 2, non appliquée.** Sa
+`TOLERANCE_COMPARATIF` de 0,5 % absout bien les deux arrondis d'écriture
+observés (BNBC 2022 écrit 1598 pour 1598,214 ; ORGT 2025 écrit −44400 pour
+−44363), mais par un seuil relatif. Une règle équivalente et plus solide existe :
+absoudre par la **précision d'écriture** — un comparatif multiple de 10^k vaut la
+valeur en base à 10^k/2 près, borne plafonnée à 0,5 %. Mesurée sur les six écarts
+de la base, elle sépare avec plus de marge : les deux arrondis passent à 1,4x et
+2,3x sous la tolérance, les quatre divergences échouent de 9x à 1113x au-delà.
+Son intérêt est un cas non encore rencontré : un titre de faible montant dont le
+document arrondit à la centaine dépasserait 0,5 % sans être une divergence. À
+prendre ou à laisser, aucune urgence — c'est un faux positif bloquant, pas un
+défaut manqué.
+
+**Barrières repassées sur `a6ec1ca`** avant ce commit, qui ne touche que ce
+fichier : `tester.py` 0, `tester_donnees.py` 0 avec les deux mêmes alertes de
+fraîcheur, les deux nouveaux contrôles du cycle 2 OK, `avis_brvm.py --test` 0,
+`notations.py --test` 0, `generer_dashboard.py` 0.
+
+**Aucun chantier exécuté, C1 non touché.** Aucun libellé nouveau : C10 à C12
+appartiennent aux cycles 1 et 2. Deux règles ajoutées à la liste des
+non-franchissements, pour que ce gâchis ne se reproduise pas — refetcher avant
+de committer et abandonner le redondant, et annoncer la famille chassée en tête
+du journal avant de travailler.
 
 ## 2026-09-28 — cycle 2
 
