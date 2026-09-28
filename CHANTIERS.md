@@ -497,6 +497,23 @@ mesuré, soit elle et son chargeur sont retirés et la section 17 est mise à jo
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-09-28 — cycle 5 (en cours)
+
+**Famille annoncée avant tout travail** : la **confrontation des deux séries de
+cours**. La base porte deux sources de prix indépendantes — `cours_mensuels`
+(depuis `collecte/cours_extraits.csv`) et `cours_quotidien_boc` (depuis le BOC) —
+et **aucun test ne les confronte l'une à l'autre**. Les sections 1 à 3 vérifient
+la fraîcheur, la fréquence et la source retenue, jamais l'accord des valeurs.
+C'est la même famille que le repli silencieux de C13, pris par l'autre bout :
+C13 dit que le repli est atteignable sans bruit, cette chasse demande si la
+donnée de repli vaut celle qu'elle remplace.
+
+**Chantier exécuté ce cycle : C13.** Deux lignes portaient `validation : OK`
+(C1 et C13) ; la règle n'en autorise qu'une. C13 est retenu parce qu'il ne
+demande aucun jugement — c'est de la plomberie — et parce qu'il protège les
+barrières elles-mêmes, donc tout ce qui viendra après. **C1 reste `OK` et non
+touché : c'est le chantier du cycle 6.**
+
 ## 2026-09-28 — cycle 4
 
 **Aucun chantier exécuté.** Aucune ligne `validation : OK` dans la file à
