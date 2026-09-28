@@ -242,6 +242,13 @@ puisque le gain dépend de ce qui reste réellement manquant. Sa vraie valeur es
 ailleurs : une deuxième agence permet de croiser les notations au lieu de
 dépendre d'une seule.
 
+**Mesuré le 28/09/2026 (cycle 2)** : l'autotest de `collecte/notations.py` rend
+déjà « PDF GCR 10/10 ». Le critère de terminaison ci-dessous est donc **déjà
+satisfait tel qu'il est écrit**, ce qui veut dire qu'il ne décrit pas le vrai
+travail. Le fonds compte 4 `ECHEC` pour 291 `OK` et 87 `SANS_NOTE` : c'est sur
+ces 4 qu'il faut regarder, pas sur l'analyseur d'échantillon. À rediagnostiquer
+avant toute proposition.
+
 **Terminé quand** : l'extracteur passe les 10 PDF GCR d'échantillon, ou le
 motif d'abandon est chiffré sur des données fraîches.
 
@@ -303,6 +310,89 @@ migration idempotent dans `outils/`, les chargeurs normalisent à l'entrée, la
 déduplication de `collecte_boc_quotidien.py` retrouve bien les lignes
 existantes, et un test refuse toute date non ISO dans la table.
 
+## C11 — Le référentiel comptable n'est pas une colonne de la base
+
+- statut : À FAIRE
+- validation : —
+- autonomie : complète, aucune donnée extérieure nécessaire
+- priorité : 4
+
+**Le constat, trouvé le 28/09/2026 par la confrontation du comparatif N-1.**
+Sur les **95 paires confrontables** de `etats_financiers.csv`, **4** sont en
+désaccord : le document de l'exercice N republie pour N−1 un résultat qui n'est
+pas celui de notre ligne N−1. **Trois de ces quatre sont une rupture de
+référentiel comptable**, lisible dans l'URL de la source :
+
+- **CIEC 2022** vient d'un document IFRS, les lignes 2023 et 2024 de documents
+  SYSCOHADA, et le document 2025 publie les deux. Écart 4,60 % sur la paire
+  2023, 4,31 % sur la paire 2025.
+- **TTLS 2025** est en IFRS, sa ligne 2024 en SYSCOHADA. Écart 0,69 %.
+- La quatrième, **STBC 2025**, n'est pas une rupture de référentiel mais un
+  retraitement assumé : le document s'intitule « annule et remplace le
+  précédent » et republie 2024 à 44 173,762 contre 44 730,358. Écart
+  556,596 M (1,24 %).
+
+**Pourquoi c'est grave.** La croissance est calculée sur la série complète, donc
+à travers la rupture. Mesuré ce cycle : la croissance de CIEC passe de
+**10,09 %/an à 6,69 %/an** — 3,40 points — si l'on retire 2022, le seul
+exercice IFRS de sa série. Pour TTLS la rupture est à l'autre bout : le
+glissement du dernier exercice (−5,06 %) est homogène, car le moteur utilise
+bien le comparatif IFRS du document lui-même, mais la moyenne sur quatre
+exercices (1,11 %/an) enjambe le changement. Les deux titres portent pourtant le
+drapeau `CROISSANCE_CORROBOREE` : une corroboration de **transcription** ne dit
+rien de l'**homogénéité du référentiel**, et rassure donc à tort.
+
+**Pourquoi la base ne peut pas encore l'exprimer.** Il n'y a aucune colonne de
+référentiel dans `etats_financiers.csv`. Le référentiel n'est aujourd'hui
+devinable que par l'URL de la source, et seulement **20 des 167 lignes** de
+`source_urls.csv` le nomment. Deux titres à rupture sont détectés par cette
+voie (CIEC, TTLS) — exactement deux des quatre divergences ci-dessus, ce qui
+corrobore la méthode sans couvrir les 147 lignes muettes.
+
+**Ce qu'il faut faire.** Une colonne `referentiel` dans
+`etats_financiers.csv`, renseignée quand le document le dit et laissée **vide**
+sinon (une case vide vaut mieux qu'une valeur approchée), puis le refus de
+calculer une croissance moyenne à travers une rupture : soit la série est
+restreinte au référentiel homogène le plus récent, soit un drapeau
+`RUPTURE_REFERENTIEL` le dit sur la fiche. BICB, traité à la main le
+27/09/2026, est le précédent : la même question avait alors été tranchée pour
+un seul titre.
+
+**Terminé quand** : la colonne existe, aucune croissance ne traverse une
+rupture sans drapeau, l'effet est mesuré titre par titre, et un test de la
+section 13 empêche le retour du mélange.
+
+## C12 — Le bilan de SIBC 2025 ne se ferme pas
+
+- statut : À FAIRE
+- validation : —
+- autonomie : partielle — document hors de portée du bac à sable
+- priorité : 5
+
+**Le constat, trouvé le 28/09/2026.** Sur les **113 bilans renseignés**, un
+seul ne se ferme pas : **SIBC 2025**, total actif **1 881 733** contre total
+passif **1 685 249**, soit **196 484 M d'écart (10,44 %)**, sur une ligne
+marquée **VALIDE**. Ce n'est pas un retraitement : un bilan qui ne se ferme pas
+est une impossibilité arithmétique, donc un défaut d'extraction.
+
+**Hypothèse, non tranchée.** Les capitaux propres de la ligne valent
+204 765 M ; 1 685 249 + 204 765 = 1 890 014, à 8 281 M du total actif. Le total
+passif extrait est donc vraisemblablement le **passif exigible seul, hors
+capitaux propres** — mais les 8 281 M résiduels interdisent de l'affirmer, et
+rien ne sera corrigé à l'aveugle.
+
+**Portée du défaut, mesurée.** `total_actif` et `total_passif` ne traversent
+pas le moteur de profilage : ils ne servent à aucun score. Ils sont en revanche
+**affichés sur la fiche publiée** (`dashboard/generer_dashboard_html.py`, la
+requête des fondamentaux les sélectionne). Le défaut est donc visible par le
+lecteur sans peser sur le classement — d'où sa priorité derrière C11.
+
+**Terminé quand** : le bilan se ferme sur les valeurs du document source
+(`20260421 — rapport d'activités annuel et états financiers — exercice 2025 —
+SIB`), relevé par `extraction_etats.yml` ou à la main, avec son procès-verbal
+dans `outils/` ; ou l'impossibilité de lire le document est constatée et datée,
+et la ligne repasse de VALIDE à PROBABLE.
+
 ---
 
 # Veille datée, hors file
@@ -316,6 +406,59 @@ existantes, et un test refuse toute date non ISO dans la table.
 # Journal
 
 Une entrée par cycle. La plus récente en haut.
+
+## 2026-09-28 — cycle 2
+
+**Aucun chantier exécuté** : `C1` porte `validation : EN ATTENTE`, et la règle
+est de n'y pas toucher. C1 reste le seul chantier `PROPOSÉ`, pour que le
+protocole n'ait qu'une ligne à basculer ; les deux trouvailles de ce cycle sont
+inscrites en `À FAIRE` avec leur diagnostic complet.
+
+**Cycle concurrent.** Le cycle 1 a poussé `2f5d8a3` pendant que celui-ci
+travaillait. Il avait déjà pris le numéro C10 : mes deux chantiers sont donc
+C11 et C12, et les priorités 4 et 5 s'insèrent derrière les siennes sans rien
+réordonner. Son correctif d'idempotence de `peupler.py` et sa section 16 ont
+été reprises par rebase, et toutes les barrières ont été repassées **après**
+la fusion, pas seulement avant.
+
+**Chasse aux défauts — deux identités comptables que rien ne vérifiait.** Les
+règles du projet exigent « une identité comptable qui se ferme » comme preuve
+avant de corriger une donnée certifiée. Aucun test ne vérifiait que les
+identités se ferment sur les données **déjà en base**. Deux contrôles ajoutés à
+la section 13 de `moteur/tester_donnees.py` :
+
+1. **Identité du bilan** — `total_actif` = `total_passif`. Sur 113 bilans
+   renseignés, **un seul ne se ferme pas** : SIBC 2025, écart 196 484 M
+   (10,44 %), sur une ligne marquée VALIDE. Inscrit en **C12**.
+2. **Comparatif N-1** — le résultat que le document de l'exercice N republie
+   pour N−1 doit concorder avec la ligne N−1 de la base. Sur 95 paires
+   confrontables, **4 divergences**, dont deux entre lignes toutes deux
+   marquées VALIDE. Trois sont des ruptures de référentiel comptable
+   (CIEC 2023, CIEC 2025, TTLS 2025) → **C11** ; la quatrième un retraitement
+   assumé (STBC 2025, document « annule et remplace le précédent »).
+
+Ce second contrôle est exactement le raisonnement appliqué **à la main** le
+27/09/2026 sur ECOC 2022 et BICC 2024 — « deux se réfutaient d'elles-mêmes par
+la colonne N-1 de l'exercice suivant ». Il n'avait jamais été rejoué. Preuve
+qu'il l'attrape désormais : en réinjectant le défaut d'origine
+(`resultat_net_n1` d'ECOC 2023 ramené à 28 386), le contrôle échoue en nommant
+l'écart de 36,35 % contre les 44 598 de la base. Un déséquilibre de bilan
+injecté sur SDSC 2025 fait échouer le premier de la même façon. Les deux
+registres d'exceptions sont **adossés aux valeurs observées** : en déplaçant le
+total passif de SIBC, son exception cesse de s'appliquer et le test bloque.
+Le CSV a été restauré après chaque injection.
+
+**Rien n'a été corrigé.** Les quatre divergences et le bilan ouvert restent tels
+quels : trois demandent une décision de méthode (C11), le quatrième un document
+que le bac à sable n'atteint pas (C12). Preuve à deux côtés obligatoire.
+
+**Une affirmation du cycle 0 à revoir** : C8 se fonde sur des échecs
+d'extraction GCR. Mesuré ce cycle, l'autotest de `collecte/notations.py` rend
+« PDF GCR 10/10 » : l'analyseur passe déjà les dix PDF d'échantillon. Son
+critère de terminaison est donc **déjà satisfait tel qu'il est écrit** et ne
+décrit pas le vrai travail ; les 4 statuts `ECHEC` du fonds, pour 291 `OK` et
+87 `SANS_NOTE`, portent sur autre chose. À rediagnostiquer avant toute
+proposition.
 
 ## 2026-09-28 — cycle 1
 

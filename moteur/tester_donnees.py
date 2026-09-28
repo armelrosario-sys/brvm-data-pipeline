@@ -1071,6 +1071,150 @@ def test_base_reference():
             "cloture de son exercice"
             + ("" if not intermediaires else " — " + " ; ".join(intermediaires)))
 
+    # ------------------------------------------------------------------
+    # Identite du bilan : total actif = total passif.
+    #
+    # POURQUOI (28/09/2026). Les regles du projet exigent « une identite
+    # comptable qui se ferme » comme preuve avant de corriger une donnee
+    # certifiee -- mais AUCUN test ne verifiait que les identites se
+    # fermaient sur les donnees deja en base. En confrontant les 116 bilans
+    # renseignes, un seul ne se ferme pas : SIBC 2025, total actif
+    # 1881733 contre total passif 1685249, soit 196484 M d'ecart (10,44 %).
+    # Un bilan qui ne se ferme pas n'est pas un retraitement : c'est une
+    # impossibilite arithmetique, donc un defaut d'extraction. La ligne est
+    # pourtant marquee VALIDE et avait traverse quinze sections de tests.
+    #
+    # Le registre ci-dessous est ADOSSE AUX VALEURS observees : si l'une des
+    # deux bouge, l'exception ne s'applique plus et le test bloque. Une
+    # exception ne se transmet donc pas a une valeur qu'elle n'a pas
+    # examinee.
+    TOLERANCE_BILAN = 0.001          # 0,1 % — couvre l'arrondi d'extraction
+    BILANS_NON_FERMES_CONNUS = {
+        # (ticker, exercice): (total_actif, total_passif, motif)
+        ("SIBC", "2025"): (
+            1881733.0, 1685249.0,
+            "ecart 196484 M (10,44 %) pour des capitaux propres de 204765 M : "
+            "le total passif extrait est vraisemblablement le passif exigible "
+            "seul, hors capitaux propres (1685249 + 204765 = 1890014, a 8281 M "
+            "du total actif). Non tranche : le document source "
+            "(20260421, rapport annuel SIB) est hors de portee du bac a sable. "
+            "Inscrit en C11, aucune valeur n'est corrigee a l'aveugle."),
+    }
+    bilans_confrontes, bilans_ouverts = 0, []
+    for r in etats:
+        if r["ticker"].startswith("TEST"):
+            continue
+        try:
+            ta = float(r["total_actif"])
+            tp = float(r["total_passif"])
+        except (TypeError, ValueError):
+            continue
+        echelle = max(abs(ta), abs(tp))
+        if echelle == 0:
+            continue
+        bilans_confrontes += 1
+        if abs(ta - tp) / echelle <= TOLERANCE_BILAN:
+            continue
+        connu = BILANS_NON_FERMES_CONNUS.get((r["ticker"], r["exercice"]))
+        if connu and abs(connu[0] - ta) < 0.001 and abs(connu[1] - tp) < 0.001:
+            continue
+        bilans_ouverts.append(
+            "%s %s : total actif %s contre total passif %s (ecart %.2f %%)"
+            % (r["ticker"], r["exercice"], ta, tp, 100.0 * abs(ta - tp) / echelle))
+    verifie(not bilans_ouverts,
+            "identite du bilan : les %d bilans renseignes se ferment, hors les "
+            "%d ecarts inscrits au registre"
+            % (bilans_confrontes, len(BILANS_NON_FERMES_CONNUS))
+            + ("" if not bilans_ouverts else " — " + " ; ".join(bilans_ouverts)))
+
+    # ------------------------------------------------------------------
+    # Le comparatif N-1 republie par le document de l'exercice N doit
+    # concorder avec la ligne N-1 de la base.
+    #
+    # POURQUOI (28/09/2026). C'est le mecanisme qui a demasque ECOC 2022 et
+    # BICC 2024 le 27/09/2026 : « deux se refutaient d'elles-memes par la
+    # colonne N-1 de l'exercice suivant ». Il avait ete applique A LA MAIN,
+    # sur deux titres, et rien ne le rejouait. Confronte aux 96 paires
+    # confrontables de la base, il revele quatre desaccords que rien ne
+    # signalait, dont deux entre lignes toutes deux marquees VALIDE.
+    #
+    # Ce controle attrape a lui seul quatre defauts de nature differente :
+    # un fragment d'extraction, un rapport intermediaire pris pour un
+    # exercice clos, un retraitement du comparatif, et une RUPTURE DE
+    # REFERENTIEL COMPTABLE (CIEC et TTLS ci-dessous) -- que la base ne sait
+    # aujourd'hui pas exprimer, faute de colonne de referentiel. D'ou C10.
+    #
+    # Registre adosse aux deux valeurs, comme ci-dessus.
+    TOLERANCE_COMPARATIF = 0.005     # 0,5 % — couvre l'arrondi au million
+    COMPARATIFS_DIVERGENTS_CONNUS = {
+        # (ticker, exercice): (resultat_net_n1 du doc N, resultat_net ligne N-1, motif)
+        ("CIEC", "2023"): (
+            10271.0, 9819.0,
+            "RUPTURE DE REFERENTIEL : la ligne 2022 vient d'un document IFRS "
+            "(20230427_..._ifrs_exercice_2022) tandis que le document 2023 est "
+            "en SYSCOHADA. Ecart 4,60 %. Les deux valeurs sont justes dans "
+            "leur referentiel ; c'est la serie qui est heterogene."),
+        ("CIEC", "2025"): (
+            10100.0, 10555.0,
+            "RUPTURE DE REFERENTIEL : le document 2025 publie SYSCOHADA ET "
+            "IFRS (20260520_..._syscohada_et_ifrs) ; son comparatif 2024 "
+            "(10100) n'est pas celui de notre ligne 2024, en SYSCOHADA seul "
+            "(10555). Ecart 4,31 %."),
+        ("STBC", "2025"): (
+            44173.762491, 44730.358142,
+            "RETRAITEMENT DU COMPARATIF : le document 2025 s'intitule "
+            "« annule et remplace le precedent » et republie 2024 a "
+            "44173,762 contre 44730,358 dans le document 2024 d'origine. "
+            "Ecart 556,596 M (1,24 %)."),
+        ("TTLS", "2025"): (
+            7140.0, 7090.811,
+            "RUPTURE DE REFERENTIEL : le document 2025 est en IFRS "
+            "(20260430_..._ifrs) et la ligne 2024 en SYSCOHADA. Ecart "
+            "0,69 %. C'est le comparatif IFRS (7140) que le moteur utilise "
+            "pour le glissement du dernier exercice, ce qui est homogene ; "
+            "c'est la moyenne sur quatre exercices qui enjambe la rupture."),
+    }
+    par_ticker = {}
+    for r in etats:
+        if r["ticker"].startswith("TEST"):
+            continue
+        try:
+            exercice = int(r["exercice"])
+        except (TypeError, ValueError):
+            continue
+        par_ticker.setdefault(r["ticker"], {})[exercice] = r
+    paires, divergences = 0, []
+    for ticker, lignes in sorted(par_ticker.items()):
+        for exercice, ligne in sorted(lignes.items()):
+            precedente = lignes.get(exercice - 1)
+            if precedente is None:
+                continue
+            try:
+                comparatif = float(ligne["resultat_net_n1"])
+                reference = float(precedente["resultat_net"])
+            except (TypeError, ValueError):
+                continue
+            if reference == 0:
+                continue
+            paires += 1
+            ecart = abs(comparatif - reference) / abs(reference)
+            if ecart <= TOLERANCE_COMPARATIF:
+                continue
+            connu = COMPARATIFS_DIVERGENTS_CONNUS.get((ticker, str(exercice)))
+            if (connu and abs(connu[0] - comparatif) < 0.001
+                    and abs(connu[1] - reference) < 0.001):
+                continue
+            divergences.append(
+                "%s %s : le document republie %s pour %s, la base porte %s "
+                "(ecart %.2f %%)"
+                % (ticker, exercice, comparatif, exercice - 1, reference,
+                   100.0 * ecart))
+    verifie(not divergences,
+            "comparatif N-1 : les %d paires confrontables concordent, hors les "
+            "%d divergences inscrites au registre"
+            % (paires, len(COMPARATIFS_DIVERGENTS_CONNUS))
+            + ("" if not divergences else " — " + " ; ".join(divergences)))
+
 
 
 # ----------------------------------------------------------------------
