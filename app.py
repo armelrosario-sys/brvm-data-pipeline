@@ -102,9 +102,32 @@ def empreinte_donnees():
 def preparer_base(_empreinte):
     """Reconstruit brvm.db quand l'empreinte des sources change.
     La base n'est jamais commitee : elle est rebatie depuis les CSV du depot."""
+    # Correctif du 28/09/2026 : cette liste omettait DEUX des quatre chargeurs de
+    # collecte/, alors que pages.yml — la chaine qui construit la fiche publiee —
+    # les enchaine tous. Mesure des deux bases construites depuis les memes CSV :
+    # dividendes 311 par la chaine complete contre 15 ici (4,8 %), et
+    # liquidite_quotidienne 73141 contre 0. Sur les 47 fiches : 308 lignes de
+    # dividendes et 47/47 fiches non vides par la chaine complete, contre 12
+    # lignes et 9/47 par celle-ci.
+    #
+    # Le defaut etait LATENT, pas actif : app.py ne lit aujourd'hui que societes,
+    # etats_financiers, cours_mensuels et cours_quotidien_boc, et profils.json est
+    # identique au champ pres entre les deux bases (verifie sur les 47 titres,
+    # 0 ecart). Mais il etait arme : empreinte() inclut DEJA
+    # collecte/dividendes_par_exercice.csv dans la clef de cache, donc modifier ce
+    # CSV declenchait une "reconstruction" qui ne le relisait pas — et les scripts
+    # tournent en check=False, capture_output=True, donc aucun echec ne se voit.
+    # Le jour ou un onglet aurait affiche un historique de dividendes, il l'aurait
+    # tire d'une table remplie a 4,8 % sans qu'aucune erreur ne s'affiche.
+    #
+    # Cout mesure de la correction : construction a froid 0,54 s -> 0,78 s,
+    # soit +0,25 s. La section 17 de tester_donnees.py verrouille desormais
+    # l'egalite entre cette liste et les chargeurs de collecte/.
     scripts = [RACINE / "moteur" / "peupler.py",
                RACINE / "collecte" / "charger_cours.py",
                RACINE / "collecte" / "charger_cours_quotidien.py",  # pont ajoute 03/09
+               RACINE / "collecte" / "charger_dividendes_exercice.py",
+               RACINE / "collecte" / "charger_liquidite_quotidienne.py",
                RACINE / "moteur" / "profils.py"]
     for script in scripts:
         if not script.exists():

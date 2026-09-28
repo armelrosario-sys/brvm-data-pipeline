@@ -413,6 +413,76 @@ SIB`), relevé par `extraction_etats.yml` ou à la main, avec son procès-verbal
 dans `outils/` ; ou l'impossibilité de lire le document est constatée et datée,
 et la ligne repasse de VALIDE à PROBABLE.
 
+## C13 — `preparer_base()` avale tout échec de chargeur
+
+- statut : PROPOSÉ
+- validation : EN ATTENTE
+- autonomie : complète, aucune donnée extérieure nécessaire
+- priorité : 1 — à égalité avec C1, sur un autre axe : plomberie contre méthode
+
+**Le constat, mesuré le 28/09/2026 (cycle 4).** `app.py::preparer_base()` lance
+ses chargeurs en `subprocess.run(..., check=False, capture_output=True)` puis
+rend `DB.exists()`. Un chargeur qui échoue rend donc `1`, ce code est jeté, sa
+sortie d'erreur est capturée puis abandonnée, et la fonction répond « base
+disponible ».
+
+**Mesuré par injection d'une panne dans `charger_cours_quotidien.py`**, sur la
+chaîne des six scripts :
+
+- codes de retour réellement vus : `charger_cours_quotidien.py` → **1**, tous
+  les autres 0 ;
+- valeur rendue par `preparer_base()` : **`True`** ;
+- `cours_quotidien_boc` : **0 ligne** ;
+- `app.py::charger()` bascule alors sur sa branche de repli `cours_mensuels`, et
+  le dernier cours servi devient **2026-07** au lieu du **2026-09-25** collecté.
+
+**Pourquoi c'est grave : c'est la régression n°2 rejouée.** L'en-tête de
+`moteur/tester_donnees.py` explique que ce fichier existe à cause de trois
+régressions, dont celle-ci mot pour mot — « le moteur et l'application lisaient
+`cours_mensuels` alors que la collecte quotidienne allait jusqu'au 01/09 ». Le
+repli est conçu pour être silencieux, et il est aujourd'hui atteignable par une
+simple panne de chargeur sans qu'aucune erreur n'apparaisse nulle part.
+
+**Second effet, du même ordre que celui du cycle 1.** `profils.py` est dans la
+même liste et tourne sur la base dégradée : la mesure a produit
+**849 insertions et 854 suppressions** dans `collecte/profils.json`, fichier
+commité. Un échec de chargeur ne dégrade donc pas seulement l'affichage, il
+réécrit un fichier de référence. (Restauré par `git checkout` dans le cycle.)
+
+**Ce qu'il faut faire.** Relever le code de retour de chaque script, refuser de
+servir une base construite sur un échec, et faire remonter le motif à l'écran
+plutôt que de le capturer pour le jeter. La branche de repli `cours_mensuels`
+doit dire explicitement qu'elle est un repli, jamais l'afficher comme la donnée
+du jour. Un test injecte la panne et vérifie que le silence est rompu.
+
+**Terminé quand** : un chargeur en échec empêche le service ou s'annonce à
+l'écran, `profils.json` n'est plus réécrit sur une base incomplète, et un test
+de `tester_donnees.py` fige la propriété par injection de panne.
+
+## C14 — `liquidite_quotidienne` : 73 141 lignes écrites, lues par personne
+
+- statut : À FAIRE
+- validation : —
+- autonomie : complète
+- priorité : 8
+
+**Le constat, mesuré le 28/09/2026 (cycle 4).** La table contient
+**73 141 lignes** (47 tickers, 1 834 jours, du 02/01/2018 au 24/07/2026). Elle
+est écrite par `collecte/charger_liquidite_quotidienne.py`, alimentée par
+`collecte/backfill_liquidite.py`, et **aucun `SELECT` du dépôt ne la lit** :
+vérifié par balayage de tous les `.py`, seul le chargeur la nomme. C'est le seul
+cas de ce genre dans la base — les onze autres tables ont un lecteur.
+
+**Ce qui rend le cas intéressant plutôt que cosmétique.** `app.py` écrit
+lui-même, dans sa section de limites : « VALUE et RENDEMENT, et surtout la
+liquidité, n'ont jamais été éprouvées ». La donnée nécessaire à cette
+éprouvation est donc **déjà en base depuis 2018**, et personne ne s'en sert. Le
+choix est binaire et demande un arbitrage : brancher la liquidité comme critère
+(filtre d'éligibilité, ou axe de la fiche), ou retirer la table et son chargeur.
+
+**Terminé quand** : soit la table a un lecteur et l'effet sur les 47 titres est
+mesuré, soit elle et son chargeur sont retirés et la section 17 est mise à jour.
+
 ---
 
 # Veille datée, hors file
@@ -427,23 +497,135 @@ et la ligne repasse de VALIDE à PROBABLE.
 
 Une entrée par cycle. La plus récente en haut.
 
-## 2026-09-28 — cycle 4 (en cours — annonce de la famille chassée)
+## 2026-09-28 — cycle 4
 
-**Annonce préalable, poussée seule avant tout travail**, conformément à la règle
-ajoutée par le cycle 3.
+**Aucun chantier exécuté.** Aucune ligne `validation : OK` dans la file à
+l'ouverture : C1 portait toujours `EN ATTENTE`, comme aux cycles 1, 2 et 3. Le
+cycle est donc allé directement à la chasse aux défauts. État à l'ouverture :
+`HEAD` = `origin/main` = `58fe426`, aucun commit nouveau depuis le cycle 3, CI
+verte sur ce SHA (`P4` et `pages` en `success`).
 
-**Famille chassée : l'idempotence des quatre chargeurs de `collecte/` que la
-barrière exécute juste après `peupler.py`.** La section 16, écrite par le
-cycle 1, ne relance que `peupler.main()`. Or la séquence de barrière enchaîne
-ensuite `charger_cours.py`, `charger_cours_quotidien.py`,
-`charger_dividendes_exercice.py` et `charger_liquidite_quotidienne.py`, dont
-aucun n'est rejoué deux fois par un test. Le cycle 1 a montré que ce défaut
-mord réellement — un avis compté deux fois fait basculer SDSC de `ELIGIBLE` à
-`EXCLU` — et que l'idempotence du projet repose entièrement sur la présence
-d'une clef unique. `charger_dividendes_exercice.py` écrit dans `dividendes`,
-justement la table qui n'en avait pas.
+**Famille annoncée, poussée seule avant tout travail** (`05f9f05`), selon la
+règle du cycle 3 : l'idempotence des quatre chargeurs de `collecte/` que la
+barrière enchaîne après `peupler.py`, la section 16 du cycle 1 ne rejouant que
+`peupler.main()`.
 
-Toute session concurrente qui lit ces lignes doit chasser **autre chose**.
+**Résultat de la chasse sur la question posée : les quatre chargeurs sont
+idempotents.** Mesuré deux fois, et il faut le dire même si c'est un résultat
+négatif. Comptes des douze tables identiques entre une passe et deux. Puis, plus
+strictement, **empreinte SHA-256 du contenu trié de chaque table, colonne `id`
+exclue** : une base construite en une passe et une base construite en deux
+passes donnent les **douze mêmes empreintes**. Relancer `peupler.py` sur une base
+déjà chargée par les quatre chargeurs ne change rien non plus — c'est le
+scénario réel de `app.py`.
+
+**Mais la question a déplacé la trouvaille : la chaîne de chargement est écrite
+deux fois, dans deux versions différentes.**
+
+- `.github/workflows/pages.yml`, qui construit la fiche publiée, enchaîne les
+  **quatre** chargeurs après `peupler.py`.
+- `app.py::preparer_base()` n'en lançait que **deux** (`charger_cours.py`,
+  `charger_cours_quotidien.py`) puis `profils.py`. Il omettait
+  `charger_dividendes_exercice.py` et `charger_liquidite_quotidienne.py`.
+
+**L'écart, mesuré sur deux bases construites depuis les mêmes CSV :**
+
+| table | chaîne `pages.yml` | chaîne `app.py` |
+|---|---|---|
+| `dividendes` | 311 (49 tickers) | **15** (11 tickers) |
+| `liquidite_quotidienne` | 73 141 | **0** |
+
+Et sur ce que lirait la Fiche titre : **308 lignes de dividendes, 47/47 fiches
+non vides** par la chaîne complète, contre **12 lignes et 9/47** par celle de
+`app.py`.
+
+**Ce que le défaut n'était pas, dit honnêtement.** Il n'était **pas actif**.
+`app.py` ne lit que `societes`, `etats_financiers`, `cours_mensuels` et
+`cours_quotidien_boc`, que sa propre chaîne remplissait entièrement.
+`profils.json` est **identique au champ près** entre les deux bases, vérifié sur
+les 47 titres : **0 écart**. La fiche publiée, elle, est construite par
+`pages.yml` et était donc juste. Le défaut était **latent**, comme la
+déduplication de C10.
+
+**Ce qui l'armait.** `app.py::empreinte_donnees()` inclut **déjà**
+`collecte/dividendes_par_exercice.csv` — la source des 296 dividendes manquants —
+dans sa clef de cache. Modifier ce CSV invalidait donc le cache et déclenchait
+une « reconstruction » qui, par construction, ne le relisait pas. Le jour où un
+onglet aurait affiché un historique de dividendes, il l'aurait tiré d'une table
+remplie à **4,8 %**, sans erreur visible.
+
+**Corrigé.** Les deux chargeurs sont ajoutés à `preparer_base()`. Coût mesuré :
+construction à froid **0,54 s → 0,78 s**, soit **+0,25 s**. L'objection de
+lenteur que j'avais anticipée n'existe pas — et au passage le libellé du
+`spinner` de `app.py`, « 30 s au premier lancement », est **faux d'un facteur
+40** sur cette machine ; non touché, ce n'est pas le sujet du cycle.
+
+**Test : section 17 de `moteur/tester_donnees.py`.** L'invariant retenu est
+volontairement plus large que le défaut : un contrôle limité aux tables que
+`app.py` lit *aujourd'hui* serait vrai et inutile, puisque c'est précisément
+parce que `app.py` ne lisait pas `dividendes` que l'omission a tenu sans se voir.
+Trois contrôles, tous bloquants :
+
+1. `preparer_base()` enchaîne **tous** les `collecte/charger_*.py` ;
+2. `pages.yml` les enchaîne **tous** aussi — la même divergence prise à l'autre
+   bout, pour le jour où un chargeur neuf ne serait branché que d'un côté ;
+3. garde-fou : la table déclarée « sans lecteur » dans le registre
+   `LECTEURS_HORS_APP` doit le rester, sinon le message du contrôle 1 devient
+   faux.
+
+La liste de scripts et les tables écrites sont **dérivées du source** par
+expression régulière, jamais figées dans un registre en dur : un registre en dur
+se désynchronise du code qu'il décrit, et c'est exactement la dérive surveillée.
+
+**Contre-essai, quatre injections, toutes rejetées comme prévu** : `app.py` qui
+se met à lire `dividendes` ; `pages.yml` privé de `charger_dividendes_exercice.py` ;
+un lecteur ajouté à `liquidite_quotidienne` (fait tomber **deux** contrôles) ;
+et, après correction, un chargeur retiré de `preparer_base()` — qui reproduit
+exactement le défaut d'origine et le nomme. Sources restaurées après chacune,
+vérifié par `git diff` vide.
+
+**C13 ouvert et proposé — trouvé en instrumentant la correction ci-dessus.** `preparer_base()`
+lance ses scripts en `check=False, capture_output=True`. Injection d'une panne
+dans `charger_cours_quotidien.py` : code de retour **1**, jeté ;
+`preparer_base()` rend **`True`** ; `cours_quotidien_boc` à **0 ligne** ;
+`app.py` bascule sur son repli `cours_mensuels` et sert **2026-07** au lieu du
+**2026-09-25** collecté. C'est **la régression n°2 de l'en-tête de
+`tester_donnees.py` rejouée à l'identique**, et atteignable par une simple panne
+de chargeur. Second effet, du même ordre que celui du cycle 1 : `profils.py`
+tourne dans la même liste et a réécrit `collecte/profils.json` à
+**849 insertions / 854 suppressions** sur la base dégradée. Restauré par
+`git checkout`, et `profils.json` régénéré sur base propre est **identique au
+commité** — ce qui recorrobore au passage l'idempotence de la chaîne.
+
+**C14 ouvert** (`À FAIRE`) : `liquidite_quotidienne` porte 73 141 lignes et
+**aucun `SELECT` du dépôt ne la lit**, vérifié par balayage de tous les `.py`.
+Seule table du fonds dans ce cas. `app.py` écrit pourtant lui-même que « surtout
+la liquidité » n'a jamais été éprouvée : la donnée est là depuis 2018, inutilisée.
+
+**Deux lignes à basculer désormais, et c'est assumé.** Les cycles 2 et 3
+gardaient C1 comme unique `PROPOSÉ` pour que le protocole n'ait qu'une ligne.
+Après trois cycles sans validation, la rareté des propositions n'a rien
+débloqué : C13 est donc proposé à côté de C1. Les deux sont indépendants et
+d'autonomie complète — C1 demande un arbitrage de **méthode** (seuils de
+distribution non récurrente), C13 ne demande aucun jugement, c'est de la
+**plomberie**. Basculer l'une, l'autre, ou les deux : le cycle suivant n'en
+exécutera qu'une, comme le veut la règle.
+
+**Une gêne d'outillage, notée pour le cycle suivant.** Le clone du bac à sable
+était en `HEAD` détaché, la branche locale `main` restant trois commits en
+arrière : `git push origin main` a d'abord poussé cette branche périmée et s'est
+fait rejeter en non-fast-forward. Corrigé par `git checkout -B main`. Vérifier
+`git status -sb` avant de committer.
+
+**Barrières, toutes repassées après la correction** : `peupler.py` 50 sociétés /
+185 lignes d'états ; les quatre chargeurs OK (4 509 / 85 963 / 296+63 / 73 141) ;
+`tester.py` **0**, tous les golden tests ; `profils.py` **0** (A=5, B=28, C=14) ;
+`tester_donnees.py` **2** — les **deux mêmes** alertes de fraîcheur qu'en
+référence (C4 et C5), aucune nouvelle, section 17 incluse ; `avis_brvm.py --test`
+**0** ; `notations.py --test` **0** ; `generer_dashboard.py` **0** (48 titres) ;
+`app.py` démarre, 4 onglets — sur la chaîne à six scripts, donc la correction ne
+casse pas le démarrage. `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant
+commit.
 
 ## 2026-09-28 — cycle 3 (session concurrente du cycle 2 — travail abandonné)
 

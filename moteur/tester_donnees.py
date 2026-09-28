@@ -1427,6 +1427,141 @@ def test_fondamentaux_agregateur():
 
 
 # ----------------------------------------------------------------------
+# 17. COUVERTURE DE LA CHAINE DE CHARGEMENT (bloquant)
+# ----------------------------------------------------------------------
+# Registre des tables lues par la chaine de publication, hors app.py. Sert a
+# expliquer, dans le message du controle A, pourquoi un chargeur peut legitimement
+# manquer a app.py : sa table n'est lue que par la publication.
+LECTEURS_HORS_APP = {
+    "dividendes": "dashboard/generer_dashboard_html.py (historique des dividendes de la Fiche titre)",
+    "liquidite_quotidienne": "personne — table ecrite sans lecteur (constat du 28/09/2026)",
+}
+
+
+def _tables_ecrites(source):
+    """Tables cibles des INSERT d'un fichier Python, lues dans son source.
+
+    Deliberement derive du source plutot que fige dans un registre : un registre
+    en dur se desynchronise du code qu'il decrit, et c'est precisement le genre de
+    derive que cette section surveille.
+    """
+    import re
+    return set(m.group(1) for m in re.finditer(
+        r"INSERT\s+(?:OR\s+(?:REPLACE|IGNORE)\s+)?INTO\s+([a-z_]+)", source, re.I))
+
+
+def test_chaine_chargement():
+    """La chaine que app.py construit doit remplir toute table que app.py lit.
+
+    POURQUOI CETTE SECTION EXISTE (28/09/2026). Rien ne surveillait cette famille,
+    et la chaine de chargement est deja ecrite DEUX FOIS, dans deux versions
+    differentes :
+
+      - .github/workflows/pages.yml enchaine les quatre chargeurs de collecte/
+        apres peupler.py, puis calendrier, signaux, profils, et publie la fiche ;
+      - app.py::preparer_base() n'en lance que DEUX (charger_cours.py et
+        charger_cours_quotidien.py) puis profils.py. Il omet
+        charger_dividendes_exercice.py et charger_liquidite_quotidienne.py.
+
+    Mesure du 28/09/2026, base construite des deux facons depuis les memes CSV :
+
+        table                   chaine pages.yml    chaine app.py
+        dividendes                       311                 15
+        liquidite_quotidienne          73141                  0
+
+    Et sur les 47 fiches : 308 lignes de dividendes, 47/47 fiches non vides par la
+    chaine complete, contre 12 lignes et 9/47 par celle de app.py.
+
+    CE N'EST PAS UN DEFAUT ACTIF AUJOURD'HUI, et il faut le dire ainsi : app.py ne
+    lit que societes, etats_financiers, cours_mensuels et cours_quotidien_boc, que
+    sa propre chaine remplit entierement. profils.json est d'ailleurs identique au
+    champ pres entre les deux bases — verifie sur les 47 titres, 0 ecart. Le defaut
+    est LATENT, exactement comme la deduplication de C10 : arme, en attente de se
+    declencher.
+
+    Ce qui l'armera. app.py calcule sa clef de cache (empreinte()) sur une liste de
+    CSV qui inclut DEJA collecte/dividendes_par_exercice.csv — la source des 296
+    dividendes manquants. Modifier ce CSV invalide donc le cache et declenche une
+    "reconstruction" qui, par construction, ne le relit pas. Le jour ou un onglet
+    de app.py affichera un historique de dividendes, il le tirera d'une table
+    remplie a 4,8 %, sans qu'aucune erreur ne s'affiche : preparer_base() lance ses
+    scripts en check=False, capture_output=True, donc tout echec de chargeur est
+    avale sans trace.
+
+    Les deux controles ci-dessous. Le premier bloque le jour ou app.py lit une
+    table que sa chaine ne remplit pas. Le second bloque le jour ou un chargeur
+    nouveau est ajoute a collecte/ sans etre branche dans pages.yml — c'est la
+    meme divergence, prise a l'autre bout.
+    """
+    print("\n=== 17. Couverture de la chaine de chargement (bloquant) ===")
+    import re
+
+    app = APP.read_text(encoding="utf-8")
+    pages = RACINE / ".github" / "workflows" / "pages.yml"
+    chargeurs = sorted((RACINE / "collecte").glob("charger_*.py"))
+    verifie(bool(chargeurs), "collecte/ contient au moins un chargeur charger_*.py")
+    if not chargeurs:
+        return
+
+    # Liste de scripts de preparer_base(), lue dans le source de app.py.
+    bloc = re.search(r"def preparer_base\(.*?\n    return ", app, re.S)
+    verifie(bloc is not None,
+            "app.py::preparer_base() est reperable dans le source "
+            "(sans quoi ce controle ne prouve rien)")
+    if bloc is None:
+        return
+    chaine_app = set(re.findall(r'"([a-z_0-9]+\.py)"', bloc.group(0)))
+
+    # Tables lues par app.py, hors faux positif de "from pathlib import".
+    lues_app = set(m.group(1).lower() for m in re.finditer(
+        r"FROM\s+([a-z_]+)", app)) - {"pathlib"}
+
+    # --- Controle A : preparer_base() enchaine TOUS les chargeurs --------------
+    # Invariant volontairement plus large que le defaut d'origine. Un controle
+    # limite aux tables que app.py lit AUJOURD'HUI serait vrai et inutile : c'est
+    # exactement parce que app.py ne lisait pas dividendes que l'omission a tenu
+    # sans se voir. L'invariant qui protege est l'egalite des deux chaines.
+    absents = sorted(ch.name for ch in chargeurs if ch.name not in chaine_app)
+    consequences = []
+    for nom in absents:
+        tables = sorted(_tables_ecrites((RACINE / "collecte" / nom).read_text(encoding="utf-8")))
+        lues = [t for t in tables if t in lues_app]
+        consequences.append(
+            f"{nom} n'alimente pas {', '.join(tables)}"
+            + (f" — DEJA LUE(S) PAR app.py : {', '.join(lues)}" if lues
+               else " — pas encore lue par app.py, donc defaut latent"))
+    verifie(not absents,
+            f"app.py::preparer_base() enchaine les {len(chargeurs)} chargeurs de "
+            f"collecte/ — sa base est donc celle que pages.yml publie"
+            + ("" if not absents else " — MANQUE(S) : " + " ; ".join(consequences)))
+
+    # --- Controle B : pages.yml branche tous les chargeurs existants ----------
+    verifie(pages.exists(), "pages.yml existe (c'est la chaine de reference)")
+    if pages.exists():
+        texte_pages = pages.read_text(encoding="utf-8")
+        oublies = [ch.name for ch in chargeurs if ch.name not in texte_pages]
+        verifie(not oublies,
+                f"pages.yml enchaine les {len(chargeurs)} chargeurs de collecte/ "
+                f"— la fiche publiee est donc construite sur la base complete"
+                + ("" if not oublies else " — OUBLIE(S) : " + ", ".join(oublies)))
+
+    # --- Garde-fou : le registre d'explication doit rester adosse au code ----
+    # Une table declaree "sans lecteur" qui se met a etre lue quelque part doit
+    # faire tomber son explication, sinon le message du controle A devient faux.
+    sans_lecteur = [t for t, motif in LECTEURS_HORS_APP.items()
+                    if motif.startswith("personne")]
+    for table in sans_lecteur:
+        lecteurs = [p.name for p in list(RACINE.rglob("*.py"))
+                    if p.name not in {c.name for c in chargeurs}
+                    and re.search(rf"FROM\s+{table}\b", p.read_text(encoding="utf-8", errors="ignore"), re.I)]
+        verifie(not lecteurs,
+                f"{table} est toujours sans lecteur, comme le dit le registre"
+                + ("" if not lecteurs else
+                   f" — DESORMAIS LUE PAR : {', '.join(sorted(lecteurs))} ; "
+                   f"mettre a jour LECTEURS_HORS_APP et rebrancher son chargeur"))
+
+
+# ----------------------------------------------------------------------
 # 15. FONDS DES NOTATIONS FINANCIERES (bloquant)
 # ----------------------------------------------------------------------
 def test_fonds_notations():
@@ -1537,6 +1672,7 @@ def main():
     test_fondamentaux_agregateur()
     test_fonds_notations()
     test_idempotence_peupler()
+    test_chaine_chargement()
     if not sans_app:
         test_application()
 
