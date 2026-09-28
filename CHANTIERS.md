@@ -427,6 +427,24 @@ et la ligne repasse de VALIDE à PROBABLE.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-09-28 — cycle 4 (en cours — annonce de la famille chassée)
+
+**Annonce préalable, poussée seule avant tout travail**, conformément à la règle
+ajoutée par le cycle 3.
+
+**Famille chassée : l'idempotence des quatre chargeurs de `collecte/` que la
+barrière exécute juste après `peupler.py`.** La section 16, écrite par le
+cycle 1, ne relance que `peupler.main()`. Or la séquence de barrière enchaîne
+ensuite `charger_cours.py`, `charger_cours_quotidien.py`,
+`charger_dividendes_exercice.py` et `charger_liquidite_quotidienne.py`, dont
+aucun n'est rejoué deux fois par un test. Le cycle 1 a montré que ce défaut
+mord réellement — un avis compté deux fois fait basculer SDSC de `ELIGIBLE` à
+`EXCLU` — et que l'idempotence du projet repose entièrement sur la présence
+d'une clef unique. `charger_dividendes_exercice.py` écrit dans `dividendes`,
+justement la table qui n'en avait pas.
+
+Toute session concurrente qui lit ces lignes doit chasser **autre chose**.
+
 ## 2026-09-28 — cycle 3 (session concurrente du cycle 2 — travail abandonné)
 
 **Ce cycle n'a rien ajouté au code, et c'est le bon résultat.** Il a démarré sur
