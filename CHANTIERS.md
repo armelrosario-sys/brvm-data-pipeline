@@ -98,7 +98,7 @@ Chacune vient d'une erreur réelle du 27/09/2026.
 ## C1 — Distributions non récurrentes faussent l'axe rendement
 
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK
 - autonomie : complète, aucune donnée extérieure nécessaire
 - priorité : 1
 
@@ -416,7 +416,7 @@ et la ligne repasse de VALIDE à PROBABLE.
 ## C13 — `preparer_base()` avale tout échec de chargeur
 
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK
 - autonomie : complète, aucune donnée extérieure nécessaire
 - priorité : 1 — à égalité avec C1, sur un autre axe : plomberie contre méthode
 
