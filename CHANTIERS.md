@@ -62,7 +62,8 @@ conversation n'est nécessaire : la boucle ne lit que ce fichier.
    aucun arbitrage n'est laissé au cycle, parce que deux cycles qui arbitrent
    séparément arbitrent différemment :
 
-   1. un `ORANGE` portant `validation : OK` — Claudia attend un résultat, il passe
+   1. un `ORANGE` portant `validation : OK` **dont la ligne `statut` ne dit pas que
+      la passe autorisée est déjà consommée** — Claudia attend un résultat, il passe
       avant tout ;
    2. sinon la première `VERTE` ;
    3. sinon le premier `ORANGE` non encore mesuré, dont on ne fait que **la
@@ -70,6 +71,12 @@ conversation n'est nécessaire : la boucle ne lit que ce fichier.
 
    Dans chaque rang : priorité la plus haute d'abord, et **à priorité égale, le
    plus petit numéro de chantier**. Aucun cycle n'est jamais inoccupé.
+
+   *Clause ajoutée au rang 1 le 30/09/2026 (cycle 9), et pourquoi.* Sans elle, un
+   ORANGE dont la mesure pré-autorisée est faite reste le premier du rang 1 et
+   **chaque cycle suivant la refait** : C16, mesuré ce cycle, aurait été repris
+   indéfiniment. Corollaire : un cycle qui consomme une passe pré-autorisée **doit**
+   l'écrire sur la ligne `statut` du chantier, comme C16 le fait maintenant.
 5. **Chasser une famille de défauts que rien ne surveille**, et en faire un test.
    **Une fois par jour, au cycle du matin seulement** — c'est l'étape la plus
    chère et la plus facile à dupliquer, et deux sessions qui lisent le même
@@ -353,23 +360,34 @@ dessus, et la publication GitHub Pages fonctionne toujours.
 - statut : À FAIRE
 - validation : —
 - autonomie : complète, aucune donnée extérieure nécessaire
-- priorité : 3 — **avant C3**, dont le journal datera ses lignes
+- priorité : **2** — **avant C3**, dont le journal datera ses lignes. *Corrigé le
+  30/09/2026 (cycle 9) : la priorité était 3, à égalité avec C3, et l'ordre
+  déterministe (« à priorité égale, le plus petit numéro ») faisait donc passer C3
+  d'abord — l'inverse exact de ce que cette ligne demande. C10 est le prochain
+  chantier du rang VERTE.*
 
 Trouvé le 28/09/2026 en cherchant à dater les dividendes. La colonne mélange
-**deux formats incompatibles**, comptés sur les 326 lignes de la base :
+**deux formats incompatibles**. **Comptes refaits sur la base du 30/09/2026
+(cycle 9) — ceux du 28/09 ne valent plus** : la table porte **311 lignes**, pas 326.
 
-- **296 lignes** (91 %) au format français abrégé, année sur deux chiffres :
+- **296 lignes** (95 %) au format français abrégé, année sur deux chiffres :
   `24-juil.-17`, `30-sept.-24`, `24-août-22`. Toutes issues de
   `collecte/dividendes_par_exercice.csv (Piste D, confiance ELEVEE)` —
   `charger_dividendes_exercice.py` insère la chaîne brute sans la normaliser.
-- **24 lignes** en ISO `aaaa-mm-jj`, venues de `donnees/base/dividendes.csv`.
-- **6 lignes** nulles (SDSC).
+- **12 lignes** en ISO `aaaa-mm-jj`, venues de `donnees/base/dividendes.csv`.
+- **3 lignes** nulles (SDSC).
 
 Trois conséquences, dont une déjà armée :
 
-1. **Tri et comparaison faux.** `scoring.py::dividendes()` fait
-   `ORDER BY date_paiement DESC` : sur du français abrégé l'ordre est
-   alphabétique, pas chronologique.
+1. **Tri et comparaison faux, et l'ampleur est maintenant chiffrée.**
+   `scoring.py::dividendes()` fait `ORDER BY date_paiement DESC` : sur du français
+   abrégé l'ordre est alphabétique, pas chronologique. **Mesuré le 30/09/2026
+   (cycle 9)** : sur les **49 tickers** portant au moins deux dividendes datés, ce
+   tri rend un autre versement que le plus récent pour **34 d'entre eux** — ABJC,
+   BNBC, BOAB, BOABF, BOAC, BOAM, BOAN, BOAS, CABC, CBIBF, CFAC, CIEC, ECOC, ETIT,
+   FTSC, NEIC, NSBC, NTLC, ONTBF, PALC, PRSC, SCRC, SDSC, SEMC, SHEC, SIBC, SLBC,
+   SMBC, SNTS, SOGC, SPHC, STBC, TTLC, TTLS. Ce n'est donc pas un défaut latent :
+   il est actif partout où ce tri sert.
 2. **Extraction d'année impossible.** `substr(date_paiement,1,4)` rend `24-j`.
    C'est ce qui a fait échouer ma première tentative de mesurer le décalage
    entre année de paiement et exercice couvert — mesure donc **non faite**,
@@ -380,13 +398,19 @@ Trois conséquences, dont une déjà armée :
    montant_net=? AND date_paiement=?`. Une date ISO ne s'égalera jamais à la
    forme française du même jour : le jour où le BOC réobserve un dividende déjà
    chargé par la Piste D, il l'insère en double. Aucun doublon mixte
-   n'existe encore (vérifié : 0 sur 326) — le défaut est latent, pas actif.
+   n'existe encore (revérifié le 30/09/2026 : **0 paire (ticker, jour) portant les
+   deux formats**, sur 311 lignes) — ce défaut-là, lui, reste latent.
+
+**Faisabilité vérifiée le 30/09/2026 (cycle 9)** : `date_dividende()` de
+`profils.py`, qui porte déjà la table des mois français abrégés, convertit les
+**311 lignes sans une seule exception**. La migration peut donc être totale, et le
+refus d'écrire sur mois non reconnu ne devrait rien écarter.
 
 **Attention** : la conversion doit lever l'ambiguïté du siècle sur l'année à
 deux chiffres, et refuser plutôt que deviner sur un mois non reconnu. Un mois
 français abrégé mal orthographié doit échouer bruyamment.
 
-**Terminé quand** : la colonne est ISO sur les 326 lignes via un script de
+**Terminé quand** : la colonne est ISO sur les 311 lignes via un script de
 migration idempotent dans `outils/`, les chargeurs normalisent à l'entrée, la
 déduplication de `collecte_boc_quotidien.py` retrouve bien les lignes
 existantes, et un test refuse toute date non ISO dans la table.
@@ -606,7 +630,9 @@ de C18.
 ## C16 — Retirer aussi l'axe de décote des titres à dividende périmé
 
 - classe : ORANGE — arbitrage de méthode — **la passe de mesure des trois options est pré-autorisée**
-- statut : PROPOSÉ
+- statut : **MESURÉ le 30/09/2026 (cycle 9)** — la passe pré-autorisée est CONSOMMÉE, le
+  tableau est plus bas. **Aucun cycle ne la refait** : l'application attend que Claudia
+  écrive son choix sur la ligne `validation` (voir *Ce qu'il reste à trancher*).
 - validation : OK
 - autonomie : complète, mais **c'est un arbitrage de méthode**
 - priorité : 3
@@ -616,12 +642,6 @@ titres à dividende de référence périmé « de l'axe rendement ». Le cycle 7
 leur **prime** et leur **rendement des classements**, mais a laissé le rendement
 facial dans l'**axe de décote** (`decote_pctl`), parce que le retirer déplace des
 verdicts.
-
-**Effet mesuré, sur une variante jetable de `profils.py` où les axes lisent le
-rendement récurrent** (10 titres portent le drapeau) : **2 profils basculent**
-(ORGT `AUCUN_PROFIL` → `VALUE`, SLBC `VALUE` → `AUCUN_PROFIL`), aucun grade ne
-bouge, et `decote_pctl` change sur **30 titres sur 47** (le bassin de comparaison
-se déplace).
 
 **Pourquoi ce n'est pas une évidence.** ORGT n'a pas versé depuis 2019 : son
 rendement récurrent est **zéro**, pas **inconnu**. Le retirer de l'axe (case vide)
@@ -648,9 +668,66 @@ titre, et le tableau est inscrit ici. L'application, elle, attend un second
 arbitrage de Claudia — et c'est alors seulement qu'un test de la section 21 figera
 la règle retenue.
 
-**Note du cycle 7 bis** : l'effet mesuré plus haut l'a été sur **10** titres
-drapeautés. Ils sont **6** depuis la correction de la règle 1 (voir le journal).
-Ce chiffre de 2 profils et 30 `decote_pctl` **ne vaut plus** : ne pas le reprendre.
+### La mesure, faite le 30/09/2026 (cycle 9)
+
+Trois variantes jetables de `moteur/profils.py`, générées par substitution
+textuelle avec assertion d'unicité sur chaque ancre, exécutées sur la base du jour,
+écrivant chacune son `profils.json` hors du dépôt. **Garde vérifiée** : la variante
+(a) reproduit le `profils.json` commité **au champ près, 0 titre d'écart** — sans
+quoi la mesure n'aurait rien valu. Aucun fichier du dépôt modifié.
+
+Seule la lecture de l'**axe de décote** change d'une option à l'autre (les deux
+percentiles `dy` : celui du titre et le bassin de comparaison). La prime, les
+classements et le test du profil RENDEMENT restent tels que C1 les a laissés.
+
+**Les 6 titres drapeautés.** Cinq sont drapeautés PÉRIMÉ, un seul EXCEPTIONNEL
+(FTSC). Quatre des six ne sont pas analysables — leur profil vient d'un fait
+qualitatif, ils n'ont pas de `decote_pctl` du tout, et **aucune option ne les
+touche** : seuls ORGT et SEMC sont sur les axes.
+
+| titre | motif | `dy` facial | décote (a) | décote (b) | décote (c) | profil/grade, les trois options |
+|---|---|---|---|---|---|---|
+| ORGT | PÉRIMÉ (2019-07-01) | 1,98 % | 54 | **93** | **50** | `AUCUN_PROFIL`/B → **`VALUE`**/B en (b) ; `AUCUN_PROFIL`/B en (c) |
+| SEMC | PÉRIMÉ (2021-12-28) | 0,94 % | 3 | 3 | **4** | `VIGILANCE_CONTRACTION`/C, inchangé partout |
+| BNBC | PÉRIMÉ (2023-07-24) | 7,54 % | — | — | — | `RETOURNEMENT`/B, inchangé (hors axes) |
+| SCRC | PÉRIMÉ (2021-08-20) | 1,37 % | — | — | — | `RETOURNEMENT`/B, inchangé (hors axes) |
+| SIVC | PÉRIMÉ (2017-09-29) | 26,81 % | — | — | — | `MUTATION`/B, inchangé (hors axes) |
+| FTSC | EXCEPTIONNEL (×7,3) | 86,54 % | — | — | — | `MUTATION`/B, inchangé (hors axes) |
+
+**Effet sur les 47 titres.**
+
+| | (b) case vide | (c) zéro si périmé |
+|---|---|---|
+| `decote_pctl` bouge | **28 / 47** | **3 / 47** |
+| amplitude hors ORGT | −1 à −3 points | +1 à +3 points |
+| `profil` ou `secondaire` bascule | **2** : ORGT `AUCUN_PROFIL` → `VALUE` ; SMBC perd son secondaire `VALUE` (décote 68 → 66, seuil `value_pctl_min` = 67) | **0** |
+| `grade` bouge | **0** | **0** |
+| `gate` bouge | **0** | **0** |
+
+**Ce que la mesure apprend, et qui n'était pas prévu.**
+
+1. **L'option (b) déplace tout le monde d'un cran vers le cher.** Retirer ORGT
+   (1,98 %) et SEMC (0,94 %) du bassin ôte deux valeurs **basses** : les 26 autres
+   titres perdent 1 à 3 points de décote sans qu'aucune de leurs données n'ait
+   changé. C'est l'effet de bassin, pas un effet de titre — et il produit le second
+   basculement, SMBC, qui n'a rien à voir avec un dividende périmé.
+2. **L'option (c) est presque neutre** : 3 titres, aucun verdict. ORGT descend de
+   54 à 50 au lieu de monter à 93 ; ETIT gagne 3 points (même secteur qu'ORGT).
+3. **L'option (b) récompense bien ORGT de ne rien distribuer** — 54 → 93, et un
+   profil `VALUE` gagné — exactement ce que le texte de ce chantier redoutait.
+   La mesure le confirme sur les chiffres du jour.
+4. **Zéro n'est pas défendable pour FTSC**, seul titre EXCEPTIONNEL : la société a
+   bel et bien distribué. L'option (c) a donc été mesurée comme « zéro pour les 5
+   périmés, case vide pour l'exceptionnel ». FTSC étant hors axes, la distinction
+   ne change aucun chiffre aujourd'hui — mais elle changera dès qu'un titre
+   EXCEPTIONNEL sera analysable, et la règle doit le dire.
+
+### Ce qu'il reste à trancher
+
+Un mot de Claudia sur la ligne `validation`, par exemple `- validation : OK —
+option (c)`. Le cycle suivant appliquera l'option nommée et figera la règle par un
+test de la section 21. **Sans ce mot, aucun cycle ne reprend C16** : la passe
+pré-autorisée est consommée.
 
 ## C17 — Pour 13 titres sur 44, le dividende que le BOC divise reste introuvable
 
@@ -783,38 +860,35 @@ plus rien en silence.
 
 # Dernier cycle
 
-> **ANNONCE — cycle 9 en cours, 2026-09-30 18h53 UTC.** Chantier pris : **C16**
-> (ORANGE, `validation : OK`) — passe de mesure des trois options sur les titres
-> drapeautes. Cycle du soir : pas de chasse. Cette annonce disparait au commit de
-> cloture ; si elle est encore la sans commit de cloture, la session a echoue.
-
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-09-30 — cycle 8, puis révision du protocole
+## 2026-09-30 — cycle 9 (soir)
 
-**Exécuté : C15.** `outils/versement_mensuel_vers_quotidien.py` a versé les
-4 509 lignes du mensuel dans la série quotidienne : 0 ligne préexistante
-modifiée, relance sans effet. La confrontation de la section 19 est passée de
-**vide** à **4 508 paires (ticker, jour), 0 divergence au franc**. Effet sur les
-sorties : 9 titres bougent, **0 champ décisionnel** sur 47.
+**Exécuté : C16, la passe de mesure des trois options.** Trois variantes jetables
+de `profils.py`, garde vérifiée (la variante (a) reproduit `profils.json` au champ
+près, 0 écart). Résultat, sur 47 titres : **(b) case vide** déplace `decote_pctl`
+sur **28/47** et fait basculer **2** profils — ORGT `AUCUN_PROFIL` → `VALUE`, et
+SMBC perd son secondaire `VALUE` par simple effet de bassin ; **(c) zéro si
+périmé** déplace **3/47** et **0** profil. Aucun grade, aucun gate ne bouge dans
+aucune option. Des 6 drapeautés, **4 sont hors axes** : seuls ORGT et SEMC comptent.
+Tableau titre par titre dans le bloc C16. **Rien appliqué** : le choix est à Claudia.
 
-**Chassé : l'implicite du BOC dans le temps.** 108 PER et 327 rendements figés
-alors que le cours bougeait (sur 52 368 et 51 781 séances). **12 cas enjambent
-deux extractions indépendantes** : c'est le BOC qui les a publiés, pas notre
-transcription — confrontation rendue possible par C15 le jour même. Exposition
-du moteur minime : aucun figement sur la dernière séance, un seul sur un point
-de BPA annuel (BOAS, 0,63 %). Test : **section 22**, huit contrôles.
+**Deux incohérences de ce fichier, corrigées.** (1) Le rang 1 de l'ordre de passage
+reprenait indéfiniment un ORANGE `validation : OK` déjà mesuré — clause ajoutée, et
+C16 porte désormais « passe consommée » sur sa ligne `statut`. (2) C10 demandait à
+passer avant C3 tout en portant la même priorité 3, ce que l'ordre déterministe
+tranchait en faveur de C3 — C10 passe à **priorité 2**.
 
-**Trouvé au passage : 5 collisions d'échelle** (SLBC 154 000 → 154 → 154 000),
-inscrites en **C18**. Trois d'entre elles étaient comptées à tort par C4 comme
-divisions de nominal ; C4 corrigé, et passé à 13 dates.
+**Comptes de C10 refaits, les anciens étaient faux** : la table `dividendes` porte
+**311** lignes (296 français abrégé, 12 ISO, 3 nulles), pas 326/296/24/6. Et le
+défaut de tri est **actif**, pas latent : `ORDER BY date_paiement DESC` rend un
+autre versement que le plus récent sur **34 des 49** tickers à deux dividendes datés.
 
-**État à la reprise** : CI verte, arbre propre, `tester_donnees.py` **159
-contrôles OK, 0 échec**, code 2 avec les deux seules alertes connues (C4, C5).
-Golden tests verts. Rien en suspens.
+**État à la reprise** : CI verte, arbre propre, aucun commit sur `main` depuis 3 h.
+Pas de chasse (cycle du soir). Rien en suspens.
 
-**Protocole révisé le même jour** — classes, allègement, anti-collision,
-cadence : voir ci-dessous.
+**Prochain chantier** : **C10** (VERTE, priorité 2), migration ISO — faisabilité
+vérifiée, `date_dividende()` convertit les 311 lignes sans exception.
 
 ---
 

@@ -9,6 +9,153 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-09-30 — cycle 9 (soir, 18h53 UTC)
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `main` : aucun
+commit. Dernier commit `d33ac0a`, 09h18 UTC, cycle 8. Annonce poussée seule
+(`b107732`) avant tout travail, puis effacée par ce commit de clôture.
+
+**État à la reprise.** CI verte (`P4 - Golden tests`, `P5b - Publication dashboard`
+et `pages` en succès sur les derniers commits de `main`). Arbre propre. Base
+reconstruite par `peupler.py` et les quatre chargeurs, sans erreur : 50 sociétés,
+185 lignes d'états financiers, 4 509 lignes de cours mensuels, 90 566 lignes de
+cours quotidiens (47 tickers, 2 027 jours, 2018-01-02 → 2026-09-29), 73 141 lignes
+de liquidité. `profils.py` rend 47 titres profilés et **ne modifie pas**
+`collecte/profils.json` (arbre resté propre après exécution) — la base du jour
+reproduit donc exactement l'état commité.
+
+**Cycle du soir : pas de chasse aux défauts** (étape 5, réservée au cycle du matin).
+
+### Exécuté : C16 — mesure des trois options de l'axe de décote
+
+Chantier choisi par l'ordre déterministe : seul ORANGE portant `validation : OK`.
+Passe de mesure pré-autorisée, **aucune écriture de donnée**.
+
+**Méthode.** Trois variantes de `moteur/profils.py` générées par substitution
+textuelle, **assertion d'unicité sur chacune des cinq ancres** (la ligne `SORTIE`,
+le remplissage du bassin sectoriel `d["dy"]`, le bassin de marché `marche_dy`, et
+les deux `pctl(..., v["dy"])` des branches secteur et marché). Chaque variante
+écrit son `profils.json` dans le bac à sable, jamais dans le dépôt ; les trois
+fichiers de variante sont supprimés dans un `finally`. Seule la lecture de l'axe de
+décote change : la prime de rendement, les classements et le test du profil
+RENDEMENT restent tels que C1 les a laissés.
+
+**Garde, sans laquelle la mesure ne vaudrait rien.** La variante (a) — censée
+reproduire l'état actuel — est comparée champ par champ (`decote_pctl`, `profil`,
+`secondaire`, `grade`, `dy`, `dy_recurrent`, `prime_rendement`, `gate`, `drapeaux`,
+`reference_axes`) au `profils.json` commité : **0 titre d'écart sur 47**. Le
+harnais est donc fidèle.
+
+**Les 6 titres drapeautés `DISTRIBUTION_NON_RECURRENTE`** : BNBC, FTSC, ORGT, SCRC,
+SEMC, SIVC. Cinq PÉRIMÉ, un seul EXCEPTIONNEL (FTSC, dividende de 1 726,56 FCFA le
+2025-09-30, 7,3 fois le plus fort des 5 versements précédents). **Quatre des six ne
+sont pas analysables** — leur profil vient d'un fait qualitatif, ils n'ont pas de
+`decote_pctl`, aucune option ne les touche. Seuls **ORGT** et **SEMC** sont sur les
+axes. C'est le fait le plus important de la mesure, et il n'était pas prévu : le
+chantier parlait de « 6 titres », l'arbitrage ne porte en réalité que sur deux.
+
+| titre | motif | `dy` facial | (a) | (b) | (c) | profil/grade |
+|---|---|---|---|---|---|---|
+| ORGT | PÉRIMÉ 2019-07-01 | 1,98 % | 54 | 93 | 50 | `AUCUN_PROFIL`/B, → `VALUE`/B en (b) |
+| SEMC | PÉRIMÉ 2021-12-28 | 0,94 % | 3 | 3 | 4 | `VIGILANCE_CONTRACTION`/C partout |
+| BNBC | PÉRIMÉ 2023-07-24 | 7,54 % | — | — | — | `RETOURNEMENT`/B, hors axes |
+| SCRC | PÉRIMÉ 2021-08-20 | 1,37 % | — | — | — | `RETOURNEMENT`/B, hors axes |
+| SIVC | PÉRIMÉ 2017-09-29 | 26,81 % | — | — | — | `MUTATION`/B, hors axes |
+| FTSC | EXCEPTIONNEL ×7,3 | 86,54 % | — | — | — | `MUTATION`/B, hors axes |
+
+**Effet sur les 47 titres.**
+
+| | (b) case vide | (c) zéro si périmé |
+|---|---|---|
+| `decote_pctl` bouge | **28 / 47** | **3 / 47** |
+| amplitude hors ORGT | −1 à −3 points | +1 à +3 points |
+| `profil` / `secondaire` bascule | **2** | **0** |
+| `grade` bouge | **0** | **0** |
+| `gate` bouge | **0** | **0** |
+
+Détail de (b), les 28 : ABJC 47→46, BICB 43→40, BICC 36→34, BOABF 39→38, BOAC
+79→78, BOAM 57→56, BOAS 75→74, CABC 56→54, CBIBF 28→26, CFAC 18→16, CIEC 16→14,
+ECOC 54→52, LNBB 42→40, NSBC 58→55, NTLC 21→18, ONTBF 64→63, ORAC 24→22, **ORGT
+54→93**, PALC 86→85, SDCC 28→26, SGBC 90→89, SHEC 25→23, SIBC 36→34, SLBC 69→68,
+SMBC 68→66, SNTS 62→60, SPHC 89→88, TTLC 34→32. Détail de (c), les 3 : ETIT 54→57,
+ORGT 54→50, SEMC 3→4.
+
+**Quatre enseignements.**
+
+1. **(b) déplace tout le monde vers le cher par effet de bassin.** Retirer ORGT
+   (1,98 %) et SEMC (0,94 %) ôte deux valeurs basses du bassin : 26 titres perdent
+   1 à 3 points de décote sans qu'aucune de leurs données n'ait changé. C'est ce
+   qui produit le second basculement, **SMBC**, qui perd son secondaire `VALUE` en
+   passant de 68 à 66 pour un `value_pctl_min` de 67 — un titre qui n'a aucun
+   dividende périmé et que personne n'aurait pensé toucher.
+2. **(c) est presque neutre** : 3 titres, aucun verdict, aucun grade.
+3. **(b) récompense bien ORGT de ne rien distribuer** : 54 → 93 et un profil
+   `VALUE` gagné. Ce que le texte du chantier redoutait est confirmé sur les
+   chiffres du jour.
+4. **Zéro n'est pas défendable pour un titre EXCEPTIONNEL.** FTSC a bel et bien
+   distribué. (c) a donc été mesurée comme « zéro pour les 5 périmés, case vide
+   pour l'exceptionnel ». FTSC étant hors axes, la distinction ne change rien
+   aujourd'hui, mais la règle devra la porter explicitement le jour où un titre
+   EXCEPTIONNEL sera analysable.
+
+**Écarts avec la mesure du cycle 7.** Celle-ci annonçait 2 profils et 30
+`decote_pctl` sur 10 titres drapeautés, dont SLBC `VALUE` → `AUCUN_PROFIL`. Sur les
+6 drapeautés d'aujourd'hui, l'option (b) donne 28 `decote_pctl` et 2 profils, mais
+**pas les mêmes** : ORGT (identique) et SMBC (nouveau) ; SLBC ne bascule plus, il
+passe de 69 à 68. L'ancien chiffre était bien périmé, comme la note du cycle 7 bis
+l'annonçait.
+
+### Deux incohérences de `CHANTIERS.md`, trouvées en l'exécutant et corrigées
+
+1. **Le rang 1 de l'ordre de passage bouclait.** « un ORANGE portant
+   `validation : OK` passe avant tout » n'a aucune condition de sortie : C16 mesuré
+   ce cycle serait resté premier du rang 1 et **chaque cycle suivant aurait refait
+   la même mesure**. Clause ajoutée — le rang 1 ignore un chantier dont la ligne
+   `statut` dit la passe consommée — et corollaire écrit : un cycle qui consomme une
+   passe pré-autorisée doit l'inscrire sur `statut`. C16 le porte.
+2. **C10 contredisait l'ordre déterministe.** Sa ligne disait « priorité : 3 —
+   **avant C3** », alors que C3 porte aussi la priorité 3 et un numéro plus petit :
+   la règle « à priorité égale, le plus petit numéro » faisait donc passer C3
+   d'abord, l'inverse de l'intention écrite. C10 passe à **priorité 2**.
+
+### Comptes de C10 refaits — les anciens étaient faux
+
+Mesuré sur la base du jour, contre les chiffres du 28/09 inscrits dans le chantier :
+
+| | inscrit (28/09) | mesuré (30/09, cycle 9) |
+|---|---|---|
+| lignes de `dividendes` | 326 | **311** |
+| français abrégé | 296 | **296** |
+| ISO | 24 | **12** |
+| nulles | 6 | **3** |
+
+Le 296 tient exactement (`charger_dividendes_exercice.py` : 296 ajoutés, 63 déjà
+présents). L'écart porte sur l'apport de `donnees/base/dividendes.csv`, qui compte
+15 lignes de données. Deux mesures ajoutées au chantier :
+
+- **le défaut de tri est ACTIF, pas latent** : `ORDER BY date_paiement DESC` rend un
+  autre versement que le plus récent pour **34 des 49** tickers portant au moins deux
+  dividendes datés (ABJC, BNBC, BOAB, BOABF, BOAC, BOAM, BOAN, BOAS, CABC, CBIBF,
+  CFAC, CIEC, ECOC, ETIT, FTSC, NEIC, NSBC, NTLC, ONTBF, PALC, PRSC, SCRC, SDSC,
+  SEMC, SHEC, SIBC, SLBC, SMBC, SNTS, SOGC, SPHC, STBC, TTLC, TTLS) ;
+- **la migration peut être totale** : `date_dividende()` de `profils.py` convertit
+  les 311 lignes **sans une seule exception**, et **0 paire (ticker, jour) ne porte
+  les deux formats** — le défaut de déduplication reste donc latent, lui.
+
+### Barrières
+
+**Aucune requise** : le commit ne touche que `CHANTIERS.md` et `docs/JOURNAL.md`.
+Aucune donnée, aucun code. `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés
+avant le commit ; `collecte/profils.json` vérifié identique à l'état commité.
+
+### Proposé pour le cycle suivant
+
+**C10** (VERTE, priorité 2) — normalisation ISO de `dividendes.date_paiement` par
+un script de migration idempotent dans `outils/`, normalisation à l'entrée des
+chargeurs, et test refusant toute date non ISO. Diagnostic et faisabilité mesurés
+ci-dessus. Aucun nouveau chantier ouvert ce cycle : les deux défauts trouvés sont
+des défauts de `CHANTIERS.md` lui-même, corrigés sur place plutôt qu'inscrits.
+
 ## 2026-09-30 — révision du protocole (hors cycle)
 
 Décidée par Claudia après le cycle 8, sur trois mesures : 5 cycles sur 8 n'avaient
