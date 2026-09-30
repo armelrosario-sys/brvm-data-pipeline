@@ -1863,6 +1863,21 @@ def test_distribution_non_recurrente():
     verifie(not trou,
             "un dividende implicite (140) sans versement date correspondant ne conclut pas : "
             "un trou de la table n'est pas un dividende perime")
+
+    # Correction du 30/09/2026 (journal, cycle 7). La premiere version de la regle
+    # retenait le versement le plus proche EN MONTANT parmi TOUTES les dates : un
+    # vieux versement dont le montant coincide par hasard faisait conclure
+    # "perime" sur un titre qui a distribue depuis. Quatre titres reels etaient
+    # dans ce cas (NTLC, SDCC, SIBC, SMBC). Le BOC divise par le DERNIER dividende
+    # paye : la coincidence ne vaut que sur le plus recent de la table.
+    serie("COINCIDENCE", [100, 180], ["1-juil.-21", "1-juil.-25"])
+    faux, _ = diagnostic_distribution(cur, "COINCIDENCE", "2026-09-29", sp,
+                                      cours=1000, dy=0.10)
+    verifie(not faux,
+            "un vieux versement dont le montant coincide (100 en 2021) ne conclut pas "
+            "quand la table porte un versement POSTERIEUR (180 en 2025) : la reference "
+            "du BOC nous echappe")
+
     verifie(date_dividende("30-sept.-25") is not None and date_dividende("3-foo.-25") is None
             and date_dividende("2025-09-30") is not None,
             "un mois francais non reconnu est refuse, pas devine")
@@ -1877,6 +1892,32 @@ def test_distribution_non_recurrente():
         verifie(not illisibles,
                 f"aucune date de dividende illisible dans brvm.db ({len(illisibles)} trouvee(s))"
                 + ("" if not illisibles else " : " + str(illisibles[:4])))
+
+        # Le meme controle que l'injection COINCIDENCE ci-dessus, mais sur le
+        # fonds reel : un titre declare "dividende perime" ne doit pas porter,
+        # dans la meme table, un versement POSTERIEUR a celui que le motif nomme.
+        # C'est ce qui a ete mesure et corrige le 30/09/2026 sur quatre titres.
+        c = sqlite3.connect(DB)
+        contredits = []
+        for t, v in sorted(json.loads(
+                (RACINE / "collecte" / "profils.json").read_text(encoding="utf-8")).items()):
+            motif = v.get("distribution_non_recurrente") or ""
+            if "verse le " not in motif:
+                continue
+            nomme = motif.split("verse le ", 1)[1][:10]
+            dates = [date_dividende(d) for (d,) in c.execute(
+                "SELECT date_paiement FROM dividendes WHERE ticker=? AND montant_net > 0 "
+                "AND COALESCE(statut_donnee,'VALIDE')='VALIDE' AND date_paiement IS NOT NULL",
+                (t,))]
+            plus_recent = max([d for d in dates if d is not None], default=None)
+            if plus_recent is not None and plus_recent.isoformat() > nomme:
+                contredits.append("%s : motif sur %s, table jusqu'a %s"
+                                  % (t, nomme, plus_recent.isoformat()))
+        c.close()
+        verifie(not contredits,
+                "aucun drapeau de dividende perime n'est contredit par un versement "
+                "posterieur de la meme table"
+                + ("" if not contredits else " — " + " ; ".join(contredits)))
 
     # --- Jurisprudence sur profils.json regenere --------------------------------
     chemin = RACINE / "collecte" / "profils.json"
@@ -1897,8 +1938,19 @@ def test_distribution_non_recurrente():
     for t, pourquoi in (("BICC", "serie croissante"), ("NEIC", "trou de table"),
                         ("STBC", "trou de table")):
         verifie(t in pj and not porte(t), f"{t} ne porte PAS le drapeau ({pourquoi})")
-    verifie(all((pj[t].get("grade") == "A") for t in ("NTLC", "SMBC") if t in pj and porte(t)),
-            "le drapeau ne deplace aucun grade : NTLC et SMBC le portent et restent grade A")
+    # Reecrit le 30/09/2026 : NTLC et SMBC ne portent plus le drapeau depuis la
+    # correction de la regle 1, donc la formulation d'origine passait a vide. La
+    # propriete a garder est celle du code : le drapeau ne fait pas partie de ceux
+    # que le grade lit, quel que soit le titre qui le porte.
+    from profils import _drapeaux_de_croissance as _dc
+    verifie("DISTRIBUTION_NON_RECURRENTE" not in _dc(
+                {"drapeaux": ["CROISSANCE_CORROBOREE", "DISTRIBUTION_NON_RECURRENTE"]}),
+            "le drapeau est exclu des drapeaux que le grade note : il ne deplace "
+            "aucun verdict de confiance")
+    for t in ("NTLC", "SDCC", "SIBC", "SMBC"):
+        verifie(t in pj and not porte(t),
+                f"{t} ne porte PAS le drapeau (coincidence de montant sur un vieux "
+                f"versement, alors que la table en porte un posterieur)")
 
     taux = next((v.get("taux_reference") for v in pj.values() if v.get("taux_reference")), None)
     if taux is None:

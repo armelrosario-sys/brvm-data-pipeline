@@ -562,6 +562,73 @@ compter zéro pour les dividendes périmés. Le cycle mesurera l'option choisie.
 **Terminé quand** : l'option est tranchée, appliquée, l'effet mesuré titre par
 titre, et un test de la section 21 fige la règle.
 
+**Note du cycle 7 bis** : l'effet ci-dessus a été mesuré sur **10** titres
+drapeautés. Ils sont **6** depuis la correction de la règle 1 (voir le journal).
+**La mesure est à refaire** avant de trancher.
+
+## C17 — Pour 13 titres sur 44, le dividende que le BOC divise reste introuvable
+
+- statut : PROPOSÉ
+- validation : EN ATTENTE
+- autonomie : partielle — première passe **sans réseau** sur le corpus déjà collecté
+- priorité : 3
+
+**Le constat, mesuré le 30/09/2026 (cycle 7 bis), sur la règle de C1 corrigée.**
+Le rendement du BOC est un rapport : dernier dividende par action sur cours. En
+reconstruisant le dividende implicite (`rendement × cours`) et en le confrontant au
+versement **le plus récent** de notre table `dividendes`, **31 titres sur 44
+concordent** à 10 % près — la plupart à moins de 1 %, ce qui prouve que la méthode
+identifie bien la référence. Les **13 autres** ne concordent pas :
+
+| titre | implicite du BOC | dernier versement en base | écart |
+|---|---|---|---|
+| NTLC | 369,60 | 2025-08-18 · 721,60 | +95 % |
+| CFAC | 55,52 | 2025-08-19 · 7,04 | −87 % |
+| LNBB | 164,19 | 2025-07-31 · 275,50 | +68 % |
+| STBC | 1 707,46 | 2024-07-29 · 675,00 | −60 % |
+| SMBC | 704,55 | 2024-09-30 · 1 080,00 | +53 % |
+| SLBC | 1 871,10 | 2025-07-29 · 1 073,60 | −43 % |
+| NEIC | 140,30 | 2024-06-25 · 81,78 | −42 % |
+| TTLC | 139,70 | 2025-09-03 · 195,67 | +40 % |
+| SGBC | 2 298,99 | 2025-08-05 · 1 645,78 | −28 % |
+| SPHC | 430,55 | 2025-07-17 · 323,84 | −25 % |
+| SDCC | 462,44 | 2025-09-30 · 352,00 | −24 % |
+| SHEC | 85,08 | 2025-10-22 · 75,29 | −12 % |
+| SIBC | 374,24 | 2025-07-31 · 330,00 | −12 % |
+
+**Pourquoi c'est un chantier et pas une curiosité.** Le BOC divise par un dividende
+que nous n'avons pas. C'est une **lacune de collecte**, mesurée et nommée titre par
+titre, et elle a trois conséquences immédiates :
+
+1. **la règle de C1 est inapplicable sur ces 13 titres.** Ni périmé ni exceptionnel
+   ne peut être établi pour eux — c'est précisément ce qui a produit les quatre faux
+   drapeaux corrigés ce cycle (NTLC, SDCC, SIBC, SMBC) : faute de référence, la
+   règle d'origine en inventait une par coïncidence de montant ;
+2. **c'est la mesure qui manquait à C2.** Le rapport implicite/déclaré est ce qui
+   trancherait la convention brut/net ; et 31 concordances à 10 % disent déjà que
+   pour celles-là l'écart entre les deux conventions ne peut pas être grand ;
+3. **CFAC à −87 % n'est pas un écart de convention, c'est un ordre de grandeur.**
+   Sa ligne 2025 porte 7,04 FCFA quand le BOC en divise 55,5. À regarder en premier,
+   avec STBC (−60 %) et NTLC (+95 %).
+
+**Première passe sans réseau** : `collecte/dividendes_boc.csv` et le corpus de
+bulletins déjà archivés n'ont pas été fouillés pour ces 13 titres. Ce qui manque
+après cela seulement justifie un `collecte.yml`.
+
+**Attention, une piste et une seule** : **NTLC est à +95 %**, soit presque
+exactement un facteur deux — la signature d'une division de nominal non ajustée.
+Et **SLBC** (−43 %) est le seul titre de cette liste dont **C4** signale une chute
+de cours non documentée **récente**, le 27/09/2024, donc antérieure à son versement
+de 2025. Les onze autres chutes listées par C4 datent de 2018-2019 et ne peuvent
+pas expliquer un écart sur un dividende de 2024 ou 2025. À vérifier sur ces deux
+titres avant de conclure à un dividende manquant : ce serait le même défaut vu
+d'ailleurs.
+
+**Terminé quand** : chaque titre a soit son dividende de référence en base avec sa
+source, soit un motif daté d'impossibilité ; l'effet sur la règle de C1 est mesuré
+titre par titre ; et le compte de titres à référence identifiée, aujourd'hui 31 sur
+44, est figé par un test qui ne peut que monter.
+
 ---
 
 # Veille datée, hors file
@@ -575,6 +642,109 @@ titre, et un test de la section 21 fige la règle.
 # Journal
 
 Une entrée par cycle. La plus récente en haut.
+
+## 2026-09-30 — cycle 7 bis (session parallèle — C1 abandonné, une erreur de C1 corrigée)
+
+**Deux sessions ont exécuté C1 en même temps.** Celle-ci a démarré sur `c546a1d`
+et a travaillé une heure sans contact avec l'autre. Au `git fetch` d'avant
+poussée, `e769287` était là : C1 fait, testé, poussé. **Mon implémentation de C1
+est abandonnée, pas fusionnée** — c'est la règle écrite après le gâchis du
+28/09, et elle a raison : deux règles concurrentes sur le même drapeau, avec deux
+registres d'exceptions, se désynchronisent et ne surveillent plus rien. Pareil
+pour ma section de test sur la forme de `profils.json`, que la section 20 de
+`e769287` couvre **mieux** : elle mesure le retard sur 21 commits là où je n'avais
+mesuré qu'un point, et elle en tire la bonne conclusion — comparer les **valeurs**
+commitées serait un faux positif quotidien, seule la **forme** doit être figée.
+
+**Ce que la double mesure vaut quand même : une corroboration indépendante.** Sans
+aucun contact, les deux sessions ont mesuré les mêmes nombres sur le constat de
+C1 : prime **FTSC +79,47 points** (rendement 86,54 %), **SIVC +19,74**, troisième
+**STBC +0,70**, et **1 726,56 FCFA** pour la distribution FTSC de l'exercice 2024.
+Ces chiffres sont sûrs. Deux corrections de forme au passage : les autres titres
+sont **42**, pas 45 — la base compte 44 titres portant un rendement, pas 47 ; et
+le dividende de référence de SIVC couvre l'**exercice 2016**, payé le 29/09/2017,
+donc **dix ans** et non neuf.
+
+**Ce que ce commit apporte : une erreur de `e769287`, mesurée et corrigée.**
+Sa règle 1 cherchait le versement le plus proche **en montant** parmi **toutes**
+les dates de la table. Sur une série de versements voisins, le plus proche en
+montant n'est pas forcément le plus récent — et la règle concluait alors
+« dividende périmé » sur un titre dont **la même table porte un versement
+postérieur** :
+
+| titre | implicite du BOC | versement retenu | versement le plus récent de la table |
+|---|---|---|---|
+| NTLC | 369,60 | 2021-07-30 (363,67) | **2025-08-18 (721,60)** |
+| SDCC | 462,44 | 2023-09-15 (450,00) | **2025-09-30 (352,00)** |
+| SIBC | 374,24 | 2021-07-23 (360,00) | **2025-07-31 (330,00)** |
+| SMBC | 704,55 | 2022-08-24 (720,00) | **2024-09-30 (1 080,00)** |
+
+**Quatre des neuf drapeaux de péremption reposaient donc sur une coïncidence de
+montant, pas sur une identification**, et la fiche affirmait de quatre sociétés
+qu'elles ne distribuent plus alors que notre propre base montre le contraire.
+
+**Correctif, une ligne** : le BOC divise par le **dernier** dividende payé ; la
+coïncidence ne vaut donc que sur le versement **le plus récent** de la table.
+Ailleurs, la référence nous échappe et on ne conclut pas — exactement le
+traitement que `e769287` réservait déjà à NEIC et STBC, dont la table a un trou.
+**Effet mesuré** : 10 drapeaux → **6** (BNBC, FTSC, ORGT, SCRC, SEMC, SIVC) ;
+les primes de NTLC, SDCC, SIBC et SMBC reviennent, toutes **négatives**
+(−4,67 à −2,80 points), donc très loin du plancher de plausibilité ;
+**0 écart** sur `profil`, `secondaire`, `grade`, `gate`, `decote_pctl`, `peg`,
+`pegy`, `g` pour les 47 titres. Il reste **38 primes**, entre **−5,74 et +0,70**
+point.
+
+**Tests, dans la section 21 de `e769287` plutôt qu'à côté** — un contrôle de plus
+sur la même identité, pas une seconde section. Trois ajouts : une injection
+`COINCIDENCE` (100 en 2021, 180 en 2025, implicite 100) qui ne doit **pas**
+conclure ; un contrôle sur le fonds réel — aucun motif de péremption ne doit être
+contredit par un versement postérieur de la même table ; et les quatre titres
+nommés. Le contrôle « NTLC et SMBC restent grade A » a été **réécrit** : depuis la
+correction ils ne portent plus le drapeau, donc il passait à vide ; il vérifie
+maintenant la propriété du code, que le drapeau est exclu de ceux que le grade
+lit. **Contre-essai** : la ligne corrigée remise en `min`, **six contrôles
+échouent**, en nommant les quatre titres et leurs deux dates ; remise en `max`,
+tous passent.
+
+**Conséquence pour C16, signalée sans être traitée.** Son effet mesuré (2 profils
+basculent, `decote_pctl` bouge sur 30 titres) a été obtenu sur les **10** titres
+drapeautés. Ils sont **6** désormais : **la mesure est à refaire** avant tout
+arbitrage. Mon propre essai de retrait de l'axe, fait sur un jeu de 8 titres
+obtenu par une autre règle, donnait 0 profil déplacé et 9 `decote_pctl` — deux
+mesures non comparables, aucune ne vaut pour l'autre.
+
+**Chasse aux défauts — ce que cette session a mesuré sur la famille annoncée**
+(reproductibilité de `collecte/profils.json`), et qui ne recoupe pas la section 20
+de `e769287` :
+
+- le `profils.json` commité **est** reproductible : régénéré sur base propre,
+  **0 champ différent sur 47 titres**, et **0 champ différent** également à
+  `4656d9f` reconstruit dans un arbre de travail séparé avec le code de ce
+  commit. Le résultat est négatif et il faut le dire ;
+- il l'est **par ordonnancement, pas par construction** : sur les 11 derniers
+  commits touchant une source de `profils.py`, **8 ne régénèrent pas**
+  `profils.json` — les commits BOC quotidiens. C'est `avis_brvm.yml`, quotidien,
+  qui repasse derrière eux ;
+- **aucun lecteur de la version commitée n'existe** : `pages.yml`, `tests.yml` et
+  `app.py` lancent tous `profils.py` **avant** de lire le fichier. C'est le vrai
+  motif pour lequel le `profils.json` corrompu du cycle 1 a pu être publié sans
+  que rien ne bronche : il n'y avait pas d'endroit où le regarder. La section 20
+  de `e769287` est désormais cet endroit, pour la forme ;
+- vérifié plutôt que repris : « `tests.yml` recalcule mais ne commite rien » est
+  **exact** ; l'occurrence de `profils.json` dans ce workflow est un commentaire.
+
+**Barrières, toutes repassées sur base reconstruite après la correction** :
+`peupler.py` 50 sociétés / 185 lignes d'états ; les quatre chargeurs OK
+(4 509 / 86 057 / 296+63 / 73 141) ; `tester.py` **0** ; `profils.py` **0**
+(A=5, B=28, C=14) ; `tester_donnees.py` **2**, **150 contrôles OK, 0 échec**, les
+deux mêmes alertes de fraîcheur qu'en référence (C4, C5), aucune nouvelle ;
+`app.py` démarre, 4 onglets ; `avis_brvm.py --test` **0** ; `notations.py --test`
+**0** ; `generer_dashboard.py` **0** (48 titres). `dashboard_brvm.xlsx` et
+`moteur/brvm.db` supprimés avant commit.
+
+**C15 reste `OK` et non touché : chantier du cycle 8.** **C17 ouvert et proposé**
+— 13 titres sur 44 dont le dividende de référence du BOC n'est identifiable dans
+aucune ligne de notre base. Aucun libellé repris : C16 appartient à `e769287`.
 
 ## 2026-09-30 — cycle 7
 

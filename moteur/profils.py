@@ -486,11 +486,15 @@ def diagnostic_distribution(cur, ticker, date_cours, sp, cours=None, dy=None):
     base ; sans historique suffisant, aucun drapeau (une case vide vaut mieux
     qu'une estimation) :
       1. PERIME : le dividende qui porte le rendement du BOC date de plus de
-         `distribution_age_max_ans` ans. Ce dividende n'est pas « le dernier de la
-         table » : la table a des trous (NEIC 2025, STBC 2025 y manquent, C5). On le
-         retrouve par le dividende IMPLICITE du BOC, rendement x cours, qui doit
-         coincider (a `distribution_tolerance_implicite` pres) avec un versement
-         date de la table. Sans coincidence, on ne conclut pas : aucun drapeau ;
+         `distribution_age_max_ans` ans. On l'identifie par le dividende IMPLICITE
+         du BOC, rendement x cours, qui doit coincider (a
+         `distribution_tolerance_implicite` pres) avec le versement date le PLUS
+         RECENT de la table -- celui-la seul, parce que c'est par le dernier
+         dividende paye que le BOC divise. Sans coincidence, on ne conclut pas :
+         aucun drapeau. C'est le cas quand la table a un trou (NEIC 2025 et
+         STBC 2025 y manquent, C5) comme quand le BOC connait un versement que
+         nous n'avons pas : dans les deux cas la reference nous echappe, et une
+         lacune de collecte n'est pas un fait sur la societe ;
       2. EXCEPTIONNEL : le dernier versement de la table depasse
          `distribution_ratio_max` fois le PLUS FORT des versements precedents (au
          moins `distribution_historique_min`). Contre le maximum et non la
@@ -513,9 +517,25 @@ def diagnostic_distribution(cur, ticker, date_cours, sp, cours=None, dy=None):
         auj = None
 
     # --- Regle 1 : le dividende du BOC est-il perime ? -------------------------
+    # CORRECTION du 30/09/2026, meme jour, session parallele du cycle 7. La
+    # premiere version cherchait le versement le plus proche EN MONTANT parmi
+    # TOUTES les dates. Sur une serie de versements voisins, le plus proche en
+    # montant n'est pas forcement le plus recent, et la regle concluait alors
+    # "dividende perime" sur un titre dont la MEME table porte un versement
+    # POSTERIEUR. Quatre titres sur les neuf drapeautes PERIME etaient dans ce
+    # cas, mesure sur la base du jour :
+    #   NTLC  implicite 369,60 -> retenu 2021-07-30 (363,67), table : 2025-08-18 (721,60)
+    #   SDCC  implicite 462,44 -> retenu 2023-09-15 (450,00), table : 2025-09-30 (352,00)
+    #   SIBC  implicite 374,24 -> retenu 2021-07-23 (360,00), table : 2025-07-31 (330,00)
+    #   SMBC  implicite 704,55 -> retenu 2022-08-24 (720,00), table : 2024-09-30 (1080,00)
+    # Le rapprochement etait une COINCIDENCE de montant, pas une identification.
+    # Le BOC divise par le DERNIER dividende paye : la coincidence ne vaut donc
+    # que sur le versement le plus recent de la table. Si c'est un autre qui
+    # colle, la reference nous echappe et on ne conclut pas -- exactement le
+    # traitement deja reserve a NEIC et STBC, dont la table a un trou.
     if auj is not None and cours and dy:
         implicite = cours * dy
-        d_proche = min(par_date, key=lambda d: abs(par_date[d] - implicite))
+        d_proche = max(par_date)
         ecart = abs(par_date[d_proche] - implicite) / implicite
         age = (auj - d_proche).days / 365.25
         if ecart <= sp["distribution_tolerance_implicite"] and age > sp["distribution_age_max_ans"]:

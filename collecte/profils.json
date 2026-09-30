@@ -2485,9 +2485,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2024,
   "taux_reference": 0.0707,
-  "prime_rendement": null,
-  "dy_recurrent": null,
-  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 363.67 FCFA verse le 2021-07-30, soit 5.2 ans avant le cours (dividende implicite du BOC : 369.60) : il ne decrit plus une distribution en cours",
+  "prime_rendement": -0.0467,
+  "dy_recurrent": 2.4,
+  "distribution_non_recurrente": null,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 19.5,
   "ecart_benefice": 0.06,
@@ -2499,7 +2499,6 @@
   "reserves": [
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
    "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
-   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 363.67 FCFA verse le 2021-07-30, soit 5.2 ans avant le cours (dividende implicite du BOC : 369.60) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 233261.0,
@@ -2520,7 +2519,6 @@
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
    "CROISSANCE_CORROBOREE",
-   "DISTRIBUTION_NON_RECURRENTE",
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 18.44,
@@ -3459,9 +3457,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2024,
   "taux_reference": 0.0707,
-  "prime_rendement": null,
-  "dy_recurrent": null,
-  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 450.00 FCFA verse le 2023-09-15, soit 3.0 ans avant le cours (dividende implicite du BOC : 462.44) : il ne decrit plus une distribution en cours",
+  "prime_rendement": -0.0351,
+  "dy_recurrent": 3.56,
+  "distribution_non_recurrente": null,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 20.1,
   "ecart_benefice": 0.01,
@@ -3478,7 +3476,6 @@
    "SERIE_TROUEE : des exercices manquent entre les bornes : le taux relie deux points sans les annees intermediaires",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "ECART_AGREGATEUR : une source exterieure donne un glissement sensiblement different sur le meme exercice — la ligne certifiee est conservee, mais le perimetre (consolide ou part du groupe) reste a verifier sur le document",
-   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 450.00 FCFA verse le 2023-09-15, soit 3.0 ans avant le cours (dividende implicite du BOC : 462.44) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 189430.0,
@@ -3500,8 +3497,7 @@
   "drapeaux": [
    "SERIE_TROUEE",
    "SERIE_COMPLETEE_N1",
-   "ECART_AGREGATEUR",
-   "DISTRIBUTION_NON_RECURRENTE"
+   "ECART_AGREGATEUR"
   ],
   "per": 19.88,
   "payout": 0.7077279999999999,
@@ -4112,9 +4108,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0707,
-  "prime_rendement": null,
-  "dy_recurrent": null,
-  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 360.00 FCFA verse le 2021-07-23, soit 5.2 ans avant le cours (dividende implicite du BOC : 374.24) : il ne decrit plus une distribution en cours",
+  "prime_rendement": -0.0298,
+  "dy_recurrent": 4.09,
+  "distribution_non_recurrente": null,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -4129,7 +4125,6 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "CONTRADICTION_RN_BPA : les resultats nets en base et le BPA implicite evoluent en sens OPPOSE — la croissance affichee n'est pas fiable, trancher avant tout usage",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 360.00 FCFA verse le 2021-07-23, soit 5.2 ans avant le cours (dividende implicite du BOC : 374.24) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 108663.0,
@@ -4150,8 +4145,7 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
    "CONTRADICTION_RN_BPA",
-   "CROISSANCE_CORROBOREE",
-   "DISTRIBUTION_NON_RECURRENTE"
+   "CROISSANCE_CORROBOREE"
   ],
   "per": 16.46,
   "payout": 0.673214,
@@ -4568,9 +4562,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0707,
-  "prime_rendement": null,
-  "dy_recurrent": null,
-  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 720.00 FCFA verse le 2022-08-24, soit 4.1 ans avant le cours (dividende implicite du BOC : 704.55) : il ne decrit plus une distribution en cours",
+  "prime_rendement": -0.028,
+  "dy_recurrent": 4.27,
+  "distribution_non_recurrente": null,
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 10.6,
   "ecart_benefice": 0.08,
@@ -4583,7 +4577,6 @@
   ],
   "reserves": [
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 720.00 FCFA verse le 2022-08-24, soit 4.1 ans avant le cours (dividende implicite du BOC : 704.55) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 206740.0,
@@ -4603,8 +4596,7 @@
   "g": 11.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
-   "CROISSANCE_CORROBOREE",
-   "DISTRIBUTION_NON_RECURRENTE"
+   "CROISSANCE_CORROBOREE"
   ],
   "per": 9.84,
   "payout": 0.42016799999999993,
