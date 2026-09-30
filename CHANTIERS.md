@@ -603,7 +603,7 @@ Ce chiffre de 2 profils et 30 `decote_pctl` **ne vaut plus** : ne pas le reprend
 ## C17 — Pour 13 titres sur 44, le dividende que le BOC divise reste introuvable
 
 - statut : PROPOSÉ
-- validation : OK
+- validation : EN ATTENTE
 - autonomie : partielle — première passe **sans réseau** sur le corpus déjà collecté
 - priorité : 3
 
