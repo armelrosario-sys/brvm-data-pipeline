@@ -860,6 +860,11 @@ plus rien en silence.
 
 # Dernier cycle
 
+> **ANNONCE — cycle 10 en cours, 2026-09-30 19h25 UTC.** Chantier pris : **C10**
+> (VERTE, priorite 2) — normalisation ISO de `dividendes.date_paiement`. Cycle
+> demande par Claudia ("suite"), hors cadence. Cette annonce disparait au commit
+> de cloture ; si elle est encore la sans commit de cloture, la session a echoue.
+
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
 ## 2026-09-30 — cycle 9 (soir)
