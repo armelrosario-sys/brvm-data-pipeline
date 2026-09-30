@@ -569,7 +569,7 @@ drapeautés. Ils sont **6** depuis la correction de la règle 1 (voir le journal
 ## C17 — Pour 13 titres sur 44, le dividende que le BOC divise reste introuvable
 
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK
 - autonomie : partielle — première passe **sans réseau** sur le corpus déjà collecté
 - priorité : 3
 
