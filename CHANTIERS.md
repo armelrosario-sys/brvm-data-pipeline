@@ -124,6 +124,15 @@ Chacune vient d'une erreur réelle.
 **Aucune** si le commit ne touche que `CHANTIERS.md` ou `docs/`. Reconstruire la
 base pour un commit de texte a coûté un cycle entier les 28 et 30/09.
 
+**Une barrière ne tourne pas dans le bac à sable, et ce n'est pas une régression.**
+`dashboard/generer_dashboard_html.py` échoue à la compilation avec
+`SyntaxError: f-string expression part cannot include a backslash`. Vérifié le
+30/09/2026 (cycle 10) : **il échoue identiquement sur `HEAD`**, parce que le bac à
+sable porte Python **3.11** alors que `pages.yml` et `tests.yml` épinglent
+**3.12**, où PEP 701 autorise l'antislash dans une f-string. Ne pas chercher à le
+« réparer » : c'est l'environnement qui diffère, pas le fichier. Les barrières à
+passer sont `generer_dashboard.py` (celle de la liste) et la CI pour l'autre.
+
 ## Moyens disponibles
 
 - **Poussée directe sur `main`** : opérationnelle depuis le 27/09/2026.
@@ -357,7 +366,7 @@ dessus, et la publication GitHub Pages fonctionne toujours.
 ## C10 — `dividendes.date_paiement` n'est pas une colonne de dates
 
 - classe : VERTE — normalisation de format : aucune valeur ne change, un mois non reconnu arrête le script
-- statut : À FAIRE
+- statut : **FAIT le 30/09/2026 (cycle 10)** — voir *Fait le 30/09/2026* en bas de ce bloc
 - validation : —
 - autonomie : complète, aucune donnée extérieure nécessaire
 - priorité : **2** — **avant C3**, dont le journal datera ses lignes. *Corrigé le
@@ -414,6 +423,51 @@ français abrégé mal orthographié doit échouer bruyamment.
 migration idempotent dans `outils/`, les chargeurs normalisent à l'entrée, la
 déduplication de `collecte_boc_quotidien.py` retrouve bien les lignes
 existantes, et un test refuse toute date non ISO dans la table.
+
+### Fait le 30/09/2026 (cycle 10)
+
+Quatre pièces, et les quatre critères de terminaison sont remplis.
+
+- **`collecte/dates_dividendes.py`** — seule définition de la conversion dans le
+  dépôt, avec autotest (`--test`, **27 cas, 0 échec**). Liste **blanche exacte**
+  de mois, sans aucune correspondance par préfixe : `24-jullet-17` échoue, là où
+  un préfixe de trois lettres l'aurait pris pour un 24 juillet. Refuse aussi un
+  jour inexistant (`31-fevr.-20`, et `2025-02-31` en ISO), une année hors de la
+  fenêtre 1998–2027 (`30-sept.-97` → refus, c'est ainsi que l'ambiguïté du siècle
+  est levée au lieu d'être masquée), et un mois numérique (`24/07/2017`, ambigu).
+- **`outils/migration_dates_dividendes_iso.py`** — procès-verbal exécutable.
+  **362 lignes converties sur 364**, 2 cases vides laissées vides, aucune autre
+  colonne touchée. Six gardes : entête et comptes, ancres, empreintes SHA-256
+  **avant** et **après**, réserialisation exigée à l'octet près avant écriture,
+  refus sur date illisible (0 cas), et relecture après écriture. **Relancé deux
+  fois : sans effet**, il constate « migration DEJA APPLIQUEE ».
+- **Les trois chargeurs normalisent à l'entrée** — `charger_dividendes_exercice.py`
+  (une date illisible fait écarter la ligne, avec message, jamais une date
+  devinée), `moteur/peupler.py` (garde sur `donnees/base/dividendes.csv`, qui est
+  déjà ISO : aucune valeur ne change), et `historiser_dividendes_exercice.py`, qui
+  émet désormais de l'ISO — sans quoi une régénération aurait défait la migration.
+- **Test : section 23 de `tester_donnees.py`, 13 contrôles.**
+
+**Effet mesuré, avant/après, sur la base du jour.**
+
+| | avant | après |
+|---|---|---|
+| dates non ISO en base | 296 | **0** (308 ISO, 3 nulles sur 311) |
+| tickers dont `ORDER BY date_paiement DESC` rend le mauvais versement | **34 / 49** | **0 / 49** |
+| tickers dont `int(date[:4])` échoue, donc bloc « régularité du dividende » de `scoring.py` sauté en silence | **45 / 49** | **0 / 49** |
+| dividendes témoins retrouvés par la déduplication du BOC | **0 / 40** | **40 / 40** |
+| champs de `collecte/profils.json` déplacés | — | **0** (fichier identique) |
+
+Le deuxième effet n'était pas chiffré avant ce cycle et c'est le plus grave :
+`int("24-j")` lève `ValueError`, avalée par un `except (ValueError, TypeError):
+pass`, donc le bonus de 20 points, le malus de 20 et l'alerte « dernier dividende
+versé il y a N ans » ne s'exécutaient sur **aucun** des 45 titres concernés.
+
+**Trouvé en posant les gardes, inscrit en C19** : 12 lignes strictement dupliquées
+dans `dividendes_par_exercice.csv`, qui passent à 16 après migration — quatre
+événements y étaient dédoublés sous **deux orthographes du même jour**. Et une
+régénération du fichier par son propre générateur ne rend pas le fichier commité :
+un événement de plus (FTSC 2016).
 
 ## C11 — Le référentiel comptable n'est pas une colonne de la base
 
@@ -848,6 +902,65 @@ registre `COLLISIONS_ECHELLE` de la section 22 reflète ce qui reste, l'alerte d
 C4 retombe de 13 à 10 dates, et le seuil `var > -0,995` de la section 7 n'écarte
 plus rien en silence.
 
+## C19 — `dividendes_par_exercice.csv` porte des doublons, et son générateur ne le rend plus
+
+- classe : ORANGE — décider quelle ligne est la bonne est un arbitrage ; la mesure est faite
+- statut : PROPOSÉ
+- validation : EN ATTENTE
+- autonomie : complète, **sans réseau** — tout est dans le dépôt
+- priorité : 6
+
+**Le constat, mesuré le 30/09/2026 (cycle 10), trouvé par les gardes de C10.**
+Le script de migration de C10 a refusé de tourner au premier essai : son assertion
+d'unicité a buté sur les lignes 4 et 6 du fichier (`ABJC, 2017, 98,97,
+20-juin-18`). Deux mesures en sont sorties.
+
+**1. Douze lignes strictement dupliquées, qui deviennent seize.** Sur les 364
+lignes, **12** sont identiques sur les six colonnes, note comprise : 352 clés pour
+364 lignes. Après la normalisation ISO elles sont **16**, parce que **quatre
+événements étaient dédoublés sous deux orthographes du même jour** — ce que le
+format français cachait :
+
+| titre | exercice | montant | jour | les deux formes brutes |
+|---|---|---|---|---|
+| ABJC | 2017 | 98,97 | 2018-06-20 | `20-juin-18` et `20-juin.-18` |
+| ORAC | 2023 | 780,00 | 2024-06-03 | `3-juin-24` et `03-juin-24` |
+| ETIT | 2016 | 1,21 | 2017-04-28 | `28 Apr 17` et `28-avr.-17` |
+| ETIT | 2021 | 0,90 | 2022-06-20 | `20 Jun 22` et `20-juin-22` |
+
+Les deux ETIT sont les plus parlants : le même versement a été saisi une fois en
+anglais et une fois en français. C'est une **corroboration** involontaire de la
+valeur, pas une contradiction.
+
+**2. Le fichier commité n'est plus ce que son générateur produit.**
+`collecte/historiser_dividendes_exercice.py` lit `dividendes_historique.csv`
+(365 lignes) et écrit `dividendes_par_exercice.csv` (364 lignes commitées). Relancé
+sur l'état du dépôt **avant tout changement de ce cycle**, il rend **365 lignes**,
+donc une de plus : **FTSC 2016, 1 045,00, payé le 31/07/2017**. C'est exactement le
+cas que le générateur documente dans son propre commentaire (avis BRVM
+N° 072-2017/DC/BR/DG). Le fichier dérivé a donc été retouché à la main sans que le
+générateur le sache, et personne ne peut plus le régénérer sans changer les données.
+
+**Portée, dite franchement : le défaut est LATENT.**
+`charger_dividendes_exercice.py` déduplique par `(ticker, exercice_couvert)` : les
+doublons ne produisent **aucun doublon en base**, vérifié — la table porte 311
+lignes avant comme après. Aucun profil, grade ni gate n'en dépend. Ce qui en
+dépend : tout comptage d'événements de dividende lu sur ce fichier (le générateur
+annonce « 364 événements » là où il y en a 352), et la prochaine régénération, qui
+ajouterait FTSC 2016 sans que ce soit une décision de quiconque.
+
+**Ce qu'il faut faire, et ce qui demande un arbitrage.** Retirer 16 lignes
+strictement identiques est mécanique. Mais trancher le cas FTSC 2016 ne l'est pas :
+soit le versement est légitime et le fichier commité a **tort** de ne pas le porter
+(et il faut l'y remettre), soit il a été retiré à la main pour une raison qui n'est
+écrite nulle part (et c'est le générateur qu'il faut corriger). Les deux se
+défendent, et la doctrine du projet interdit de deviner laquelle.
+
+**Terminé quand** : les 16 doublons sont retirés par un script idempotent dans
+`outils/`, le cas FTSC 2016 est tranché avec son motif écrit, une régénération par
+`historiser_dividendes_exercice.py` rend **exactement** le fichier commité, et un
+test de la section 23 fige l'égalité entre le fichier et sa régénération.
+
 ---
 
 # Veille datée, hors file
@@ -860,40 +973,35 @@ plus rien en silence.
 
 # Dernier cycle
 
-> **ANNONCE — cycle 10 en cours, 2026-09-30 19h25 UTC.** Chantier pris : **C10**
-> (VERTE, priorite 2) — normalisation ISO de `dividendes.date_paiement`. Cycle
-> demande par Claudia ("suite"), hors cadence. Cette annonce disparait au commit
-> de cloture ; si elle est encore la sans commit de cloture, la session a echoue.
-
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-09-30 — cycle 9 (soir)
+## 2026-09-30 — cycle 10 (hors cadence, demandé par Claudia)
 
-**Exécuté : C16, la passe de mesure des trois options.** Trois variantes jetables
-de `profils.py`, garde vérifiée (la variante (a) reproduit `profils.json` au champ
-près, 0 écart). Résultat, sur 47 titres : **(b) case vide** déplace `decote_pctl`
-sur **28/47** et fait basculer **2** profils — ORGT `AUCUN_PROFIL` → `VALUE`, et
-SMBC perd son secondaire `VALUE` par simple effet de bassin ; **(c) zéro si
-périmé** déplace **3/47** et **0** profil. Aucun grade, aucun gate ne bouge dans
-aucune option. Des 6 drapeautés, **4 sont hors axes** : seuls ORGT et SEMC comptent.
-Tableau titre par titre dans le bloc C16. **Rien appliqué** : le choix est à Claudia.
+**Exécuté : C10, jusqu'au bout.** `collecte/dates_dividendes.py` (autotest 27 cas,
+0 échec), `outils/migration_dates_dividendes_iso.py` (**362 lignes converties sur
+364**, six gardes, relancé deux fois sans effet), les trois chargeurs qui
+normalisent à l'entrée, et la **section 23** de `tester_donnees.py` (13 contrôles).
 
-**Deux incohérences de ce fichier, corrigées.** (1) Le rang 1 de l'ordre de passage
-reprenait indéfiniment un ORANGE `validation : OK` déjà mesuré — clause ajoutée, et
-C16 porte désormais « passe consommée » sur sa ligne `statut`. (2) C10 demandait à
-passer avant C3 tout en portant la même priorité 3, ce que l'ordre déterministe
-tranchait en faveur de C3 — C10 passe à **priorité 2**.
+**Effet mesuré, avant → après** : dates non ISO en base **296 → 0** ;
+`ORDER BY date_paiement DESC` rend le mauvais versement sur **34/49 → 0/49** ;
+`int(date[:4])` échoue — donc le bloc « régularité du dividende » de `scoring.py`
+est sauté en silence — sur **45/49 → 0/49** ; déduplication du BOC : **0/40 →
+40/40**. **`profils.json` est identique** : aucun verdict ne bouge.
 
-**Comptes de C10 refaits, les anciens étaient faux** : la table `dividendes` porte
-**311** lignes (296 français abrégé, 12 ISO, 3 nulles), pas 326/296/24/6. Et le
-défaut de tri est **actif**, pas latent : `ORDER BY date_paiement DESC` rend un
-autre versement que le plus récent sur **34 des 49** tickers à deux dividendes datés.
+**Trouvé en posant les gardes, inscrit en C19** (ORANGE, `EN ATTENTE`) : 12 lignes
+dupliquées dans `dividendes_par_exercice.csv`, **16** après normalisation — quatre
+événements dédoublés sous deux orthographes du même jour, dont deux en anglais
+(`28 Apr 17` et `28-avr.-17`). Et une régénération par
+`historiser_dividendes_exercice.py` **ne rend plus le fichier commité** : un
+événement de plus, FTSC 2016. Latent en base, mais la prochaine régénération
+changerait les données sans décision.
 
-**État à la reprise** : CI verte, arbre propre, aucun commit sur `main` depuis 3 h.
-Pas de chasse (cycle du soir). Rien en suspens.
+**Barrières complètes, vertes** : golden OK, `tester_donnees.py` **172 OK, 0
+échec**, code 2 sur les deux seules alertes connues (C4, C5), `avis_brvm.py --test`,
+`notations.py --test`, `generer_dashboard.py` OK. `generer_dashboard_html.py` ne
+compile pas sous le Python 3.11 du bac à sable — identique sur `HEAD`, CI en 3.12.
 
-**Prochain chantier** : **C10** (VERTE, priorité 2), migration ISO — faisabilité
-vérifiée, `date_dividende()` convertit les 311 lignes sans exception.
+**Prochain chantier** : **C3** (VERTE, priorité 3), journal des prédictions.
 
 ---
 

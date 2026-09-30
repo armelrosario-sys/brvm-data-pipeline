@@ -121,6 +121,37 @@ def lire(fichier):
         return [tuple(_valeur(c, ligne[c]) for c in attendu) for ligne in lecteur]
 
 
+def normaliser_dates_dividendes(lignes):
+    """date_paiement en ISO a l'entree (chantier C10, 30/09/2026).
+
+    donnees/base/dividendes.csv est deja ISO (12 dates) ou vide (3) : cette
+    garde ne change aujourd'hui aucune valeur. Elle est la pour que la table
+    ne puisse plus MELANGER deux formats, quel que soit le chargeur -- c'est
+    le melange, et non le format francais en soi, qui cassait le tri
+    `ORDER BY date_paiement DESC` et l'extraction d'annee de scoring.py.
+    Une date illisible arrete le peuplement : elle n'est jamais devinee, et
+    elle n'entre pas non plus en base telle quelle.
+    """
+    import sys as _sys
+    _sys.path.insert(0, str(RACINE / "collecte"))
+    from dates_dividendes import vers_iso
+    i_date = SCHEMA_CSV["dividendes.csv"].index("date_paiement")
+    sorties = []
+    for ligne in lignes:
+        brute = ligne[i_date]
+        if brute in (None, ""):
+            sorties.append(ligne)
+            continue
+        iso = vers_iso(brute)
+        if iso is None:
+            raise SystemExit(
+                "Date de paiement illisible dans donnees/base/dividendes.csv : "
+                "%r (ticker %s). Un mois non reconnu ou un jour inexistant ne se "
+                "devine pas : corriger la ligne." % (brute, ligne[0]))
+        sorties.append(ligne[:i_date] + (iso,) + ligne[i_date + 1:])
+    return sorties
+
+
 def main():
     societes = lire("societes.csv")
     etats = lire("etats_financiers.csv")
@@ -128,7 +159,7 @@ def main():
     exploitation = lire("resultat_exploitation.csv")
     intermediaires = lire("resultats_intermediaires.csv")
     source_urls = lire("source_urls.csv")
-    dividendes = lire("dividendes.csv")
+    dividendes = normaliser_dates_dividendes(lire("dividendes.csv"))
     avis = lire("avis_reglementaires.csv")
 
     conn = sqlite3.connect(DB)

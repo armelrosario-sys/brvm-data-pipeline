@@ -2227,6 +2227,149 @@ def test_distribution_non_recurrente():
             f"(plancher de plausibilite +{PLAUSIBILITE_PRIME * 100:.0f})")
 
 
+# Plancher de la section 23 : nombre de dates de paiement ISO en base. Il ne peut
+# que monter — la collecte ajoute des dividendes, elle n'en retire pas. Mesure du
+# 30/09/2026 (cycle 10), apres migration : 308 ISO et 3 nulles sur 311 lignes.
+DATES_ISO_MIN = 308
+
+
+def test_dates_dividendes_iso():
+    """La colonne date_paiement est ISO, et le tri chronologique redevient vrai.
+
+    POURQUOI CETTE SECTION EXISTE (chantier C10, 30/09/2026). La colonne
+    melangeait 296 dates en francais abrege ('24-juil.-17') et 12 en ISO, parce
+    que charger_dividendes_exercice.py inserait la chaine brute du CSV. Ce
+    melange n'etait pas cosmetique, et deux de ses trois effets etaient ACTIFS,
+    mesures sur la base du jour avant correction :
+
+      1. moteur/scoring.py::dividendes() fait ORDER BY date_paiement DESC. Sur du
+         francais abrege l'ordre est ALPHABETIQUE : sur les 49 tickers portant au
+         moins un dividende date, le premier rendu n'etait PAS le versement le
+         plus recent pour 34 d'entre eux ;
+      2. le meme fichier fait int(dernier_div["date_paiement"][:4]), soit
+         int("24-j") sur du francais : ValueError, avalee par un except. Tout le
+         bloc « regularite du dividende » (bonus 20, malus 20, alerte
+         « dernier dividende verse il y a N ans ») etait silencieusement saute
+         sur 45 des 49 tickers ;
+      3. collecte_boc_quotidien.py normalise en ISO puis deduplique par egalite
+         de chaine : une date ISO ne s'egalera jamais a la forme francaise du
+         meme jour, donc le BOC aurait un jour reinsere en double un dividende
+         deja charge par la Piste D. Celui-la etait LATENT (0 paire (ticker,
+         jour) portant les deux formats), et c'est pour qu'il le reste que le
+         quatrieme controle ci-dessous existe.
+
+    Ce que la section verrouille : la conversion elle-meme (liste blanche de
+    mois, refus des formes approchantes), l'absence de toute date non ISO en
+    base, la verite du tri, la faisabilite de l'extraction d'annee, et la
+    reconnaissance par le dedoublonneur du BOC.
+    """
+    print("\n=== 23. Dates de paiement des dividendes en ISO (bloquant) ===")
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from dates_dividendes import CAS, est_iso, vers_iso
+
+    # --- 1. La conversion : refuser plutot que deviner ----------------------
+    echecs = [(e, a, vers_iso(e)) for e, a in CAS if vers_iso(e) != a]
+    verifie(not echecs,
+            "les %d cas de collecte/dates_dividendes.py passent (formes reelles du "
+            "depot, et refus des pieges)" % len(CAS)
+            + ("" if not echecs else " — ECHECS : %r" % echecs[:5]))
+    # Le piege fondateur : un prefixe de trois lettres aurait accepte celui-ci.
+    verifie(vers_iso("24-jullet-17") is None,
+            "un mois francais mal orthographie ('jullet') echoue au lieu d'etre "
+            "devine par prefixe")
+    verifie(vers_iso("31-fevr.-20") is None and vers_iso("2025-02-31") is None,
+            "un jour qui n'existe pas echoue, en francais comme en ISO")
+    verifie(vers_iso("30-sept.-97") is None,
+            "l'annee sur deux chiffres est levee en 20AA, et 2097 est refusee "
+            "comme hors fenetre de plausibilite")
+
+    if not DB.exists():
+        verifie(False, "base absente", bloquant=False)
+        return
+    conn = sqlite3.connect(DB)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # --- 2. Aucune date non ISO en base ------------------------------------
+    lignes = cur.execute(
+        "SELECT ticker, montant_net, date_paiement FROM dividendes").fetchall()
+    fautives = sorted({(r["ticker"], r["date_paiement"]) for r in lignes
+                       if r["date_paiement"] and not est_iso(r["date_paiement"])})
+    verifie(not fautives,
+            "les %d lignes de dividendes portent une date ISO ou une case vide, "
+            "aucune autre forme" % len(lignes)
+            + ("" if not fautives else " — FAUTIVES : %r" % fautives[:8]))
+    n_iso = sum(1 for r in lignes if est_iso(r["date_paiement"]))
+    verifie(n_iso >= DATES_ISO_MIN,
+            "%d date(s) ISO en base (plancher %d, qui ne peut que monter)"
+            % (n_iso, DATES_ISO_MIN))
+
+    # --- 3. Le tri SQL redit la verite, et l'annee s'extrait ---------------
+    tickers = [r[0] for r in cur.execute(
+        "SELECT DISTINCT ticker FROM dividendes ORDER BY 1")]
+    mal_triees, annee_illisible = [], []
+    for t in tickers:
+        rs = cur.execute("SELECT date_paiement FROM dividendes WHERE ticker=? "
+                         "ORDER BY date_paiement DESC", (t,)).fetchall()
+        premier = rs[0]["date_paiement"]
+        dates = [r["date_paiement"] for r in rs if r["date_paiement"]]
+        if dates:
+            vrai = max(dates, key=lambda d: vers_iso(d) or "")
+            if premier != vrai:
+                mal_triees.append("%s : %s au lieu de %s" % (t, premier, vrai))
+            try:
+                int(str(premier)[:4])
+            except (ValueError, TypeError):
+                annee_illisible.append("%s : %r" % (t, premier))
+    verifie(not mal_triees,
+            "ORDER BY date_paiement DESC rend le versement le plus recent sur les "
+            "%d tickers a dividende (34 etaient faux avant C10)" % len(tickers)
+            + ("" if not mal_triees else " — FAUX : " + " ; ".join(mal_triees[:6])))
+    verifie(not annee_illisible,
+            "int(date_paiement[:4]) reussit sur les %d tickers, donc le bloc "
+            "« regularite du dividende » de scoring.py s'execute reellement "
+            "(il etait saute sur 45 d'entre eux)" % len(tickers)
+            + ("" if not annee_illisible else " — ILLISIBLES : " + ", ".join(annee_illisible[:6])))
+
+    # --- 4. Le dedoublonneur du BOC retrouve bien les lignes existantes ----
+    # C'etait le defaut LATENT de C10. On rejoue exactement sa requete, avec la
+    # date telle que le BOC l'ecrit (francais abrege), sur des dividendes
+    # reellement en base. Sans la migration, aucune de ces recherches n'aboutit.
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from collecte_boc_quotidien import date_dividende_vers_iso
+    MOIS_INV = {1: "janv.", 2: "fevr.", 3: "mars", 4: "avr.", 5: "mai", 6: "juin",
+                7: "juil.", 8: "aout", 9: "sept.", 10: "oct.", 11: "nov.", 12: "dec."}
+    temoins = [r for r in lignes if est_iso(r["date_paiement"])
+               and r["montant_net"] is not None][:40]
+    introuvables = []
+    for r in temoins:
+        a, m, j = (int(x) for x in r["date_paiement"].split("-"))
+        forme_boc = "%d-%s-%02d" % (j, MOIS_INV[m], a % 100)
+        iso_boc = date_dividende_vers_iso(forme_boc)
+        trouve = cur.execute(
+            "SELECT 1 FROM dividendes WHERE ticker=? AND montant_net=? "
+            "AND date_paiement=?", (r["ticker"], r["montant_net"], iso_boc)).fetchone()
+        if iso_boc != r["date_paiement"] or not trouve:
+            introuvables.append("%s %s -> %r (BOC : %r)"
+                                % (r["ticker"], r["date_paiement"], iso_boc, forme_boc))
+    verifie(temoins and not introuvables,
+            "la deduplication de collecte_boc_quotidien.py retrouve les %d "
+            "dividendes temoins quand le BOC les reobserve en francais abrege "
+            "(elle ne les retrouvait sur aucun avant C10)" % len(temoins)
+            + ("" if not introuvables else " — INTROUVABLES : " + " ; ".join(introuvables[:5])))
+    conn.close()
+
+    # --- 5. Les chargeurs normalisent bien a l'entree ----------------------
+    for chemin, quoi in (("collecte/charger_dividendes_exercice.py", "Piste D"),
+                         ("moteur/peupler.py", "donnees/base"),
+                         ("collecte/historiser_dividendes_exercice.py", "la sortie de l'historisation")):
+        code = (RACINE / chemin).read_text(encoding="utf-8")
+        verifie("dates_dividendes" in code and "vers_iso" in code,
+                "%s normalise les dates a l'entree (%s)" % (chemin, quoi))
+    mig = RACINE / "outils" / "migration_dates_dividendes_iso.py"
+    verifie(mig.exists(), "le proces-verbal executable de la migration est dans outils/")
+
+
 # ----------------------------------------------------------------------
 # 15. FONDS DES NOTATIONS FINANCIERES (bloquant)
 # ----------------------------------------------------------------------
@@ -2344,6 +2487,7 @@ def main():
     test_implicite_boc()
     test_forme_profils_json()
     test_distribution_non_recurrente()
+    test_dates_dividendes_iso()
     if not sans_app:
         test_application()
 

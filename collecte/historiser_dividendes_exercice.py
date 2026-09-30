@@ -26,9 +26,22 @@ montant, date_paiement, confiance, note) -- une ligne par evenement de
 dividende distinct deja identifie, jamais un doublon invente.
 
 Usage : python3 collecte/historiser_dividendes_exercice.py
+NORMALISATION ISO DE LA SORTIE (chantier C10, 30/09/2026). Ce script recopiait
+date_paiement telle quelle depuis l'archive brute, donc en francais abrege. La
+sortie porte desormais des dates ISO, produites par dates_dividendes.vers_iso :
+sans cela une regeneration defairait la migration
+outils/migration_dates_dividendes_iso.py. L'ENTREE, elle, reste intacte : c'est
+le releve non retouche des observations du BOC, et sa valeur est d'etre brut.
+Une date illisible est recopiee telle quelle avec confiance=MANQUANT, comme
+avant -- on ne devine pas, et la ligne ne sera de toute facon pas chargee.
 """
 import csv
+import os
 import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from dates_dividendes import vers_iso  # noqa: E402
 
 ENTREE = "collecte/dividendes_historique.csv"
 SORTIE = "collecte/dividendes_par_exercice.csv"
@@ -98,11 +111,24 @@ def main():
                 continue
             annee, mois = d
             exercice, confiance, note = deduire_exercice(annee, mois)
+            # C10 : la sortie est ISO. vers_iso() est plus strict que
+            # parser_date_fr() (liste blanche de mois, jour valide, annee dans
+            # une fenetre de plausibilite) : ce qu'elle refuse repart en
+            # MANQUANT avec la chaine brute, jamais en date devinee.
+            iso = vers_iso(row["date_paiement"])
+            if iso is None:
+                lignes_sortie.append({
+                    "ticker": row["ticker"], "exercice_couvert": "",
+                    "montant": row["montant"], "date_paiement": row["date_paiement"],
+                    "confiance": "MANQUANT",
+                    "note": "date de paiement non convertible en ISO, non devinee",
+                })
+                continue
             lignes_sortie.append({
                 "ticker": row["ticker"],
                 "exercice_couvert": exercice if exercice is not None else "",
                 "montant": row["montant"],
-                "date_paiement": row["date_paiement"],
+                "date_paiement": iso,
                 "confiance": confiance,
                 "note": note,
             })

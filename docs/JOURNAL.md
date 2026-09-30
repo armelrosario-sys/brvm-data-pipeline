@@ -9,6 +9,164 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-09-30 — cycle 10 (hors cadence, 19h25 UTC)
+
+Cycle demandé par Claudia (« suite ») juste après le cycle 9, hors des deux
+passages quotidiens. C10 étant `classe : VERTE`, il s'exécute sans attendre.
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `main` rend deux
+commits, `b107732` et `b4edafd` : l'annonce du cycle 9 et son commit de clôture.
+Aucune annonce orpheline, donc aucune session concurrente. Annonce du cycle 10
+poussée seule (`ab5c1f5`) avant tout travail.
+
+**État à la reprise.** CI verte, arbre propre.
+
+### Exécuté : C10 — `dividendes.date_paiement` en ISO
+
+Quatre pièces, et les quatre critères de terminaison du chantier.
+
+**1. `collecte/dates_dividendes.py`** — seule définition de la conversion dans le
+dépôt, avec autotest (`--test`) de **27 cas, 0 échec**. Choix de conception qui
+compte : **liste blanche exacte de mois, aucune correspondance par préfixe**. La
+première version faisait un repli sur les trois premières lettres ; son autotest a
+immédiatement attrapé que `24-jullet-17` était alors accepté comme un 24 juillet,
+c'est-à-dire exactement la devinette que le chantier interdit (« un mois français
+abrégé mal orthographié doit échouer bruyamment »). Le module refuse aussi un jour
+inexistant (`31-fevr.-20`, et `2025-02-31` côté ISO — l'ISO est revalidée, pas
+recopiée), une année hors de la fenêtre 1998–2027 (c'est ainsi que l'ambiguïté du
+siècle sur l'année à deux chiffres est **levée** plutôt que masquée : `30-sept.-97`
+est refusé au lieu de devenir 2097), un mois numérique (`24/07/2017`, ambigu
+jour/mois) et une ISO non zéro-paddée (`2017-7-24`). Couverture vérifiée sur les
+trois CSV concernés : **0 valeur non convertible sur 364 + 365 + 15 lignes**.
+
+**2. `outils/migration_dates_dividendes_iso.py`** — le procès-verbal exécutable.
+**362 lignes converties sur 364**, 2 cases vides laissées vides, aucune autre
+colonne modifiée (garde explicite champ par champ). Six gardes :
+
+- entête, nombre de lignes (364), dates distinctes (253), cases vides (2),
+  répartition des confiances (359 ELEVEE / 5 MANQUANT), fin de ligne ;
+- ancres : toute clé répétée ne l'est que par des lignes rigoureusement
+  identiques, et leur nombre est figé ;
+- empreinte SHA-256 des clés et dates **avant** migration, et **après** ;
+- réserialisation du fichier d'origine exigée **à l'octet près** avant toute
+  écriture, sur le modèle de `versement_mensuel_vers_quotidien.py` ;
+- refus sur date illisible — 0 cas ;
+- relecture après écriture, empreinte revérifiée.
+
+Relancé **deux fois** : il constate « migration DEJA APPLIQUEE », vérifie
+l'empreinte d'après et sort sans écrire. `--verifier` ne touche à rien.
+
+**3. Les trois chargeurs normalisent à l'entrée.**
+`charger_dividendes_exercice.py` passe la date par `vers_iso` et **écarte la ligne
+avec un message sur stderr** si elle est illisible (jamais une date devinée, jamais
+une chaîne non ISO en base). `moteur/peupler.py` porte la même garde sur
+`donnees/base/dividendes.csv` — déjà ISO, donc **aucune valeur ne change** : la
+garde est là pour que la table ne puisse plus *mélanger* deux formats, et c'est le
+mélange, non le format français en soi, qui cassait tout.
+`historiser_dividendes_exercice.py` **émet désormais de l'ISO** : sans cela une
+régénération aurait défait la migration.
+
+`collecte_boc_quotidien.py` n'a pas été touché : son propre normaliseur
+fonctionnait déjà, et ce que C10 lui demandait, c'était que sa déduplication
+retrouve les lignes existantes — ce qui vient de la table, pas de lui.
+
+**4. Test : section 23 de `tester_donnees.py`, 13 contrôles.** Les 27 cas du
+module, les trois pièges nommément (`jullet`, jour inexistant, année 2097),
+l'absence de toute date non ISO en base, un plancher de 308 dates ISO qui ne peut
+que monter, la vérité du tri SQL, la faisabilité de `int(date[:4])`, la
+reconnaissance par le dédoublonneur du BOC sur 40 témoins, et la présence de la
+normalisation dans les trois chargeurs.
+
+### Effet mesuré, avant → après, sur la base du jour
+
+| | avant | après |
+|---|---|---|
+| dates non ISO dans `dividendes` | 296 | **0** (308 ISO, 3 nulles, 311 lignes) |
+| tickers dont `ORDER BY date_paiement DESC` rend le mauvais versement | **34 / 49** | **0 / 49** |
+| tickers dont `int(date[:4])` échoue | **45 / 49** | **0 / 49** |
+| dividendes témoins retrouvés par la déduplication du BOC | **0 / 40** | **40 / 40** |
+| champs déplacés dans `collecte/profils.json` | — | **0** (fichier identique) |
+
+Le deuxième effet n'était pas chiffré avant le cycle 9 et c'est le plus grave des
+trois conséquences du chantier. `scoring.py` fait
+`int(dernier_div["date_paiement"][:4])` dans un `try` dont le `except (ValueError,
+TypeError)` fait `pass`. Sur `24-juil.-17`, `[:4]` vaut `"24-j"` : `ValueError`,
+avalée. Donc le bonus de 20 points « dividende versé cette année », le malus de 20
+et l'alerte « dernier dividende versé il y a N ans » ne s'exécutaient sur **aucun**
+des 45 titres concernés. Le troisième effet, la déduplication du BOC, était le seul
+**latent** : 0 paire (ticker, jour) portant les deux formats, donc aucun doublon
+n'existait encore — et c'est pour qu'il n'en existe jamais que la section 23 le
+contrôle sur 40 témoins.
+
+Que `profils.json` soit **identique au champ près** est attendu et vérifié :
+`profils.py` lisait les dates par `date_dividende()`, qui acceptait déjà les deux
+formats. C10 est de la plomberie, pas une révision de méthode — d'où sa classe
+VERTE.
+
+### Trouvé en posant les gardes : C19
+
+L'assertion d'unicité du script de migration a **refusé de tourner au premier
+essai**, sur les lignes 4 et 6 de `dividendes_par_exercice.csv` (`ABJC, 2017,
+98,97, 20-juin-18`). C'est exactement ce pour quoi cette garde existe. Deux mesures
+en sont sorties, inscrites en **C19** (ORANGE, `EN ATTENTE`, priorité 6) :
+
+1. **12 lignes strictement dupliquées** sur les 364 (352 clés), identiques sur les
+   six colonnes. Après normalisation elles sont **16**, parce que quatre événements
+   étaient dédoublés sous **deux orthographes du même jour** : ABJC 2017
+   (`20-juin-18` / `20-juin.-18`), ORAC 2023 (`3-juin-24` / `03-juin-24`),
+   ETIT 2016 (`28 Apr 17` / `28-avr.-17`) et ETIT 2021 (`20 Jun 22` /
+   `20-juin-22`). Les deux ETIT sont le même versement saisi une fois en anglais et
+   une fois en français — une corroboration involontaire, pas une contradiction.
+2. **Le fichier commité n'est plus ce que son générateur produit.** Relancé sur
+   l'état du dépôt **avant tout changement de ce cycle** (vérifié sur des copies
+   extraites de `HEAD`, pour ne pas imputer la dérive à ce cycle),
+   `historiser_dividendes_exercice.py` rend **365 lignes** contre 364 commitées :
+   une de plus, **FTSC 2016, 1 045,00, payé le 31/07/2017** — précisément le cas
+   que le générateur documente dans son propre commentaire (avis BRVM
+   N° 072-2017/DC/BR/DG). Le fichier dérivé a donc été retouché à la main.
+
+Portée : **latente**. `charger_dividendes_exercice.py` déduplique par
+`(ticker, exercice_couvert)`, donc la table porte 311 lignes avant comme après, et
+aucun profil, grade ni gate n'en dépend. Ce qui en dépend : tout comptage
+d'événements lu sur ce fichier (le générateur annonce « 364 événements » là où il
+y en a 352), et la prochaine régénération, qui ajouterait FTSC 2016 sans que ce soit
+la décision de quiconque. Le cas FTSC est un vrai arbitrage — soit le fichier a tort
+de ne pas le porter, soit c'est le générateur qu'il faut corriger — d'où la classe
+ORANGE.
+
+### Barrières
+
+**Complètes** (le commit touche `collecte/`, `moteur/` et `outils/`), toutes
+vertes :
+
+- les cinq scripts de construction de la base : 0 erreur, 296 dividendes chargés,
+  **0 écarté pour date illisible** ;
+- `moteur/tester.py` : TOUS LES GOLDEN TESTS PASSENT ;
+- `moteur/profils.py` : 47 titres, et `collecte/profils.json` inchangé ;
+- `moteur/tester_donnees.py` : **172 contrôles OK, 0 échec**, code de sortie 2 avec
+  les deux seules alertes connues (C4 : 13 dates de division non documentées ;
+  C5 : CFAC et NEIC 2025) ;
+- `collecte/dates_dividendes.py --test` : 27 cas, 0 échec ;
+- `collecte/avis_brvm.py --test` et `collecte/notations.py --test` : OK ;
+- `dashboard/generer_dashboard.py` : dashboard généré, 48 titres.
+
+**Une barrière ne tourne pas dans le bac à sable, et ce n'est pas une régression.**
+`dashboard/generer_dashboard_html.py` échoue avec `SyntaxError: f-string
+expression part cannot include a backslash`. Vérifié en compilant la version de
+`HEAD` : **elle échoue identiquement**. Le bac à sable porte Python 3.11, tandis que
+`pages.yml` et `tests.yml` épinglent 3.12, où PEP 701 autorise l'antislash dans une
+f-string. La note est inscrite dans la section « Barrières » de `CHANTIERS.md` pour
+qu'aucun cycle ne perde de temps à « réparer » un fichier sain.
+
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
+### Proposé pour le cycle suivant
+
+**C3** (VERTE, priorité 3) — `journal_profils.csv`, le journal des prédictions.
+C10 était inscrit « avant C3, dont le journal datera ses lignes » : cette
+dépendance est maintenant levée, les dates sont ISO. C19 attend, lui, une
+validation de Claudia sur le cas FTSC 2016.
+
 ## 2026-09-30 — cycle 9 (soir, 18h53 UTC)
 
 **Contrôle anti-collision.** `git log --since="3 hours ago"` sur `main` : aucun
