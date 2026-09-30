@@ -541,6 +541,21 @@ sans aucune divergence.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-09-30 — cycle 7 (en cours)
+
+**Deux lignes portent `validation : OK` : C1 et C15** (Claudia a basculé C15 après
+le cycle 6). La règle n'en autorise qu'une. **C1 est retenu** : il est validé
+depuis le 28/09, il est de priorité 1, et le journal du cycle 6 l'a désigné
+chantier du cycle 7. **C15 est le chantier du cycle 8.**
+
+**Famille annoncée avant tout travail** : la **reproductibilité de
+`collecte/profils.json`**. C'est un fichier commité, produit par `profils.py` à
+partir des CSV commités. Aucun test ne vérifie que le fichier commité égale ce que
+`profils.py` régénère : `tests.yml` recalcule, mais ne compare pas et ne commite
+rien. Or les commits automatiques de collecte (cours du jour, BOC) modifient les CSV
+sans repasser par `profils.py`. Le cycle 1 a déjà trouvé un `profils.json` commité
+portant un verdict corrompu (SDSC `EXCLU`), produit sur une base dupliquée.
+
 ## 2026-09-30 — cycle 6
 
 **Correction d'abord : le cycle 5 n'a rien exécuté.** Son entrée ci-dessous
