@@ -443,6 +443,101 @@ def croissance_bpa_implicite(cur, ticker, annees, cap):
 # ----------------------------------------------------------------------
 
 
+# ----------------------------------------------------------------------
+# Distribution non recurrente (chantier C1, 30/09/2026)
+# ----------------------------------------------------------------------
+# Le rendement du BOC est arithmetiquement exact et peut pourtant ne pas etre un
+# rendement de REVENU. Mesure du 30/09/2026 sur les 47 titres : FTSC porte une prime
+# de +79,5 points (rendement 86,54 %), SIVC +19,7 points (26,81 %) ; le troisieme,
+# STBC, est a +0,7 point. FTSC a verse 1 726,56 FCFA le 30/09/2025 contre 143,10 un
+# an plus tot (dividende exceptionnel sur une plus-value de cession) ; le dividende
+# de reference de SIVC date de 2017.
+MOIS_FR = {"janv.": 1, "janv": 1, "fevr.": 2, "fevr": 2, "f\u00e9vr.": 2, "f\u00e9vr": 2,
+           "mars": 3, "avr.": 4, "avr": 4, "mai": 5, "juin": 6, "juil.": 7, "juil": 7,
+           "aout": 8, "ao\u00fbt": 8, "sept.": 9, "sept": 9, "oct.": 10, "oct": 10,
+           "nov.": 11, "nov": 11, "dec.": 12, "dec": 12, "d\u00e9c.": 12, "d\u00e9c": 12}
+
+
+def date_dividende(texte):
+    """Date d'un paiement de dividende, ISO ou francais abrege ('30-sept.-25').
+
+    Rend None plutot que de deviner : un mois non reconnu, une forme inattendue.
+    (dividendes.date_paiement melange deux formats, chantier C10.) Annee sur deux
+    chiffres lue comme 20AA : la base ne remonte pas avant 2017.
+    """
+    if not texte:
+        return None
+    t = str(texte).strip().lower()
+    try:
+        if len(t) == 10 and t[4] == "-" and t[7] == "-":
+            return date(int(t[:4]), int(t[5:7]), int(t[8:10]))
+        j, m, a = t.split("-")
+        if m not in MOIS_FR or len(a) != 2:
+            return None
+        return date(2000 + int(a), MOIS_FR[m], int(j))
+    except (ValueError, TypeError):
+        return None
+
+
+def diagnostic_distribution(cur, ticker, date_cours, sp, cours=None, dy=None):
+    """(non_recurrente, detail) pour la distribution qui porte le rendement du BOC.
+
+    Deux regles, qui ne se lisent que sur des dates et des montants presents en
+    base ; sans historique suffisant, aucun drapeau (une case vide vaut mieux
+    qu'une estimation) :
+      1. PERIME : le dividende qui porte le rendement du BOC date de plus de
+         `distribution_age_max_ans` ans. Ce dividende n'est pas « le dernier de la
+         table » : la table a des trous (NEIC 2025, STBC 2025 y manquent, C5). On le
+         retrouve par le dividende IMPLICITE du BOC, rendement x cours, qui doit
+         coincider (a `distribution_tolerance_implicite` pres) avec un versement
+         date de la table. Sans coincidence, on ne conclut pas : aucun drapeau ;
+      2. EXCEPTIONNEL : le dernier versement de la table depasse
+         `distribution_ratio_max` fois le PLUS FORT des versements precedents (au
+         moins `distribution_historique_min`). Contre le maximum et non la
+         mediane : une serie qui monte (BICC 830 -> 1157) n'est pas exceptionnelle.
+    """
+    lignes = cur.execute(
+        "SELECT montant_net, date_paiement FROM dividendes WHERE ticker=? "
+        "AND montant_net IS NOT NULL AND montant_net > 0 "
+        "AND COALESCE(statut_donnee, 'VALIDE')='VALIDE'", (ticker,)).fetchall()
+    par_date = {}
+    for montant, d in lignes:
+        dd = date_dividende(d)
+        if dd is not None:
+            par_date[dd] = max(par_date.get(dd, 0.0), float(montant))
+    if not par_date:
+        return False, None
+    try:
+        auj = date.fromisoformat(str(date_cours)[:10])
+    except (ValueError, TypeError):
+        auj = None
+
+    # --- Regle 1 : le dividende du BOC est-il perime ? -------------------------
+    if auj is not None and cours and dy:
+        implicite = cours * dy
+        d_proche = min(par_date, key=lambda d: abs(par_date[d] - implicite))
+        ecart = abs(par_date[d_proche] - implicite) / implicite
+        age = (auj - d_proche).days / 365.25
+        if ecart <= sp["distribution_tolerance_implicite"] and age > sp["distribution_age_max_ans"]:
+            return True, ("le rendement du BOC repose sur un dividende de %.2f FCFA verse le "
+                          "%s, soit %.1f ans avant le cours (dividende implicite du BOC : "
+                          "%.2f) : il ne decrit plus une distribution en cours"
+                          % (par_date[d_proche], d_proche.isoformat(), age, implicite))
+
+    # --- Regle 2 : le dernier versement est-il hors norme ? ---------------------
+    ref_date = max(par_date)
+    ref_montant = par_date[ref_date]
+    avant = [m for d, m in par_date.items() if d < ref_date]
+    if len(avant) >= sp["distribution_historique_min"]:
+        plus_fort = max(avant)
+        if ref_montant > sp["distribution_ratio_max"] * plus_fort:
+            return True, ("dividende de %.2f FCFA le %s, soit %.1f fois le plus fort des %d "
+                          "versements precedents (%.2f) : distribution exceptionnelle, "
+                          "non reproductible" % (ref_montant, ref_date.isoformat(),
+                                                 ref_montant / plus_fort, len(avant), plus_fort))
+    return False, None
+
+
 def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
                 sp_age_max_cp=3, arb=None):
     table, col = source_cours(cur)
@@ -585,6 +680,12 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
         g, source_g = None, "ARBITRAGE_BLOQUANT"
 
     peg = per / (g * 100) if (per and g and g > 0) else None
+    cours_row = cur.execute(
+        f"SELECT cours FROM {table} WHERE ticker=? AND rendement IS NOT NULL "
+        f"AND cours IS NOT NULL ORDER BY {col} DESC LIMIT 1", (ticker,)).fetchone()
+    non_rec, detail_dist = diagnostic_distribution(
+        cur, ticker, date_cours, sp, cours_row[0] if cours_row else None, dy)
+    dy_axe = None if non_rec else dy   # rendement RECURRENT : celui de la prime et des classements
     base_pegy = (g + (dy or 0)) * 100 if g is not None else None
     pegy = per / base_pegy if (per and base_pegy and base_pegy > 0) else None
 
@@ -596,6 +697,8 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
         drapeaux = drapeaux + ["BENEFICE_NON_REPRESENTATIF"]
     if roe_perime:
         drapeaux = drapeaux + ["DONNEES_PERIMEES"]
+    if non_rec:
+        drapeaux = drapeaux + ["DISTRIBUTION_NON_RECURRENTE"]
     if roe_source == "AGREGATEUR":
         drapeaux = drapeaux + ["ROE_SOURCE_EXTERIEURE"]
 
@@ -610,7 +713,10 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
                 arbitrage_detail=arb.get("detail"),
                 arbitrage_corroboree=bool(arb.get("corroboree")),
                 arbitrage_bloquant=bool(arb.get("bloquant")),
-                per=per, dy=100.0 * dy if dy is not None else None, payout=payout,
+                per=per, dy=100.0 * dy if dy is not None else None,
+                dy_axe=100.0 * dy_axe if dy_axe is not None else None,
+                distribution_non_recurrente=non_rec, distribution_detail=detail_dist,
+                payout=payout,
                 payout_source=payout_source, part_operationnelle=part_operationnelle,
                 date_cours=date_cours, table_cours=table,
                 roe_exercice=roe_exercice, roe_perime=roe_perime,
@@ -836,6 +942,14 @@ def sensible_brut_net(profil, ing, sp):
     return bool(dy < seuil <= dy / 0.88)
 
 
+def _drapeaux_de_croissance(ing):
+    """Drapeaux qui pesent sur la fiabilite de la CROISSANCE, seule chose que le
+    grade note. DISTRIBUTION_NON_RECURRENTE (C1) parle du rendement du dividende :
+    l'y compter ferait passer NTLC et SMBC du grade A au B, un verdict deplace par
+    un drapeau qui ne concerne pas l'axe note (mesure du 30/09/2026)."""
+    return set(ing["drapeaux"]) - {"DISTRIBUTION_NON_RECURRENTE"}
+
+
 def grade_confiance(profil, ing, faits_titre):
     """A = exploitable tel quel | B = solide avec reserve nommee | C = travail requis."""
     reserves = []
@@ -895,6 +1009,8 @@ def grade_confiance(profil, ing, faits_titre):
             reserves.append("%s : %s" % (d, EXPLICATIONS[base]))
         elif d.startswith("CAP_"):
             reserves.append("%s : croissance plafonnee" % d)
+    if ing.get("distribution_non_recurrente"):
+        reserves.append("DISTRIBUTION_NON_RECURRENTE : %s" % ing["distribution_detail"])
     if ing["payout"] is None:
         reserves.append("payout non disponible — soutenabilite du dividende non verifiee")
     if ing["payout"] is not None and ing["payout"] > 1.0:
@@ -923,10 +1039,10 @@ def grade_confiance(profil, ing, faits_titre):
     # ne prouve rien de plus que leur accord. Placee APRES le controle du payout
     # pour ne jamais effacer une reserve deja etablie.
     if (ing.get("arbitrage_corroboree") and "VERIFIE" in source
-            and set(ing["drapeaux"]) <= {"CROISSANCE_CORROBOREE", "SERIE_COMPLETEE_N1",
-                                         "ROE_SOURCE_EXTERIEURE"}):
+            and _drapeaux_de_croissance(ing) <= {"CROISSANCE_CORROBOREE", "SERIE_COMPLETEE_N1",
+                                                 "ROE_SOURCE_EXTERIEURE"}):
         return "A", reserves
-    if "VERIFIE" in source and set(ing["drapeaux"]) <= {"ROE_SOURCE_EXTERIEURE"}:
+    if "VERIFIE" in source and _drapeaux_de_croissance(ing) <= {"ROE_SOURCE_EXTERIEURE"}:
         return "A", reserves
     if "VERIFIE" in source or source == "RN_PROBABLE" or source.startswith("RN_"):
         return "B", reserves
@@ -961,7 +1077,9 @@ def calculer():
         n_secteur_min=8, value_pctl_min=67, growth_pctl_min=67,
         garp_g_min=0.08, garp_g_max=0.30, garp_pegy_max=1.5, growth_g_min=0.05,
         rendement_dy_min=0.048, contraction_seuil=0.10, alerte_pegy_max=0.25,
-        confiance_haute_min_exercices=4, confiance_moyenne_min_exercices=2)
+        confiance_haute_min_exercices=4, confiance_moyenne_min_exercices=2,
+        distribution_ratio_max=3.0, distribution_age_max_ans=2,
+        distribution_historique_min=3, distribution_tolerance_implicite=0.10)
     sp = dict(par_defaut)
     sp.update({k: v for k, v in (seuils.get("profils") or {}).items() if k in par_defaut})
 
@@ -1234,8 +1352,14 @@ def calculer():
             # Prime du rendement sur le taux sans risque regional. Negative =
             # le titre rapporte MOINS qu'une obligation d'Etat de la zone.
             "taux_reference": taux_ref,
-            "prime_rendement": (round(v["dy"] / 100 - taux_ref, 4)
-                                if (v["dy"] is not None and taux_ref) else None),
+            "prime_rendement": (round(v["dy_axe"] / 100 - taux_ref, 4)
+                                if (v["dy_axe"] is not None and taux_ref) else None),
+            # C1 (30/09/2026) : "dy" reste le rendement FACIAL du BOC, exact, et les axes
+            # de decote continuent de le lire. La prime, "dy_recurrent" et les
+            # classements ne lisent que le rendement recurrent. Retirer aussi l'axe de
+            # decote deplacerait des verdicts (mesure au journal, C16) : decision a part.
+            "dy_recurrent": (round(v["dy_axe"], 2) if v["dy_axe"] is not None else None),
+            "distribution_non_recurrente": v["distribution_detail"],
             "table_cours": v["table_cours"],
             "per_normalise": (round(v["per_normalise"], 1)
                               if v.get("per_normalise") is not None else None),

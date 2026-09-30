@@ -97,7 +97,7 @@ Chacune vient d'une erreur réelle du 27/09/2026.
 
 ## C1 — Distributions non récurrentes faussent l'axe rendement
 
-- statut : PROPOSÉ
+- statut : FAIT le 30/09/2026 (cycle 7) — voir le journal ; retrait de l'axe de décote laissé à C16
 - validation : OK
 - autonomie : complète, aucune donnée extérieure nécessaire
 - priorité : 1
@@ -527,6 +527,41 @@ source, que ce chantier ne comble pas.
 plafond de la section 19 tombe à 0, et la confrontation compte plus de 4 000 paires
 sans aucune divergence.
 
+## C16 — Retirer aussi l'axe de décote des titres à dividende périmé
+
+- statut : PROPOSÉ
+- validation : EN ATTENTE
+- autonomie : complète, mais **c'est un arbitrage de méthode**
+- priorité : 3
+
+**Ce que C1 n'a volontairement pas fait.** Le texte de C1 demandait de retirer les
+titres à dividende de référence périmé « de l'axe rendement ». Le cycle 7 a retiré
+leur **prime** et leur **rendement des classements**, mais a laissé le rendement
+facial dans l'**axe de décote** (`decote_pctl`), parce que le retirer déplace des
+verdicts.
+
+**Effet mesuré, sur une variante jetable de `profils.py` où les axes lisent le
+rendement récurrent** (10 titres portent le drapeau) : **2 profils basculent**
+(ORGT `AUCUN_PROFIL` → `VALUE`, SLBC `VALUE` → `AUCUN_PROFIL`), aucun grade ne
+bouge, et `decote_pctl` change sur **30 titres sur 47** (le bassin de comparaison
+se déplace).
+
+**Pourquoi ce n'est pas une évidence.** ORGT n'a pas versé depuis 2019 : son
+rendement récurrent est **zéro**, pas **inconnu**. Le retirer de l'axe (case vide)
+fait monter sa décote de 54 à 93 en ne gardant que le rendement bénéfice/prix, ce
+qui récompense un titre qui ne distribue rien. Laisser le rendement facial faux
+(1,98 %) est une erreur ; le compter pour 0 est une autre lecture, défendable, qui
+ne fait pas basculer ORGT de la même façon. **La règle « une case vide vaut mieux
+qu'une valeur approchée » ne tranche pas ici** : zéro n'est pas une approximation
+pour un titre qui ne verse rien.
+
+**À trancher par Claudia** : (a) laisser tel quel (le rendement facial reste dans
+la décote, prime et classements corrigés) ; (b) retirer l'axe (case vide) ; (c)
+compter zéro pour les dividendes périmés. Le cycle mesurera l'option choisie.
+
+**Terminé quand** : l'option est tranchée, appliquée, l'effet mesuré titre par
+titre, et un test de la section 21 fige la règle.
+
 ---
 
 # Veille datée, hors file
@@ -541,7 +576,7 @@ sans aucune divergence.
 
 Une entrée par cycle. La plus récente en haut.
 
-## 2026-09-30 — cycle 7 (en cours)
+## 2026-09-30 — cycle 7
 
 **Deux lignes portent `validation : OK` : C1 et C15** (Claudia a basculé C15 après
 le cycle 6). La règle n'en autorise qu'une. **C1 est retenu** : il est validé
@@ -555,6 +590,70 @@ partir des CSV commités. Aucun test ne vérifie que le fichier commité égale 
 rien. Or les commits automatiques de collecte (cours du jour, BOC) modifient les CSV
 sans repasser par `profils.py`. Le cycle 1 a déjà trouvé un `profils.json` commité
 portant un verdict corrompu (SDSC `EXCLU`), produit sur une base dupliquée.
+
+**Chantier exécuté : C1.** Constat revérifié sur données fraîches : prime de rendement
+FTSC **+79,47 points** (rendement 86,54 %), SIVC **+19,74 points** (26,81 %), le
+troisième, STBC, à **+0,70 point**. Le rendement est exact ; ce n'est pas un rendement
+de revenu. Filtisac a versé **1 726,56** le 30/09/2025 contre 235,00 pour le plus fort
+des cinq versements précédents (**7,3 fois**) ; le dividende qui porte le rendement de
+SIVC date du **29/09/2017** (9,0 ans). La copie commitée de `docs_site/poste_decision.html`
+(générée le 13/07) plaçait **SIVC en tête** de la vue « cœur rendement-qualité » à
+23,8 % : le défaut a atteint une vue publiée.
+
+**Règle, dans `moteur/profils.py::diagnostic_distribution`** (seuils dans
+`config/seuils.yaml`) : drapeau `DISTRIBUTION_NON_RECURRENTE` si (1) le dividende qui
+porte le rendement du BOC date de plus de 2 ans, ou (2) le dernier versement dépasse
+3 fois le plus fort des versements précédents (au moins 3). **Deux erreurs de ma
+première version, corrigées avant le commit** : la règle d'ampleur comparait à la
+*médiane* et marquait BICC (830 → 1 157, série croissante, 3,4× la médiane mais
+1,4× le maximum) ; et la règle d'âge lisait « le dernier dividende de la table », ce
+qui marquait à tort NEIC et STBC, dont le dernier versement manque à la table (C5).
+Le dividende « du BOC » se retrouve par le **dividende implicite**, rendement × cours ;
+sans coïncidence avec un versement daté, on ne conclut pas. Vérifié : BNBC 150,05
+implicite contre 150,00 en table, ORGT 59,40 contre 56,73, SCRC 40,41 contre 40,50.
+
+**Résultat : 10 titres portent le drapeau** (BNBC, FTSC, NTLC, ORGT, SCRC, SDCC, SEMC,
+SIBC, SIVC, SMBC). Leur prime est vide, leur `dy_recurrent` est vide, `app.py`
+(tableaux, tris, médiane, « rend plus que l'Etat ») ne lit plus que le rendement
+récurrent, la fiche affiche le rendement facial avec le motif, et la vue 3A du poste
+de décision les écarte. **La plus forte prime restante est de +0,7 point.**
+
+**Aucune décision ne bouge** : sur les 47 titres, `profil`, `secondaire`, `grade`,
+`gate`, `decote_pctl`, `pegy`, `peg`, `g` sont **identiques** au commit précédent
+(0 écart). Une première version avait fait passer NTLC et SMBC du grade A au B, parce
+que le grade exige que les drapeaux soient dans une liste blanche ; le drapeau ne
+concerne pas la croissance, que le grade note, donc il en est exclu.
+
+**Ce que C1 demandait et que je n'ai pas fait : C16.** Retirer aussi les titres de
+l'axe de décote fait basculer 2 profils et déplace `decote_pctl` sur 30 titres ; et
+pour un titre qui ne verse rien, zéro n'est pas « inconnu ». Proposé à Claudia.
+
+**Test : section 21.** Seuil figé (3,00× ne déclenche pas, 3,01× oui), historique
+minimal, dividende périmé, trou de table sans conclusion, mois français inconnu
+refusé, aucune date de dividende illisible (0 sur 308), jurisprudence FTSC/SIVC
+(drapeau) contre BICC/NEIC/STBC (pas de drapeau), grades de NTLC et SMBC inchangés, et
+plancher de plausibilité : aucune prime au-delà de +10 points sans le drapeau.
+**Contre-essai** : drapeau retiré de FTSC dans `profils.json` → 3 contrôles échouent.
+
+**Chasse : la reproductibilité de `collecte/profils.json`.** `profils.py` régénère
+un fichier identique au commité (0 différence) : la propriété tient. Mais mesuré sur
+les 21 derniers commits qui modifient `cours_quotidien_boc.csv` : à **chacun**, le
+`profils.json` commité est en retard d'au moins une séance sur le CSV (21 sur 21) — par
+construction, `avis_brvm.yml` le régénère ensuite. Comparer les valeurs serait un
+faux positif quotidien. **Section 20** compare donc la **forme** (titres et champs) entre
+`git HEAD` et le fichier régénéré. Stricte en CI (`GITHUB_ACTIONS`), tolérante en
+local tant que le changement n'est pas commité. Contre-essai : champ retiré et titre
+inventé → 2 échecs.
+
+**Barrières, sur base reconstruite** : `tester.py` **0** ; `profils.py` **0**
+(A=5, B=28, C=14, inchangé) ; `tester_donnees.py` **2**, les deux mêmes alertes de
+fraîcheur (C4, C5), **144 contrôles OK, 0 échec** ; `avis_brvm.py --test` 0 ;
+`notations.py --test` 0 ; `generer_dashboard.py` 0. `dashboard_brvm.xlsx`,
+`moteur/brvm.db` supprimés ; `docs_site/poste_decision.html` régénéré localement puis
+restauré (le build de `pages.yml` le régénère, et sans table `signaux` locale il sort
+avec 0 signal).
+
+**C15 est le chantier du cycle 8** (`validation : OK`). C16 proposé à `EN ATTENTE`.
 
 ## 2026-09-30 — cycle 6
 

@@ -168,7 +168,11 @@ def charger(_empreinte):
         lignes.append(dict(
             ticker=t, nom=noms.get(t, t), profil=v.get("profil"),
             secondaire=v.get("secondaire"), grade=v.get("grade"),
-            secteur=v.get("secteur"), per=v.get("per"), dy=v.get("dy"),
+            secteur=v.get("secteur"), per=v.get("per"),
+            # C1 (30/09/2026) : "dy" alimente tris, medianes et tableaux ; il ne porte
+            # que le rendement RECURRENT. Le rendement facial, exact, reste sur la fiche.
+            dy=v.get("dy_recurrent", v.get("dy")), dy_facial=v.get("dy"),
+            dist_non_rec=v.get("distribution_non_recurrente"),
             croissance=v.get("g"), source=v.get("source_croissance"),
             pegy=v.get("pegy"), payout=v.get("payout"), roe=v.get("roe"),
             ca=v.get("chiffre_affaires"), marge=v.get("marge_nette"),
@@ -826,7 +830,9 @@ with o3:
         st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d", help=aide_per,
                   delta=(f"normalise {r.per_norm:.1f}" if pd.notna(r.per_norm) else None),
                   delta_color="off")
-        st.metric("Rendement", f"{r.dy:.1f} %" if pd.notna(r.dy) else "n/d",
+        if isinstance(r.dist_non_rec, str) and r.dist_non_rec:
+            st.warning(f"**Rendement facial {r.dy_facial:.1f} % — hors classement.** {r.dist_non_rec}")
+        st.metric("Rendement", f"{r.dy_facial:.1f} %" if pd.notna(r.dy_facial) else "n/d",
                   delta=(f"{r.prime*100:+.1f} pts vs Etat" if pd.notna(r.prime) else None),
                   help=(_ctx("dy", " %") or "") + "\n\nConvention brut/net du champ "
                        "rendement du BOC : chantier de verification ouvert.")

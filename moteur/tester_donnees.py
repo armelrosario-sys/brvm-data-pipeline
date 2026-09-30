@@ -40,6 +40,7 @@ Usage :
     python3 moteur/tester_donnees.py            # tout
     python3 moteur/tester_donnees.py --sans-app # sans le lancement Streamlit
 """
+import os
 import sqlite3
 import subprocess
 import sys
@@ -1742,6 +1743,180 @@ def test_confrontation_cours():
 
 
 # ----------------------------------------------------------------------
+# 20. profils.json COMMITE ET CODE COURANT PARLENT LA MEME LANGUE (bloquant)
+# ----------------------------------------------------------------------
+def test_forme_profils_json():
+    """Le profils.json commite doit avoir la forme que profils.py produit aujourd'hui.
+
+    POURQUOI CETTE SECTION EXISTE (30/09/2026, cycle 7). profils.json est un
+    fichier COMMITE, regenere par profils.py. Mesure sur les 21 derniers commits qui
+    modifient cours_quotidien_boc.csv : a chacun, le profils.json commite est en
+    RETARD d'au moins une seance sur le CSV (21 sur 21) — retard voulu, puisque le
+    workflow P13 le regenere une demi-heure plus tard, et sans consequence pour la
+    fiche publiee, que pages.yml reconstruit. Comparer les VALEURS commitees aux
+    valeurs regenerees serait donc un faux positif quotidien.
+
+    Ce qui, en revanche, ne doit jamais deriver : la FORME. Un commit qui change
+    profils.py (champ ajoute, renomme, retire) sans regenerer le fichier laisserait
+    app.py lire un champ absent, en silence (`.get()` rend None). Le controle compare
+    la liste des titres et, pour chacun, l'ensemble des champs, entre le fichier
+    commite (git HEAD) et le fichier que la barriere vient de regenerer.
+    """
+    print("\n=== 20. Forme de profils.json : commite contre regenere (bloquant) ===")
+    import json
+    chemin = RACINE / "collecte" / "profils.json"
+    if not chemin.exists():
+        verifie(False, "collecte/profils.json absent", bloquant=False)
+        return
+    try:
+        r = subprocess.run(["git", "show", "HEAD:collecte/profils.json"], cwd=str(RACINE),
+                           capture_output=True, text=True, timeout=60)
+    except Exception as e:
+        verifie(True, f"git indisponible ({type(e).__name__}) — controle ignore", bloquant=False)
+        return
+    if r.returncode != 0:
+        verifie(True, "profils.json non suivi par git (HEAD) — controle ignore", bloquant=False)
+        return
+    commite = json.loads(r.stdout)
+    regenere = json.loads(chemin.read_text(encoding="utf-8"))
+    verifie(len(regenere) >= 40, f"profils.json regenere couvre {len(regenere)} titres "
+                                 f"— sans quoi la comparaison ne prouverait rien")
+    titres_diff = sorted(set(commite) ^ set(regenere))
+    verifie(not titres_diff,
+            f"memes titres dans le fichier commite et le regenere ({len(regenere)})"
+            + ("" if not titres_diff else " — DIFFERENCE : " + ", ".join(titres_diff[:8])))
+    derive = []
+    for t in sorted(set(commite) & set(regenere)):
+        a, b = set(commite[t]), set(regenere[t])
+        if a != b:
+            derive.append(f"{t} (commite seul : {sorted(a - b)} ; regenere seul : {sorted(b - a)})")
+    if derive and os.environ.get("GITHUB_ACTIONS") != "true":
+        # En local, une difference de forme est LEGITIME tant que le changement de
+        # profils.py et le profils.json regenere ne sont pas commites ensemble. Le
+        # controle se durcit en CI, ou HEAD est le commit qui vient d'etre pousse.
+        verifie(True, f"forme de profils.json modifiee localement sur {len(derive)} titre(s), "
+                      f"non commitee — controle applique en CI (GITHUB_ACTIONS), "
+                      f"a commiter avec profils.py")
+        return
+    verifie(not derive,
+            "chaque titre porte les memes champs dans le commite et le regenere"
+            + ("" if not derive else f" — DERIVE sur {len(derive)} titre(s) : " + " ; ".join(derive[:3])
+               + " — regenerer et commiter collecte/profils.json"))
+
+
+# ----------------------------------------------------------------------
+# 21. DISTRIBUTIONS NON RECURRENTES (bloquant)
+# ----------------------------------------------------------------------
+PLAUSIBILITE_PRIME = 0.10   # au-dela de +10 points sur le taux sans risque, le drapeau est obligatoire
+
+
+def test_distribution_non_recurrente():
+    """Un rendement facial hors norme doit porter son drapeau et sortir des classements.
+
+    POURQUOI CETTE SECTION EXISTE (chantier C1, 30/09/2026). FTSC portait une prime
+    de rendement de +79,5 points (rendement 86,54 %) et SIVC de +19,7 points ; les
+    45 autres titres tenaient entre -6,1 et +0,7. Aucune erreur de donnee : Filtisac
+    a bien verse 1 726,56 FCFA le 30/09/2025 (7,3 fois le plus fort des cinq versements
+    precedents, 235), et le dividende de reference de SIVC date de 2017. Le rendement
+    est exact et n'est pas un rendement de revenu.
+
+    Jurisprudence en trois cas, chacun avec son contre-exemple (comme la section 5) :
+      - FTSC (exceptionnel) et SIVC (perime) DOIVENT porter le drapeau ;
+      - BICC verse 1 157 apres 831 (serie croissante, 1,4x le plus fort precedent) :
+        NE DOIT PAS le porter, sinon la regle marque toute banque qui croit ;
+      - NEIC et STBC dont la table n'a pas le dernier versement (C5) : le dividende
+        implicite du BOC (rendement x cours) ne coincide avec aucun versement date,
+        donc AUCUN drapeau — un trou de table n'est pas un dividende perime.
+    """
+    print("\n=== 21. Distributions non recurrentes (bloquant) ===")
+    import json
+    import sqlite3
+    sys.path.insert(0, str(ICI))
+    from profils import date_dividende, diagnostic_distribution
+
+    # --- Regle pure, sur une base jetable -------------------------------------
+    sp = dict(distribution_ratio_max=3.0, distribution_age_max_ans=2,
+              distribution_historique_min=3, distribution_tolerance_implicite=0.10)
+    conn = sqlite3.connect(":memory:")
+    conn.execute("CREATE TABLE dividendes (ticker TEXT, montant_net REAL, "
+                 "date_paiement TEXT, statut_donnee TEXT)")
+
+    def serie(t, montants, dates):
+        for m, d in zip(montants, dates):
+            conn.execute("INSERT INTO dividendes VALUES (?,?,?,'VALIDE')", (t, m, d))
+
+    serie("X3", [100, 100, 100, 300], ["1-juil.-21", "1-juil.-22", "1-juil.-23", "1-juil.-25"])
+    serie("X4", [100, 100, 100, 301], ["1-juil.-21", "1-juil.-22", "1-juil.-23", "1-juil.-25"])
+    serie("X2", [100, 500], ["1-juil.-24", "1-juil.-25"])
+    serie("OLD", [50], ["1-juil.-21"])
+    cur = conn.cursor()
+    ok3, _ = diagnostic_distribution(cur, "X3", "2026-09-29", sp)
+    ok4, _ = diagnostic_distribution(cur, "X4", "2026-09-29", sp)
+    ok2, _ = diagnostic_distribution(cur, "X2", "2026-09-29", sp)
+    verifie(not ok3 and ok4,
+            "le seuil est fige : 3,00x le plus fort des precedents ne declenche pas, 3,01x oui")
+    verifie(not ok2,
+            "sous 3 versements precedents, l'ampleur ne se juge pas : aucun drapeau (case vide, pas estimation)")
+    perime, _ = diagnostic_distribution(cur, "OLD", "2026-09-29", sp, cours=1000, dy=0.05)
+    verifie(perime, "un rendement du BOC qui repose sur un dividende de plus de deux ans est perime")
+    trou, _ = diagnostic_distribution(cur, "OLD", "2026-09-29", sp, cours=1000, dy=0.14)
+    verifie(not trou,
+            "un dividende implicite (140) sans versement date correspondant ne conclut pas : "
+            "un trou de la table n'est pas un dividende perime")
+    verifie(date_dividende("30-sept.-25") is not None and date_dividende("3-foo.-25") is None
+            and date_dividende("2025-09-30") is not None,
+            "un mois francais non reconnu est refuse, pas devine")
+
+    # --- Illisibilite des dates de la base -------------------------------------
+    if DB.exists():
+        c = sqlite3.connect(DB)
+        illisibles = [r for r in c.execute(
+            "SELECT ticker, date_paiement FROM dividendes WHERE date_paiement IS NOT NULL")
+            if date_dividende(r[1]) is None]
+        c.close()
+        verifie(not illisibles,
+                f"aucune date de dividende illisible dans brvm.db ({len(illisibles)} trouvee(s))"
+                + ("" if not illisibles else " : " + str(illisibles[:4])))
+
+    # --- Jurisprudence sur profils.json regenere --------------------------------
+    chemin = RACINE / "collecte" / "profils.json"
+    if not chemin.exists():
+        verifie(False, "collecte/profils.json absent", bloquant=False)
+        return
+    pj = json.loads(chemin.read_text(encoding="utf-8"))
+
+    def porte(t):
+        return "DISTRIBUTION_NON_RECURRENTE" in ((pj.get(t) or {}).get("drapeaux") or [])
+
+    for t in ("FTSC", "SIVC"):
+        v = pj.get(t) or {}
+        verifie(porte(t) and v.get("prime_rendement") is None and v.get("dy_recurrent") is None
+                and v.get("distribution_non_recurrente"),
+                f"{t} porte le drapeau, sa prime et son rendement recurrent sont vides, "
+                f"le motif est ecrit (rendement facial {v.get('dy')} % conserve)")
+    for t, pourquoi in (("BICC", "serie croissante"), ("NEIC", "trou de table"),
+                        ("STBC", "trou de table")):
+        verifie(t in pj and not porte(t), f"{t} ne porte PAS le drapeau ({pourquoi})")
+    verifie(all((pj[t].get("grade") == "A") for t in ("NTLC", "SMBC") if t in pj and porte(t)),
+            "le drapeau ne deplace aucun grade : NTLC et SMBC le portent et restent grade A")
+
+    taux = next((v.get("taux_reference") for v in pj.values() if v.get("taux_reference")), None)
+    if taux is None:
+        verifie(False, "taux_reference absent de profils.json", bloquant=False)
+        return
+    trop_hauts = sorted(t for t, v in pj.items()
+                        if v.get("dy") is not None and v["dy"] / 100 - taux > PLAUSIBILITE_PRIME
+                        and not porte(t))
+    verifie(not trop_hauts,
+            f"aucune prime de rendement au-dela de +{PLAUSIBILITE_PRIME * 100:.0f} points sans le drapeau"
+            + ("" if not trop_hauts else " — SANS DRAPEAU : " + ", ".join(trop_hauts)))
+    primes = [v["prime_rendement"] for v in pj.values() if v.get("prime_rendement") is not None]
+    verifie(primes and max(primes) < PLAUSIBILITE_PRIME,
+            f"la plus forte prime restante est de {max(primes) * 100:+.1f} points "
+            f"(plancher de plausibilite +{PLAUSIBILITE_PRIME * 100:.0f})")
+
+
+# ----------------------------------------------------------------------
 # 15. FONDS DES NOTATIONS FINANCIERES (bloquant)
 # ----------------------------------------------------------------------
 def test_fonds_notations():
@@ -1855,6 +2030,8 @@ def main():
     test_chaine_chargement()
     test_panne_de_chargeur()
     test_confrontation_cours()
+    test_forme_profils_json()
+    test_distribution_non_recurrente()
     if not sans_app:
         test_application()
 

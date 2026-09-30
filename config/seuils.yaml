@@ -67,6 +67,10 @@ profils:
   garp_pegy_max: 1.5                # PEGY (Lynch ; fondement theorique Easton 2004)
   growth_g_min: 0.05
   rendement_dy_min: 0.048           # rendement brut plancher du profil RENDEMENT
+  distribution_ratio_max: 3.0       # C1 : dividende > 3x le plus fort des precedents = exceptionnel
+  distribution_age_max_ans: 2       # C1 : dividende de reference de plus de 2 ans = perime
+  distribution_historique_min: 3    # C1 : versements precedents requis pour juger l'ampleur
+  distribution_tolerance_implicite: 0.10  # C1 : ecart admis entre dividende implicite du BOC et versement date
   contraction_seuil: 0.10           # au-dela : VIGILANCE_CONTRACTION
   payout_max: 1.00                  # veto SI connu ; jamais un veto si non disponible
   per_max_analysable: 50            # au-dela : benefices residuels -> hors axes

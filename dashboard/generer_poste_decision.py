@@ -254,6 +254,8 @@ def generer():
     for t, p in sorted(profils.items(), key=lambda kv: -(kv[1].get("dy") or 0)):
         if p.get("dy") is None:
             continue
+        if p.get("distribution_non_recurrente"):
+            continue   # C1 (30/09/2026) : rendement facial non recurrent, hors du coeur rendement
         net = dy_net(p["dy"], pays.get(t))
         nets.append(net)
         if net <= taux:
