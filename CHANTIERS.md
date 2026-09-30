@@ -687,7 +687,7 @@ de C18.
 - statut : **MESURÉ le 30/09/2026 (cycle 9)** — la passe pré-autorisée est CONSOMMÉE, le
   tableau est plus bas. **Aucun cycle ne la refait** : l'application attend que Claudia
   écrive son choix sur la ligne `validation` (voir *Ce qu'il reste à trancher*).
-- validation : OK
+- validation : OK option (b) 
 - autonomie : complète, mais **c'est un arbitrage de méthode**
 - priorité : 3
 
