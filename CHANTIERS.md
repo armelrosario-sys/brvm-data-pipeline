@@ -643,6 +643,31 @@ titre par titre ; et le compte de titres à référence identifiée, aujourd'hui
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-09-30 — cycle 8 (en cours)
+
+**Trois lignes portent `validation : OK` : C15, C16 et C17.** La règle n'en
+autorise qu'une. **C15 est retenu** : priorité 2, désigné chantier du cycle 8 par
+les journaux des cycles 6 et 7, autonomie complète et sans réseau, et il ne
+demande aucun jugement. C16 et C17 restent `OK` et non touchés.
+
+**C16 précisé par Claudia, inscrit dans son bloc** : l'option retenue est
+**« mesurer d'abord, décider après »**. Le cycle qui prendra C16 mesurera les
+trois options sur les 6 titres drapeautés et n'appliquera rien.
+
+**Famille annoncée avant tout travail** : **l'implicite du BOC dans le temps**.
+Le bulletin publie trois nombres par titre et par séance — `cours`, `per`,
+`rendement` — dont deux sont dérivés : le bénéfice par action implicite
+(`cours / per`) et le dividende par action implicite (`cours × rendement`). Ces
+deux-là ne peuvent bouger qu'à une publication de résultats ou à un détachement
+de dividende : entre deux, ce sont des **paliers**. Sur les 86 057 lignes du
+quotidien, **rien ne vérifie cette propriété** — les sections 1 à 3 regardent la
+fraîcheur, la fréquence et la source retenue, la section 19 confronte les deux
+séries de *cours*, et le moteur ne lit jamais que la **dernière** ligne de chaque
+titre. Un `per` ou un `rendement` resté collé à sa valeur de la veille pendant que
+le cours bouge, ou l'inverse, passerait donc inaperçu. C'est la même famille que
+celle qui a produit les 13 titres de C17, prise par l'autre bout : C17 demande
+quel dividende le BOC divise, cette chasse demande **quand il en a changé**.
+
 ## 2026-09-30 — cycle 7 bis (session parallèle — C1 abandonné, une erreur de C1 corrigée)
 
 **Deux sessions ont exécuté C1 en même temps.** Celle-ci a démarré sur `c546a1d`
