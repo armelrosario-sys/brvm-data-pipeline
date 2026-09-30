@@ -977,31 +977,32 @@ Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
 ## 2026-09-30 — cycle 10 (hors cadence, demandé par Claudia)
 
-**Exécuté : C10, jusqu'au bout.** `collecte/dates_dividendes.py` (autotest 27 cas,
-0 échec), `outils/migration_dates_dividendes_iso.py` (**362 lignes converties sur
-364**, six gardes, relancé deux fois sans effet), les trois chargeurs qui
-normalisent à l'entrée, et la **section 23** de `tester_donnees.py` (13 contrôles).
+**Exécuté : C10, jusqu'au bout** — `collecte/dates_dividendes.py` (autotest 27 cas),
+`outils/migration_dates_dividendes_iso.py` (**362 lignes converties sur 364**, six
+gardes, relancé sans effet), les trois chargeurs normalisent à l'entrée, et la
+**section 23** de `tester_donnees.py` (16 contrôles).
 
-**Effet mesuré, avant → après** : dates non ISO en base **296 → 0** ;
-`ORDER BY date_paiement DESC` rend le mauvais versement sur **34/49 → 0/49** ;
-`int(date[:4])` échoue — donc le bloc « régularité du dividende » de `scoring.py`
-est sauté en silence — sur **45/49 → 0/49** ; déduplication du BOC : **0/40 →
-40/40**. **`profils.json` est identique** : aucun verdict ne bouge.
+**Effet, avant → après** : dates non ISO en base **296 → 0** ; `ORDER BY
+date_paiement DESC` rend le mauvais versement sur **34/49 → 0/49** ; `int(date[:4])`
+échoue — donc le bloc « régularité du dividende » de `scoring.py` est sauté en
+silence — sur **45/49 → 0/49** ; déduplication du BOC **0/40 → 40/40**.
+**`profils.json` identique** : aucun verdict ne bouge.
 
-**Trouvé en posant les gardes, inscrit en C19** (ORANGE, `EN ATTENTE`) : 12 lignes
-dupliquées dans `dividendes_par_exercice.csv`, **16** après normalisation — quatre
-événements dédoublés sous deux orthographes du même jour, dont deux en anglais
-(`28 Apr 17` et `28-avr.-17`). Et une régénération par
-`historiser_dividendes_exercice.py` **ne rend plus le fichier commité** : un
-événement de plus, FTSC 2016. Latent en base, mais la prochaine régénération
-changerait les données sans décision.
+**Inscrit en C19** (ORANGE, `EN ATTENTE`), trouvé par les gardes : 12 lignes
+dupliquées dans `dividendes_par_exercice.csv`, **16** après normalisation (quatre
+événements dédoublés sous deux orthographes du même jour, dont deux en anglais), et
+une régénération par `historiser_dividendes_exercice.py` ne rend plus le fichier
+commité — un événement de plus, FTSC 2016. Latent en base.
 
-**Barrières complètes, vertes** : golden OK, `tester_donnees.py` **172 OK, 0
-échec**, code 2 sur les deux seules alertes connues (C4, C5), `avis_brvm.py --test`,
-`notations.py --test`, `generer_dashboard.py` OK. `generer_dashboard_html.py` ne
-compile pas sous le Python 3.11 du bac à sable — identique sur `HEAD`, CI en 3.12.
+**CI tombée puis réparée dans le même cycle, et c'est ma faute.** La section 23
+importait `collecte_boc_quotidien`, dont les imports tirent `pdfplumber`, **absent
+de `requirements.txt`** et préinstallé par hasard dans le bac à sable : P4 est tombé
+sur `ModuleNotFoundError` quand la barrière était verte en local. Fonction extraite
+par AST, et un contrôle interdit cet import. **Leçon : une barrière verte dans le
+bac à sable ne prouve rien si le test importe hors `requirements.txt`.**
 
-**Prochain chantier** : **C3** (VERTE, priorité 3), journal des prédictions.
+**Barrières rejouées `pdfplumber` indisponible** : golden OK, `tester_donnees.py`
+**175 OK, 0 échec**, code 2 sur C4 et C5. **Prochain : C3** (VERTE, priorité 3).
 
 ---
 

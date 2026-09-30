@@ -2233,6 +2233,34 @@ def test_distribution_non_recurrente():
 DATES_ISO_MIN = 308
 
 
+def _extraire_fonction(chemin, nom, besoins=()):
+    """Compile UNE fonction d'un module, sans importer le module.
+
+    Sert a tester une fonction qui vit dans un fichier dont les imports de tete
+    tirent une dependance absente de requirements.txt (ici pdfplumber, via
+    collecte_boc_quotidien -> extracteur_boc). Seuls le corps de la fonction et
+    les affectations de tete nommees dans `besoins` sont compiles ; tout le reste
+    du fichier, imports compris, est ignore. `re` est fourni parce que les
+    normaliseurs de date s'en servent.
+    """
+    import ast as _ast
+    import re as _re
+    arbre = _ast.parse(chemin.read_text(encoding="utf-8"))
+    retenus = []
+    for noeud in arbre.body:
+        if isinstance(noeud, _ast.FunctionDef) and noeud.name == nom:
+            retenus.append(noeud)
+        elif isinstance(noeud, _ast.Assign) and any(
+                isinstance(c, _ast.Name) and c.id in besoins for c in noeud.targets):
+            retenus.append(noeud)
+    if not any(isinstance(n, _ast.FunctionDef) for n in retenus):
+        raise AssertionError("fonction %s absente de %s" % (nom, chemin))
+    espace = {"re": _re}
+    exec(compile(_ast.Module(body=retenus, type_ignores=[]), str(chemin), "exec"),
+         espace)
+    return espace[nom]
+
+
 def test_dates_dividendes_iso():
     """La colonne date_paiement est ISO, et le tri chronologique redevient vrai.
 
@@ -2335,8 +2363,18 @@ def test_dates_dividendes_iso():
     # C'etait le defaut LATENT de C10. On rejoue exactement sa requete, avec la
     # date telle que le BOC l'ecrit (francais abrege), sur des dividendes
     # reellement en base. Sans la migration, aucune de ces recherches n'aboutit.
-    sys.path.insert(0, str(RACINE / "collecte"))
-    from collecte_boc_quotidien import date_dividende_vers_iso
+    #
+    # La fonction du BOC est extraite par AST, PAS importee. Pourquoi : un
+    # `from collecte_boc_quotidien import date_dividende_vers_iso` tire
+    # extracteur_boc, donc `import pdfplumber`, qui n'est PAS dans
+    # requirements.txt. La premiere version de cette section l'importait et a
+    # fait tomber P4 le 30/09/2026 (ModuleNotFoundError), alors qu'elle passait
+    # dans le bac a sable ou pdfplumber se trouve preinstalle -- une barriere
+    # verte par accident d'environnement. Les tests de donnees ne doivent
+    # dependre que de ce que requirements.txt installe.
+    date_dividende_vers_iso = _extraire_fonction(
+        RACINE / "collecte" / "collecte_boc_quotidien.py",
+        "date_dividende_vers_iso", besoins=("MOIS_FR",))
     MOIS_INV = {1: "janv.", 2: "fevr.", 3: "mars", 4: "avr.", 5: "mai", 6: "juin",
                 7: "juil.", 8: "aout", 9: "sept.", 10: "oct.", 11: "nov.", 12: "dec."}
     temoins = [r for r in lignes if est_iso(r["date_paiement"])
@@ -2368,6 +2406,29 @@ def test_dates_dividendes_iso():
                 "%s normalise les dates a l'entree (%s)" % (chemin, quoi))
     mig = RACINE / "outils" / "migration_dates_dividendes_iso.py"
     verifie(mig.exists(), "le proces-verbal executable de la migration est dans outils/")
+
+    # --- 6. Le dedoublonneur du BOC n'a pas change de forme ----------------
+    boc = (RACINE / "collecte" / "collecte_boc_quotidien.py").read_text(encoding="utf-8")
+    verifie("date_paiement = date_dividende_vers_iso(date_brute)" in boc,
+            "collecte_boc_quotidien.py convertit toujours en ISO avant de chercher "
+            "le doublon (le controle 4 ne prouve rien s'il cesse de le faire)")
+    verifie("WHERE ticker=? AND montant_net=? AND date_paiement=?" in boc,
+            "sa recherche de doublon est toujours l'egalite sur (ticker, montant, date)")
+    # Cette section ne doit dependre que de ce que requirements.txt installe :
+    # P4 est tombe le 30/09/2026 parce qu'elle importait collecte_boc_quotidien,
+    # donc pdfplumber, absent de requirements.txt et present par hasard dans le
+    # bac a sable. La fonction est desormais extraite par AST.
+    # Le controle porte sur les INSTRUCTIONS, pas sur le texte du fichier : la
+    # premiere version cherchait la sous-chaine et se declenchait sur le
+    # commentaire ci-dessus, qui la contient.
+    ici = (ICI / "tester_donnees.py").read_text(encoding="utf-8")
+    importe = [l.strip() for l in ici.splitlines()
+               if l.strip().startswith(("from collecte_boc_quotidien import",
+                                        "import collecte_boc_quotidien"))]
+    verifie(not importe,
+            "tester_donnees.py n'importe pas collecte_boc_quotidien : sa chaine "
+            "d'imports tire pdfplumber, qui n'est pas dans requirements.txt"
+            + ("" if not importe else " — TROUVE : %r" % importe))
 
 
 # ----------------------------------------------------------------------

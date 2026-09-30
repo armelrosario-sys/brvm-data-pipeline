@@ -160,6 +160,41 @@ qu'aucun cycle ne perde de temps à « réparer » un fichier sain.
 
 `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
 
+### La CI est tombée, et c'était ma faute
+
+Le premier commit de ce cycle (`c314f37`) a fait échouer **P4 — Golden tests** sur
+`ModuleNotFoundError: No module named 'pdfplumber'`, alors que les barrières étaient
+vertes dans le bac à sable une demi-heure plus tôt.
+
+**Cause.** Le contrôle 4 de la section 23 faisait
+`from collecte_boc_quotidien import date_dividende_vers_iso`. Ce module importe
+`extracteur_boc`, qui fait `import pdfplumber` — et **`pdfplumber` n'est pas dans
+`requirements.txt`**. Il se trouve préinstallé dans le bac à sable (0.11.9), donc la
+barrière y passait ; le runner, qui n'installe que `pyyaml`, `openpyxl`, `pandas` et
+`requirements.txt`, ne l'a pas.
+
+**Correctif.** La fonction du BOC est désormais **extraite par AST** (`_extraire_fonction`
+dans `tester_donnees.py`) : seuls son corps et l'affectation `MOIS_FR` sont compilés,
+le reste du fichier — imports compris — est ignoré. Le contrôle teste donc toujours
+la vraie fonction, sans dépendre de rien de plus que `requirements.txt`. Trois
+contrôles s'ajoutent : deux qui vérifient que `collecte_boc_quotidien.py` convertit
+toujours en ISO avant sa recherche de doublon et que cette recherche est toujours
+l'égalité sur `(ticker, montant, date)` — sans quoi le contrôle 4 ne prouverait plus
+rien — et un qui **interdit** l'import fautif. Ce dernier s'est déclenché sur son
+propre commentaire à la première tentative (il cherchait la sous-chaîne) : il porte
+maintenant sur les instructions, ligne par ligne.
+
+**Vérification.** Les barrières ont été rejouées avec `pdfplumber` **rendu
+indisponible** (un module factice en tête de `PYTHONPATH` qui lève
+`ModuleNotFoundError`), pour reproduire le runner et non l'environnement local :
+`tester.py` golden OK, `tester_donnees.py` **175 contrôles OK, 0 échec**, code 2 sur
+les deux seules alertes connues.
+
+**Leçon, à retenir par les cycles suivants.** Une barrière verte dans le bac à sable
+ne prouve rien si le test importe quelque chose d'absent de `requirements.txt`. Le
+bac à sable est plus riche que le runner. Quand un test a besoin d'une fonction qui
+vit dans un fichier à imports lourds, l'extraire plutôt que l'importer.
+
 ### Proposé pour le cycle suivant
 
 **C3** (VERTE, priorité 3) — `journal_profils.csv`, le journal des prédictions.
