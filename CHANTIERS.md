@@ -486,7 +486,7 @@ mesuré, soit elle et son chargeur sont retirés et la section 17 est mise à jo
 ## C15 — Les 101 séances du mensuel manquent au quotidien
 
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK
 - autonomie : complète, **sans réseau** — les données sont déjà dans le dépôt
 - priorité : 2
 
