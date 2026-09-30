@@ -13,7 +13,6 @@ depuis peupler.py + charger_cours.py (doctrine du depot conservee).
 """
 import json
 import sqlite3
-import subprocess
 import sys
 from pathlib import Path
 
@@ -22,6 +21,8 @@ import pandas as pd
 import streamlit as st
 
 RACINE = Path(__file__).resolve().parent
+sys.path.insert(0, str(RACINE / "moteur"))
+from chaine import executer_chaine  # noqa: E402  (C13, 30/09/2026)
 DB = RACINE / "moteur" / "brvm.db"
 PROFILS = RACINE / "collecte" / "profils.json"
 
@@ -129,12 +130,13 @@ def preparer_base(_empreinte):
                RACINE / "collecte" / "charger_dividendes_exercice.py",
                RACINE / "collecte" / "charger_liquidite_quotidienne.py",
                RACINE / "moteur" / "profils.py"]
-    for script in scripts:
-        if not script.exists():
-            continue
-        subprocess.run([sys.executable, str(script)], cwd=str(script.parent),
-                       check=False, capture_output=True, timeout=300)
-    return DB.exists()
+    # C13 (30/09/2026) : la boucle d'origine lancait chaque script en
+    # check=False, capture_output=True puis rendait DB.exists(). Un chargeur en
+    # echec (code 1) etait jete, et l'application servait le repli cours_mensuels
+    # (2026-07) a la place du BOC collecte (2026-09-25), en reecrivant
+    # collecte/profils.json au passage. La chaine s'arrete desormais au premier
+    # echec et rend la liste des echecs ; l'appelant refuse de servir.
+    return executer_chaine(scripts)
 
 
 @st.cache_data(ttl=1800)
@@ -272,7 +274,16 @@ def badge_grade(g):
 
 
 emp = empreinte_donnees()
-preparer_base(emp)
+echecs_chaine = preparer_base(emp)
+if echecs_chaine:
+    # Ne pas figer l'echec dans le cache : le prochain rechargement doit retenter.
+    preparer_base.clear()
+    for e in echecs_chaine:
+        st.error(f"**La base n'a pas pu etre construite** — `{e['script']}` a echoue "
+                 f"(code {e['code'] if e['code'] is not None else 'n/a'}). "
+                 f"Aucune donnee n'est servie plutot qu'une donnee de repli presentee "
+                 f"comme celle du jour.\n\n```\n{e['motif']}\n```")
+    st.stop()
 if not DB.exists() or not PROFILS.exists():
     st.error("Base indisponible. Verifier que moteur/peupler.py et collecte/charger_cours.py "
              "s'executent sans erreur.")
@@ -305,6 +316,9 @@ with st.sidebar:
     except Exception:
         manquees = None
     st.caption(f"{len(df)} titres · cours au **{derniere}** · source : {origine_cours}")
+    if origine_cours != "BOC quotidien":
+        st.warning("**REPLI** : la table des cours quotidiens est vide, les cours affiches "
+                   "viennent des bulletins mensuels et ne sont PAS ceux du jour.")
     if manquees is not None:
         if manquees <= 1:
             st.success("Donnees a jour (derniere seance publiee)")

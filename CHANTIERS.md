@@ -415,7 +415,7 @@ et la ligne repasse de VALIDE à PROBABLE.
 
 ## C13 — `preparer_base()` avale tout échec de chargeur
 
-- statut : PROPOSÉ
+- statut : FAIT le 30/09/2026 (cycle 6) — voir le journal
 - validation : OK
 - autonomie : complète, aucune donnée extérieure nécessaire
 - priorité : 1 — à égalité avec C1, sur un autre axe : plomberie contre méthode
@@ -483,6 +483,50 @@ choix est binaire et demande un arbitrage : brancher la liquidité comme critèr
 **Terminé quand** : soit la table a un lecteur et l'effet sur les 47 titres est
 mesuré, soit elle et son chargeur sont retirés et la section 17 est mise à jour.
 
+## C15 — Les 101 séances du mensuel manquent au quotidien
+
+- statut : PROPOSÉ
+- validation : EN ATTENTE
+- autonomie : complète, **sans réseau** — les données sont déjà dans le dépôt
+- priorité : 2
+
+**Le constat, mesuré le 30/09/2026 (cycle 6).** Les deux séries de prix de la
+base, `cours_mensuels` (depuis `collecte/cours_extraits.csv`) et
+`cours_quotidien_boc` (depuis `collecte/cours_quotidien_boc.csv`), ne partagent
+**aucune date** : **0 sur 101**. Les 101 séances du mensuel sont exactement 101 des
+**355** jours ouvrés absents du quotidien (2 281 jours ouvrés du 02/01/2018 au
+29/09/2026, 1 926 présents). Il n'existe donc pas une seule paire (ticker, jour)
+commune, et leurs valeurs n'ont jamais pu être confrontées.
+
+**Cause, écrite dans le code.** `collecte/backfill_boc_quotidien.py` porte depuis le
+25/07/2026 une « LIMITE CONNUE, non corrigée » : un BOC déjà archivé par le
+collecteur mensuel n'est jamais réextrait vers `cours_quotidien_boc.csv`.
+
+**Ce que la comparaison naïve cachait.** Comparer le dernier cours quotidien du mois
+au cours mensuel donne 1 561 égalités au franc sur 4 463 paires — mais ce sont deux
+jours *différents* (1 à 3 jours d'écart), donc du bruit, pas un accord. Ne pas
+s'appuyer dessus.
+
+**Ce qu'il faut faire.** Verser les lignes de `cours_extraits.csv` dans
+`cours_quotidien_boc.csv` pour ces 101 dates, par un script idempotent dans
+`outils/`, sans réseau. Le test de la section 19 de `tester_donnees.py` dit
+aussitôt si le versement est fidèle : il exige l'égalité au franc sur toute date
+commune et fait baisser son plafond.
+
+**Effet mesuré avant de proposer**, en versant les 4 508 lignes dans une base
+jetable puis en relançant `profils.py` : **9 titres sur 47** voient un champ bouger
+(`comparaisons` 6, `g` 3, `peg` 2, `motif` 1), **aucun champ décisionnel** (`profil`,
+`secondaire`, `grade`, `gate`, `drapeaux`) : 0 titre sur 47.
+
+**Hors de portée, dit franchement.** Restent **254** jours ouvrés absents du
+quotidien hors mensuel : 247 confirmés absents chez brvm.org par le backfill, 5 jamais
+tentés. **2021 en porte 107**, contre 15 à 24 les autres années — un trou côté
+source, que ce chantier ne comble pas.
+
+**Terminé quand** : les 101 dates sont dans le quotidien avec leur source, le
+plafond de la section 19 tombe à 0, et la confrontation compte plus de 4 000 paires
+sans aucune divergence.
+
 ---
 
 # Veille datée, hors file
@@ -497,7 +541,7 @@ mesuré, soit elle et son chargeur sont retirés et la section 17 est mise à jo
 
 Une entrée par cycle. La plus récente en haut.
 
-## 2026-09-30 — cycle 6 (en cours)
+## 2026-09-30 — cycle 6
 
 **Correction d'abord : le cycle 5 n'a rien exécuté.** Son entrée ci-dessous
 annonce « Chantier exécuté ce cycle : C13 » et désigne C1 comme chantier du
@@ -520,6 +564,44 @@ l'autre bout : C13 dit que le repli est atteignable sans bruit, cette chasse
 demande si la donnée de repli vaut celle qu'elle remplace. La reprendre n'est
 pas dupliquer : le cycle 5 n'a poussé aucune mesure, aucun contrôle, aucun
 chiffre sur cette question.
+
+**Chantier exécuté : C13.** Mesure de départ par injection d'une panne dans
+`charger_cours_quotidien.py` : code de retour **1** jeté ; `preparer_base()` rend
+**`True`** ; `cours_quotidien_boc` **0 ligne** ; l'écran sert **2026-07** en source
+« bulletins mensuels (repli) » ; `profils.json` réécrit à **854 insertions / 857
+suppressions** (le journal du cycle 4 disait 849 / 854 : autre mesure, même ordre,
+recomptée ici). Correctif : `moteur/chaine.py::executer_chaine()` — le premier échec
+**arrête** la chaîne (donc `profils.py` ne tourne pas sur une base construite sur un
+échec), un script absent ou trop lent est un échec, et `app.py` affiche le script, son
+code et sa sortie d'erreur puis `st.stop()`, sans mettre l'échec en cache. Le repli
+`cours_mensuels` s'annonce désormais par un avertissement.
+
+**Test : section 18.** Cinq contrôles sur `executer_chaine` et **quatre sur
+l'application elle-même** : une copie d'`app.py` dans un arbre jetable, où la base
+existe mais où un chargeur sort en code 1, doit nommer le chargeur, ne rendre aucun
+onglet et ne pas lancer `profils.py`. **Contre-essai** : sur l'ancien `app.py`, trois de
+ces contrôles échouent ; sur le corrigé, tous passent.
+
+**Chasse : la confrontation des deux séries de cours.** Résultat que je n'attendais
+pas : la confrontation est **vide**, faute de date commune (0 sur 101) — voir **C15**.
+Section 19 : plafond de 101 séances absentes (il ne peut que descendre) et égalité
+au franc exigée sur toute date commune. Contre-essai par deux injections (une 102e
+séance absente ; une paire commune à 50 FCFA d'écart) : les deux échouent comme prévu.
+CSV restauré, `git diff` vide.
+
+**Fausse piste, écartée.** Comparer le dernier cours du mois quotidien au mensuel
+donnait 34,8 % d'égalités avec le jour quotidien précédent et 34,0 % avec le suivant :
+deux taux quasi identiques, donc du bruit d'un marché peu liquide, pas une preuve
+d'alignement.
+
+**Barrières, repassées sur base reconstruite** : `peupler.py` 50 sociétés / 185
+lignes ; les quatre chargeurs OK ; `tester.py` **0** ; `profils.py` **0**, avec
+`profils.json` inchangé (A=5, B=28, C=14) ; `tester_donnees.py` **2** — les deux mêmes
+alertes de fraîcheur (C4, C5), aucune nouvelle, 127 contrôles OK, 0 échec ; `avis_brvm.py
+--test` 0 ; `notations.py --test` 0 ; `generer_dashboard.py` 0 (48 titres).
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant commit.
+
+**C1 reste `OK` et non touché : chantier du cycle 7.** C15 proposé à `EN ATTENTE`.
 
 ## 2026-09-28 — cycle 5 (annoncé, jamais exécuté — voir cycle 6)
 

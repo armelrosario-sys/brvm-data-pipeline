@@ -1562,6 +1562,186 @@ def test_chaine_chargement():
 
 
 # ----------------------------------------------------------------------
+# 18. UN CHARGEUR EN ECHEC NE SE TAIT PLUS (bloquant)
+# ----------------------------------------------------------------------
+def test_panne_de_chargeur():
+    """Un chargeur qui echoue doit rompre le silence, pas basculer sur le repli.
+
+    POURQUOI CETTE SECTION EXISTE (chantier C13, 30/09/2026). preparer_base()
+    lancait ses scripts en check=False, capture_output=True puis rendait
+    DB.exists(). Mesure par injection d'une panne dans
+    charger_cours_quotidien.py : code de retour 1 jete, preparer_base() rend True,
+    cours_quotidien_boc a 0 ligne, l'application sert alors le repli
+    cours_mensuels (2026-07 au lieu de 2026-09-25) et profils.py reecrit
+    collecte/profils.json (854 insertions / 857 suppressions) sur la base
+    degradee. C'est la regression n°2 de l'en-tete de ce fichier, rejouee.
+
+    Quatre controles. Les trois premiers portent sur executer_chaine() : un echec
+    est rendu, il arrete la chaine (donc profils.py ne tourne pas en aval), un
+    script absent en est un aussi. Le quatrieme est l'INJECTION sur l'application
+    elle-meme : une copie de app.py dans un arbre jetable ou la base existe mais ou
+    un chargeur sort en code 1 doit afficher l'echec et ne rien rendre d'autre.
+    """
+    print("\n=== 18. Un chargeur en echec ne se tait plus (bloquant) ===")
+    import shutil
+    sys.path.insert(0, str(ICI))
+    from chaine import executer_chaine
+
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "ok.py").write_text("pass\n", encoding="utf-8")
+        (t / "ko.py").write_text(
+            "import sys\nsys.stderr.write('PANNE-DE-TEST')\nsys.exit(3)\n", encoding="utf-8")
+        (t / "aval.py").write_text(
+            "from pathlib import Path\nPath('aval_a_tourne').write_text('x')\n", encoding="utf-8")
+        (t / "lent.py").write_text("import time\ntime.sleep(30)\n", encoding="utf-8")
+
+        verifie(executer_chaine([t / "ok.py", t / "aval.py"]) == [],
+                "une chaine saine ne rend aucun echec")
+        (t / "aval_a_tourne").unlink(missing_ok=True)
+
+        echecs = executer_chaine([t / "ok.py", t / "ko.py", t / "aval.py"])
+        verifie(len(echecs) == 1 and echecs[0]["script"] == "ko.py" and echecs[0]["code"] == 3
+                and "PANNE-DE-TEST" in echecs[0]["motif"],
+                "un chargeur en code 3 est rendu avec son code et sa sortie d'erreur"
+                + ("" if echecs else " — RIEN RENDU : le silence est revenu"))
+        verifie(not (t / "aval_a_tourne").exists(),
+                "la chaine s'arrete au premier echec : le script en aval "
+                "(profils.py, qui reecrit un fichier commite) ne tourne pas")
+
+        absent = executer_chaine([t / "ok.py", t / "n_existe_pas.py"])
+        verifie(len(absent) == 1 and absent[0]["script"] == "n_existe_pas.py",
+                "un script absent est un echec, pas une omission tolerable")
+        lent = executer_chaine([t / "lent.py"], timeout=1)
+        verifie(len(lent) == 1 and lent[0]["code"] is None and "delai" in lent[0]["motif"],
+                "un script qui depasse son delai est un echec")
+
+    # --- Injection sur l'application elle-meme --------------------------------
+    if not DB.exists():
+        verifie(False, "brvm.db absente : l'injection sur app.py ne prouverait rien "
+                       "(lancer peupler.py et les chargeurs d'abord)", bloquant=False)
+        return
+    try:
+        from streamlit.testing.v1 import AppTest
+        import streamlit as st
+    except ImportError:
+        verifie(True, "streamlit non installe — injection sur app.py ignoree", bloquant=False)
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        arbre = Path(tmp)
+        (arbre / "moteur").mkdir()
+        (arbre / "collecte").mkdir()
+        shutil.copy2(APP, arbre / "app.py")
+        shutil.copy2(ICI / "chaine.py", arbre / "moteur" / "chaine.py")
+        shutil.copy2(DB, arbre / "moteur" / "brvm.db")      # la base EXISTE : c'est le piege
+        shutil.copy2(RACINE / "collecte" / "profils.json", arbre / "collecte" / "profils.json")
+        temoin = arbre / "profils_a_tourne"
+        noms_ok = ["moteur/peupler.py", "collecte/charger_cours.py",
+                   "collecte/charger_dividendes_exercice.py",
+                   "collecte/charger_liquidite_quotidienne.py"]
+        for n in noms_ok:
+            (arbre / n).write_text("pass\n", encoding="utf-8")
+        (arbre / "collecte" / "charger_cours_quotidien.py").write_text(
+            "import sys\nsys.stderr.write('PANNE-INJECTEE')\nsys.exit(1)\n", encoding="utf-8")
+        (arbre / "moteur" / "profils.py").write_text(
+            f"from pathlib import Path\nPath({str(temoin)!r}).write_text('x')\n", encoding="utf-8")
+        st.cache_resource.clear()
+        try:
+            at = AppTest.from_file(str(arbre / "app.py"), default_timeout=300).run()
+        except Exception as e:
+            verifie(False, f"app.py copiee leve une exception sous panne : {type(e).__name__} — {str(e)[:160]}")
+            return
+        finally:
+            st.cache_resource.clear()
+        erreurs = " ".join(e.value for e in at.error)
+        verifie(len(at.exception) == 0, "sous panne de chargeur, app.py ne plante pas")
+        verifie("charger_cours_quotidien.py" in erreurs and "PANNE-INJECTEE" in erreurs,
+                "sous panne de chargeur, l'ecran NOMME le chargeur et affiche sa sortie d'erreur"
+                + ("" if erreurs else " — ECRAN MUET : la base existante a ete servie"))
+        verifie(len(at.tabs) == 0,
+                "sous panne de chargeur, aucun onglet n'est rendu (pas de donnee de repli servie)")
+        verifie(not temoin.exists(),
+                "sous panne de chargeur, profils.py ne tourne pas (profils.json n'est pas reecrit)")
+
+
+# ----------------------------------------------------------------------
+# 19. CONFRONTATION DES DEUX SERIES DE COURS (bloquant)
+# ----------------------------------------------------------------------
+# Plafond des seances du mensuel absentes du quotidien, mesure le 30/09/2026 :
+# 101 sur 101. Registre ADOSSE A LA VALEUR OBSERVEE : il ne peut que descendre.
+# Cause documentee dans collecte/backfill_boc_quotidien.py (« LIMITE CONNUE
+# 25/07/2026, non corrigee ») : un BOC deja archive par le collecteur mensuel
+# n'est jamais reextrait vers cours_quotidien_boc.csv. Chantier C15.
+SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN = 101
+
+
+def test_confrontation_cours():
+    """La base porte deux sources de prix ; il faut qu'elles puissent se confronter.
+
+    POURQUOI CETTE SECTION EXISTE (30/09/2026). cours_mensuels (depuis
+    collecte/cours_extraits.csv) et cours_quotidien_boc (depuis
+    collecte/cours_quotidien_boc.csv) sont deux extractions INDEPENDANTES des BOC.
+    Les sections 1 a 3 verifient fraicheur, frequence et source retenue, jamais
+    l'accord des VALEURS. Mesure du 30/09/2026 :
+
+      - le mensuel porte 101 dates de bulletin, le quotidien 1926 ;
+      - les deux series ne partagent AUCUNE date : 0 sur 101. Les 101 seances du
+        mensuel sont exactement 101 des 355 jours ouvres absents du quotidien ;
+      - la confrontation des valeurs est donc VIDE : pas une seule paire
+        (ticker, jour) commune. Comparer le dernier cours du mois quotidien au cours
+        mensuel donne 1561 egalites au franc sur 4463 paires, mais cela compare deux
+        jours DIFFERENTS (1 a 3 jours d'ecart) : ce n'est pas un accord, c'est du bruit.
+
+    Deux controles. A : le nombre de seances du mensuel absentes du quotidien ne
+    remonte pas au-dessus du plafond inscrit ci-dessus. B : sur toute date commune
+    (aujourd'hui aucune), le meme ticker doit porter le meme cours au franc — deux
+    extractions du MEME document ne peuvent pas diverger sans qu'une soit fausse.
+    """
+    print("\n=== 19. Confrontation des deux series de cours (bloquant) ===")
+    import csv
+    mens_f = RACINE / "collecte" / "cours_extraits.csv"
+    quot_f = RACINE / "collecte" / "cours_quotidien_boc.csv"
+    if not (mens_f.exists() and quot_f.exists()):
+        verifie(False, "cours_extraits.csv ou cours_quotidien_boc.csv absent : "
+                       "rien a confronter", bloquant=False)
+        return
+
+    def iso(d):
+        d = d.strip()
+        return d if "-" in d else f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+
+    mens = {}
+    for r in csv.DictReader(open(mens_f, encoding="utf-8")):
+        if r["cours"] and r["date_bulletin"]:
+            mens[(r["ticker"], iso(r["date_bulletin"]))] = float(r["cours"])
+    quot = {}
+    for r in csv.DictReader(open(quot_f, encoding="utf-8")):
+        if r["cours"] and r["date_bulletin"]:
+            quot[(r["ticker"], iso(r["date_bulletin"]))] = float(r["cours"])
+    verifie(len(mens) > 4000 and len(quot) > 80000,
+            f"les deux series sont chargees ({len(mens)} cours mensuels, {len(quot)} quotidiens) "
+            f"— sans quoi la confrontation ne prouverait rien")
+
+    dates_m = {d for _, d in mens}
+    dates_q = {d for _, d in quot}
+    absentes = sorted(dates_m - dates_q)
+    verifie(len(absentes) <= SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN,
+            f"{len(absentes)} seance(s) du mensuel sur {len(dates_m)} sont absentes du quotidien "
+            f"(plafond {SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN}, limite connue du backfill, C15)"
+            + ("" if len(absentes) <= SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN else
+               " — LE PLAFOND EST DEPASSE : une seance de plus a disparu du quotidien"))
+
+    communs = sorted(set(mens) & set(quot))
+    diverg = [(k, mens[k], quot[k]) for k in communs if mens[k] != quot[k]]
+    verifie(not diverg,
+            f"{len(communs)} paire(s) (ticker, jour) communes aux deux series, "
+            f"{len(diverg)} divergente(s) au franc"
+            + ("" if not diverg else " — " + " ; ".join(
+                f"{k[0]} {k[1]} : mensuel {a:g} contre quotidien {b:g}" for k, a, b in diverg[:5]))
+            + (" — confrontation VIDE tant que C15 n'est pas traite" if not communs else ""))
+
+
+# ----------------------------------------------------------------------
 # 15. FONDS DES NOTATIONS FINANCIERES (bloquant)
 # ----------------------------------------------------------------------
 def test_fonds_notations():
@@ -1673,6 +1853,8 @@ def main():
     test_fonds_notations()
     test_idempotence_peupler()
     test_chaine_chargement()
+    test_panne_de_chargeur()
+    test_confrontation_cours()
     if not sans_app:
         test_application()
 
