@@ -58,9 +58,18 @@ conversation n'est nécessaire : la boucle ne lit que ce fichier.
    qui se marchent dessus coûtent deux fois tout.
 3. **Vérifier l'état** : CI verte ? commits nouveaux ? le bloc *Dernier cycle*
    signale-t-il quelque chose en suspens ?
-4. **Exécuter un chantier, et un seul** : le premier de la file, par priorité, qui
-   soit `VERTE`, ou `ORANGE` portant `validation : OK`. S'il n'y en a aucun,
-   prendre le premier `ORANGE` non mesuré et n'en faire que **la mesure**.
+4. **Exécuter un chantier, et un seul.** L'ordre est **entièrement déterminé** —
+   aucun arbitrage n'est laissé au cycle, parce que deux cycles qui arbitrent
+   séparément arbitrent différemment :
+
+   1. un `ORANGE` portant `validation : OK` — Claudia attend un résultat, il passe
+      avant tout ;
+   2. sinon la première `VERTE` ;
+   3. sinon le premier `ORANGE` non encore mesuré, dont on ne fait que **la
+      mesure**, sans rien écrire.
+
+   Dans chaque rang : priorité la plus haute d'abord, et **à priorité égale, le
+   plus petit numéro de chantier**. Aucun cycle n'est jamais inoccupé.
 5. **Chasser une famille de défauts que rien ne surveille**, et en faire un test.
    **Une fois par jour, au cycle du matin seulement** — c'est l'étape la plus
    chère et la plus facile à dupliquer, et deux sessions qui lisent le même
