@@ -783,6 +783,11 @@ plus rien en silence.
 
 # Dernier cycle
 
+> **ANNONCE — cycle 9 en cours, 2026-09-30 18h53 UTC.** Chantier pris : **C16**
+> (ORANGE, `validation : OK`) — passe de mesure des trois options sur les titres
+> drapeautes. Cycle du soir : pas de chasse. Cette annonce disparait au commit de
+> cloture ; si elle est encore la sans commit de cloture, la session a echoue.
+
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
 ## 2026-09-30 — cycle 8, puis révision du protocole
