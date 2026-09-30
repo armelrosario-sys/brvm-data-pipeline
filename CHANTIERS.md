@@ -497,7 +497,31 @@ mesuré, soit elle et son chargeur sont retirés et la section 17 est mise à jo
 
 Une entrée par cycle. La plus récente en haut.
 
-## 2026-09-28 — cycle 5 (en cours)
+## 2026-09-30 — cycle 6 (en cours)
+
+**Correction d'abord : le cycle 5 n'a rien exécuté.** Son entrée ci-dessous
+annonce « Chantier exécuté ce cycle : C13 » et désigne C1 comme chantier du
+cycle 6. C'est faux, et le dépôt le prouve : le dernier commit du cycle 5 est
+`ec7efc4`, son annonce de famille, et rien après lui ne touche au code — seuls
+les commits automatiques de collecte (BOC, cours, veille avis, Sikafinance) se
+sont succédés jusqu'à `4656d9f`. Vérifié dans le source : `app.py::preparer_base()`
+lance toujours ses six scripts en `check=False, capture_output=True` et rend
+toujours `DB.exists()`. **C13 est donc intact, et c'est le chantier de ce
+cycle.** C1 reste `OK` et non touché.
+
+**Famille annoncée avant tout travail — reprise de celle du cycle 5, qui n'a
+rien produit** : la **confrontation des deux séries de cours**. La base porte
+deux sources de prix indépendantes — `cours_mensuels` (depuis
+`collecte/cours_extraits.csv`) et `cours_quotidien_boc` (depuis le BOC) — et
+aucun test ne confronte leurs **valeurs**. Les sections 1 à 3 de
+`tester_donnees.py` vérifient la fraîcheur, la fréquence et la source retenue,
+jamais l'accord. C'est la même famille que le repli silencieux de C13, prise par
+l'autre bout : C13 dit que le repli est atteignable sans bruit, cette chasse
+demande si la donnée de repli vaut celle qu'elle remplace. La reprendre n'est
+pas dupliquer : le cycle 5 n'a poussé aucune mesure, aucun contrôle, aucun
+chiffre sur cette question.
+
+## 2026-09-28 — cycle 5 (annoncé, jamais exécuté — voir cycle 6)
 
 **Famille annoncée avant tout travail** : la **confrontation des deux séries de
 cours**. La base porte deux sources de prix indépendantes — `cours_mensuels`
