@@ -530,7 +530,7 @@ sans aucune divergence.
 ## C16 — Retirer aussi l'axe de décote des titres à dividende périmé
 
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK
 - autonomie : complète, mais **c'est un arbitrage de méthode**
 - priorité : 3
 
