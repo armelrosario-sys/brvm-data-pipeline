@@ -1668,12 +1668,23 @@ def test_panne_de_chargeur():
 # ----------------------------------------------------------------------
 # 19. CONFRONTATION DES DEUX SERIES DE COURS (bloquant)
 # ----------------------------------------------------------------------
-# Plafond des seances du mensuel absentes du quotidien, mesure le 30/09/2026 :
-# 101 sur 101. Registre ADOSSE A LA VALEUR OBSERVEE : il ne peut que descendre.
-# Cause documentee dans collecte/backfill_boc_quotidien.py (« LIMITE CONNUE
-# 25/07/2026, non corrigee ») : un BOC deja archive par le collecteur mensuel
-# n'est jamais reextrait vers cours_quotidien_boc.csv. Chantier C15.
-SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN = 101
+# Plafond des seances du mensuel absentes du quotidien. Registre ADOSSE A LA
+# VALEUR OBSERVEE : il ne peut que descendre. Il valait 101 sur 101 le
+# 30/09/2026 au matin -- la cause etant la « LIMITE CONNUE 25/07/2026, non
+# corrigee » de collecte/backfill_boc_quotidien.py : un BOC deja archive par le
+# collecteur mensuel n'etait jamais reextrait vers cours_quotidien_boc.csv.
+# Le chantier C15 a verse les 4 509 lignes du mensuel dans le quotidien
+# (outils/versement_mensuel_vers_quotidien.py) : le plafond tombe a ZERO, et
+# toute seance qui en disparaitrait serait desormais une regression.
+SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN = 0
+
+# Nombre de paires (ticker, jour) que les deux series doivent pouvoir
+# confronter. Mesure apres versement : 4 508 -- les 4 509 lignes du mensuel
+# moins STAC au 31/12/2018, seule ligne sans cours. Registre adosse a la valeur
+# observee lui aussi, mais dans l'autre sens : il ne peut que MONTER. Sans ce
+# plancher, vider la confrontation la rendrait verte, ce qu'elle etait
+# precisement avant C15 -- verte et vide.
+PAIRES_CONFRONTABLES_MINIMUM = 4508
 
 
 def test_confrontation_cours():
@@ -1683,20 +1694,31 @@ def test_confrontation_cours():
     collecte/cours_extraits.csv) et cours_quotidien_boc (depuis
     collecte/cours_quotidien_boc.csv) sont deux extractions INDEPENDANTES des BOC.
     Les sections 1 a 3 verifient fraicheur, frequence et source retenue, jamais
-    l'accord des VALEURS. Mesure du 30/09/2026 :
+    l'accord des VALEURS. Etat mesure le 30/09/2026 au matin :
 
-      - le mensuel porte 101 dates de bulletin, le quotidien 1926 ;
-      - les deux series ne partagent AUCUNE date : 0 sur 101. Les 101 seances du
-        mensuel sont exactement 101 des 355 jours ouvres absents du quotidien ;
-      - la confrontation des valeurs est donc VIDE : pas une seule paire
-        (ticker, jour) commune. Comparer le dernier cours du mois quotidien au cours
-        mensuel donne 1561 egalites au franc sur 4463 paires, mais cela compare deux
-        jours DIFFERENTS (1 a 3 jours d'ecart) : ce n'est pas un accord, c'est du bruit.
+      - le mensuel portait 101 dates de bulletin, le quotidien 1926 ;
+      - les deux series ne partageaient AUCUNE date : 0 sur 101 ;
+      - la confrontation etait donc VIDE : pas une seule paire (ticker, jour)
+        commune. Cette section passait au vert sans rien confronter. Comparer le
+        dernier cours du mois quotidien au cours mensuel donnait 1561 egalites au
+        franc sur 4463 paires, mais cela compare deux jours DIFFERENTS (1 a 3 jours
+        d'ecart) : ce n'est pas un accord, c'est du bruit.
 
-    Deux controles. A : le nombre de seances du mensuel absentes du quotidien ne
-    remonte pas au-dessus du plafond inscrit ci-dessus. B : sur toute date commune
-    (aujourd'hui aucune), le meme ticker doit porter le meme cours au franc — deux
-    extractions du MEME document ne peuvent pas diverger sans qu'une soit fausse.
+    CE QUE LE CHANTIER C15 A CHANGE (30/09/2026, cycle 8). Les 4 509 lignes du
+    mensuel ont ete versees dans le quotidien par
+    outils/versement_mensuel_vers_quotidien.py, script idempotent et sans reseau.
+    La confrontation est desormais PLEINE et son resultat est le premier verdict
+    que le projet possede sur la qualite de ses prix : sur **4 508 paires
+    (ticker, jour)** communes, **0 divergence au franc**. Deux extractions
+    independantes des memes bulletins, faites a des dates differentes par des
+    codes differents, donnent exactement le meme cours partout.
+
+    Trois controles. A : plus aucune seance du mensuel n'est absente du quotidien
+    (plafond zero, il ne peut que descendre). B : la confrontation reste PLEINE --
+    au moins PAIRES_CONFRONTABLES_MINIMUM paires ; sans ce plancher, la vider
+    suffirait a rendre la section verte, ce qu'elle etait avant C15. C : sur toute
+    paire commune, le meme ticker porte le meme cours au franc -- deux extractions
+    du MEME document ne peuvent pas diverger sans qu'une soit fausse.
     """
     print("\n=== 19. Confrontation des deux series de cours (bloquant) ===")
     import csv
@@ -1728,18 +1750,255 @@ def test_confrontation_cours():
     absentes = sorted(dates_m - dates_q)
     verifie(len(absentes) <= SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN,
             f"{len(absentes)} seance(s) du mensuel sur {len(dates_m)} sont absentes du quotidien "
-            f"(plafond {SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN}, limite connue du backfill, C15)"
+            f"(plafond {SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN}, verse par C15)"
             + ("" if len(absentes) <= SEANCES_MENSUEL_ABSENTES_DU_QUOTIDIEN else
-               " — LE PLAFOND EST DEPASSE : une seance de plus a disparu du quotidien"))
+               " — LE PLAFOND EST DEPASSE : une seance a disparu du quotidien, "
+               "relancer outils/versement_mensuel_vers_quotidien.py et chercher "
+               "ce qui l'a retiree : " + ", ".join(absentes[:5])))
 
     communs = sorted(set(mens) & set(quot))
+    # Plancher : la confrontation doit rester PLEINE. Avant C15 elle etait vide,
+    # donc verte sans rien prouver — c'est le faux vert que ce controle interdit.
+    verifie(len(communs) >= PAIRES_CONFRONTABLES_MINIMUM,
+            f"{len(communs)} paire(s) (ticker, jour) confrontables "
+            f"(plancher {PAIRES_CONFRONTABLES_MINIMUM}, il ne peut que monter)"
+            + ("" if len(communs) >= PAIRES_CONFRONTABLES_MINIMUM else
+               " — LA CONFRONTATION S'EST VIDEE : verte sans rien confronter, "
+               "l'etat exact d'avant C15"))
+
     diverg = [(k, mens[k], quot[k]) for k in communs if mens[k] != quot[k]]
     verifie(not diverg,
-            f"{len(communs)} paire(s) (ticker, jour) communes aux deux series, "
-            f"{len(diverg)} divergente(s) au franc"
+            f"{len(communs)} paire(s) confrontees, {len(diverg)} divergente(s) au franc "
+            f"— deux extractions independantes des memes bulletins"
             + ("" if not diverg else " — " + " ; ".join(
-                f"{k[0]} {k[1]} : mensuel {a:g} contre quotidien {b:g}" for k, a, b in diverg[:5]))
-            + (" — confrontation VIDE tant que C15 n'est pas traite" if not communs else ""))
+                f"{k[0]} {k[1]} : mensuel {a:g} contre quotidien {b:g}" for k, a, b in diverg[:5])))
+
+
+# ----------------------------------------------------------------------
+# 22. L'IMPLICITE DU BOC DANS LE TEMPS (bloquant + alertes)
+# ----------------------------------------------------------------------
+# Plafonds mesures le 30/09/2026 (cycle 8), sur 52 368 seances a cours mouvant
+# pour le PER et 51 781 pour le rendement. Registres ADOSSES AUX VALEURS
+# OBSERVEES : une hausse est signalee, jamais silencieuse.
+FIGEMENTS_PER_MAX = 108
+FIGEMENTS_RENDEMENT_MAX = 327
+
+# Points de BPA annuel (derniere seance de l'annee, cours/per) qui reposent sur
+# un PER fige. croissance_bpa_implicite() les lit pour calculer un CAGR : celui-ci
+# est donc faux du meme pourcentage que le mouvement de cours non repercute.
+# Un seul cas sur huit ans et demi, et il est CORROBORE par les deux extractions
+# (la seance du 30/12 vient de la collecte quotidienne, celle du 31/12 du
+# bulletin mensuel verse par C15) : c'est le BOC qui a publie ce PER fige, pas
+# notre transcription. Effet : 0,63 % sur une borne du CAGR de BOAS.
+BPA_ANNUEL_SUR_PER_FIGE = {("BOAS", "2024-12-31"): 6.66}
+
+# Collisions d'echelle : une chute de plus de 60 % en une seance, suivie dans les
+# quinze seances d'un RETOUR a moins de 5 % du niveau d'avant. Une division de
+# nominal ne revient jamais sur ses pas : ces cinq cas sont donc des valeurs d'une
+# AUTRE echelle deposees dans la serie, pas des operations sur titre. Registre
+# adosse aux valeurs observees, avec le facteur mesure. Voir C18.
+# Les deux SLBC sont des facteurs 1000 : le controle de la section 7 les ecarte
+# explicitement comme « erreurs de saisie manifestes » (var > -0.995) et ne les
+# enregistre nulle part. Les trois autres, lui, les compte a tort comme divisions
+# de nominal non enregistrees.
+COLLISIONS_ECHELLE = {
+    ("SAFC", "2018-12-21"): 24.65,
+    ("SAFC", "2019-01-02"): 24.65,
+    ("SLBC", "2022-01-12"): 1000.0,
+    ("SLBC", "2023-06-02"): 1080.99,
+    ("STBC", "2018-07-12"): 3.98,
+}
+
+
+def _collisions_echelle(cur, chute=0.40, fenetre=15, retour=0.05):
+    """Chutes de plus de 60 % qui REVIENNENT au niveau d'avant dans la fenetre."""
+    lignes = cur.execute(
+        "SELECT ticker, date_bulletin, cours FROM cours_quotidien_boc "
+        "WHERE ticker NOT LIKE 'TEST_%' AND cours IS NOT NULL "
+        "ORDER BY ticker, date_bulletin").fetchall()
+    par_ticker = {}
+    for ticker, date_b, cours in lignes:
+        par_ticker.setdefault(ticker, []).append((date_b, cours))
+    trouves = {}
+    for ticker, serie in par_ticker.items():
+        for i in range(1, len(serie)):
+            (_d0, c0), (d1, c1) = serie[i - 1], serie[i]
+            if not (c0 and c1) or c1 >= chute * c0:
+                continue
+            for dj, cj in serie[i + 1:i + 1 + fenetre]:
+                if cj and abs(cj / c0 - 1) < retour:
+                    trouves[(ticker, d1)] = round(c0 / c1, 2)
+                    break
+    return trouves
+
+
+def _figements(cur, champ, demi_pas):
+    """Seances ou `champ` est reste IDENTIQUE alors que le cours a bouge.
+
+    L'arrondi de publication est defalque : le BOC publie le PER a deux
+    decimales et le rendement a quatre (en fraction), donc une valeur peut
+    legitimement ne pas bouger tant que le mouvement de cours reste sous la
+    granularite de la case. La marge retenue est deux fois le demi-pas rapporte
+    a la valeur, ce qui laisse passer tout ce que l'arrondi explique.
+    """
+    lignes = cur.execute(
+        f"SELECT ticker, date_bulletin, cours, {champ} FROM cours_quotidien_boc "
+        "WHERE ticker NOT LIKE 'TEST_%' ORDER BY ticker, date_bulletin").fetchall()
+    cas, population, precedent = [], 0, None
+    for ticker, date_b, cours, valeur in lignes:
+        if precedent and precedent[0] == ticker:
+            _t, _d, cours_p, valeur_p = precedent
+            if (cours and cours_p and cours != cours_p
+                    and valeur is not None and valeur_p is not None):
+                population += 1
+                if valeur == valeur_p:
+                    marge = (demi_pas / abs(valeur)) if valeur else 0.0
+                    variation = abs(cours / cours_p - 1.0)
+                    if variation > 2 * marge:
+                        cas.append((ticker, date_b, cours_p, cours, valeur, variation))
+        precedent = (ticker, date_b, cours, valeur)
+    return cas, population
+
+
+def test_implicite_boc():
+    """Le BPA et le DPA implicites du BOC doivent etre des PALIERS, pas du bruit.
+
+    POURQUOI CETTE SECTION EXISTE (chasse du cycle 8, 30/09/2026). Le bulletin
+    publie trois nombres par titre et par seance -- cours, per, rendement -- dont
+    deux sont derives : le benefice par action implicite (cours / per) et le
+    dividende par action implicite (cours x rendement). Ces deux-la ne peuvent
+    bouger qu'a une publication de resultats ou a un detachement de dividende :
+    entre deux, ce sont des paliers. Rien ne le verifiait. Les sections 1 a 3
+    regardent la fraicheur, la frequence et la source retenue ; la section 19
+    confronte les deux series de COURS ; et le moteur ne lit jamais que la
+    DERNIERE ligne de chaque titre. Un per ou un rendement reste colle a sa
+    valeur de la veille pendant que le cours bouge passait donc inapercu.
+
+    CE QUE LA CHASSE A MESURE, et qu'il faut lire avant de toucher aux plafonds :
+
+      - **108 figements du PER** sur 52 368 seances a cours mouvant (0,2 %), et
+        **327 du rendement** sur 51 781 (0,6 %), une fois defalque tout ce que
+        l'arrondi de publication explique. Les ecarts de cours non repercutes
+        vont de 0,6 % a 6,8 %.
+      - **Ce ne sont pas nos erreurs de transcription.** 12 de ces cas (10 PER,
+        2 rendement) enjambent DEUX extractions independantes -- une seance venue
+        de la collecte quotidienne, la suivante du bulletin mensuel. Deux codes
+        differents ne recopient pas la meme valeur par hasard : c'est le BOC qui
+        a publie la valeur figee. Cette confrontation etait IMPOSSIBLE avant le
+        chantier C15, qui a verse le mensuel dans le quotidien le meme jour.
+      - **L'exposition du moteur est aujourd'hui minime.** Aucun figement sur la
+        derniere seance, donc aucun profil du jour n'en depend. Un seul des 108
+        tombe sur un point de BPA ANNUEL lu par croissance_bpa_implicite (BOAS,
+        31/12/2024), pour 0,63 % sur une borne de son CAGR.
+
+    SEVERITES. Bloquant : un point de BPA annuel repose sur un PER fige hors du
+    registre ci-dessus -- c'est un nombre que le moteur CALCULE, et le registre
+    est adosse aux valeurs observees. En alerte : les plafonds de figements et la
+    derniere seance, parce qu'une hausse vient du BOC et non du code, et que la
+    doctrine de ce fichier ne bloque pas un commit pour un defaut de source.
+    """
+    print("\n=== 22. L'implicite du BOC dans le temps ===")
+    if not DB.exists():
+        verifie(False, "brvm.db absent : rien a mesurer", bloquant=False)
+        return
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+
+    # PER a deux decimales -> demi-pas 0,005 ; rendement en FRACTION a quatre
+    # decimales -> demi-pas 0,00005. Verifie sur la base avant de s'en servir.
+    def decimales_max(champ):
+        return max((len(("%.10f" % v).rstrip("0").split(".")[1])
+                    for (v,) in cur.execute(
+                        f"SELECT DISTINCT {champ} FROM cours_quotidien_boc "
+                        f"WHERE {champ} IS NOT NULL")), default=0)
+
+    d_per, d_rend = decimales_max("per"), decimales_max("rendement")
+    verifie(d_per <= 2 and d_rend <= 4,
+            f"granularite publiee confirmee (per {d_per} decimales, rendement {d_rend}) "
+            f"— les marges d'arrondi en decoulent"
+            + ("" if (d_per <= 2 and d_rend <= 4) else
+               " — la granularite a change, les demi-pas de cette section sont a revoir"))
+
+    figes_per, pop_per = _figements(cur, "per", 0.005)
+    figes_rend, pop_rend = _figements(cur, "rendement", 0.00005)
+
+    verifie(len(figes_per) <= FIGEMENTS_PER_MAX,
+            f"{len(figes_per)} PER figes alors que le cours bougeait, sur {pop_per} seances "
+            f"(plafond {FIGEMENTS_PER_MAX})"
+            + ("" if len(figes_per) <= FIGEMENTS_PER_MAX else
+               " — EN HAUSSE : " + ", ".join(f"{t} {d}" for t, d, *_ in figes_per[-3:])),
+            bloquant=False)
+    verifie(len(figes_rend) <= FIGEMENTS_RENDEMENT_MAX,
+            f"{len(figes_rend)} rendements figes alors que le cours bougeait, sur {pop_rend} "
+            f"seances (plafond {FIGEMENTS_RENDEMENT_MAX})"
+            + ("" if len(figes_rend) <= FIGEMENTS_RENDEMENT_MAX else
+               " — EN HAUSSE : " + ", ".join(f"{t} {d}" for t, d, *_ in figes_rend[-3:])),
+            bloquant=False)
+
+    # Garde-fou : une population vide rendrait les deux controles ci-dessus
+    # trivialement verts. C'est le faux vert de la section 19 d'avant C15.
+    verifie(pop_per > 40000 and pop_rend > 40000,
+            f"la mesure porte sur une population reelle ({pop_per} seances pour le PER, "
+            f"{pop_rend} pour le rendement)")
+
+    derniere = cur.execute(
+        "SELECT MAX(date_bulletin) FROM cours_quotidien_boc").fetchone()[0]
+    du_jour = [f"{t} ({champ})"
+               for champ, cas in (("per", figes_per), ("rendement", figes_rend))
+               for t, d, *_ in cas if d == derniere]
+    verifie(not du_jour,
+            f"aucune valeur figee sur la derniere seance ({derniere}) : les profils du "
+            f"jour ne reposent sur aucun champ perime"
+            + ("" if not du_jour else " — ATTENTION : " + ", ".join(du_jour)
+               + " ; le PER et le rendement de ces titres datent de la veille alors "
+                 "que leur cours a bouge"),
+            bloquant=False)
+
+    # --- Bloquant : les points que le moteur CALCULE ------------------------
+    # croissance_bpa_implicite() prend la DERNIERE seance de chaque annee.
+    annuels = {}
+    for ticker, date_b, cours, per in cur.execute(
+            "SELECT ticker, date_bulletin, cours, per FROM cours_quotidien_boc "
+            "WHERE ticker NOT LIKE 'TEST_%' AND per IS NOT NULL AND per > 0 "
+            "AND cours IS NOT NULL ORDER BY ticker, date_bulletin"):
+        annuels[(ticker, date_b[:4])] = date_b
+    touches = {(t, d): v for t, d, _cp, _c, v, _var in figes_per
+               if annuels.get((t, d[:4])) == d}
+    inconnus = sorted(k for k in touches if k not in BPA_ANNUEL_SUR_PER_FIGE
+                      or abs(BPA_ANNUEL_SUR_PER_FIGE[k] - touches[k]) > 0.001)
+    verifie(not inconnus,
+            f"{len(touches)} point(s) de BPA annuel reposent sur un PER fige, tous au "
+            f"registre ({len(BPA_ANNUEL_SUR_PER_FIGE)} inscrit)"
+            + ("" if not inconnus else
+               " — HORS REGISTRE : " + ", ".join(f"{t} {d} (per {touches[(t, d)]})"
+                                                 for t, d in inconnus)
+               + " — le CAGR du BPA implicite de ce titre est faux du mouvement de "
+                 "cours non repercute ; mesurer, puis inscrire au registre"))
+
+    # --- Bloquant : les collisions d'echelle -------------------------------
+    # Decouvertes en versant le mensuel dans le quotidien (C15) : la seance
+    # mensuelle du 31/12/2018 de SAFC porte 5 300 quand les seances quotidiennes
+    # qui l'encadrent portent 215. Un cours qui chute de 99,9 % et revient le
+    # lendemain n'est pas un fait de marche, c'est une valeur d'une autre echelle.
+    collisions = _collisions_echelle(cur)
+    nouvelles = sorted(k for k in collisions if k not in COLLISIONS_ECHELLE)
+    disparues = sorted(k for k in COLLISIONS_ECHELLE if k not in collisions)
+    verifie(not nouvelles,
+            f"{len(collisions)} collision(s) d'echelle, toutes au registre "
+            f"({len(COLLISIONS_ECHELLE)} inscrites)"
+            + ("" if not nouvelles else
+               " — HORS REGISTRE : " + ", ".join(f"{t} {d} (facteur {collisions[(t, d)]})"
+                                                 for t, d in nouvelles)
+               + " — un cours qui chute puis revient au niveau d'avant n'est pas une "
+                 "division de nominal : mesurer, puis corriger la serie ou inscrire"))
+    verifie(not disparues,
+            "les collisions inscrites au registre sont toujours la"
+            + ("" if not disparues else
+               " — DISPARUES : " + ", ".join(f"{t} {d}" for t, d in disparues)
+               + " — soit la serie a ete corrigee (retirer du registre en le disant), "
+                 "soit une seance a ete perdue"),
+            bloquant=False)
+    conn.close()
 
 
 # ----------------------------------------------------------------------
@@ -2082,6 +2341,7 @@ def main():
     test_chaine_chargement()
     test_panne_de_chargeur()
     test_confrontation_cours()
+    test_implicite_boc()
     test_forme_profils_json()
     test_distribution_non_recurrente()
     if not sans_app:

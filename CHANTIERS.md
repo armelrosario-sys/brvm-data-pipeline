@@ -196,12 +196,27 @@ ECOC 26/12/2018, FTSC 30/01/2018, PRSC 24/10/2019, SAFC 21/12/2018 et
 07/01/2019, SEMC 19/12/2018, SIBC 15/06/2018, SLBC 27/09/2024, SMBC 22/02/2019,
 STBC 12/07/2018 et 27/07/2018, TTLC 12/02/2018.
 
+**Mise à jour du 30/09/2026 (cycle 8) : elles sont 13, et 3 n'en sont pas.**
+Le versement de C15 a ajouté une date à l'alerte — **SAFC 02/01/2019** — qui monte
+donc à **13**. Surtout, la chasse du même cycle a mesuré que **trois de ces dates
+ne sont pas des divisions de nominal** : le cours y chute puis **revient** au
+niveau d'avant en une à dix séances, ce qu'une division ne fait jamais.
+
+- **STBC 12/07/2018** : 44 995 → 11 315 → **44 995 le lendemain** (facteur 3,98).
+- **SAFC 21/12/2018** : 5 300 → 215 → **5 300 le 31/12** (facteur 24,65).
+- **SAFC 02/01/2019** : 5 300 → 215 → **5 300 le 04/01** (facteur 24,65).
+
+Ce sont des **collisions d'échelle**, inscrites en **C18** avec deux cas de plus
+que ce contrôle-ci ne voit même pas. Ne pas chercher d'avis de fractionnement pour
+ces trois dates : il n'y en a pas. Les dix autres restent à documenter.
+
 Première passe **sans réseau** : `collecte/avis_brvm.py` sait déjà reconnaître
 un fractionnement, donc fouiller d'abord le corpus d'avis déjà collecté. Ce qui
 manque après cela seulement justifie un `collecte.yml`.
 
-**Terminé quand** : chaque date est soit documentée avec sa source, soit
-explicitement écartée avec son motif ; l'alerte de fraîcheur s'éteint.
+**Terminé quand** : chacune des 13 dates est soit documentée avec sa source, soit
+explicitement écartée avec son motif — les trois collisions d'échelle relèvent de
+C18 et s'écartent par là ; l'alerte de fraîcheur s'éteint.
 
 ## C5 — Exercices manquants : CFAC 2025 et NEIC 2025
 
@@ -485,7 +500,7 @@ mesuré, soit elle et son chargeur sont retirés et la section 17 est mise à jo
 
 ## C15 — Les 101 séances du mensuel manquent au quotidien
 
-- statut : PROPOSÉ
+- statut : FAIT le 30/09/2026 (cycle 8) — voir le journal
 - validation : OK
 - autonomie : complète, **sans réseau** — les données sont déjà dans le dépôt
 - priorité : 2
@@ -527,6 +542,16 @@ source, que ce chantier ne comble pas.
 plafond de la section 19 tombe à 0, et la confrontation compte plus de 4 000 paires
 sans aucune divergence.
 
+**Fait le 30/09/2026 (cycle 8)**, par `outils/versement_mensuel_vers_quotidien.py`,
+idempotent et sans réseau : 4 509 lignes ajoutées, 0 ligne préexistante modifiée,
+plafond de la section 19 à **0**, et la confrontation rend **4 508 paires, 0
+divergence au franc**. La prévision d'effet du cycle 6 est vérifiée au champ près :
+9 titres bougent (`comparaisons` 6, `g` 3, `peg` 2, `motif` 1), **0 champ
+décisionnel**. Deux conséquences non prévues, toutes deux inscrites ailleurs : une
+**treizième** date est apparue dans l'alerte de C4 (SAFC 2019-01-02), et la
+confrontation des deux extractions a rendu mesurables les **collisions d'échelle**
+de C18.
+
 ## C16 — Retirer aussi l'axe de décote des titres à dividende périmé
 
 - statut : PROPOSÉ
@@ -559,12 +584,21 @@ pour un titre qui ne verse rien.
 la décote, prime et classements corrigés) ; (b) retirer l'axe (case vide) ; (c)
 compter zéro pour les dividendes périmés. Le cycle mesurera l'option choisie.
 
-**Terminé quand** : l'option est tranchée, appliquée, l'effet mesuré titre par
-titre, et un test de la section 21 fige la règle.
+**TRANCHÉ le 30/09/2026 par Claudia : « mesurer d'abord, décider après ».** Le
+cycle qui prendra C16 **n'applique rien**. Il mesure les **trois** options (a), (b)
+et (c) sur les **6** titres aujourd'hui drapeautés — et non les 10 de la mesure
+d'origine, périmée depuis la correction de la règle 1 — et rend, titre par titre :
+le `decote_pctl` avant/après, les `profil` qui basculent, les `grade` qui bougent.
+Les trois mesures et rien d'autre : le choix revient ensuite à Claudia.
 
-**Note du cycle 7 bis** : l'effet ci-dessus a été mesuré sur **10** titres
+**Terminé quand** : les trois options sont mesurées sur les 6 titres, titre par
+titre, et le tableau est inscrit ici. L'application, elle, attend un second
+arbitrage de Claudia — et c'est alors seulement qu'un test de la section 21 figera
+la règle retenue.
+
+**Note du cycle 7 bis** : l'effet mesuré plus haut l'a été sur **10** titres
 drapeautés. Ils sont **6** depuis la correction de la règle 1 (voir le journal).
-**La mesure est à refaire** avant de trancher.
+Ce chiffre de 2 profils et 30 `decote_pctl` **ne vaut plus** : ne pas le reprendre.
 
 ## C17 — Pour 13 titres sur 44, le dividende que le BOC divise reste introuvable
 
@@ -629,6 +663,60 @@ source, soit un motif daté d'impossibilité ; l'effet sur la règle de C1 est m
 titre par titre ; et le compte de titres à référence identifiée, aujourd'hui 31 sur
 44, est figé par un test qui ne peut que monter.
 
+## C18 — Cinq collisions d'échelle dans la série de cours
+
+- statut : PROPOSÉ
+- validation : EN ATTENTE
+- autonomie : complète, **sans réseau** — tout est dans `collecte/cours_quotidien_boc.csv`
+- priorité : 4 — **avant C4**, dont il retire trois dates
+
+**Le constat, mesuré le 30/09/2026 (cycle 8), rendu visible par C15.** En versant
+les séances mensuelles dans la série quotidienne, la séance du **31/12/2018 de
+SAFC** est venue se placer entre des séances quotidiennes qui l'encadrent — et
+elle porte **5 300** quand elles portent **215**. En cherchant systématiquement
+les chutes de plus de 60 % qui **reviennent** au niveau d'avant dans les quinze
+séances, il y en a **cinq**, sur trois titres :
+
+| titre | séance | cours avant → pendant → après | facteur |
+|---|---|---|---|
+| SLBC | 12/01/2022 | 154 000 → **154** → 154 000 le lendemain | **1 000** |
+| SLBC | 02/06/2023 | 73 075 → **67,6** → 73 075 le 19/06 | **1 081** |
+| SAFC | 21/12/2018 | 5 300 → **215** → 5 300 le 31/12 | 24,65 |
+| SAFC | 02/01/2019 | 5 300 → **215** → 5 300 le 04/01 | 24,65 |
+| STBC | 12/07/2018 | 44 995 → **11 315** → 44 995 le lendemain | 3,98 |
+
+**Une division de nominal ne revient jamais sur ses pas.** Ce ne sont donc pas des
+opérations sur titre mais des valeurs d'une **autre échelle** déposées dans la
+série. Les deux SLBC sont des facteurs 1 000 : une erreur d'unité, pas un prix.
+
+**Ce que les contrôles existants en font, et c'est le vrai sujet.** Le contrôle
+des divisions de nominal (section 7) trie sur `var < -0,60` **et** `var > -0,995` :
+
+1. les **deux SLBC** tombent sous −99,5 % et sont donc **écartés explicitement**
+   comme « erreurs de saisie manifestes » — écartés, et **enregistrés nulle part**.
+   Ils restent dans le CSV commité et dans la base ;
+2. les **trois autres** sont comptés **à tort** comme divisions de nominal non
+   documentées, et gonflent la file de C4 de trois dates pour lesquelles aucun
+   avis de fractionnement ne sera jamais trouvé.
+
+**Portée, mesurée et dite franchement : le défaut est LATENT.** Aucune des cinq
+séances n'est un point de BPA annuel lu par `croissance_bpa_implicite`, et aucune
+n'est la dernière séance : **aucun profil, grade ni gate d'aujourd'hui n'en
+dépend**. Ce qui en dépendra, c'est tout backtest lisant la série entière — et
+`backtest_rendement_total.py`, `backtest_leger.py` et
+`backtest_bootstrap_blocs.py` sont dans le dépôt.
+
+**Ce qu'il faut faire.** Trancher, pour chacune des cinq, entre corriger la valeur
+dans `collecte/cours_quotidien_boc.csv` par un script de migration idempotent dans
+`outils/` — avec la preuve à deux côtés que le projet exige, ici le cours des
+séances qui l'encadrent — et la laisser en l'état avec son motif. Puis faire en
+sorte que la section 7 cesse de compter les collisions comme des divisions.
+
+**Terminé quand** : les cinq séances sont corrigées ou motivées une par une, le
+registre `COLLISIONS_ECHELLE` de la section 22 reflète ce qui reste, l'alerte de
+C4 retombe de 13 à 10 dates, et le seuil `var > -0,995` de la section 7 n'écarte
+plus rien en silence.
+
 ---
 
 # Veille datée, hors file
@@ -643,7 +731,7 @@ titre par titre ; et le compte de titres à référence identifiée, aujourd'hui
 
 Une entrée par cycle. La plus récente en haut.
 
-## 2026-09-30 — cycle 8 (en cours)
+## 2026-09-30 — cycle 8
 
 **Trois lignes portent `validation : OK` : C15, C16 et C17.** La règle n'en
 autorise qu'une. **C15 est retenu** : priorité 2, désigné chantier du cycle 8 par
@@ -667,6 +755,126 @@ titre. Un `per` ou un `rendement` resté collé à sa valeur de la veille pendan
 le cours bouge, ou l'inverse, passerait donc inaperçu. C'est la même famille que
 celle qui a produit les 13 titres de C17, prise par l'autre bout : C17 demande
 quel dividende le BOC divise, cette chasse demande **quand il en a changé**.
+
+
+### Chantier exécuté : C15
+
+**Prémisse revérifiée avant d'agir**, sans reprendre les chiffres du journal :
+`cours_extraits.csv` porte 4 509 lignes, 101 dates, 47 tickers, aucune paire
+(ticker, jour) en double ; `cours_quotidien_boc.csv` en porte 86 057 sur
+1 926 dates ; **dates communes : 0**. La confrontation de la section 19 était donc
+bien vide — et **verte**, ce qui est le vrai danger : elle ne prouvait rien.
+
+**Le piège des unités, trouvé avant d'écrire et non après.** Les deux fichiers
+n'écrivent pas le rendement dans la même unité. Le mensuel le porte en
+**pourcentage** ; le quotidien mélange les deux unités et son chargeur les
+discrimine par un seuil — au-delà de 1,5 c'est un pourcentage, en dessous une
+fraction. Or **105 lignes** du mensuel portent un rendement inférieur ou égal à
+1,5 % (BICC, CFAC, NSBC, ORGT, PALC, SCRC, SEMC, SPHC, UNXC) : recopiées telles
+quelles, elles auraient été relues **cent fois trop grandes**. Le versement
+convertit donc en fraction. Reste **une** case que la fraction ne sauve pas :
+**STBC au 31/07/2018, rendement 210,41 %**, soit 2,1041 en fraction, au-dessus du
+plafond de 1,5 du lecteur, qui l'aurait servi à 2,10 %. Cette case part **vide** —
+une case vide vaut mieux qu'une valeur approchée. Note pour C4 : ce 210 % tombe
+entre les deux chutes STBC des 12 et 27/07/2018.
+
+**`outils/versement_mensuel_vers_quotidien.py`**, idempotent, sans réseau, sur le
+modèle des deux scripts déjà présents : ancres exactes, assertion d'unicité, garde
+`ATTENDU` sur chaque grandeur, refus d'écrire si une paire existe déjà avec des
+valeurs **différentes** (trancher une divergence n'est pas le travail d'un script
+de migration), relance sans effet une fois appliqué. Une garde de plus, propre au
+cas : **réserialiser le fichier existant et exiger l'octet près l'original avant
+d'y ajouter quoi que ce soit**. Elle a mordu au premier essai — le fichier est en
+CRLF, et une réécriture en LF aurait produit un diff de 86 057 lignes sans changer
+une valeur.
+
+**Résultat** : 4 509 lignes ajoutées, **0 ligne préexistante modifiée** (vérifié
+paire par paire), fins de ligne intactes, relance sans effet. Le plafond de la
+section 19 tombe de 101 à **0**, et un **plancher** de 4 508 paires confrontables
+est ajouté : sans lui, vider la confrontation suffirait à rendre la section verte,
+ce qu'elle était exactement avant ce chantier.
+
+**Et le verdict que le projet attendait depuis le début : sur 4 508 paires
+(ticker, jour), 0 divergence au franc.** Deux extractions indépendantes des mêmes
+bulletins, écrites à des dates différentes par des codes différents, donnent
+partout le même cours.
+
+**Effet sur les sorties, mesuré champ par champ : la prévision du cycle 6 est
+exacte.** 9 titres sur 47 voient un champ bouger — `comparaisons` 6, `g` 3,
+`peg` 2, `motif` 1 — et **0 champ décisionnel** (`profil`, `secondaire`, `grade`,
+`gate`, `drapeaux`). Répartition et grades inchangés.
+
+**Deux conséquences non prévues, dites pour ce qu'elles sont.** L'alerte de C4
+passe de 12 à **13** dates (SAFC 02/01/2019 apparaît) ; et le versement a rendu
+mesurables les collisions d'échelle de C18, ci-dessous.
+
+### Chasse : l'implicite du BOC dans le temps
+
+**Mesure.** Sur les 52 368 séances à cours mouvant, une fois défalqué tout ce que
+l'arrondi de publication explique (PER à deux décimales, rendement à quatre) :
+**108 PER figés** (0,2 %) et **327 rendements figés** (0,6 %), avec des écarts de
+cours non répercutés de **0,6 % à 6,8 %**. La propriété de palier ne tient donc
+pas.
+
+**Ce ne sont pas nos erreurs de transcription, et c'est C15 qui permet de le
+dire.** **12** de ces cas (10 PER, 2 rendement) enjambent **deux extractions
+indépendantes** — une séance venue de la collecte quotidienne, la suivante du
+bulletin mensuel versé le jour même. Deux codes différents ne recopient pas la
+même valeur par hasard : **c'est le BOC qui a publié la valeur figée.** Cette
+confrontation était impossible il y a une heure.
+
+**Exposition du moteur, mesurée : minime.** **Aucun** figement sur la dernière
+séance — aucun profil du jour n'en dépend. Un seul des 108 tombe sur un point de
+**BPA annuel** lu par `croissance_bpa_implicite` : **BOAS au 31/12/2024**, PER
+figé à 6,66, pour **0,63 %** sur une borne de son CAGR. Et ce cas-là est
+précisément l'un des 12 corroborés.
+
+**Une hypothèse écartée, et c'est utile.** Les figements n'expliquent **pas** C17 :
+les 13 titres dont le dividende de référence est introuvable y affichent des
+écarts de −87 % à +95 %, deux ordres de grandeur au-dessus de ce qu'un rendement
+figé d'une séance peut produire.
+
+**La trouvaille que la question a déplacée : cinq collisions d'échelle.** En
+plaçant la séance mensuelle du 31/12/2018 de SAFC entre les séances quotidiennes
+qui l'encadrent, le versement a exposé un cours de **5 300** au milieu de cours de
+**215**. En cherchant les chutes de plus de 60 % qui **reviennent** au niveau
+d'avant, il y en a **cinq**, sur trois titres, jusqu'à un facteur **1 000**
+(SLBC : 154 000 → 154 → 154 000 le lendemain). Une division de nominal ne revient
+jamais sur ses pas. Le contrôle des divisions de la section 7 **écarte** les deux
+SLBC comme « erreurs de saisie manifestes » sans les enregistrer nulle part, et
+compte les trois autres **à tort** comme des divisions non documentées. Inscrit en
+**C18**, et C4 corrigé en conséquence. Défaut **latent** : aucune des cinq n'est un
+point de BPA annuel ni une dernière séance.
+
+**Test : section 22**, huit contrôles. En **alerte** — les plafonds de figements
+(108 et 327) et la dernière séance : une hausse vient du BOC et non du code, et la
+doctrine de ce fichier ne bloque pas un commit pour un défaut de source. En
+**bloquant** — qu'aucun point de BPA annuel hors registre ne repose sur un PER
+figé (c'est un nombre que le moteur *calcule*), et qu'aucune collision d'échelle
+hors registre n'apparaisse (un cours qui chute de 99,9 % et revient le lendemain
+n'est pas un fait de marché). Plus un garde-fou de population : une mesure sur un
+ensemble vide serait verte et vide.
+
+**Contre-essais, six, tous rejetés comme prévu.** Section 19 : une séance versée
+retirée → plafond dépassé **et** plancher enfoncé, les deux contrôles tombent ;
+un cours modifié de 50 F sur une date versée → la divergence est nommée (SNTS
+07/07/2026). Section 22 : un PER figé injecté sur la dernière séance → l'alerte le
+nomme **et** le contrôle bloquant le prend, le 29/09/2026 étant aussi le point
+annuel 2026 ; le même figement sur le point annuel 2023 d'un autre titre → le
+bloquant seul ; une collision d'échelle neuve (SNTS divisé par 1 000) → bloquant,
+facteur 1 008 nommé ; une collision inscrite qui disparaît → alerte. Base restaurée
+après chacun, `git diff` vérifié.
+
+**Barrières, toutes repassées sur base reconstruite** : `peupler.py` 50 sociétés /
+185 lignes d'états ; les quatre chargeurs OK (4 509 / **90 566** / 296+63 /
+73 141) ; `tester.py` **0**, tous les golden tests ; `profils.py` **0** (A=5,
+B=28, C=14) ; `tester_donnees.py` **2**, **159 contrôles OK, 0 échec**, les deux
+mêmes alertes de fraîcheur qu'en référence — C4, passée de 12 à 13 dates, et C5 —
+aucune nouvelle ; `app.py` démarre, 4 onglets ; `avis_brvm.py --test` **0** ;
+`notations.py --test` **0** ; `generer_dashboard.py` **0** (48 titres).
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant commit.
+
+**C16 et C17 restent `OK` et non touchés.** **C18 proposé** à `EN ATTENTE`.
 
 ## 2026-09-30 — cycle 7 bis (session parallèle — C1 abandonné, une erreur de C1 corrigée)
 

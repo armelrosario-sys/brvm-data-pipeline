@@ -872,7 +872,7 @@
     "n_marche": 36
    },
    "g": {
-    "titre": 44.28,
+    "titre": 44.26,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -1201,7 +1201,7 @@
    },
    "g": {
     "titre": 21.86,
-    "mediane_secteur": -1.48,
+    "mediane_secteur": -1.49,
     "n_secteur": 2,
     "mediane_marche": 5.06,
     "n_marche": 35
@@ -1857,7 +1857,7 @@
     "n_marche": 36
    },
    "g": {
-    "titre": 14.67,
+    "titre": 14.7,
     "mediane_secteur": 7.93,
     "n_secteur": 13,
     "mediane_marche": 5.06,
@@ -2190,11 +2190,11 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.76,
+  "peg": 0.77,
   "dy": 6.1,
   "confiance": "FAIBLE",
   "profil": "GARP",
-  "motif": "croissance de 18.9 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.58 — la croissance n'est pas encore dans le prix",
+  "motif": "croissance de 18.8 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.58 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
     "titre": 14.42,
@@ -2211,7 +2211,7 @@
     "n_marche": 36
    },
    "g": {
-    "titre": 18.88,
+    "titre": 18.85,
     "mediane_secteur": 2.1,
     "n_secteur": 5,
     "mediane_marche": 5.06,
@@ -2270,7 +2270,7 @@
   "decote_pctl": 74,
   "croissance_pctl": 77,
   "reference_axes": "marche (n=36)",
-  "g": 18.9,
+  "g": 18.8,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
    "FONDAMENTAL_EN_RETARD",
@@ -2588,7 +2588,7 @@
     "n_marche": 36
    },
    "g": {
-    "titre": -13.41,
+    "titre": -13.43,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
     "mediane_marche": 5.06,
@@ -3326,7 +3326,7 @@
   "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
-  "g": 13.1,
+  "g": 13.2,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
    "DISTRIBUTION_NON_RECURRENTE"
@@ -3671,7 +3671,7 @@
    },
    "g": {
     "titre": -24.83,
-    "mediane_secteur": -1.48,
+    "mediane_secteur": -1.49,
     "n_secteur": 2,
     "mediane_marche": 5.06,
     "n_marche": 35
@@ -4221,7 +4221,7 @@
   "decote_pctl": null,
   "croissance_pctl": null,
   "reference_axes": "hors axes",
-  "g": -45.5,
+  "g": -45.6,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 139.98,
@@ -5048,7 +5048,7 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 1.58,
+  "peg": 1.57,
   "dy": 2.78,
   "confiance": "HAUTE",
   "profil": "RETOURNEMENT",
