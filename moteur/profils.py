@@ -911,34 +911,88 @@ def per_normalise(cur, ticker, per, fenetre=4):
     seul dernier.
 
     Ajout du 12/09/2026. Un PER se calcule sur un benefice : si ce benefice est
-    un pic, le PER parait bas alors que le titre est cher. Ecarts mesures sur la
-    cote :
-      SLBC  PER affiche 14,9 -> PER normalise 32,7 (dernier benefice +119 % au
-            dessus de sa moyenne : 45,8 Mds contre 20,9 Mds)
-      BICC  12,9 -> 25,1 (+95 %)
-      SHEC  23,7 -> 30,1 (+27 %)
-      STBC  12,1 -> 16,8 (+39 %)
-    Mediane de la cote : 14,0 en affiche, 17,3 en normalise. Le marche est
-    environ un quart plus cher qu'il n'en a l'air.
+    un pic, le PER parait bas alors que le titre est cher.
 
     Meme logique que le drapeau RESULTAT_NON_OPERATIONNEL : verifier que le
     benefice qui sert de denominateur est representatif. Ici c'est sa
     REGULARITE dans le temps ; la c'etait son ORIGINE.
+
+    CHIFFRES REFAITS SUR LA BASE DU 01/10/2026 -- ceux du 12/09 ne valent plus.
+    La version precedente de ce texte annoncait "SLBC 14,9 -> 32,7", "BICC
+    12,9 -> 25,1", "SHEC 23,7 -> 30,1", "STBC 12,1 -> 16,8", et concluait
+    "mediane de la cote : 14,0 en affiche, 17,3 en normalise, le marche est
+    environ un quart plus cher qu'il n'en a l'air". Cette conclusion ne se
+    deduisait pas de ses deux nombres : ils ne portaient pas sur la meme
+    population -- 47 titres ont un PER affiche, 19 seulement un PER normalise.
+
+    Mesure du jour, sur les 19 titres calculables et sur EUX SEULS des deux
+    cotes : mediane 14,0 en affiche contre 16,2 en normalise, soit +16 %. Les
+    quatre titres que le drapeau BENEFICE_NON_REPRESENTATIF retient :
+      BICC  14,9 -> 20,5  (dernier benefice +38 % au dessus de sa moyenne)
+      SLBC  13,5 -> 29,5  (+119 %)
+      SPHC   8,2 -> 12,7  (+56 %)
+      STBC  10,8 -> 15,0  (+39 %)
+    La mediane du PER affiche sur les 47 titres, elle, vaut 15,2 : ne jamais la
+    comparer a celle du normalise, c'est l'erreur que ce texte portait.
+
+    DEUX DEFAUTS DE SELECTION CORRIGES LE 01/10/2026 (signales par Claudia sur
+    le tableau de bord publie). Ils portaient tous deux sur la constitution de
+    la fenetre, pas sur la formule.
+
+    1. LA FENETRE N'ETAIT PAS CONSECUTIVE. Le `ORDER BY exercice DESC LIMIT 4`
+       prenait les quatre exercices les plus recents DISPONIBLES, pas les quatre
+       dernieres annees : sur 6 titres de 25 la fenetre enjambait un trou de la
+       base. BICC sautait 2022 (le trou de C6), ORGT sautait 2023 et 2024,
+       SDCC 2022 et 2023, et SICC n'avait AUCUN exercice posterieur a 2021 --
+       son PER normalise reposait sur 2018 a 2021, soit des benefices vieux de
+       quatre a sept ans, sans que rien ne le dise. La fenetre est desormais
+       prise par annees CONSECUTIVES a partir du dernier exercice connu ;
+       sous trois exercices consecutifs, on ne calcule pas (une case vide vaut
+       mieux qu'une valeur approchee).
+
+    2. LES PERTES ETAIENT ECARTEES EN SILENCE, et l'effet etait a l'envers.
+       Le filtre `resultat_net > 0` retirait 17 exercices deficitaires depuis
+       2021 (ORGT 2023 et 2024, STAC quatre annees, UNXC quatre annees, SCRC,
+       SAFC, NEIC, FTSC, SICC). Retirer une perte REMONTE la moyenne, donc
+       BAISSE le rapport dernier/moyenne, donc fait paraitre le titre MOINS
+       cher : un titre qui sort de pertes voyait sa normalisation jouer contre
+       le lecteur. Les exercices deficitaires entrent desormais dans la
+       moyenne. On refuse de conclure si la moyenne ou le dernier exercice
+       n'est pas strictement positif : un rapport a une moyenne negative n'a
+       pas de sens, et le PER du BOC se divise de toute facon par un benefice.
+
+    CE QUI RESTE NON TRANCHE, et qu'il faut lire avant de se fier a ce nombre.
+    Le rapport dernier/moyenne mesure autant la CROISSANCE qu'un pic : sur une
+    serie geometrique de taux g, le dernier terme depasse la moyenne de quatre
+    termes d'environ 1,5 g, sans aucun pic. Mesure du 01/10/2026 : 8 titres a
+    serie strictement croissante -- donc sans pic possible -- voyaient leur PER
+    gonfle de 12 a 119 % (BOAC 12,9 -> 16,2 ; CABC 14,0 -> 16,9 ; BICC
+    14,9 -> 24,4). C'est le chantier C23, et il n'est PAS corrige ici : ces deux
+    correctifs-ci portent sur la selection des exercices, pas sur la lecture.
 
     Retourne (per_normalise, ecart_dernier_sur_moyenne, n_exercices).
     """
     if not per or per <= 0:
         return None, None, 0
     lignes = cur.execute(
-        "SELECT resultat_net FROM etats_financiers WHERE ticker=? "
-        "AND resultat_net IS NOT NULL AND resultat_net > 0 "
-        "ORDER BY exercice DESC LIMIT ?", (ticker, fenetre)).fetchall()
-    vals = [x[0] for x in lignes]
+        "SELECT exercice, resultat_net FROM etats_financiers WHERE ticker=? "
+        "AND resultat_net IS NOT NULL ORDER BY exercice DESC", (ticker,)).fetchall()
+    # Fenetre CONSECUTIVE a partir du dernier exercice connu : on s'arrete au
+    # premier trou plutot que de l'enjamber. Sans cela la "moyenne des quatre
+    # derniers exercices" peut couvrir sept annees.
+    vals = []
+    for exercice, rn in lignes:
+        if vals and exercice != precedent - 1:
+            break
+        vals.append(rn)
+        precedent = exercice
+        if len(vals) == fenetre:
+            break
     if len(vals) < 3:
         return None, None, len(vals)
     dernier = vals[0]
     moyenne = sum(vals) / len(vals)
-    if moyenne <= 0:
+    if moyenne <= 0 or dernier <= 0:
         return None, None, len(vals)
     # PER_normalise = PER_affiche x (dernier / moyenne) : le nombre d'actions
     # s'annule, inutile de l'estimer.

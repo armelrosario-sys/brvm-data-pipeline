@@ -420,6 +420,96 @@ def test_per_normalise_et_operations():
             f"le drapeau BENEFICE_NON_REPRESENTATIF reste discriminant : "
             f"{len(marques)} titre(s) sur {len(calcules)}")
 
+    # --- (a bis) La FENETRE du PER normalise, corrigee le 01/10/2026 ----------
+    #
+    # POURQUOI CES CONTROLES EXISTENT. Claudia a signale que les PER normalises
+    # du tableau de bord etaient faux. Deux defauts portaient sur la
+    # constitution de la fenetre -- pas sur la formule :
+    #
+    #   1. ORDER BY exercice DESC LIMIT 4 prend les quatre exercices les plus
+    #      recents DISPONIBLES, pas les quatre dernieres annees. Sur 6 titres de
+    #      25 la fenetre enjambait un trou : BICC sautait 2022 (trou de C6), ORGT
+    #      2023 et 2024, SDCC 2022 et 2023, et SICC n'avait aucun exercice
+    #      posterieur a 2021 -- son PER normalise reposait sur 2018-2021.
+    #   2. resultat_net > 0 ecartait 17 exercices deficitaires depuis 2021, et
+    #      l'effet etait a l'envers : retirer une perte REMONTE la moyenne, donc
+    #      BAISSE le rapport, donc fait paraitre le titre MOINS cher.
+    #
+    # Les deux controles ci-dessous portent sur la REGLE, sur une base jetable,
+    # et chacun porte son CONTRE-EXEMPLE : sous l'ancienne regle ils tombent.
+    # Un controle qui ne tombe pas sous injection ne surveille rien.
+    sys.path.insert(0, str(ICI))
+    from profils import per_normalise as _pern
+
+    conn = sqlite3.connect(":memory:")
+    conn.execute("CREATE TABLE etats_financiers (ticker TEXT, exercice INT, "
+                 "resultat_net REAL)")
+
+    def _serie(t, paires):
+        conn.executemany("INSERT INTO etats_financiers VALUES (?,?,?)",
+                         [(t, e, rn) for e, rn in paires])
+
+    # A. quatre annees CONSECUTIVES dont une en perte. Moyenne attendue :
+    #    (100 - 50 + 100 + 100) / 4 = 62,5 ; rapport 100/62,5 = 1,60.
+    #    Sous l'ancienne regle la perte disparaissait : moyenne 100, rapport 1,00.
+    _serie("A", [(2025, 100.0), (2024, -50.0), (2023, 100.0), (2022, 100.0)])
+    # B. un TROU en 2023 : la fenetre consecutive s'arrete a deux exercices,
+    #    donc on ne calcule pas. Sous l'ancienne regle elle enjambait le trou et
+    #    rendait un nombre sur quatre exercices couvrant cinq annees.
+    _serie("B", [(2025, 100.0), (2024, 90.0), (2022, 50.0), (2021, 40.0)])
+    # C. serie saine : la correction ne doit RIEN changer au cas courant.
+    _serie("C", [(2025, 120.0), (2024, 110.0), (2023, 100.0), (2022, 90.0)])
+    # D. moyenne negative : aucun rapport n'a de sens.
+    _serie("D", [(2025, 10.0), (2024, -100.0), (2023, -100.0), (2022, -100.0)])
+    cur_j = conn.cursor()
+
+    pa, ra, na = _pern(cur_j, "A", 10.0)
+    verifie(na == 4 and abs(ra - 0.60) < 1e-9 and abs(pa - 16.0) < 1e-9,
+            "un exercice en PERTE entre dans la moyenne : 100/-50/100/100 donne "
+            f"un rapport de 1,60 et un PER normalise de 16,0 (obtenu : "
+            f"{na} exercices, rapport {ra if ra is None else round(1 + ra, 2)}, "
+            f"PER {pa if pa is None else round(pa, 1)}) — sous l'ancienne regle "
+            "la perte etait ecartee et le rapport valait 1,00")
+    pb, rb, nb = _pern(cur_j, "B", 10.0)
+    verifie(pb is None and nb == 2,
+            "une fenetre a TROU ne se calcule pas : 2025, 2024, puis 2022 "
+            f"s'arrete a deux exercices consecutifs (obtenu : {nb} exercices, "
+            f"PER {pb}) — sous l'ancienne regle elle enjambait 2023 et rendait "
+            "un nombre sur cinq annees")
+    pc, rc, nc = _pern(cur_j, "C", 10.0)
+    verifie(nc == 4 and abs(pc - 10.0 * (120.0 / 105.0)) < 1e-9,
+            "une serie consecutive et beneficiaire est inchangee par la "
+            f"correction (4 exercices, PER 10,0 -> {pc:.2f})")
+    pd_, _rd, nd = _pern(cur_j, "D", 10.0)
+    verifie(pd_ is None and nd == 4,
+            "une moyenne negative ne rend aucun PER normalise, la perte "
+            f"etant desormais comptee (obtenu : {nd} exercices, PER {pd_})")
+    conn.close()
+
+    # Et la propriete sur la BASE du jour : toute fenetre reellement retenue est
+    # consecutive. Le controle sur base jetable ci-dessus prouve la regle ; ce
+    # controle-ci prouve qu'elle s'applique aux donnees publiees.
+    if DB.exists():
+        conn = sqlite3.connect(DB)
+        cur_r = conn.cursor()
+        non_consecutives = []
+        for ticker, v in sorted(profils.items()):
+            n = v.get("n_ex_normalise")
+            if v.get("per_normalise") is None or not n or n < 3:
+                continue
+            ex = [e for (e,) in cur_r.execute(
+                "SELECT exercice FROM etats_financiers WHERE ticker=? AND "
+                "resultat_net IS NOT NULL ORDER BY exercice DESC LIMIT ?",
+                (ticker, n))]
+            if ex and ex[0] - ex[-1] != len(ex) - 1:
+                non_consecutives.append(f"{ticker} {ex}")
+        verifie(not non_consecutives,
+                f"les {len(calcules)} fenetres retenues sur la base du jour sont "
+                f"consecutives"
+                + ("" if not non_consecutives else
+                   " — A TROU : " + ", ".join(non_consecutives)))
+        conn.close()
+
     # Le taux sans risque doit etre present et plausible pour la zone.
     taux = {v.get("taux_reference") for v in profils.values() if v.get("taux_reference")}
     verifie(len(taux) == 1 and 0.03 <= list(taux)[0] <= 0.15,

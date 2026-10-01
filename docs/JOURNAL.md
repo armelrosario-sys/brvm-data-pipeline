@@ -9,6 +9,145 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-01 — hors cycle, signalement de Claudia : les PER normalisés
+
+**Le signalement.** « Les PER normalisés que le tableau de bord affiche sont
+incorrects. Les PER non normalisés sont plus proches de ceux retrouvés sur le site de
+la BRVM. » Capture du tableau de bord et de `brvm.org/fr/volumes/0` à l'appui.
+
+### 1. Le PER affiché est juste — vérifié
+
+Relevé du site au 01/10/2026 19h30 contre notre dernière séance en base (2026-09-30).
+Dix des seize titres relevés concordent à 2 % près ; les six autres s'expliquent
+**exactement** par la séance du 01/10, que notre base n'a pas encore :
+
+| titre | PER 30/09 en base | variation du 01/10 | PER prédit | PER du site | écart |
+|---|---|---|---|---|---|
+| BOAN | 269,36 | −5,66 % | 254,11 | 254,11 | **0,0 %** |
+| BICC | 14,88 | +3,67 % | 15,43 | 15,43 | **0,0 %** |
+| ABJC | 29,84 | −7,42 % | 27,63 | 27,71 | **0,3 %** |
+
+Le PER brut du dépôt **est** celui de la BRVM. L'écart que Claudia voyait ne venait
+donc pas de la collecte.
+
+### 2. La collecte du PER tourne déjà, et elle est saine
+
+Vérifié avant de répondre à sa question sur un système automatisé : `boc_quotidien.yml`
+tourne **deux fois par jour** du lundi au vendredi (18h et 21h UTC, le second passage
+rattrapant le différé de publication du bulletin), `collecte_boc_quotidien.yml` à 18h.
+La table `cours_quotidien_boc` porte **79 163 PER**, et les **dix-sept dernières
+séances ouvrées portent chacune 43 PER, sans un seul trou**. Dernière séance en base :
+2026-09-30, soit J−1 au moment du signalement — normal, le bulletin du 01/10 n'est
+publié qu'après 18h UTC.
+
+### 3. Le défaut est entièrement dans notre calcul
+
+`per_normalise()` rend `PER_affiché × (dernier RN / moyenne des 4 derniers RN)`. Trois
+défauts, de nature différente.
+
+**(a) La fenêtre n'était pas consécutive.** `ORDER BY exercice DESC LIMIT 4` prend les
+quatre exercices les plus récents **disponibles**, pas les quatre dernières années. Sur
+les 25 titres calculables, **6** avaient une fenêtre à trou :
+
+| titre | fenêtre retenue | années couvertes |
+|---|---|---|
+| BICC | 2025, 2024, 2023, **2021** | 5 pour 4 exercices (trou de C6) |
+| BNBC | 2025, **2023**, 2022, 2021 | 5 |
+| BOABF | 2025, **2023**, 2022, 2021 | 5 |
+| ECOC | 2025, **2023**, 2022 | 4 pour 3 |
+| ORGT | 2025, **2022**, 2021 | 5 pour 3 |
+| SDCC | 2025, 2024, **2021** | 5 pour 3 |
+
+Et **SICC** n'avait aucun exercice postérieur à 2021 : son « PER normalisé » de 54,7
+reposait sur les exercices **2018 à 2021**, des bénéfices vieux de quatre à sept ans,
+sans que rien ne le signale au lecteur.
+
+**(b) Le filtre `resultat_net > 0` écartait les pertes en silence, et à l'envers.**
+**17 exercices déficitaires depuis 2021** étaient retirés de la moyenne — ORGT 2023 et
+2024, STAC quatre années, UNXC quatre années, SCRC, SAFC, NEIC, FTSC, SICC. Or retirer
+une perte **remonte** la moyenne, donc **baisse** le rapport dernier/moyenne, donc fait
+paraître le titre **moins cher**. Un titre qui sort de pertes voyait la normalisation
+jouer contre le lecteur, exactement à l'inverse de son intention affichée.
+
+**(c) Le rapport mesure la croissance, pas un pic** — et c'est ce que Claudia voyait.
+Sur une série géométrique de taux g, le dernier terme dépasse la moyenne de quatre
+termes d'environ **1,5 g**. Mesuré sur les **8 titres à série strictement croissante**,
+donc sans pic possible par construction : le PER est gonflé de **12 % à 119 %**, et le
+gonflement suit g.
+
+| titre | ratio mesuré | 1 + 1,5 g prédit | g %/an |
+|---|---|---|---|
+| NSBC | 1,12 | 1,12 | 7,9 |
+| SNTS | 1,17 | 1,21 | 14,0 |
+| ECOC | 1,22 | 1,29 | 19,3 |
+| CABC | 1,21 | 1,33 | 21,9 |
+| BOAC | 1,25 | 1,31 | 21,0 |
+| SHEC | 1,27 | 1,29 | 19,3 |
+
+BOAC — 20 069 → 26 075 → 32 044 → 35 540 — est monotone croissante, sans le moindre
+pic, et son PER passe de 12,9 à 16,2.
+
+**(d) Les chiffres du docstring étaient périmés et sa conclusion ne s'en déduisait
+pas.** Il annonçait « médiane de la cote : 14,0 en affiché, 17,3 en normalisé — le
+marché est environ un quart plus cher qu'il n'en a l'air ». Les deux médianes ne
+portaient pas sur la même population : **47 titres** ont un PER affiché, **19
+seulement** un PER normalisé. Sur les 19 calculables et sur eux seuls des deux côtés :
+**14,0 affiché contre 16,2 normalisé, soit +16 %**. La médiane du PER affiché sur les
+47 titres vaut 15,2, et ne doit jamais être comparée à celle du normalisé.
+
+### 4. Ce qui a été corrigé, et ce qui ne l'est pas
+
+Claudia a validé les correctifs **mécaniques** dans un commit à part. Corrigés :
+(a) fenêtre prise par années **consécutives** à partir du dernier exercice connu, refus
+de calculer sous trois exercices consécutifs ; (b) exercices déficitaires **inclus**
+dans la moyenne, avec refus de conclure si la moyenne ou le dernier exercice n'est pas
+strictement positif ; (d) chiffres du docstring refaits sur la base du jour, avec la
+population explicitée.
+
+**(c) n'est PAS corrigé** : c'est un arbitrage de méthode, inscrit en **C23**, avec les
+trois lectures mesurées (moyenne, tendance, retrait). La lecture par **tendance**
+— régression log-linéaire sur la fenêtre — ramène les titres monotones à **0,93–1,02**
+(BOAC 1,25 → 0,96, CABC 1,21 → 0,93, BICC 1,64 → 1,02) tout en laissant SPHC à 1,25 ;
+mais sur un effondrement récent elle extrapole l'ancienne pente et rendrait **327** pour
+SICC et **875** pour BNBC. Aucune des deux n'est bonne partout : c'est pour cela que
+cela se tranche et ne se décide pas dans un cycle.
+
+### 5. Effet mesuré des deux correctifs
+
+| | avant | après |
+|---|---|---|
+| titres avec un PER normalisé | 25 | **19** |
+| fenêtres à trou | 6 | **0** |
+| exercices déficitaires écartés en silence | 17 | **0** |
+| `profil`, `secondaire`, `grade`, `gate` qui bougent | — | **0, 0, 0, 0** |
+
+Six titres **perdent** leur PER normalisé, et c'est le résultat voulu : BNBC, BOABF,
+ECOC, SDCC et SICC n'ont pas trois exercices consécutifs, ORGT a une moyenne négative
+sur 2022-2025 (21 640, −44 363, −18 186, 19 199). Une case vide vaut mieux qu'une
+valeur approchée. Un seul change de valeur : **BICC, 24,4 → 20,5**, désormais calculé
+sur 2023-2025 au lieu d'enjamber 2022. **Aucun verdict ne bouge.**
+
+### 6. Test
+
+**Section 7 de `tester_donnees.py`, 5 contrôles ajoutés**, dont quatre sur une base
+**jetable** — donc indépendants des données du jour — et portant chacun leur
+**contre-exemple** : A (quatre années consécutives dont une perte : rapport attendu
+1,60, l'ancienne règle donnait 1,00), B (fenêtre à trou : refus, l'ancienne règle
+enjambait), C (série saine : inchangée, garde contre une sur-correction), D (moyenne
+négative : refus). Le cinquième porte sur le fichier publié : toutes les fenêtres
+retenues sont consécutives.
+
+**Injection** — ancienne règle réinjectée dans `profils.py` : **3 des 4 contrôles sur
+base jetable tombent en ÉCHEC**, et C reste vert comme il doit. Les contrôles
+surveillent.
+
+### 7. Barrières
+
+Golden tests tous verts ; `tester_donnees.py` **197 OK, 0 ÉCHEC**, code 2 (alertes de
+fraîcheur connues C4 et C5) — 192 avant, les 5 nouveaux en plus ;
+`avis_brvm.py --test`, `notations.py --test`, `dates_dividendes.py --test` (27 cas),
+`generer_dashboard.py` (48 titres) tous verts.
+
 ## 2026-10-01 — cycle 12 (soir, 18h54 UTC)
 
 **Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` ne rend

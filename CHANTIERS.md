@@ -1206,6 +1206,62 @@ source, et renvoi au chantier dont il relève quand c'en est un ; les refus qui
 subsistent sont motivés dans un registre que la section 24 relit ; et aucun refus
 nouveau n'apparaît sans être inscrit.
 
+## C23 — Le PER normalisé mesure la croissance, pas un pic
+
+- classe : ORANGE — arbitrage de méthode sur une mesure publiée ; le diagnostic est fait
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau** — tout est dans le dépôt
+- priorité : 2 — **une mesure fausse est publiée et lue**
+
+**Le constat, signalé par Claudia le 01/10/2026 sur le tableau de bord publié**, et
+mesuré le même jour. `per_normalise()` calcule `PER_affiché × (dernier bénéfice /
+moyenne des 4 derniers)`. Le texte de la fonction dit corriger un **pic** de bénéfice.
+Le rapport mesure en réalité la **croissance** : sur une série géométrique de taux g,
+le dernier terme dépasse la moyenne de quatre termes d'environ **1,5 g**, sans qu'il y
+ait le moindre pic.
+
+**Mesuré sur les séries strictement croissantes — où un pic est impossible par
+construction** (chiffres après les deux correctifs de sélection du 01/10) :
+
+| titre | série des RN | PER | PER « normalisé » | surcoût | g %/an |
+|---|---|---|---|---|---|
+| BOAC | 20 069 → 26 075 → 32 044 → 35 540 | 12,9 | 16,2 | **+25 %** | 21,0 |
+| CABC | 796 → 1 135 → 1 375 → 1 439 | 14,0 | 16,9 | **+21 %** | 21,9 |
+| SHEC | 3 549 → 4 012 → 5 354 → 6 028 | 24,7 | 31,4 | **+27 %** | 19,3 |
+| SNTS | 278 912 → 331 748 → 393 662 → 413 588 | 10,9 | 12,7 | **+17 %** | 14,0 |
+| NSBC | 32 382 → 34 813 → 38 112 → 40 712 | 13,1 | 14,6 | **+12 %** | 7,9 |
+| BICC | 16 694 → 26 226 → 36 520 | 14,9 | 20,5 | **+38 %** | 47,9 |
+
+Le surcoût suit g, pas une irrégularité : c'est la signature de la formule, pas des
+sociétés. **Le PER affiché, lui, est juste** — vérifié contre brvm.org le 01/10 : BOAN,
+BICC et ABJC concordent à 0,0 %, 0,0 % et 0,3 % une fois appliquée la variation de
+séance du jour.
+
+**Trois lectures, toutes défendables, mesurées sans rien écrire.**
+
+- **(a) laisser la moyenne** — c'est un CAPE à quatre ans, et pénaliser la croissance
+  est une critique connue et assumée du CAPE ; mais à quatre ans et aux taux de
+  croissance de la BRVM, la pénalité de croissance domine le signal de pic ;
+- **(b) normaliser sur la TENDANCE** — rapport = dernier / valeur ajustée par
+  régression log-linéaire sur la fenêtre. Mesuré : les titres monotones retombent à
+  **0,93–1,02** (BOAC 1,25 → 0,96 ; CABC 1,21 → 0,93 ; BICC 1,64 → 1,02), et SPHC
+  reste à 1,25, STBC passe à 0,81. **Son défaut**, mesuré lui aussi : sur un
+  effondrement récent la régression extrapole l'ancienne pente, et SICC rendrait 327,
+  BNBC 875 ;
+- **(c) retirer l'affichage** et ne garder que le PER du BOC, qui est juste.
+
+**Ce qui est déjà corrigé, et qui ne relève pas de cet arbitrage** — fait le
+01/10/2026, voir le journal : la fenêtre n'était pas consécutive (6 titres sur 25 ;
+SICC n'avait aucun exercice postérieur à 2021) et le filtre `resultat_net > 0` écartait
+17 exercices déficitaires en faisant paraître le titre **moins** cher. Ces deux-là
+portaient sur la sélection des exercices, pas sur la lecture du rapport.
+
+**Terminé quand** : les trois lectures sont mesurées titre par titre sur les titres
+calculables — PER normalisé avant/après, drapeaux qui basculent — le tableau est
+inscrit ici, et la lecture retenue est figée par un test portant son contre-exemple.
+
+
 ---
 
 # Veille datée, hors file
