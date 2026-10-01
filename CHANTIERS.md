@@ -816,7 +816,7 @@ bassin, inscrit en **C20**.
 
 - classe : ORANGE — l'inventaire est pré-autorisé ; écrire un dividende en base ne l'est pas
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK
 - autonomie : partielle — première passe **sans réseau** sur le corpus déjà collecté
 - priorité : 3
 
@@ -880,7 +880,7 @@ titre par titre ; et le compte de titres à référence identifiée, aujourd'hui
 
 - classe : ORANGE — corriger une série de cours commitée exige la preuve à deux côtés ; la mesure est faite
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK
 - autonomie : complète, **sans réseau** — tout est dans `collecte/cours_quotidien_boc.csv`
 - priorité : 4 — **avant C4**, dont il retire trois dates
 
@@ -994,7 +994,7 @@ test de la section 23 fige l'égalité entre le fichier et sa régénération.
 
 - classe : ORANGE — arbitrage de méthode sur la lecture des axes ; le diagnostic est fait
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK option (a)
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 3
 
