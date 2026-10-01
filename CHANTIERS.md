@@ -1124,7 +1124,7 @@ inscrit ici. L'application attend un mot de Claudia, comme pour C16.
 
 - classe : ORANGE — corriger une série commitée exige la preuve à deux côtés ; le diagnostic est fait
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : complète, **sans réseau** — tout est dans `collecte/cours_quotidien_boc.csv`
 - priorité : 4 — à égalité avec C18, même famille vue dans une autre colonne
 
@@ -1170,7 +1170,7 @@ deux séances voisines sans faire tomber FTSC.
 
 - classe : ORANGE — chaque refus oppose deux valeurs certifiées ; la mesure est faite
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : complète, **sans réseau** pour six d'entre eux
 - priorité : 7
 
