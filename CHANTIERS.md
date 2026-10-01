@@ -906,7 +906,7 @@ plus rien en silence.
 
 - classe : ORANGE — décider quelle ligne est la bonne est un arbitrage ; la mesure est faite
 - statut : PROPOSÉ
-- validation : EN ATTENTE
+- validation : OK — remettre FTSC 2016
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 6
 
