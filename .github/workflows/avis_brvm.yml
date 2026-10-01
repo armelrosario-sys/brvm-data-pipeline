@@ -61,7 +61,13 @@ jobs:
         run: python3 collecte/avis_brvm.py --pages "${{ github.event.inputs.pages || 4 }}"
 
       # Le recalcul est un bonus : si le moteur echoue, les avis collectes
-      # doivent quand meme etre commites.
+      # doivent quand meme etre commites. Mais profils.json, lui, n'est alors
+      # PAS commite (voir l'etape Commit) : un fichier de reference reconstruit
+      # sur une base incomplete est pire que pas de reconstruction du tout.
+      # Mesure du 01/10/2026 (cycle 11) : la chaine de cette etape omettait
+      # charger_dividendes_exercice.py, la table dividendes tombait de 311 a 15
+      # lignes, et les SIX drapeaux DISTRIBUTION_NON_RECURRENTE de C1
+      # disparaissaient du fichier commite le 30/09 a 22h37.
       - name: Recalcul des profils
         id: profils
         continue-on-error: true
@@ -69,15 +75,24 @@ jobs:
           python3 moteur/peupler.py
           python3 collecte/charger_cours.py
           python3 collecte/charger_cours_quotidien.py
+          python3 collecte/charger_dividendes_exercice.py
+          python3 collecte/charger_liquidite_quotidienne.py
           python3 moteur/profils.py
 
       - name: Commit
+        env:
+          PROFILS: ${{ steps.profils.outcome }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add collecte/avis_brvm.csv collecte/avis_echecs.jsonl \
-                  collecte/profils.json \
                   collecte/arbitrage_croissance.csv || true
+          if [ "$PROFILS" = "success" ]; then
+            git add collecte/profils.json || true
+          else
+            echo "::warning::recalcul des profils en echec : profils.json n'est pas commite"
+            git checkout -- collecte/profils.json || true
+          fi
           git commit -m "Veille avis BRVM $(date -u +%F)" || echo "rien a committer"
           git pull --rebase --autostash origin main
           git push || echo "push impossible"

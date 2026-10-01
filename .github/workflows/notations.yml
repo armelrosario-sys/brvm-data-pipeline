@@ -64,7 +64,12 @@ jobs:
 
       # Le recalcul est un BONUS : si le moteur echoue, les notations collectees
       # a l'etape precedente doivent quand meme etre commitees. La detection des
-      # contradictions se fera au prochain run de profils.py.
+      # contradictions se fera au prochain run de profils.py. Mais profils.json,
+      # lui, n'est alors PAS commite (voir l'etape Commit) : un fichier de
+      # reference reconstruit sur une base incomplete est pire que pas de
+      # reconstruction du tout. Chaine completee le 01/10/2026 (cycle 11) : elle
+      # omettait charger_dividendes_exercice.py, ce qui faisait disparaitre les
+      # six drapeaux DISTRIBUTION_NON_RECURRENTE de C1 du fichier commite.
       - name: Recalcul des profils (detection des contradictions)
         id: profils
         continue-on-error: true
@@ -72,6 +77,8 @@ jobs:
           python3 moteur/peupler.py
           python3 collecte/charger_cours.py
           python3 collecte/charger_cours_quotidien.py
+          python3 collecte/charger_dividendes_exercice.py
+          python3 collecte/charger_liquidite_quotidienne.py
           python3 moteur/profils.py
 
       - name: Golden tests
@@ -80,12 +87,19 @@ jobs:
         run: python3 moteur/tester.py
 
       - name: Commit
+        env:
+          PROFILS: ${{ steps.profils.outcome }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add collecte/notations_financieres.csv collecte/notations_echecs.jsonl \
-                  collecte/profils.json \
                   collecte/arbitrage_croissance.csv || true
+          if [ "$PROFILS" = "success" ]; then
+            git add collecte/profils.json || true
+          else
+            echo "::warning::recalcul des profils en echec : profils.json n'est pas commite"
+            git checkout -- collecte/profils.json || true
+          fi
           git commit -m "Notations financieres $(date -u +%F)" || echo "rien a committer"
           git push || echo "push impossible"
 
