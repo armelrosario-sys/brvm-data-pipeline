@@ -86,7 +86,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -12.15 % en base contre -11.08 % chez l'agregateur (ecart 1.1 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 47,
+  "decote_pctl": 46,
   "croissance_pctl": 34,
   "reference_axes": "marche (n=36)",
   "g": 1.5,
@@ -224,7 +224,7 @@
    "drapeau": "ECART_AGREGATEUR",
    "detail": "glissement +24.71 % en base (ligne certifiee) contre -20.30 % chez l'agregateur : ecart de 45.0 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
-  "decote_pctl": 39,
+  "decote_pctl": 36,
   "croissance_pctl": null,
   "reference_axes": "secteur (n=14)",
   "g": null,
@@ -259,7 +259,7 @@
   "dy": 3.55,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P40)",
+  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P37)",
   "comparaisons": {
    "per": {
     "titre": 14.88,
@@ -334,7 +334,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +39.25 % en base contre +39.25 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 40,
+  "decote_pctl": 37,
   "croissance_pctl": 92,
   "reference_axes": "secteur (n=14)",
   "g": 43.4,
@@ -387,9 +387,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0707,
-  "prime_rendement": 0.0093,
-  "dy_recurrent": 8.0,
-  "distribution_non_recurrente": null,
+  "prime_rendement": null,
+  "dy_recurrent": null,
+  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 150.00 FCFA verse le 2023-07-24, soit 3.2 ans avant le cours (dividende implicite du BOC : 150.00) : il ne decrit plus une distribution en cours",
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 14.3,
   "ecart_benefice": -0.97,
@@ -405,6 +405,7 @@
    "FENETRE_ELARGIE : fenetre etendue au-dela de 4 exercices car elle demarrait sur un pic — la tendance de fond remplace l'effet de base",
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 150.00 FCFA verse le 2023-07-24, soit 3.2 ans avant le cours (dividende implicite du BOC : 150.00) : il ne decrit plus une distribution en cours",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
@@ -427,7 +428,8 @@
   "drapeaux": [
    "FENETRE_ELARGIE",
    "SERIE_COMPLETEE_N1",
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 556.5,
   "payout": 44.52,
@@ -674,7 +676,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -14.13 % en base contre -14.13 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 39,
+  "decote_pctl": 38,
   "croissance_pctl": 15,
   "reference_axes": "secteur (n=14)",
   "g": -8.9,
@@ -794,7 +796,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.91 % en base contre +10.91 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 79,
+  "decote_pctl": 78,
   "croissance_pctl": 85,
   "reference_axes": "secteur (n=14)",
   "g": 21.0,
@@ -853,7 +855,7 @@
   "dy": 4.96,
   "confiance": "FAIBLE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 44.3 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P50)",
+  "motif": "croissance de 44.3 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P49)",
   "comparaisons": {
    "per": {
     "titre": 15.22,
@@ -928,7 +930,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +21.46 % en base contre +21.46 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 50,
+  "decote_pctl": 49,
   "croissance_pctl": 100,
   "reference_axes": "secteur (n=14)",
   "g": 44.3,
@@ -1061,7 +1063,7 @@
   "dy": 5.52,
   "confiance": "FAIBLE",
   "profil": "VALUE",
-  "motif": "decote marquee (rang P75 sur l'axe decote) sur des benefices etablis, croissance de -2.1 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P74 sur l'axe decote) sur des benefices etablis, croissance de -2.1 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 13.39,
@@ -1134,7 +1136,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +9.62 % en base contre +9.61 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 75,
+  "decote_pctl": 74,
   "croissance_pctl": 23,
   "reference_axes": "secteur (n=14)",
   "g": -2.1,
@@ -1254,7 +1256,7 @@
    "drapeau": "ECART_AGREGATEUR",
    "detail": "glissement +4.68 % en base (ligne certifiee) contre +39.16 % chez l'agregateur : ecart de 34.5 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
-  "decote_pctl": 60,
+  "decote_pctl": 58,
   "croissance_pctl": 86,
   "reference_axes": "marche (n=36)",
   "g": 21.9,
@@ -1312,7 +1314,7 @@
   "dy": 2.99,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P36) ni rendement distinctifs",
+  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P33) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 14.69,
@@ -1388,7 +1390,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +36.44 % en base contre +36.63 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 36,
+  "decote_pctl": 33,
   "croissance_pctl": 46,
   "reference_axes": "secteur (n=14)",
   "g": 5.1,
@@ -1528,7 +1530,7 @@
    "drapeau": "FONDAMENTAL_EN_RETARD",
    "detail": "exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv"
   },
-  "decote_pctl": 20,
+  "decote_pctl": 18,
   "croissance_pctl": 23,
   "reference_axes": "marche (n=36)",
   "g": -5.3,
@@ -1646,7 +1648,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +29.70 % en base contre +29.96 % chez l'agregateur (ecart 0.3 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 16,
+  "decote_pctl": 14,
   "croissance_pctl": 57,
   "reference_axes": "marche (n=36)",
   "g": 10.1,
@@ -1778,7 +1780,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.45 % en base contre +10.45 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 54,
+  "decote_pctl": 52,
   "croissance_pctl": 62,
   "reference_axes": "secteur (n=14)",
   "g": 12.5,
@@ -1954,9 +1956,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0707,
-  "prime_rendement": 0.8035,
-  "dy_recurrent": 87.42,
-  "distribution_non_recurrente": null,
+  "prime_rendement": null,
+  "dy_recurrent": null,
+  "distribution_non_recurrente": "dividende de 1726.56 FCFA le 2025-09-30, soit 7.3 fois le plus fort des 5 versements precedents (235.00) : distribution exceptionnelle, non reproductible",
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 5.0,
   "ecart_benefice": -0.92,
@@ -1972,6 +1974,7 @@
    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "DISTRIBUTION_NON_RECURRENTE : dividende de 1726.56 FCFA le 2025-09-30, soit 7.3 fois le plus fort des 5 versements precedents (235.00) : distribution exceptionnelle, non reproductible",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
@@ -1994,7 +1997,8 @@
   "drapeaux": [
    "PIC_YOY",
    "INFLEXION_RECENTE",
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 59.78,
   "payout": 52.259676,
@@ -2046,7 +2050,7 @@
   "dy": 4.25,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P42)",
+  "motif": "croissance de 60.0 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P40)",
   "comparaisons": {
    "per": {
     "titre": 16.72,
@@ -2130,7 +2134,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -35.56 % en base contre -35.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 42,
+  "decote_pctl": 40,
   "croissance_pctl": 100,
   "reference_axes": "marche (n=36)",
   "g": 60.0,
@@ -2310,7 +2314,7 @@
   "dy": 3.1400000000000006,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 7.9 %/an sous la fenetre GARP (8 %) — a 0.1 point de la fenetre, a revoir a la prochaine publication, sans decote (rang de decote P54) ni rendement distinctifs",
+  "motif": "croissance de 7.9 %/an sous la fenetre GARP (8 %) — a 0.1 point de la fenetre, a revoir a la prochaine publication, sans decote (rang de decote P51) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 13.06,
@@ -2380,7 +2384,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +6.82 % en base contre +6.82 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 54,
+  "decote_pctl": 51,
   "croissance_pctl": 54,
   "reference_axes": "secteur (n=14)",
   "g": 7.9,
@@ -2438,7 +2442,7 @@
   "dy": 2.46,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 3.5 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P21) ni rendement distinctifs",
+  "motif": "croissance de 3.5 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P18) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 17.97,
@@ -2509,7 +2513,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +1.53 % en base contre +1.53 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 21,
+  "decote_pctl": 18,
   "croissance_pctl": 46,
   "reference_axes": "marche (n=36)",
   "g": 3.5,
@@ -2639,7 +2643,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -26.01 % en base contre -26.01 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 67,
+  "decote_pctl": 66,
   "croissance_pctl": 6,
   "reference_axes": "marche (n=36)",
   "g": -13.4,
@@ -2697,7 +2701,7 @@
   "dy": 3.27,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 4.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P25) ni rendement distinctifs",
+  "motif": "croissance de 4.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P23) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 19.3,
@@ -2768,7 +2772,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +6.07 % en base contre +6.07 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 25,
+  "decote_pctl": 23,
   "croissance_pctl": 49,
   "reference_axes": "marche (n=36)",
   "g": 4.1,
@@ -2817,7 +2821,7 @@
   ]
  },
  "ORGT": {
-  "dominant": "AUCUN_PROFIL",
+  "dominant": "VALUE",
   "mixte": false,
   "VALUE": null,
   "GROWTH": null,
@@ -2826,8 +2830,8 @@
   "peg": 3.09,
   "dy": 2.05,
   "confiance": "HAUTE",
-  "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 3.0 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P54) ni rendement distinctifs",
+  "profil": "VALUE",
+  "motif": "decote marquee (rang P93 sur l'axe decote) sur des benefices etablis, croissance de 3.0 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 9.3,
@@ -2871,9 +2875,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0707,
-  "prime_rendement": -0.0502,
-  "dy_recurrent": 2.05,
-  "distribution_non_recurrente": null,
+  "prime_rendement": null,
+  "dy_recurrent": null,
+  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 56.73 FCFA verse le 2019-07-01, soit 7.2 ans avant le cours (dividende implicite du BOC : 59.45) : il ne decrit plus une distribution en cours",
   "table_cours": "cours_quotidien_boc",
   "per_normalise": 10.0,
   "ecart_benefice": 0.07,
@@ -2884,6 +2888,7 @@
   "notes": [],
   "reserves": [
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 56.73 FCFA verse le 2019-07-01, soit 7.2 ans avant le cours (dividende implicite du BOC : 59.45) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 186609.0,
@@ -2893,12 +2898,14 @@
   "roe_source": "ETATS_FINANCIERS",
   "source_capitaux_propres": null,
   "arbitrage": null,
-  "decote_pctl": 54,
+  "decote_pctl": 93,
   "croissance_pctl": 31,
   "reference_axes": "secteur (n=14)",
   "g": 3.0,
   "source_croissance": "BPA_IMPLICITE",
-  "drapeaux": [],
+  "drapeaux": [
+   "DISTRIBUTION_NON_RECURRENTE"
+  ],
   "per": 9.3,
   "payout": 0.0,
   "roe": 19.2,
@@ -3006,7 +3013,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -2.23 % en base contre -2.23 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 86,
+  "decote_pctl": 85,
   "croissance_pctl": 11,
   "reference_axes": "marche (n=36)",
   "g": -10.5,
@@ -3070,7 +3077,7 @@
   "dy": 4.44,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 2.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P43) ni rendement distinctifs",
+  "motif": "croissance de 2.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P42) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 17.73,
@@ -3143,7 +3150,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +0.99 % en base contre +0.86 % chez l'agregateur (ecart 0.1 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 43,
+  "decote_pctl": 42,
   "croissance_pctl": 37,
   "reference_axes": "marche (n=36)",
   "g": 2.1,
@@ -3289,9 +3296,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0707,
-  "prime_rendement": -0.0564,
-  "dy_recurrent": 1.43,
-  "distribution_non_recurrente": null,
+  "prime_rendement": null,
+  "dy_recurrent": null,
+  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 40.50 FCFA verse le 2021-08-20, soit 4.7 ans avant le cours (dividende implicite du BOC : 40.54) : il ne decrit plus une distribution en cours",
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -3307,6 +3314,7 @@
   "reserves": [
    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
+   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 40.50 FCFA verse le 2021-08-20, soit 4.7 ans avant le cours (dividende implicite du BOC : 40.54) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 80569.0,
@@ -3321,7 +3329,9 @@
   "reference_axes": "hors axes",
   "g": 13.2,
   "source_croissance": "BPA_IMPLICITE",
-  "drapeaux": [],
+  "drapeaux": [
+   "DISTRIBUTION_NON_RECURRENTE"
+  ],
   "per": 15.09,
   "payout": 0.215787,
   "roe": 46.1,
@@ -3404,7 +3414,7 @@
   "dy": 3.55,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "ni decote (rang P25), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
+  "motif": "ni decote (rang P22), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
   "comparaisons": {
    "per": {
     "titre": 19.89,
@@ -3480,7 +3490,7 @@
    "drapeau": "ECART_AGREGATEUR",
    "detail": "glissement +17.78 % en base (ligne certifiee) contre +30.96 % chez l'agregateur : ecart de 13.2 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
-  "decote_pctl": 25,
+  "decote_pctl": 22,
   "croissance_pctl": 26,
   "reference_axes": "marche (n=36)",
   "g": -2.6,
@@ -3688,9 +3698,9 @@
   "periode_intermediaire": null,
   "roe_exercice": null,
   "taux_reference": 0.0707,
-  "prime_rendement": -0.0613,
-  "dy_recurrent": 0.94,
-  "distribution_non_recurrente": null,
+  "prime_rendement": null,
+  "dy_recurrent": null,
+  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 14.40 FCFA verse le 2021-12-28, soit 4.8 ans avant le cours (dividende implicite du BOC : 14.05) : il ne decrit plus une distribution en cours",
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -3705,6 +3715,7 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "AUCUN_RN_EN_BASE : aucun resultat net transcrit : la croissance repose integralement sur le BPA implicite, invérifiable en l'etat",
    "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
+   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 14.40 FCFA verse le 2021-12-28, soit 4.8 ans avant le cours (dividende implicite du BOC : 14.05) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 23200.0,
@@ -3721,6 +3732,7 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
    "AUCUN_RN_EN_BASE",
+   "DISTRIBUTION_NON_RECURRENTE",
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 37.21,
@@ -3781,7 +3793,7 @@
   "dy": 5.9,
   "confiance": "MOYENNE",
   "profil": "VALUE",
-  "motif": "decote marquee (rang P90 sur l'axe decote) sur des benefices etablis, croissance de 15.9 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P89 sur l'axe decote) sur des benefices etablis, croissance de 15.9 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 11.97,
@@ -3857,7 +3869,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -0.12 % en base contre +0.12 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 90,
+  "decote_pctl": 89,
   "croissance_pctl": 77,
   "reference_axes": "secteur (n=14)",
   "g": 15.9,
@@ -3989,7 +4001,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +12.59 % en base contre +12.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 25,
+  "decote_pctl": 23,
   "croissance_pctl": 80,
   "reference_axes": "marche (n=36)",
   "g": 19.3,
@@ -4127,7 +4139,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.73 % en base contre +10.73 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 36,
+  "decote_pctl": 34,
   "croissance_pctl": 8,
   "reference_axes": "secteur (n=14)",
   "g": -11.5,
@@ -4275,9 +4287,9 @@
   "periode_intermediaire": null,
   "roe_exercice": 2025,
   "taux_reference": 0.0707,
-  "prime_rendement": 0.1974,
-  "dy_recurrent": 26.81,
-  "distribution_non_recurrente": null,
+  "prime_rendement": null,
+  "dy_recurrent": null,
+  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 63.00 FCFA verse le 2017-09-29, soit 9.0 ans avant le cours (dividende implicite du BOC : 63.00) : il ne decrit plus une distribution en cours",
   "table_cours": "cours_quotidien_boc",
   "per_normalise": null,
   "ecart_benefice": null,
@@ -4292,6 +4304,7 @@
    "HORS PERIMETRE du profilage — releve de l'outil de pari (a construire)",
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
+   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 63.00 FCFA verse le 2017-09-29, soit 9.0 ans avant le cours (dividende implicite du BOC : 63.00) : il ne decrit plus une distribution en cours",
    "payout > 100 % — distribution non couverte ou decalage de donnees",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
@@ -4312,7 +4325,8 @@
   "g": -23.6,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
-   "CROISSANCE_CORROBOREE"
+   "CROISSANCE_CORROBOREE",
+   "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 97.43,
   "payout": 26.120983000000003,
@@ -4496,7 +4510,7 @@
  },
  "SMBC": {
   "dominant": "GARP",
-  "mixte": true,
+  "mixte": false,
   "VALUE": null,
   "GROWTH": null,
   "GARP": null,
@@ -4557,7 +4571,7 @@
   "ecart_benefice": 0.08,
   "n_ex_normalise": 4,
   "part_operationnelle": null,
-  "secondaire": "VALUE",
+  "secondaire": null,
   "grade": "A",
   "notes": [
    "profil SENSIBLE a la convention brut/net du rendement : avec un rendement brut, le seuil du profil RENDEMENT serait franchi. Chantier de verification ouvert — aucune correction appliquee."
@@ -4577,7 +4591,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +50.32 % en base contre +50.32 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 68,
+  "decote_pctl": 66,
   "croissance_pctl": 60,
   "reference_axes": "marche (n=36)",
   "g": 11.5,
@@ -4717,7 +4731,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +5.06 % en base contre +5.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 61,
+  "decote_pctl": 59,
   "croissance_pctl": 66,
   "reference_axes": "marche (n=36)",
   "g": 14.0,
@@ -4972,7 +4986,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +32.90 % en base contre +32.90 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 89,
+  "decote_pctl": 88,
   "croissance_pctl": 69,
   "reference_axes": "marche (n=36)",
   "g": 14.4,
@@ -5339,7 +5353,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -3.06 % en base contre -3.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 34,
+  "decote_pctl": 32,
   "croissance_pctl": 14,
   "reference_axes": "marche (n=36)",
   "g": -9.5,
@@ -5467,7 +5481,7 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -5.06 % en base contre -13.31 % chez l'agregateur (ecart 8.3 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 50,
+  "decote_pctl": 49,
   "croissance_pctl": 31,
   "reference_axes": "marche (n=36)",
   "g": 1.1,

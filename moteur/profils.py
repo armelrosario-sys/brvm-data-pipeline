@@ -147,6 +147,71 @@ TYPES_CRITIQUES = {"SUSPENSION", "REPRISE_COTATION", "PREMIERE_COTATION",
                    "OPA_OPR", "RETARD_PUBLICATION"}
 
 
+def bassins_et_axes(analysables, sp):
+    """Bassins de percentiles + fonction axes(t, v). Rend (ep, par_secteur, axes).
+
+    HISSE AU NIVEAU MODULE le 01/10/2026 (cycle 11), sans changer un seul
+    calcul : le bloc vivait a l'interieur de calculer(), donc la regle de
+    l'axe de decote n'etait testable que par ancrage textuel ou en refaisant
+    tourner tout le moteur. Garde posee a l'extraction : collecte/profils.json
+    est identique au champ pres avant et apres le hissage.
+
+    C16, OPTION (b), tranchee par Claudia le 30/09/2026 et appliquee ici.
+    L'axe de decote lit "dy_axe" -- le rendement RECURRENT -- et non plus "dy",
+    le rendement facial du BOC. Un titre drapeaute DISTRIBUTION_NON_RECURRENTE
+    a donc une CASE VIDE sur cet axe : il n'y entre plus, et son rendement
+    facial ne pese plus sur le bassin de comparaison des autres. La prime et
+    les classements etaient deja dans ce cas depuis C1 (cycle 7) ; l'axe de
+    decote etait la derniere lecture du rendement facial.
+
+    Les deux consequences mesurees avant l'application (cycle 9, confirmees au
+    cycle 11) sont assumees par ce choix : retirer deux rendements BAS du bassin
+    (ORGT 2,05 % et SEMC 0,94 %) deplace 28 titres sur 47 de 1 a 3 points vers
+    le cher sans qu'aucune de leurs donnees ait change, et ORGT gagne un profil
+    VALUE parce que son rendement facial faux ne le penalise plus. L'effet de
+    bassin lui-meme, lui, n'est pas tranche : voir C20.
+
+    "dy" (facial) reste lu par le test du profil RENDEMENT et affiche sur la
+    fiche : C1 l'a laisse ainsi, et C16 ne l'a pas remis en cause.
+    """
+    ep = {t: (100.0 / v["per"]) for t, v in analysables.items() if v["per"]}
+    par_secteur = {}
+    for t, v in analysables.items():
+        d = par_secteur.setdefault(v["secteur"], {"ep": [], "dy": [], "g": []})
+        if t in ep:
+            d["ep"].append(ep[t])
+        if v["dy_axe"] is not None:
+            d["dy"].append(v["dy_axe"])
+        if v["g"] is not None:
+            d["g"].append(v["g"])
+    marche_ep = list(ep.values())
+    marche_dy = [v["dy_axe"] for v in analysables.values() if v["dy_axe"] is not None]
+    marche_g = [v["g"] for v in analysables.values() if v["g"] is not None]
+
+    def axes(t, v):
+        d = par_secteur.get(v["secteur"], {"ep": [], "dy": [], "g": []})
+        assez = len(d["ep"]) >= sp["n_secteur_min"]
+        if assez:
+            ref = "secteur (n=%d)" % len(d["ep"])
+            p_ep = pctl(d["ep"], ep.get(t))
+            p_dy = pctl(d["dy"], v["dy_axe"])
+            p_g = pctl(d["g"], v["g"])
+        else:
+            ref = "marche (n=%d)" % len(marche_ep)
+            p_ep = pctl(marche_ep, ep.get(t))
+            p_dy = pctl(marche_dy, v["dy_axe"])
+            p_g = pctl(marche_g, v["g"])
+        dispo = [x for x in (p_ep, p_dy) if x is not None]
+        # Percentile de DECOTE : il monte quand le titre est bon marche (P100 =
+        # le moins cher de sa reference). Moyenne des rangs de rendement
+        # benefice/prix et de rendement du dividende, tous deux croissants avec
+        # le bon marche.
+        decote = round(sum(dispo) / len(dispo)) if dispo else None
+        return decote, p_g, ref
+
+    return ep, par_secteur, axes
+
+
 def charger_avis():
     """Avis officiels de la BRVM, par ticker, les plus recents d'abord.
 
@@ -1138,40 +1203,7 @@ def calculer():
     analysables = {t: v for t, v in brut.items() if v["analysable"]}
 
     # --- Axes : double lecture secteur (n>=8) / marche, reference etiquetee
-    ep = {t: (100.0 / v["per"]) for t, v in analysables.items() if v["per"]}
-    par_secteur = {}
-    for t, v in analysables.items():
-        d = par_secteur.setdefault(v["secteur"], {"ep": [], "dy": [], "g": []})
-        if t in ep:
-            d["ep"].append(ep[t])
-        if v["dy"] is not None:
-            d["dy"].append(v["dy"])
-        if v["g"] is not None:
-            d["g"].append(v["g"])
-    marche_ep = list(ep.values())
-    marche_dy = [v["dy"] for v in analysables.values() if v["dy"] is not None]
-    marche_g = [v["g"] for v in analysables.values() if v["g"] is not None]
-
-    def axes(t, v):
-        d = par_secteur.get(v["secteur"], {"ep": [], "dy": [], "g": []})
-        assez = len(d["ep"]) >= sp["n_secteur_min"]
-        if assez:
-            ref = "secteur (n=%d)" % len(d["ep"])
-            p_ep = pctl(d["ep"], ep.get(t))
-            p_dy = pctl(d["dy"], v["dy"])
-            p_g = pctl(d["g"], v["g"])
-        else:
-            ref = "marche (n=%d)" % len(marche_ep)
-            p_ep = pctl(marche_ep, ep.get(t))
-            p_dy = pctl(marche_dy, v["dy"])
-            p_g = pctl(marche_g, v["g"])
-        dispo = [x for x in (p_ep, p_dy) if x is not None]
-        # Percentile de DECOTE : il monte quand le titre est bon marche (P100 =
-        # le moins cher de sa reference). Moyenne des rangs de rendement
-        # benefice/prix et de rendement du dividende, tous deux croissants avec
-        # le bon marche.
-        decote = round(sum(dispo) / len(dispo)) if dispo else None
-        return decote, p_g, ref
+    ep, par_secteur, axes = bassins_et_axes(analysables, sp)
 
     # --- Medianes de reference (secteur et marche) pour la mise en contexte ---
     # Un PER de 14 ne dit rien seul ; "14,0 contre 13,2 en mediane bancaire et
@@ -1374,10 +1406,12 @@ def calculer():
             "taux_reference": taux_ref,
             "prime_rendement": (round(v["dy_axe"] / 100 - taux_ref, 4)
                                 if (v["dy_axe"] is not None and taux_ref) else None),
-            # C1 (30/09/2026) : "dy" reste le rendement FACIAL du BOC, exact, et les axes
-            # de decote continuent de le lire. La prime, "dy_recurrent" et les
-            # classements ne lisent que le rendement recurrent. Retirer aussi l'axe de
-            # decote deplacerait des verdicts (mesure au journal, C16) : decision a part.
+            # C1 (30/09/2026) : "dy" reste le rendement FACIAL du BOC, exact, et la
+            # fiche l'affiche. La prime, "dy_recurrent" et les classements ne lisent
+            # que le rendement recurrent.
+            # C16 option (b), appliquee le 01/10/2026 (cycle 11) : l'axe de decote ne
+            # lit plus "dy" non plus, mais "dy_axe". Un titre drapeaute a desormais une
+            # case vide sur cet axe et sort du bassin de comparaison.
             "dy_recurrent": (round(v["dy_axe"], 2) if v["dy_axe"] is not None else None),
             "distribution_non_recurrente": v["distribution_detail"],
             "table_cours": v["table_cours"],

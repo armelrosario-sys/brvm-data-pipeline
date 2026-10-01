@@ -1489,10 +1489,13 @@ def test_chaine_chargement():
     scripts en check=False, capture_output=True, donc tout echec de chargeur est
     avale sans trace.
 
-    Les deux controles ci-dessous. Le premier bloque le jour ou app.py lit une
+    Les controles ci-dessous. Le premier bloque le jour ou app.py lit une
     table que sa chaine ne remplit pas. Le second bloque le jour ou un chargeur
     nouveau est ajoute a collecte/ sans etre branche dans pages.yml — c'est la
-    meme divergence, prise a l'autre bout.
+    meme divergence, prise a l'autre bout. Le TROISIEME (ajoute le 01/10/2026,
+    cycle 11) porte le meme invariant sur tout workflow qui recalcule ET commite
+    collecte/profils.json : le 30/09 a 22h37, P13 a commite un profils.json
+    recalcule sur une chaine amputee, qui avait perdu les six drapeaux de C1.
     """
     print("\n=== 17. Couverture de la chaine de chargement (bloquant) ===")
     import re
@@ -1545,6 +1548,94 @@ def test_chaine_chargement():
                 f"pages.yml enchaine les {len(chargeurs)} chargeurs de collecte/ "
                 f"— la fiche publiee est donc construite sur la base complete"
                 + ("" if not oublies else " — OUBLIE(S) : " + ", ".join(oublies)))
+
+    # --- Controle C : TOUT workflow qui recalcule ET commite profils.json -----
+    #
+    # POURQUOI CE CONTROLE EXISTE (chasse du cycle 11, 01/10/2026). Le controle B
+    # ci-dessus ne regardait que pages.yml, qu'il appelle "la chaine de
+    # reference". Or pages.yml PUBLIE le tableau de bord : il ne commite rien.
+    # Deux autres workflows, eux, reconstruisent collecte/profils.json et le
+    # COMMITENT — avis_brvm.yml (P13, quotidien) et notations.yml (P12) — et
+    # aucun controle ne les regardait.
+    #
+    # Mesure, et ce n'est pas un defaut latent. Le 30/09/2026 a 22h37, P13 a
+    # commite profils.json (548639e, 1 025 lignes changees) apres l'avoir
+    # recalcule sur une chaine de QUATRE scripts qui omettait
+    # charger_dividendes_exercice.py. Reproduit a l'identique le 01/10 : la table
+    # dividendes passe de 311 lignes a 15, et les SIX drapeaux
+    # DISTRIBUTION_NON_RECURRENTE de C1 disparaissent — FTSC retrouvait une prime
+    # de rendement de +80,35 points et SIVC de +19,74, les valeurs exactes du
+    # fichier commite. Le fichier publie contredisait donc le code depuis
+    # huit heures, et la section 21 l'aurait vu si tests.yml avait tourne entre
+    # temps : aucun workflow de collecte ne lance les barrieres.
+    #
+    # C'est la regression n°2 de l'en-tete de ce fichier pour la troisieme fois,
+    # par une troisieme porte : app.py (C13, section 18), puis les workflows ici.
+    # L'invariant est donc celui du controle A, applique aux workflows : qui
+    # reconstruit un fichier de reference l'a reconstruit sur la base COMPLETE.
+    # Ce controle cherche les scripts REELLEMENT LANCES, pas les noms cites.
+    # Premiere version ecrite ce cycle : elle testait `nom not in texte`, et elle
+    # passait a vide — le commentaire que je venais d'ajouter dans avis_brvm.yml
+    # NOMMAIT charger_dividendes_exercice.py, ce qui suffisait a la satisfaire.
+    # Verifie par injection : la chaine amputee doit faire ECHOUER ce controle.
+    def _scripts_lances(texte):
+        return {Path(m).name for m in re.findall(
+            r"^\s*python3?\s+(?:-\S+\s+)*(\S+\.py)", texte, re.M)}
+
+    wf = sorted((RACINE / ".github" / "workflows").glob("*.yml"))
+    verifie(bool(wf), ".github/workflows/ contient des workflows a controler")
+    manquants = []
+    recalculeurs = []
+    for f in wf:
+        texte = f.read_text(encoding="utf-8")
+        lances = _scripts_lances(texte)
+        commite = re.search(r"git add[^\n]*(\n[^\n]*)?collecte/profils\.json", texte)
+        if not ("profils.py" in lances and commite):
+            continue
+        recalculeurs.append(f.name)
+        absents_wf = [ch.name for ch in chargeurs if ch.name not in lances]
+        if absents_wf:
+            manquants.append("%s omet %s" % (f.name, ", ".join(absents_wf)))
+    verifie(not manquants,
+            f"les {len(recalculeurs)} workflow(s) qui recalculent ET commitent "
+            f"profils.json enchainent les {len(chargeurs)} chargeurs "
+            f"({', '.join(recalculeurs) or 'aucun'})"
+            + ("" if not manquants else " — CHAINE AMPUTEE : " + " ; ".join(manquants)))
+
+    # Et le corollaire : un recalcul en echec ne doit pas committer le fichier.
+    # Sans cette garde, la chaine complete ne suffit pas — il reste la panne.
+    #
+    # Le controle porte sur l'ETAPE qui ajoute profils.json, pas sur le fichier
+    # entier. Premiere version ecrite ce cycle : elle cherchait
+    # "steps.profils.outcome" n'importe ou dans le YAML, et elle passait a vide —
+    # les deux workflows nomment deja cette sortie dans leur etape "Resume",
+    # pour afficher un avertissement. Verifie par injection.
+    import yaml
+    sans_garde = []
+    for nom in recalculeurs:
+        texte = (RACINE / ".github" / "workflows" / nom).read_text(encoding="utf-8")
+        etapes = [e for j in (yaml.safe_load(texte).get("jobs") or {}).values()
+                  for e in (j.get("steps") or []) if isinstance(e, dict)]
+        ajouts = [e for e in etapes
+                  if "collecte/profils.json" in (e.get("run") or "")
+                  and "git add" in (e.get("run") or "")]
+        if not ajouts:
+            sans_garde.append("%s : aucune etape n'ajoute profils.json" % nom)
+            continue
+        for e in ajouts:
+            cond_etape = str(e.get("if") or "")
+            env = " ".join(str(v) for v in (e.get("env") or {}).values())
+            vu = ("steps.profils.outcome" in cond_etape
+                  or ("steps.profils.outcome" in env
+                      and re.search(r"^\s*if \[", e.get("run") or "", re.M)))
+            if not vu:
+                sans_garde.append("%s : l'etape « %s » ajoute profils.json sans "
+                                  "conditionner au succes du recalcul"
+                                  % (nom, e.get("name") or "sans nom"))
+    verifie(not sans_garde,
+            f"les {len(recalculeurs)} workflow(s) subordonnent l'ajout de profils.json "
+            f"au succes du recalcul, dans l'etape qui l'ajoute"
+            + ("" if not sans_garde else " — SANS GARDE : " + " ; ".join(sans_garde)))
 
     # --- Garde-fou : le registre d'explication doit rester adosse au code ----
     # Une table declaree "sans lecteur" qui se met a etre lue quelque part doit
@@ -2225,6 +2316,62 @@ def test_distribution_non_recurrente():
     verifie(primes and max(primes) < PLAUSIBILITE_PRIME,
             f"la plus forte prime restante est de {max(primes) * 100:+.1f} points "
             f"(plancher de plausibilite +{PLAUSIBILITE_PRIME * 100:.0f})")
+
+    # --- C16, option (b) : l'axe de decote ne lit plus le rendement facial ----
+    #
+    # POURQUOI CES CONTROLES EXISTENT (chantier C16, 01/10/2026, cycle 11).
+    # C1 avait retire le rendement facial de la prime et des classements, mais
+    # l'avait laisse dans l'axe de DECOTE, parce que le retirer deplace des
+    # verdicts. Les trois options ont ete mesurees au cycle 9 ; Claudia a
+    # tranche l'option (b) -- case vide -- le 30/09/2026. Rien ne surveillait
+    # cette regle : la decision ne vivait que dans un commentaire.
+    #
+    # Le controle tourne sur un bassin JETABLE de quatre titres, donc il ne
+    # depend d'aucune donnee du jour, et il porte son CONTRE-EXEMPLE : les
+    # memes quatre titres avec le rendement facial remis dans l'axe -- ce que
+    # serait l'option (a) -- doivent donner d'autres rangs. Sans ce
+    # contre-exemple, le controle passerait aussi sur l'option refusee.
+    from profils import bassins_et_axes
+
+    def _titre(per, dy, dy_axe):
+        return {"per": per, "dy": dy, "dy_axe": dy_axe, "g": None, "secteur": "S"}
+
+    # Secteur de 4 titres : sous n_secteur_min=8, la reference est le MARCHE.
+    # A, B, C sont sains (dy_axe = dy) ; D est drapeaute : son rendement facial
+    # de 1,00 % est faux (dividende perime) et son PER est celui de A.
+    sains = {"A": _titre(10.0, 6.0, 6.0), "B": _titre(12.0, 5.0, 5.0),
+             "C": _titre(14.0, 4.0, 4.0)}
+    sp_axes = {"n_secteur_min": 8}
+    pool_b = dict(sains, D=_titre(10.0, 1.0, None))    # option (b), appliquee
+    pool_a = dict(sains, D=_titre(10.0, 1.0, 1.0))     # option (a), refusee
+    _, _, axes_b = bassins_et_axes(pool_b, sp_axes)
+    _, _, axes_a = bassins_et_axes(pool_a, sp_axes)
+    dec_b = {t: axes_b(t, v)[0] for t, v in pool_b.items()}
+    dec_a = {t: axes_a(t, v)[0] for t, v in pool_a.items()}
+
+    verifie(dec_b["D"] == 100 and dec_a["D"] == 62,
+            "un titre drapeaute n'a plus de rang de rendement : sa decote vient du "
+            f"seul axe benefice/prix (P{dec_b['D']}) au lieu d'etre tiree vers le bas "
+            f"par un rendement facial faux (P{dec_a['D']} sous l'option refusee)")
+    verifie(dec_b["B"] == 58 and dec_b["C"] == 29,
+            f"les titres sains gardent leurs DEUX axes (B P{dec_b['B']}, C P{dec_b['C']})")
+    verifie(dec_b["B"] < dec_a["B"] and dec_b["C"] < dec_a["C"],
+            "effet de bassin assume et surveille : retirer un rendement BAS du bassin "
+            f"deplace les titres sains vers le cher (B P{dec_a['B']} -> P{dec_b['B']}, "
+            f"C P{dec_a['C']} -> P{dec_b['C']}) sans qu'aucune de leurs donnees change")
+    verifie(dec_b["A"] == dec_a["A"] == 100,
+            "le titre le moins cher et le mieux remunerateur reste a P100 dans les deux "
+            "lectures : l'effet de bassin ne touche que les rangs intermediaires")
+
+    # Le meme dy_axe est bien ce que profils.json publie sous "dy_recurrent",
+    # donc la case vide de l'axe et celle de la fiche sont la MEME case.
+    incoherents = sorted(t for t, v in pj.items()
+                         if porte(t) and (v.get("dy_recurrent") is not None
+                                          or v.get("prime_rendement") is not None))
+    verifie(not incoherents,
+            "tous les titres drapeautes ont la case vide sur l'axe de decote, la prime "
+            "et le rendement recurrent"
+            + ("" if not incoherents else " — INCOHERENTS : " + ", ".join(incoherents)))
 
 
 # Plancher de la section 23 : nombre de dates de paiement ISO en base. Il ne peut
