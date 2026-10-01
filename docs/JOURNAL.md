@@ -9,6 +9,204 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-01 — cycle 11 (matin, 07h00 UTC)
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `main` ne rend
+rien : le dernier commit datait de 00h39 UTC (`80e3c8b`, Sikafinance), six heures
+plus tôt, et aucune annonce de cycle n'était ouverte. Annonce du cycle 11 poussée
+seule (`deb5cdc`) avant tout travail.
+
+**Incident technique au démarrage, à noter pour les cycles suivants.** Le dépôt
+pré-cloné du bac à sable est **superficiel** (`--depth 1`), et `git push` y est
+refusé avec un message trompeur — « a pushed branch tip is behind its remote
+counterpart » — alors que le local était en avance d'un commit sur `origin/main`.
+`git fetch --unshallow origin` (11 Mo, quelques secondes) a débloqué la poussée.
+Ce n'est pas la collision que le message suggère : ne pas aller chercher un
+conflit qui n'existe pas.
+
+**État à la reprise.** Golden tests verts. Mais `collecte/profils.json` régénéré
+par les barrières **différait du fichier commité sur six titres** — ce qui a
+ouvert la chasse de ce cycle, plus bas.
+
+**Lignes éditées par Claudia depuis le cycle 10.** `f673c88` (30/09, 19h54) :
+C16 passe de `validation : OK` à `validation : OK option (b)`. `945b067`
+(01/10, 00h11) : C19 passe de `EN ATTENTE` à `OK — remettre FTSC 2016`.
+
+**Ordre déterministe, et la question qu'il a posée.** La ligne `statut` de C16
+portait « la passe pré-autorisée est CONSOMMÉE », ce qui l'exclut du rang 1 à la
+lettre. Mais la passe consommée était celle de la **mesure** ; le mot de Claudia
+ouvre une passe **distincte**, l'application, et le bloc *Ce qu'il reste à
+trancher* du chantier le disait explicitement : « le cycle suivant appliquera
+l'option nommée ». C16 (priorité 3) passe donc avant C19 (priorité 6). La clause
+du rang 1 gagnerait à dire « la passe que la ligne `validation` autorise
+aujourd'hui », plutôt que « la passe autorisée ».
+
+### Exécuté : C16 — option (b), l'axe de décote cesse de lire le rendement facial
+
+**Ce qui a changé.** `moteur/profils.py` : les deux percentiles de rendement de
+l'axe de décote — celui du titre et le bassin de comparaison — lisent `dy_axe`,
+le rendement **récurrent**, et non plus `dy`, le rendement facial du BOC. Un titre
+drapeauté `DISTRIBUTION_NON_RECURRENTE` a donc une case vide sur cet axe : il n'y
+entre plus, et son rendement facial ne pèse plus sur le bassin des autres. `dy`
+reste lu par le test du profil RENDEMENT et affiché sur la fiche, comme C1 l'avait
+laissé.
+
+**Le bloc des bassins a été hissé au niveau module**, dans
+`bassins_et_axes(analysables, sp)`. Motif : il vivait à l'intérieur de
+`calculer()`, donc la règle n'était testable que par ancrage textuel — un
+commentaire qui dit ce que fait le code n'est pas un test. Garde posée à
+l'extraction : `collecte/profils.json` **identique au champ près**, 0 titre
+d'écart, avant et après le hissage. Le hissage est donc neutre, prouvé et non
+supposé.
+
+**Effet mesuré, option (a) → option (b), sur la base du jour.**
+
+| | prévu (cycle 9) | mesuré (cycle 11) |
+|---|---|---|
+| `decote_pctl` bouge | 28 / 47 | **29 / 47** |
+| amplitude hors ORGT | −1 à −3 points | **−1 à −3 points** |
+| ORGT | 54 → 93, gagne `VALUE` | **54 → 93, `AUCUN_PROFIL` → `VALUE`** |
+| SMBC | perd son secondaire `VALUE` | **perd son secondaire `VALUE`** (68 → 66) |
+| `grade` | 0 | **0** |
+| `gate` | 0 | **0** |
+| `drapeaux` | 0 | **0** |
+
+L'écart 28 → 29 vient des cours du jour, pas de la règle : la mesure du cycle 9
+tournait sur la base du 30/09. Les champs touchés au total sont `decote_pctl`,
+`dominant`, `mixte`, `motif`, `profil`, `secondaire` — c'est-à-dire les axes et
+leur narration, rien d'autre.
+
+**Ce que l'application confirme, et qui n'est pas confortable.** ORGT, qui n'a
+pas versé de dividende depuis 2019, **gagne** un profil `VALUE` en passant de P54
+à P93 : le titre est récompensé de ne rien distribuer, exactement ce que le texte
+du chantier redoutait. Et SMBC, qui n'a aucun dividende périmé, perd un verdict
+par simple effet de bassin. Les deux étaient annoncés avant la décision ; ils sont
+maintenant réels. Le second est inscrit en **C20**, le premier est le choix de
+Claudia et il est assumé tel quel.
+
+**Test : section 21 de `tester_donnees.py`, 5 contrôles.** Ils tournent sur un
+bassin **jetable** de quatre titres — A, B, C sains, D drapeauté dont le rendement
+facial de 1,00 % est faux et dont le PER est celui de A — donc ils ne dépendent
+d'aucune donnée du jour. Chaque contrôle porte son **contre-exemple** : les mêmes
+quatre titres sous l'option (a) donnent D P62 au lieu de P100, B P62 au lieu de
+P58, C P38 au lieu de P29. Sans ces valeurs opposées, le contrôle passerait aussi
+bien sur l'option refusée, et ne figerait donc rien. Un cinquième contrôle vérifie
+que la case vide de l'axe est la **même** que celle de `dy_recurrent` et de
+`prime_rendement` sur la fiche, pour les six titres réels.
+
+### Chasse : deux workflows réécrivaient `profils.json` sur une base amputée
+
+**La famille.** Un workflow qui reconstruit un fichier de référence sur une chaîne
+de chargement incomplète, et le commite. Rien ne la surveillait : le contrôle B de
+la section 17 ne regardait que `pages.yml`, qu'il appelle « la chaîne de
+référence » — or `pages.yml` **publie**, il ne commite rien.
+
+**Ce n'est pas un défaut latent. Il s'est produit avant-hier.** Le 30/09 à 22h37,
+`avis_brvm.yml` (P13, quotidien) a commité `collecte/profils.json` dans `548639e`,
+1 025 lignes changées, après l'avoir recalculé sur une chaîne de **quatre**
+scripts : `peupler.py`, `charger_cours.py`, `charger_cours_quotidien.py`,
+`profils.py`. Il manquait `charger_dividendes_exercice.py`.
+
+**Reproduction, au champ près.** En rejouant cette chaîne exacte dans le bac à
+sable :
+
+| | chaîne complète | chaîne de P13 |
+|---|---|---|
+| lignes dans `dividendes` | **311** | **15** |
+| drapeaux `DISTRIBUTION_NON_RECURRENTE` | **6** | **0** |
+| FTSC `prime_rendement` | *vide* | **+0,8035** |
+| FTSC `dy_recurrent` | *vide* | **87,42** |
+| SIVC `prime_rendement` | *vide* | **+0,1974** |
+
+Les quatre dernières valeurs sont **exactement** celles du fichier commité le
+30/09. `peupler.py` ne charge que les 15 dividendes de `donnees/base/` ; sans la
+Piste D, `diagnostic_distribution()` n'a plus l'historique qu'il faut pour établir
+« périmé » ou « exceptionnel », et les six drapeaux tombent en silence.
+`notations.yml` (P12, mensuel) portait la même chaîne amputée.
+
+**Pourquoi personne ne l'a vu.** La section 21 l'aurait attrapé — elle exige que
+FTSC et SIVC portent le drapeau — mais aucun workflow de collecte ne lance les
+barrières, et `tests.yml` n'avait plus tourné depuis `25f5a40` (30/09, 19h44). Le
+fichier publié a donc contredit le code pendant huit heures sans que rien ne
+s'allume. C'est **la régression n°2 de l'en-tête de `tester_donnees.py` pour la
+troisième fois**, par une troisième porte : `app.py` (C13, section 18), puis les
+workflows.
+
+**Corrigé.** Les deux workflows enchaînent les cinq chargeurs, et l'ajout de
+`collecte/profils.json` est subordonné à `steps.profils.outcome == success` dans
+l'étape qui l'ajoute ; sinon le fichier est restauré par `git checkout --` et un
+`::warning::` est émis. La chaîne complète seule ne suffisait pas : il restait la
+panne d'un chargeur, qui est précisément le scénario de C13.
+
+**Test : contrôle C de la section 17, deux assertions.** L'invariant est celui du
+contrôle A, appliqué aux workflows : qui reconstruit un fichier de référence l'a
+reconstruit sur la base complète.
+
+**Et la leçon du cycle, qui vaut plus que le correctif : mes deux premières
+versions de ce contrôle passaient à vide, et je les ai jetées.**
+
+1. La première testait `nom_du_chargeur not in texte`. Elle passait — parce que le
+   **commentaire que je venais d'ajouter** dans `avis_brvm.yml` nommait
+   `charger_dividendes_exercice.py`. Vérifiée par injection : en retirant le
+   chargeur de la chaîne, le contrôle restait `[OK]`. Elle lit maintenant les
+   scripts **réellement lancés** (`python3 <...>.py` en début de ligne, hors
+   commentaire).
+2. La seconde cherchait `steps.profils.outcome` n'importe où dans le YAML. Elle
+   passait aussi — les deux workflows nomment déjà cette sortie dans leur étape
+   « Résumé », pour afficher un avertissement. Elle porte maintenant sur
+   **l'étape** qui ajoute `profils.json`, par lecture YAML du workflow.
+
+Les deux versions finales tombent sous injection, vérifié dans les trois sens :
+chaîne amputée → `[ECHEC]` ; garde `env` neutralisée → `[ECHEC]` ; ajout rendu
+inconditionnel → `[ECHEC]` ; état sain → `[OK]`. **Un contrôle qui ne tombe pas
+sous injection ne surveille rien**, et c'est la deuxième fois en deux cycles qu'un
+contrôle écrit de bonne foi se révèle vide (cycle 10 : la formulation d'origine du
+contrôle NTLC/SMBC de la section 21 « passait à vide »).
+
+**Incident de méthode, à dire aussi.** En restaurant un fichier après injection,
+j'ai lancé `git checkout -- .github/workflows/notations.yml`, ce qui a effacé mes
+propres corrections sur ce fichier — elles n'étaient pas encore commitées. Rattrapé
+immédiatement, mais la règle est simple : pour restaurer un fichier après une
+injection, recopier la sauvegarde hors du dépôt, **jamais** `git checkout`.
+
+### Famille annoncée, non chassée
+
+L'annonce du cycle nommait une autre famille : **les tris et comparaisons
+lexicographiques sur des colonnes qui ne sont pas lexicographiquement ordonnées**,
+généralisation de C10 à tous les `ORDER BY`, `MIN`, `MAX`, `BETWEEN` et `substr`
+du dépôt. Elle a été remplacée en cours de cycle par la découverte ci-dessus, qui
+était active et non spéculative. Elle reste la candidate du prochain cycle du
+matin, et la substitution est dite ici plutôt que passée sous silence.
+
+### Barrières
+
+Golden tests OK. `tester_donnees.py` : **183 contrôles OK, 0 échec**, code **2**
+— les deux alertes de fraîcheur sont celles de C4 (13 dates de division de nominal
+non documentées) et C5 (CFAC et NEIC 2025). `avis_brvm.py --test` OK (11 avis,
+classification 8/8). `notations.py --test` OK (index 15/15, PDF GCR 10/10).
+`generer_dashboard.py` OK (48 titres). `generer_dashboard_html.py` échoue à
+l'identique sur `HEAD` — revérifié ce cycle, c'est le Python 3.11 du bac à sable
+contre le 3.12 de la CI, pas une régression. `dashboard_brvm.xlsx` et
+`moteur/brvm.db` supprimés avant commit.
+
+### Proposé
+
+**C20 — l'effet de bassin**, ORANGE, `EN ATTENTE`, priorité 3. Diagnostic chiffré
+ce cycle : le bassin marché porte 36 valeurs en bénéfice/prix et 34 en rendement
+(2,8 et 2,9 points par cran), mais les 14 titres des `SERVICES_FINANCIERS` lisent
+un bassin **sectoriel de 14 valeurs**, soit **7,1 et 7,7 points par cran** —
+alors que **six verdicts** sont aujourd'hui à 3 points ou moins d'un seuil de
+profil (ONTBF P66, SMBC P66 et SLBC P70 près du seuil VALUE 67 ; ETIT, SNTS et
+SPHC près du seuil GROWTH sur l'axe croissance). Un seul titre qui entre ou sort
+d'un bassin peut donc déplacer un verdict. Trois lectures à mesurer : laisser tel
+quel, percentile laisser-un-dehors, plancher de taille de bassin sur l'axe
+considéré — la borne `n_secteur_min = 8` porte aujourd'hui sur le bassin
+bénéfice/prix, pas sur celui du rendement, qui peut être plus petit.
+
+**Prochain chantier, par l'ordre déterministe : C19** (ORANGE, `validation : OK —
+remettre FTSC 2016`, priorité 6, rang 1 non consommé).
+
+
 ## 2026-09-30 — cycle 10 (hors cadence, 19h25 UTC)
 
 Cycle demandé par Claudia (« suite ») juste après le cycle 9, hors des deux

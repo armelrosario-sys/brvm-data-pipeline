@@ -684,9 +684,10 @@ de C18.
 ## C16 — Retirer aussi l'axe de décote des titres à dividende périmé
 
 - classe : ORANGE — arbitrage de méthode — **la passe de mesure des trois options est pré-autorisée**
-- statut : **MESURÉ le 30/09/2026 (cycle 9)** — la passe pré-autorisée est CONSOMMÉE, le
-  tableau est plus bas. **Aucun cycle ne la refait** : l'application attend que Claudia
-  écrive son choix sur la ligne `validation` (voir *Ce qu'il reste à trancher*).
+- statut : **FAIT le 01/10/2026 (cycle 11)** — option (b) appliquée et figée par un
+  test ; effet mesuré au bas de ce bloc. Les deux passes de ce chantier sont
+  consommées : la mesure (cycle 9) et l'application (cycle 11). **Aucun cycle ne le
+  reprend.** Ce que l'application a rendu visible est inscrit en **C20**, à part.
 - validation : OK option (b) 
 - autonomie : complète, mais **c'est un arbitrage de méthode**
 - priorité : 3
@@ -776,12 +777,40 @@ touche** : seuls ORGT et SEMC sont sur les axes.
    ne change aucun chiffre aujourd'hui — mais elle changera dès qu'un titre
    EXCEPTIONNEL sera analysable, et la règle doit le dire.
 
-### Ce qu'il reste à trancher
+### Fait le 01/10/2026 (cycle 11)
 
-Un mot de Claudia sur la ligne `validation`, par exemple `- validation : OK —
-option (c)`. Le cycle suivant appliquera l'option nommée et figera la règle par un
-test de la section 21. **Sans ce mot, aucun cycle ne reprend C16** : la passe
-pré-autorisée est consommée.
+Claudia a écrit `validation : OK option (b)` le 30/09 à 19h54. L'axe de décote lit
+désormais `dy_axe` — le rendement **récurrent** — et non plus `dy`, le rendement
+facial du BOC. Un titre drapeauté a donc une case vide sur cet axe et sort du
+bassin de comparaison.
+
+**Effet mesuré sur la base du jour, (a) → (b), 47 titres.** Les trois effets
+annoncés par la mesure du cycle 9 sont confirmés, au titre près :
+
+| | prévu (cycle 9) | mesuré (cycle 11) |
+|---|---|---|
+| `decote_pctl` bouge | 28 / 47 | **29 / 47** |
+| amplitude hors ORGT | −1 à −3 points | **−1 à −3 points** |
+| ORGT | 54 → 93, gagne `VALUE` | **54 → 93, `AUCUN_PROFIL` → `VALUE`** |
+| SMBC | perd son secondaire `VALUE` | **perd son secondaire `VALUE`** (68 → 66) |
+| `grade`, `gate`, `drapeaux` | 0 | **0, 0, 0** |
+
+Le bloc des bassins a été **hissé au niveau module** dans
+`moteur/profils.py::bassins_et_axes()`, sans changer un calcul : il vivait dans
+`calculer()`, donc la règle n'était testable qu'en refaisant tourner tout le
+moteur. Garde posée à l'extraction : `profils.json` identique au champ près,
+**0 titre d'écart**.
+
+**Test : section 21, 5 contrôles**, sur un bassin **jetable** de quatre titres —
+donc indépendant des données du jour — et portant son **contre-exemple** : les
+mêmes titres sous l'option (a) donnent D P62 au lieu de P100, B P62 au lieu de
+P58, C P38 au lieu de P29. Sans ce contre-exemple le contrôle passerait aussi sur
+l'option refusée.
+
+**Ce que l'application a rendu visible, et qui n'est pas tranché** : 28 titres ont
+perdu 1 à 3 points de décote **sans qu'aucune de leurs données change**, et le
+basculement de SMBC n'a rien à voir avec un dividende périmé. C'est l'effet de
+bassin, inscrit en **C20**.
 
 ## C17 — Pour 13 titres sur 44, le dividende que le BOC divise reste introuvable
 
@@ -961,6 +990,51 @@ défendent, et la doctrine du projet interdit de deviner laquelle.
 `historiser_dividendes_exercice.py` rend **exactement** le fichier commité, et un
 test de la section 23 fige l'égalité entre le fichier et sa régénération.
 
+## C20 — L'effet de bassin : un titre qui sort d'un axe déplace le rang des autres
+
+- classe : ORANGE — arbitrage de méthode sur la lecture des axes ; le diagnostic est fait
+- statut : PROPOSÉ
+- validation : EN ATTENTE
+- autonomie : complète, **sans réseau** — tout est dans le dépôt
+- priorité : 3
+
+**Le constat, mesuré le 01/10/2026 (cycle 11) en appliquant C16.** Retirer deux
+titres du bassin de rendement — ORGT (2,05 %) et SEMC (0,94 %), deux valeurs
+**basses** — a fait perdre **1 à 3 points de décote à 28 titres sur 47**, sans
+qu'aucune de leurs données ait changé. Et cela a produit un basculement de verdict
+qui n'a rien à voir avec un dividende périmé : **SMBC perd son secondaire `VALUE`**
+parce que sa décote passe de 68 à 66, pour un seuil `value_pctl_min` de 67.
+
+**Pourquoi c'est un chantier et pas la conséquence normale d'un percentile.** Trois
+mesures de ce cycle, sur la base du jour :
+
+1. **Le cran du percentile est plus gros que la marge des seuils.** Le bassin
+   marché porte 36 valeurs en bénéfice/prix et 34 en rendement, soit **2,8 et
+   2,9 points par cran**. Mais les 14 titres des `SERVICES_FINANCIERS` lisent un
+   bassin **sectoriel de 14 valeurs**, soit **7,1 points par cran** sur l'axe
+   bénéfice/prix et **7,7** sur celui du rendement. Un seul titre qui entre ou sort
+   déplace donc un rang de plus de 7 points dans ce secteur.
+2. **Trois titres sont aujourd'hui à 3 points ou moins du seuil VALUE** (67) :
+   ONTBF P66, SMBC P66, SLBC P70. Trois autres sont à 3 points ou moins du seuil
+   GROWTH sur l'axe croissance : ETIT, SNTS, SPHC. **Six verdicts** sont donc à la
+   portée d'un seul mouvement de bassin, soit un titre qui entre, sort, est
+   suspendu, ou devient non analysable.
+3. **Un titre est dans son propre bassin.** `pctl()` compte `val <= x` en incluant
+   la valeur du titre : dans un bassin de 14, un titre ne peut pas descendre sous
+   P7. Le rang mesure donc en partie la présence du titre lui-même.
+
+**Ce qu'il faut trancher, et ce qui se mesure sans rien écrire.** Trois lectures,
+toutes défendables : (a) laisser tel quel — le rang est relatif, un bassin qui
+change est une information ; (b) percentile **laisser-un-dehors**, chaque titre
+classé contre les autres seulement, ce qui supprime l'auto-inclusion ; (c) **plancher
+de taille de bassin** — relever `n_secteur_min` ou basculer sur le marché quand le
+bassin de l'axe considéré descend sous un seuil, puisque la borne actuelle (8) porte
+sur le bassin bénéfice/prix et non sur celui du rendement, qui peut être plus petit.
+
+**Terminé quand** : les trois lectures sont mesurées titre par titre sur les
+47 titres — décote avant/après, profils et grades qui basculent — et le tableau est
+inscrit ici. L'application attend un mot de Claudia, comme pour C16.
+
 ---
 
 # Veille datée, hors file
@@ -973,48 +1047,40 @@ test de la section 23 fige l'égalité entre le fichier et sa régénération.
 
 # Dernier cycle
 
-> **ANNONCE — cycle 11 en cours, 2026-10-01 07h00 UTC (cycle du matin).**
-> Chantier pris : **C16** (ORANGE, priorite 3) — Claudia a ecrit
-> `validation : OK option (b)` le 30/09 a 19h54 : l'axe de decote cesse de lire le
-> rendement facial des titres drapeautes, case vide. La passe consommee etait celle
-> de la *mesure* ; celle de l'*application* est ouverte par ce mot.
-> **Famille chassee ce matin** : les tris et comparaisons **lexicographiques** sur
-> des colonnes qui ne sont pas lexicographiquement ordonnees — generalisation de
-> C10 au-dela de `dividendes.date_paiement`, a tous les `ORDER BY`, `MIN`, `MAX`,
-> `BETWEEN` et `substr` du depot.
-> Cette annonce disparait au commit de cloture ; si elle est encore la sans commit
-> de cloture, la session a echoue.
-
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-09-30 — cycle 10 (hors cadence, demandé par Claudia)
+## 2026-10-01 — cycle 11 (matin)
 
-**Exécuté : C10, jusqu'au bout** — `collecte/dates_dividendes.py` (autotest 27 cas),
-`outils/migration_dates_dividendes_iso.py` (**362 lignes converties sur 364**, six
-gardes, relancé sans effet), les trois chargeurs normalisent à l'entrée, et la
-**section 23** de `tester_donnees.py` (16 contrôles).
+**Exécuté : C16, option (b)**, tranchée par Claudia le 30/09. L'axe de décote lit
+`dy_axe` et non plus `dy`. Effet mesuré (a) → (b) sur 47 titres : `decote_pctl`
+bouge sur **29** (prévu 28), ORGT **54 → 93** et gagne `VALUE`, SMBC perd son
+secondaire `VALUE` (68 → 66), **`grade` 0, `gate` 0, `drapeaux` 0**. Bloc des
+bassins hissé en `bassins_et_axes()`, garde à l'extraction : **0 titre d'écart**.
+Test : section 21, 5 contrôles sur bassin jetable, avec contre-exemple.
 
-**Effet, avant → après** : dates non ISO en base **296 → 0** ; `ORDER BY
-date_paiement DESC` rend le mauvais versement sur **34/49 → 0/49** ; `int(date[:4])`
-échoue — donc le bloc « régularité du dividende » de `scoring.py` est sauté en
-silence — sur **45/49 → 0/49** ; déduplication du BOC **0/40 → 40/40**.
-**`profils.json` identique** : aucun verdict ne bouge.
+**Chasse — la plus grave trouvée depuis la mise en place, et elle était active.**
+Le 30/09 à 22h37, le workflow **P13** (`avis_brvm.yml`, quotidien) a commité
+`profils.json` recalculé sur une chaîne de **quatre** scripts omettant
+`charger_dividendes_exercice.py`. Rejoué à l'identique : la table `dividendes`
+tombe de **311 à 15 lignes** et les **six** drapeaux `DISTRIBUTION_NON_RECURRENTE`
+de C1 disparaissent — FTSC retrouvait une prime de **+80,35 points**, les valeurs
+exactes du fichier commité. `notations.yml` (P12) portait la même chaîne. Le
+fichier publié contredisait le code depuis huit heures : aucun workflow de
+collecte ne lance les barrières, et `tests.yml` n'avait plus tourné.
+Régression n°2 de `tester_donnees.py` pour la **troisième** fois, par une
+troisième porte. Corrigé, et surveillé par le **contrôle C de la section 17**,
+vérifié par injection dans les deux sens. **Leçon : mes deux premières versions
+de ce contrôle passaient à vide** — l'une était satisfaite par le nom du chargeur
+cité dans un commentaire, l'autre par `steps.profils.outcome` présent dans
+l'étape « Résumé ». Un contrôle qui ne tombe pas sous injection ne surveille rien.
 
-**Inscrit en C19** (ORANGE, `EN ATTENTE`), trouvé par les gardes : 12 lignes
-dupliquées dans `dividendes_par_exercice.csv`, **16** après normalisation (quatre
-événements dédoublés sous deux orthographes du même jour, dont deux en anglais), et
-une régénération par `historiser_dividendes_exercice.py` ne rend plus le fichier
-commité — un événement de plus, FTSC 2016. Latent en base.
+**Famille annoncée mais non chassée** : les tris lexicographiques sur colonnes non
+ordonnées (généralisation de C10). Remplacée en cours de cycle par la
+découverte ci-dessus. Candidate du prochain cycle du matin.
 
-**CI tombée puis réparée dans le même cycle, et c'est ma faute.** La section 23
-importait `collecte_boc_quotidien`, dont les imports tirent `pdfplumber`, **absent
-de `requirements.txt`** et préinstallé par hasard dans le bac à sable : P4 est tombé
-sur `ModuleNotFoundError` quand la barrière était verte en local. Fonction extraite
-par AST, et un contrôle interdit cet import. **Leçon : une barrière verte dans le
-bac à sable ne prouve rien si le test importe hors `requirements.txt`.**
-
-**Barrières rejouées `pdfplumber` indisponible** : golden OK, `tester_donnees.py`
-**175 OK, 0 échec**, code 2 sur C4 et C5. **Prochain : C3** (VERTE, priorité 3).
+**Barrières** : golden OK, `tester_donnees.py` **183 OK, 0 échec**, code 2
+(fraîcheur C4 à 13 dates et C5). **Proposé : C20** (effet de bassin, ORANGE).
+**Prochain : C19** (ORANGE, `validation : OK — remettre FTSC 2016`, priorité 6).
 
 ---
 
