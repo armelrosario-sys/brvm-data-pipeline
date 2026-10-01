@@ -973,6 +973,18 @@ test de la section 23 fige l'égalité entre le fichier et sa régénération.
 
 # Dernier cycle
 
+> **ANNONCE — cycle 11 en cours, 2026-10-01 07h00 UTC (cycle du matin).**
+> Chantier pris : **C16** (ORANGE, priorite 3) — Claudia a ecrit
+> `validation : OK option (b)` le 30/09 a 19h54 : l'axe de decote cesse de lire le
+> rendement facial des titres drapeautes, case vide. La passe consommee etait celle
+> de la *mesure* ; celle de l'*application* est ouverte par ce mot.
+> **Famille chassee ce matin** : les tris et comparaisons **lexicographiques** sur
+> des colonnes qui ne sont pas lexicographiquement ordonnees — generalisation de
+> C10 au-dela de `dividendes.date_paiement`, a tous les `ORDER BY`, `MIN`, `MAX`,
+> `BETWEEN` et `substr` du depot.
+> Cette annonce disparait au commit de cloture ; si elle est encore la sans commit
+> de cloture, la session a echoue.
+
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
 ## 2026-09-30 — cycle 10 (hors cadence, demandé par Claudia)
