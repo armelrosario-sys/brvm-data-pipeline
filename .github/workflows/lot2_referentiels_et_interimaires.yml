@@ -53,6 +53,7 @@ jobs:
           python3 ../collecte/charger_cours.py brvm.db
           python3 ../collecte/charger_cours_quotidien.py brvm.db
           python3 ../collecte/charger_dividendes_exercice.py brvm.db
+          python3 ../collecte/charger_dividendes_boc.py brvm.db
           python3 ../collecte/charger_liquidite_quotidienne.py brvm.db
           python3 tester.py
           python3 profils.py

@@ -2578,6 +2578,168 @@ def test_dates_dividendes_iso():
             + ("" if not importe else " — TROUVE : %r" % importe))
 
 
+# Plancher releve le 01/10/2026 (cycle 12) : 44 titres sur 44 portant un
+# rendement BOC ont leur dividende de reference identifie en base. Il etait de
+# 31 avant le chargement de collecte/dividendes_boc.csv. Il ne doit que monter :
+# une baisse signifie que le pont a ete debranche ou que la collecte recule.
+REFERENCES_IDENTIFIEES_MIN = 44
+
+
+# ----------------------------------------------------------------------
+# 24. LE DIVIDENDE DE REFERENCE DU BOC EST EN BASE (bloquant)
+# ----------------------------------------------------------------------
+def test_reference_dividende_boc():
+    """Le dividende par lequel le BOC divise doit etre dans la table dividendes.
+
+    POURQUOI CETTE SECTION EXISTE (chantier C17, 01/10/2026). Le rendement publie
+    par le bulletin est un rapport : dernier dividende par action sur cours. En le
+    reconstruisant (rendement x cours) et en le confrontant au versement le plus
+    recent de la table, 13 titres sur 44 ne concordaient pas. C17 appelait cela
+    une « lacune de collecte ». Mesure de ce cycle : il n'y en avait aucune.
+
+    Les 13 references etaient dans collecte/dividendes_boc.csv -- fichier
+    COMMITE, ecrit par collecte_boc_quotidien.py depuis la colonne « Dernier
+    dividende paye » du bulletin, collectees entre le 28/07 et le 30/09/2026 --
+    et AUCUN chargeur de la chaine ne lisait ce fichier. collecte_boc_quotidien.py
+    les inserait dans une base jetee a chaque reconstruction. La donnee etait
+    collectee, commitee, et perdue a l'entree.
+
+    CE QUE CELA RENDAIT INERTE, et c'est le vrai cout. La regle 1 de
+    diagnostic_distribution() (chantier C1, drapeau DISTRIBUTION_NON_RECURRENTE)
+    n'identifie son dividende de reference que par coincidence entre l'implicite
+    du BOC et le versement le plus RECENT de la table. Sans coincidence, elle ne
+    conclut pas -- a juste titre. Elle etait donc silencieusement inapplicable sur
+    13 des 44 titres, soit 30 % du marche, sans qu'aucun controle ne le dise.
+    Apres chargement : 44 / 44, et les 16 lignes chargees concordent avec
+    l'implicite entre 0,01 % et 0,16 %.
+
+    AUCUN VERDICT DU JOUR N'EN DEPEND, et il faut le dire ainsi : collecte/
+    profils.json est identique au champ pres avant et apres, 0 titre d'ecart sur
+    47 -- les 16 versements charges sont tous recents (2026-07 a 2026-09), donc
+    aucun n'est perime, et aucun ne depasse le plus fort des versements
+    precedents. Le defaut etait LATENT, comme C10 et C19 : arme, en attente.
+
+    SEVERITES. Bloquant : que le pont tourne, et que la regle de completion d'un
+    montant NULL n'ait pas ete relachee -- ce sont des proprietes du CODE. En
+    alerte : le plancher de references identifiees, parce qu'une baisse peut venir
+    du BOC, et que ce fichier ne bloque pas un commit pour un defaut de source.
+    """
+    print("\n=== 24. Le dividende de reference du BOC est en base (bloquant) ===")
+    code = (RACINE / "collecte" / "charger_dividendes_boc.py")
+    verifie(code.exists(),
+            "collecte/charger_dividendes_boc.py existe (la section 17 verrouille, "
+            "elle, sa presence dans app.py, pages.yml et les workflows qui "
+            "recalculent profils.json)")
+    if not code.exists():
+        return
+    src = code.read_text(encoding="utf-8")
+
+    # Le pont doit lire LE fichier, pas un autre.
+    verifie('"dividendes_boc.csv"' in src,
+            "charger_dividendes_boc.py lit collecte/dividendes_boc.csv")
+
+    # Les deux gardes qui font la difference entre completer et ecraser. Sans la
+    # premiere, un montant valide est remplace ; sans la seconde, un montant NULL
+    # est rempli par un versement d'une AUTRE date -- NSBC 2025 porte 2026-06-30
+    # quand le BOC dit 2026-08-04, et doit rester vide.
+    verifie("montant_base is None and date_base == date_p" in src,
+            "un montant NULL n'est complete que si la date_paiement est identique "
+            "des deux cotes (la seconde moitie de la preuve a deux cotes)")
+    verifie("UPDATE dividendes SET montant_net" in src
+            and src.count("UPDATE dividendes SET montant_net") == 1,
+            "le pont ne porte qu'UN seul UPDATE de montant, celui de la completion")
+
+    if not DB.exists():
+        verifie(False, "brvm.db absent : le reste de la section ne prouverait rien",
+                bloquant=False)
+        return
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+
+    # Le pont a-t-il REELLEMENT tourne sur cette base ? Un controle qui se
+    # contente de lire le source passerait sur une base construite sans lui :
+    # c'est le faux vert que la chasse du cycle 11 a trouve deux fois.
+    charges = cur.execute(
+        "SELECT COUNT(*) FROM dividendes WHERE source LIKE '%dividendes_boc.csv%'"
+    ).fetchone()[0]
+    verifie(charges > 0,
+            f"{charges} ligne(s) de dividendes portent collecte/dividendes_boc.csv "
+            f"pour source : le pont a tourne sur cette base"
+            + ("" if charges else " — CHAINE AMPUTEE : la base a ete construite "
+                                  "sans charger_dividendes_boc.py"))
+
+    # Un montant NULL que le BOC renseigne pour le MEME exercice et le MEME jour
+    # ne doit plus exister : c'est exactement ce que la completion traite.
+    import csv as _csv
+    chemin_csv = RACINE / "collecte" / "dividendes_boc.csv"
+    boc = {}
+    if chemin_csv.exists():
+        with chemin_csv.open(encoding="utf-8", newline="") as f:
+            for r in _csv.DictReader(f):
+                if r.get("ticker") and r.get("date_paiement") and r.get("montant_net"):
+                    boc[(r["ticker"], r["date_paiement"])] = r["montant_net"]
+    # peupler.py doit refuser de REINSERER le marqueur vide a cote de la ligne
+    # completee : sa clef naturelle inclut montant_net, donc une ligne vide et sa
+    # version completee sont deux lignes differentes pour elle. Sans cette garde,
+    # le controle suivant tombait des que la section 16 relancait peupler.py --
+    # c'est ainsi que le defaut a ete trouve, le 01/10/2026.
+    peup = (ICI / "peupler.py").read_text(encoding="utf-8")
+    verifie("AND exercice_couvert IS ? AND montant_net IS NOT NULL" in peup,
+            "peupler.py ne reinsere pas un marqueur a montant vide quand le montant "
+            "est deja en base pour le meme (ticker, exercice, jour)")
+
+    masques = [f"{t} ex.{e} le {d}" for t, e, d in cur.execute(
+        "SELECT ticker, exercice_couvert, date_paiement FROM dividendes "
+        "WHERE montant_net IS NULL AND date_paiement IS NOT NULL")
+        if (t, d) in boc]
+    verifie(not masques,
+            "aucun montant NULL ne masque un montant que le BOC donne pour le meme "
+            "jour"
+            + ("" if not masques else " — MASQUES : " + ", ".join(masques)))
+
+    # --- Le plancher de C17 : combien de references sont identifiees ? --------
+    # La tolerance est lue dans config/seuils.yaml, pas recopiee ici : ce controle
+    # doit mesurer ce que le moteur applique, et suivre Claudia si elle la change.
+    import yaml as _yaml
+    _cfg = _yaml.safe_load((RACINE / "config" / "seuils.yaml").read_text(
+        encoding="utf-8")) or {}
+    tol = (_cfg.get("profils") or {}).get("distribution_tolerance_implicite", 0.10)
+    derniers = cur.execute(
+        "SELECT q.ticker, q.cours, q.rendement FROM cours_quotidien_boc q JOIN "
+        "(SELECT ticker, MAX(date_bulletin) d FROM cours_quotidien_boc "
+        " WHERE rendement IS NOT NULL AND rendement > 0 AND cours IS NOT NULL "
+        " GROUP BY ticker) m ON m.ticker = q.ticker AND m.d = q.date_bulletin"
+    ).fetchall()
+    identifiees, echappent = 0, []
+    for ticker, cours, rendement in derniers:
+        implicite = cours * rendement
+        derniere = cur.execute(
+            "SELECT montant_net FROM dividendes WHERE ticker=? AND montant_net > 0 "
+            "AND date_paiement IS NOT NULL ORDER BY date_paiement DESC LIMIT 1",
+            (ticker,)).fetchone()
+        if not derniere:
+            echappent.append(f"{ticker} (aucun versement date)")
+            continue
+        ecart = abs(derniere[0] - implicite) / implicite
+        if ecart <= tol:
+            identifiees += 1
+        else:
+            echappent.append(f"{ticker} ({ecart * 100:.0f} %)")
+
+    verifie(len(derniers) >= 40,
+            f"la mesure porte sur une population reelle ({len(derniers)} titres a "
+            f"rendement BOC publie)")
+    verifie(identifiees >= REFERENCES_IDENTIFIEES_MIN,
+            f"{identifiees} / {len(derniers)} titres ont leur dividende de reference "
+            f"identifie (plancher {REFERENCES_IDENTIFIEES_MIN}, tolerance "
+            f"{tol * 100:.0f} %) — la regle 1 de C1 ne s'applique qu'a ceux-la"
+            + ("" if identifiees >= REFERENCES_IDENTIFIEES_MIN
+               else " — EN BAISSE, la reference echappe sur : "
+                    + ", ".join(sorted(echappent))),
+            bloquant=False)
+    conn.close()
+
+
 # ----------------------------------------------------------------------
 # 15. FONDS DES NOTATIONS FINANCIERES (bloquant)
 # ----------------------------------------------------------------------
@@ -2696,6 +2858,7 @@ def main():
     test_forme_profils_json()
     test_distribution_non_recurrente()
     test_dates_dividendes_iso()
+    test_reference_dividende_boc()
     if not sans_app:
         test_application()
 

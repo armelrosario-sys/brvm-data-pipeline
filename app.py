@@ -91,8 +91,13 @@ def empreinte_donnees():
     # conteneur. C'est exactement le defaut du 03/09 decrit ci-dessus.
     parties = []
     base_ref = sorted((RACINE / "donnees" / "base").glob("*.csv"))
+    # Ajout du 01/10/2026 (C17) : collecte/dividendes_boc.csv porte la colonne
+    # « Dernier dividende paye » du bulletin, et charger_dividendes_boc.py la
+    # charge desormais. Sans ce fichier dans l'empreinte, un nouveau dividende
+    # collecte ne reconstruirait pas la base -- le defaut du 03/09 ci-dessus.
     for f in (QUOTIDIEN, RACINE / "collecte" / "cours_extraits.csv",
               RACINE / "collecte" / "dividendes_par_exercice.csv",
+              RACINE / "collecte" / "dividendes_boc.csv",
               RACINE / "collecte" / "notations_financieres.csv",
               *base_ref):
         parties.append(f"{f.name}:{int(f.stat().st_mtime)}" if f.exists() else f"{f.name}:0")
@@ -128,6 +133,7 @@ def preparer_base(_empreinte):
                RACINE / "collecte" / "charger_cours.py",
                RACINE / "collecte" / "charger_cours_quotidien.py",  # pont ajoute 03/09
                RACINE / "collecte" / "charger_dividendes_exercice.py",
+               RACINE / "collecte" / "charger_dividendes_boc.py",  # C17, 01/10/2026
                RACINE / "collecte" / "charger_liquidite_quotidienne.py",
                RACINE / "moteur" / "profils.py"]
     # C13 (30/09/2026) : la boucle d'origine lancait chaque script en

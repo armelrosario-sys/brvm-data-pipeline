@@ -9,6 +9,261 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-01 — cycle 12 (soir, 18h54 UTC)
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` ne rend
+rien. Les deux derniers commits sont `b69570a` (clôture du cycle 11, 07h12 UTC) et
+`d51a21b` (Claudia, 08h32 UTC), plus de dix heures plus tôt : aucune annonce de cycle
+ouverte sans sa clôture. **Aucune annonce poussée par ce cycle** : la règle d'annonce
+porte sur la famille chassée, et la chasse n'a lieu qu'au cycle du matin.
+
+**Ce que Claudia a édité depuis le cycle 11** (`d51a21b`, 08h32 UTC) : trois lignes
+`validation`, de `EN ATTENTE` à `OK` — **C17**, **C18**, et **C20 « OK option (a) »**.
+Le bloc *Dernier cycle* du cycle 11 annonçait C19 comme prochain ; l'ordre déterminé par
+le protocole le contredit désormais, et c'est l'ordre qui fait foi : au rang 1 (ORANGE
+portant `validation : OK`, passe non consommée) la priorité la plus haute est **3**, et à
+priorité égale le plus petit numéro — C17 passe donc avant C20, puis C18 (4) et C19 (6).
+
+**Environnement, à noter.** Le bac à sable porte désormais **Python 3.13.15** (il portait
+3.11 au cycle 10). `dashboard/generer_dashboard_html.py`, que CHANTIERS.md signalait comme
+« barrière qui ne tourne pas dans le bac à sable » à cause de PEP 701, **compile**. La
+note du cycle 10 était juste : c'était l'environnement, pas le fichier. Note corrigée.
+
+---
+
+### Exécuté : C17 — « Pour 13 titres sur 44, le dividende que le BOC divise reste introuvable »
+
+**Le diagnostic du chantier était faux, et c'est le résultat du cycle.**
+
+#### 1. La mesure d'origine, reproduite avant tout
+
+Dividende implicite du BOC = `rendement × cours` sur la dernière séance de chaque titre,
+confronté au versement le plus récent de la table `dividendes`. Reproduit à l'identique :
+**44 titres** portent un rendement BOC non nul, **31 concordent** à 10 % près, **13 non**.
+Les mêmes 13 titres que ceux inscrits au chantier, aux mêmes écarts.
+
+#### 2. La fausse piste, mesurée puis écartée
+
+Première hypothèse : le dividende de référence est en base, mais ce n'est pas le plus
+récent. Testée en cherchant, pour chacun des 13, le versement le plus proche en montant
+**parmi tous** : quatre « trouvailles » — NTLC 363,67 (2021), SMBC 720,00 (2023), SDCC
+450,00 (2023), SIBC 360,00 (2021). Ce sont **exactement** les quatre fausses
+identifications que la correction du cycle 7 bis avait retirées, et pour la même raison :
+une coïncidence de montant sur une série de versements voisins n'identifie rien. Piste
+abandonnée, et le commentaire de `diagnostic_distribution()` avait raison de l'interdire.
+
+#### 3. La méthode qui a tranché : dater l'implicite au lieu de le lire une fois
+
+Le dividende implicite ne peut bouger qu'à un détachement. Sur 2026, séance par séance,
+avec un palier défini comme une suite de séances dont l'implicite varie de moins de 1,5 %
+(bruit d'arrondi du rendement publié à quatre décimales) : **35 des 44 titres** changent
+de palier en 2026, et la dispersion **à l'intérieur** de chaque palier va de 0,13 % à
+1,08 % — sur 5 à 143 séances **à cours mouvant**. Un palier qui tient sur des dizaines de
+séances pendant que le cours varie n'est pas un hasard d'arrondi : c'est un dividende.
+
+Pour les 13 titres non concordants, la lecture est sans ambiguïté :
+
+| titre | palier d'avant | = versement en base ? | bascule | palier d'après | = implicite ? |
+|---|---|---|---|---|---|
+| SLBC | 1 073,34 | oui (1 073,60) | 2026-07-29 | 1 872,26 | oui (1 871,25) |
+| SIBC | 329,97 | oui (330,00) | 2026-07-30 | 374,04 | oui (373,73) |
+| LNBB | 275,48 | oui (275,50) | 2026-08-03 | 164,13 | oui (164,26) |
+| STBC | 2 095,92 | **non** (base 675,00) | 2026-08-12 | 1 707,20 | oui (1 707,07) |
+| CFAC | 7,12 | oui (7,04) | 2026-08-13 | 55,44 | oui (55,47) |
+| SGBC | 1 645,76 | oui (1 645,78) | 2026-08-21 | 2 298,45 | oui (2 300,41) |
+| SPHC | 323,88 | oui (323,84) | 2026-08-27 | 430,36 | oui (430,13) |
+| TTLC | 195,68 | oui (195,67) | 2026-08-28 | 139,73 | oui (139,84) |
+| NTLC | 721,50 | oui (721,60) | 2026-09-04 | 369,72 | oui (369,00) |
+| NEIC | 81,79 | oui (81,78) | 2026-09-09 | 140,39 | oui (140,30) |
+| SDCC | 352,00 | oui (352,00) | 2026-09-15 | 461,99 | oui (461,50) |
+| SMBC | 615,97 | **non** (base 1 080,00) | 2026-09-17 | 704,29 | oui (704,55) |
+| SHEC | 75,27 | oui (75,29) | 2026-09-24 | 85,09 | oui (84,96) |
+
+Onze des treize : le BOC a simplement **changé de référence** entre le 29/07 et le 24/09,
+et notre base porte la précédente — elle n'avait pas tort, elle avait un exercice de
+retard. Deux des treize, STBC et SMBC, sont un autre défaut (point 5).
+
+#### 4. La cause : un fichier commité que personne ne charge
+
+`collecte/dividendes_boc.csv`, **64 lignes, commité**, écrit par
+`collecte_boc_quotidien.py` depuis la colonne « Dernier dividende payé » du bulletin
+(montant net **et** date, lus directement, pas reconstruits). Il porte **les 13
+références**, collectées entre le 28/07 et le 30/09/2026. Balayage de tous les `.py` et
+`.yml` : seuls `collecte_boc_quotidien.py` lui-même et `backfill_dividendes.py` le
+nomment. **Aucun chargeur de la chaîne ne le lit.** Et `collecte_boc_quotidien.py`
+insère ses dividendes dans une base qui est dans `.gitignore` et rebâtie à neuf à chaque
+passage : ses écritures sont perdues à chaque reconstruction.
+
+La donnée était collectée, commitée, et perdue à l'entrée. Il n'y avait pas de lacune de
+collecte : il y avait un **pont manquant**, le même genre de défaut que le pont de
+`charger_dividendes_exercice.py` trouvé le 28/07 et que celui de
+`charger_cours_quotidien.py` trouvé le 03/09.
+
+#### 5. Les deux montants masqués
+
+`donnees/base/dividendes.csv` portait deux marqueurs à montant **vide** :
+`STBC,,2025-08-29,2024,date BOC ; montant a re-sourcer` et
+`SMBC,,2025-09-15,2024,date BOC ; montant a re-sourcer`. Or
+`charger_dividendes_exercice.py` déduplique par `(ticker, exercice_couvert)` : ces
+marqueurs **masquaient** les montants que la Piste D portait déjà pour les mêmes
+exercices et les **mêmes jours** — STBC 2024 = 2 096,00 au 2025-08-29, SMBC 2024 = 616,00
+au 2025-09-15. La note disait « à re-sourcer » ; la source était dans le dépôt depuis le
+début, rendue inatteignable par le marqueur lui-même. Et les paliers du point 3 les
+confirment une troisième fois : 2 095,92 et 615,97.
+
+#### 6. La preuve à deux côtés
+
+Les deux côtés viennent de **deux colonnes différentes du même bulletin**, extraites par
+deux chemins indépendants : la colonne « Dernier dividende payé » (ce fichier) et
+`rendement × cours` (`cours_quotidien_boc`). Concordance des 16 lignes chargées :
+
+```
+SLBC -0,03 %   BICB +0,09 %   SIBC -0,07 %   LNBB +0,06 %
+SOGC -0,04 %   STBC -0,01 %   CFAC +0,05 %   SGBC +0,07 %
+SPHC -0,04 %   TTLC +0,05 %   NTLC -0,16 %   NEIC -0,07 %
+SDCC -0,11 %   SMBC +0,08 %   SHEC -0,13 %   ABJC +0,07 %
+```
+
+#### 7. Ce qui a été écrit
+
+**`collecte/charger_dividendes_boc.py`**, cinquième chargeur. Le rattachement à
+l'exercice passe par `deduire_exercice()` de `historiser_dividendes_exercice.py` — une
+seule définition dans le dépôt — et la validation de date par `est_iso()` de
+`dates_dividendes.py`. Quatre refus par construction : jamais remplacer un montant
+renseigné ; ne compléter un montant vide que si la `date_paiement` est **identique des
+deux côtés** ; jamais deviner un exercice hors saison d'AGM ; jamais accepter une date
+non ISO. Déduplication sur le triplet `(ticker, montant_net, date_paiement)`, la même
+clef que `collecte_boc_quotidien.py`.
+
+Sur la base du jour : **16 ajouts, 2 compléments, 38 déjà présents à l'identique, 8
+refus, 0 écarté**. Table `dividendes` : **311 → 327** lignes ; montants vides : 3 → 1.
+**Relancé une seconde fois : 0 ajout, 0 complément**, « 56 déjà présents ».
+
+Branché dans `app.py::preparer_base()` et dans les **8** workflows qui enchaînent les
+chargeurs (`pages.yml`, `tests.yml`, `avis_brvm.yml`, `notations.yml`, `migration_csv.yml`,
+`releve_capitaux_propres.yml`, `lot2_referentiels_et_interimaires.yml`,
+`branchement_agregateur.yml`). `collecte/dividendes_boc.csv` ajouté à `empreinte_donnees()`
+de `app.py` : sans quoi un nouveau dividende collecté ne reconstruirait pas la base — le
+défaut du 03/09 exactement.
+
+**Pas de script de migration dans `outils/`**, et c'est voulu : aucun fichier du dépôt
+n'est modifié. La correction vit dans le chargeur, et la base est rebâtie à neuf à chaque
+passage. Le procès-verbal exécutable, ici, c'est le chargeur lui-même.
+
+#### 8. Le défaut trouvé en posant la garde, corrigé dans le même commit
+
+La clef naturelle de `peupler.py` inclut `montant_net`. Une ligne à montant vide et sa
+version **complétée** sont donc deux lignes différentes pour elle, et le passage suivant
+de `peupler.py` **réinsérait le marqueur vide à côté de la ligne complétée** — or
+`app.py::preparer_base()` relance `peupler.py` sur une base **existante** dès que
+l'empreinte change. Trouvé parce que la section 24 tombait en ÉCHEC après le seul test
+d'idempotence de la section 16, qui relance `peupler.py` sur la base déjà chargée.
+
+Seconde garde posée, volontairement étroite : elle ne retient que l'insertion d'un montant
+**vide** déjà renseigné pour le même `(ticker, exercice, jour)`. Aucune valeur du CSV n'est
+écartée, rien n'est écrasé. Vérifié : **trois passages de `peupler.py`** sur la base
+chargée, **327 lignes, stable**, et le marqueur annoncé à l'écran à chaque fois.
+
+#### 9. L'effet, dit franchement
+
+`collecte/profils.json` est **identique à l'octet** avant et après — 0 titre d'écart sur
+47, 0 champ sur les 57 du fichier. Les 16 versements chargés sont tous récents (2026-07 à
+2026-09) : aucun n'est périmé au sens de `distribution_age_max_ans = 2`, aucun ne dépasse
+`distribution_ratio_max = 3` fois le plus fort des précédents. **Aucun verdict du jour ne
+dépend de ce chantier.**
+
+Le gain est ailleurs, et il était invisible. La règle 1 de C1 n'identifie son dividende de
+référence que par coïncidence entre l'implicite et le versement **le plus récent** ; sans
+coïncidence, elle ne conclut pas — à juste titre. Elle était donc **silencieusement
+inapplicable sur 13 des 44 titres**, soit **30 % du marché**, et rien ne le disait.
+Désormais **44 / 44**. Effet visible sur la publication : 16 fiches gagnent une ligne
+d'historique de dividende, et deux montants cessent d'être vides.
+
+#### 10. Le test, et son injection
+
+**Section 24 de `tester_donnees.py`, 9 contrôles.** Bloquants : le chargeur existe et lit
+le bon fichier ; il ne porte qu'**un seul** `UPDATE` de montant ; la garde
+`montant_base is None and date_base == date_p` est présente ; `peupler.py` porte sa
+seconde garde ; le pont a **réellement tourné** sur cette base (compté sur
+`source LIKE '%dividendes_boc.csv%'`) ; aucun montant vide ne masque un montant que le BOC
+donne pour le même jour ; la population mesurée est réelle (≥ 40 titres). En alerte : le
+plancher de **44** références identifiées, parce qu'une baisse peut venir du BOC et que ce
+fichier ne bloque pas un commit pour un défaut de source. La tolérance est **lue dans
+`config/seuils.yaml`**, pas recopiée : le contrôle doit suivre le moteur.
+
+**Injection** — base reconstruite sans le cinquième chargeur. Deux contrôles tombent :
+« 0 ligne … CHAÎNE AMPUTÉE » et « MASQUÉS : STBC ex.2024, SMBC ex.2024 ». L'alerte
+redescend à **31 / 44** et nomme les 13 titres avec leurs écarts (CFAC 87 %, NTLC 96 %,
+LNBB 68 %, STBC 60 %, SMBC 53 %, SLBC 43 %, NEIC 42 %, TTLC 40 %, SGBC 28 %, SPHC 25 %,
+SDCC 24 %, SIBC 12 %, SHEC 11 %). Le contrôle tombe sous injection : il surveille.
+
+La section 17 n'a pas eu besoin d'être modifiée : elle découvre les chargeurs par
+`glob("charger_*.py")`, donc ses contrôles A, B et C exigent d'eux-mêmes le nouveau
+chargeur dans `app.py`, `pages.yml` et tout workflow qui recommite `profils.json`.
+
+---
+
+### Ce que l'exécution a rendu visible, et qui n'est pas tranché
+
+**C21 — un facteur 100 dans la colonne `rendement`.** En datant l'implicite, **29
+séances** sur **7 titres** portent un rendement valant 50 à 200 fois celui de la veille
+**et** du lendemain, à cours stable à 20 % près : ORGT 14, CFAC 3, ETIT 3, SCRC 3, SEMC 3,
+NSBC 2, SPHC 1 ; 13 en 2026. C'est un « 1,26 % » entré comme la fraction `1,26`. Chez
+**CFAC** le cas est inversé et la mauvaise échelle **domine** : 227 séances sur 2 019
+au-dessus de 25 % de rendement, et au premier semestre 2026 ce sont les séances courantes
+qui sont fausses (implicite ≈ 703) tandis que la dernière séance du mois porte la bonne
+valeur (7,04). Le compte de 29 est un **plancher**. **Portée : latente** — aucune des 29
+n'est la dernière séance de son titre (vérifié titre par titre), donc aucun `dy`, aucun
+profil, aucun grade d'aujourd'hui n'en dépend ; ce qui en dépendra, ce sont les backtests.
+**Piège à ne pas tendre** : FTSC porte 246 séances au-dessus de 25 % et ce n'est pas un
+défaut — C1 a établi que sa distribution 2025 est exacte. C'est la **rupture entre
+voisines**, pas le niveau, qui identifie le défaut.
+
+**C22 — les 8 refus du pont.** Chacun oppose deux valeurs certifiées, et trois relèvent
+d'autres chantiers : SAFC 2010 (23,04 contre 576,00, facteur **25,0** — le facteur exact
+des collisions SAFC de C18) ; SEMC, BOABF et BOAC (écarts de 0,06 % à 2,8 %, soit la
+question brut/net de C2 vue sur des montants) ; SICC 1999 et ORGT 2019 (la base porte un
+**0** posé à la main, marqueur d'obsolescence — ne pas écraser) ; SNTS 2025 (même montant,
+**un jour d'écart**, 25 contre 26/05/2026 : la clef `(ticker, montant, date)` ne protège
+pas d'un doublon à un jour près) ; NSBC 2025 (le BOC dit 675,98 au 04/08/2026, la base
+porte un montant vide daté du **30/06/2026**, qui est la date de l'**AGO** et non du
+paiement — la garde de date a donc bien refusé, et NSBC reste le seul montant vide de la
+table).
+
+**Ce que C2 reçoit de ce cycle.** Le rapport implicite/déclaré, que C17 annonçait comme
+« la mesure qui manquait à C2 », est sous 10 % sur **44 titres sur 44** contre 31 : la
+convention brute/nette ne peut plus être loin sur aucun titre. Le **second** axe de C2 —
+l'exercice de rattachement — reste entier.
+
+---
+
+### Barrières
+
+Chaîne complète relancée après chaque modification : `peupler.py`, les **cinq** chargeurs,
+`tester.py`, `profils.py`, `tester_donnees.py`, `avis_brvm.py --test`,
+`notations.py --test`, `dates_dividendes.py --test`, `generer_dashboard.py`.
+
+- `tester.py` : **tous les golden tests passent**.
+- `tester_donnees.py` : **192 OK, 0 ÉCHEC**, code de sortie **2** — les deux alertes de
+  fraîcheur connues, C4 (13 dates de division non documentées) et C5 (CFAC, NEIC).
+  183 contrôles au cycle 11, 192 ici : les 9 de la section 24.
+- `avis_brvm.py --test` : 11 avis, 10 rattachés, classification 8/8.
+- `notations.py --test` : index 15/15, PDF GCR 10/10, Bloomfield 6/6, pièges 3/3.
+- `dates_dividendes.py --test` : 27 cas, 0 échec.
+- `generer_dashboard.py` : 48 titres.
+- `generer_dashboard_html.py` : **compile** (bac à sable en Python 3.13.15).
+- `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
+### Prochain cycle
+
+Par l'ordre déterminé, rang 1 (ORANGE portant `validation : OK`, passe non consommée),
+priorité la plus haute puis plus petit numéro : **C20** (`OK option (a)`, priorité 3),
+puis C18 (4), puis C19 (6). L'option (a) de C20 ne change aucune donnée : le cycle mesure
+les lectures (b) et (c) pour documenter ce qui est écarté, et fige (a) par un test.
+Candidate de chasse pour le prochain cycle du matin : les **tris et comparaisons sur
+colonnes dont le type n'est pas celui qu'on croit** — généralisation de C10, annoncée au
+cycle 11 et jamais chassée ; C21 en est une variante sur l'échelle plutôt que sur l'ordre.
+
 ## 2026-10-01 — cycle 11 (matin, 07h00 UTC)
 
 **Contrôle anti-collision.** `git log --since="3 hours ago"` sur `main` ne rend

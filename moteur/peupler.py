@@ -213,12 +213,45 @@ def main():
     # plutot que = parce qu'il est NULL-safe : trois dividendes SDSC ont une
     # date_paiement nulle, et "NULL = NULL" est faux en SQL, ce qui laisserait
     # passer le doublon. Clefs naturelles verifiees uniques dans les deux CSV.
+    # SECONDE GARDE, ajoutee le 01/10/2026 (chantier C17). La clef naturelle
+    # ci-dessus inclut montant_net : une ligne a montant VIDE et sa version
+    # COMPLETEE sont donc deux lignes differentes pour elle. Or
+    # charger_dividendes_boc.py complete desormais un montant NULL quand le
+    # bulletin en donne un pour le MEME exercice et le MEME jour (STBC 2024 et
+    # SMBC 2024, « date BOC ; montant a re-sourcer »). Sans cette seconde garde,
+    # le passage suivant de peupler.py -- et app.py::preparer_base() le relance
+    # sur une base EXISTANTE des que l'empreinte change -- reinserait le
+    # marqueur vide a cote de la ligne completee. Mesure avant correction : la
+    # section 24 tombait en ECHEC apres le seul test d'idempotence de la
+    # section 16, qui relance peupler.py sur la base deja chargee.
+    #
+    # La garde est volontairement etroite : elle ne retient QUE l'insertion
+    # d'un montant VIDE deja renseigne pour le meme (ticker, exercice, jour).
+    # Une valeur du CSV n'est jamais ecartee, et rien n'est jamais ecrase.
+    i_montant = SCHEMA_CSV["dividendes.csv"].index("montant_net")
+    i_date = SCHEMA_CSV["dividendes.csv"].index("date_paiement")
+    i_ex = SCHEMA_CSV["dividendes.csv"].index("exercice_couvert")
+    a_inserer, deja_completes = [], []
+    for d in dividendes:
+        if d[i_montant] in (None, ""):
+            trouve = cur.execute(
+                "SELECT 1 FROM dividendes WHERE ticker IS ? AND date_paiement IS ? "
+                "AND exercice_couvert IS ? AND montant_net IS NOT NULL",
+                (d[0], d[i_date], d[i_ex])).fetchone()
+            if trouve:
+                deja_completes.append("%s ex.%s" % (d[0], d[i_ex]))
+                continue
+        a_inserer.append(d)
     cur.executemany(
         "INSERT INTO dividendes (ticker,montant_net,date_paiement,exercice_couvert) "
         "SELECT ?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM dividendes "
         "WHERE ticker IS ? AND montant_net IS ? AND date_paiement IS ? "
         "AND exercice_couvert IS ?)",
-        [d + d for d in dividendes])
+        [d + d for d in a_inserer])
+    if deja_completes:
+        print("  %d marqueur(s) a montant vide non reinsere(s), le montant etant "
+              "deja en base pour le meme jour : %s"
+              % (len(deja_completes), ", ".join(deja_completes)))
     cur.executemany(
         "INSERT INTO avis_reglementaires (ticker,type,date_avis,note) "
         "SELECT ?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM avis_reglementaires "

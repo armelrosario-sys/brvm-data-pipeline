@@ -78,6 +78,7 @@ jobs:
           python3 collecte/charger_cours.py
           python3 collecte/charger_cours_quotidien.py
           python3 collecte/charger_dividendes_exercice.py
+          python3 collecte/charger_dividendes_boc.py
           python3 collecte/charger_liquidite_quotidienne.py
           python3 moteur/profils.py
 
