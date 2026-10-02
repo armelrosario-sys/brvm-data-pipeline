@@ -1314,12 +1314,6 @@
     "type": "DIVIDENDE",
     "titre": "brvmdg paiement de dividendes exercice 2025 sicable ci",
     "url": "https://www.brvm.org/sites/default/files/20260513-_avis_ndeg134_brvmdg_-_paiement_de_dividendes_exercice_2025_-_sicable_ci.pdf"
-   },
-   {
-    "date": "2026-03-11",
-    "type": "AGO",
-    "titre": "pouvoir assemblee generale ordinaire sicable ci annule et remplace le precedent",
-    "url": "https://www.brvm.org/sites/default/files/20260311_-_pouvoir_-_assemblee_generale_ordinaire_-_sicable_ci_annule_et_remplace_le_precedent.pdf"
    }
   ]
  },
@@ -4560,12 +4554,6 @@
    {
     "date": "2026-05-19",
     "type": "AGO",
-    "titre": "avis de convocation assemblee generale ordinaire solibra ci",
-    "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
-   },
-   {
-    "date": "2026-05-19",
-    "type": "AGO",
     "titre": "pouvoir assemblee generale ordinaire solibra ci",
     "url": "https://www.brvm.org/sites/default/files/20260519_-_pouvoir_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
    },
@@ -4574,6 +4562,12 @@
     "type": "AGO",
     "titre": "formulaire de vote par correspondance assemblee generale ordinaire solibra ci",
     "url": "https://www.brvm.org/sites/default/files/20260519_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire solibra ci",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
    }
   ]
  },
@@ -5329,12 +5323,6 @@
    {
     "date": "2026-06-25",
     "type": "AGO",
-    "titre": "pouvoir personne physique assemblee generale ordinaire sitab ci",
-    "url": "https://www.brvm.org/sites/default/files/20260625_-_pouvoir_personne_physique_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
-   },
-   {
-    "date": "2026-06-25",
-    "type": "AGO",
     "titre": "avis de convocation assemblee generale ordinaire sitab ci",
     "url": "https://www.brvm.org/sites/default/files/20260625_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
    },
@@ -5343,6 +5331,12 @@
     "type": "AGO",
     "titre": "pouvoir personne morale assemblee generale ordinaire sitab ci",
     "url": "https://www.brvm.org/sites/default/files/20260625_-_pouvoir_personne_morale_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
+   },
+   {
+    "date": "2026-06-25",
+    "type": "AGO",
+    "titre": "pouvoir personne physique assemblee generale ordinaire sitab ci",
+    "url": "https://www.brvm.org/sites/default/files/20260625_-_pouvoir_personne_physique_-_assemblee_generale_ordinaire_-_sitab_ci.pdf"
    }
   ]
  },
