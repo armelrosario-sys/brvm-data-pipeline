@@ -1649,6 +1649,22 @@ et publier cet effet titre par titre (avant/après sur `profils.json`), comme C1
 
 # Dernier cycle
 
+> **ANNONCE — cycle 14 en cours, 2026-10-02 22h05 UTC (cycle du soir).**
+> Chantier pris : **C25** (ORANGE, priorite 3) — Claudia a ecrit `validation : OK`
+> le 02/10 a 08h28 UTC (commit 1d86e36). Rang 1 de l'ordre deterministe, et sa ligne
+> `statut` (PROPOSE) ne porte aucune passe consommee. A priorite egale, C26 porte le
+> numero superieur : C25 passe d'abord.
+> Objet : **confronter le bulletin PDF a la page HTML `brvm.org/fr/volumes/0`**, source
+> contre source. La page est **hors de portee du bac a sable** : le releveur doit vivre
+> dans un workflow, donc etre sur `main` avant de pouvoir etre declenche. Ce chantier
+> portera donc **deux commits** — le releveur, puis la confrontation adossee a la
+> granularite reellement mesuree sur le premier releve. C'est dit ici pour que personne
+> n'y lise deux chantiers.
+> **Aucune chasse** : elle n'a lieu qu'au cycle du matin.
+> Cette annonce disparait au commit de cloture ; si elle est encore la sans commit de
+> cloture, la session a echoue.
+
+
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
 ## 2026-10-02 — cycle 13 (matin)
