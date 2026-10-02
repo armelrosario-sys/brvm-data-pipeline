@@ -9,6 +9,41 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — hors cycle : la conversation de développement et la boucle, associées
+
+**Le contexte.** La conversation de développement qui avait livré le PER glissant a été
+supprimée par erreur le matin même ; elle n'est pas récupérable. Le dépôt, lui, portait
+tout. Une **fiche de reprise** a été établie à partir du dépôt seul et versée dans
+`docs/REPRISE.md`. Claudia poursuit le développement dans une nouvelle conversation,
+intitulée comme la fiche.
+
+**La demande.** Associer cette conversation à la tâche planifiée « BRVM — boucle des
+chantiers (2 passages/jour) ».
+
+**Ce qui a été vérifié avant d'écrire.**
+
+- La tâche planifiée est **intacte** : active, `53 6,18 * * *`, dernier passage réussi
+  (06h54 → 07h15 UTC ce jour), prochain à 18h53 UTC. Elle ne dépendait pas de la
+  conversation supprimée : chaque passage ouvre une session neuve.
+- Le PER glissant est **terminé** : CI verte sur `75b07af` (golden tests et publication).
+  Il n'est calculable que pour **1 titre sur 47** (BOAC) ; 45 titres sont refusés faute
+  de publication intermédiaire en base. La suite est C26, qui attend la décision de Claudia.
+
+**Pourquoi l'association passe par ce fichier, et pas par la tâche.** Une tâche planifiée
+ne peut pas écrire dans une conversation existante sans perdre ce qui fait sa fiabilité :
+la session neuve à chaque passage. Les deux acteurs partageaient déjà le dépôt, mais la
+conversation ne s'annonçait pas : le contrôle anti-collision de la boucle ne la voyait
+pas. Ce matin, les commits hors cycle de 08h07 à 10h30 UTC sont tombés hors des fenêtres
+de passage, par chance et non par règle.
+
+**Ce qui a été écrit.** Dans `CHANTIERS.md` : une section *Travail hors cycle* (fenêtres
+interdites, annonce et clôture, mêmes règles et barrières, traçage, une demande non finie
+devient un chantier de la file), et une phrase à l'étape 2 qui fait compter une annonce
+hors cycle ouverte comme une annonce de cycle. Le prompt de la tâche planifiée n'a pas
+été modifié : il renvoie déjà à `CHANTIERS.md`, qui fait autorité.
+
+**Barrières.** Aucune : le commit ne touche que `CHANTIERS.md` et `docs/`.
+
 ## 2026-10-02 — hors cycle : le PER glissant (TTM)
 
 **La demande.** « Intégrer le PER glissant (Trailing 12 Months) et l'afficher sur le

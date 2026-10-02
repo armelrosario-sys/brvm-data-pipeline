@@ -55,7 +55,9 @@ conversation n'est nécessaire : la boucle ne lit que ce fichier.
    sur `main` : si une annonce de cycle y figure **sans** son commit de clôture,
    une autre session travaille. **S'arrêter immédiatement**, le dire en une ligne,
    ne rien reconstruire. Un cycle abandonné tôt coûte presque rien ; deux cycles
-   qui se marchent dessus coûtent deux fois tout.
+   qui se marchent dessus coûtent deux fois tout. **Une annonce `Annonce hors
+   cycle :` sans son commit `Cloture hors cycle :` compte exactement comme une
+   annonce de cycle ouverte** (voir *Travail hors cycle*, plus bas).
 3. **Vérifier l'état** : CI verte ? commits nouveaux ? le bloc *Dernier cycle*
    signale-t-il quelque chose en suspens ?
 4. **Exécuter un chantier, et un seul.** L'ordre est **entièrement déterminé** —
@@ -113,6 +115,38 @@ Chacune vient d'une erreur réelle.
 - **Jamais de commit si une barrière tombe.** Tout annuler, ne committer que le
   constat d'échec.
 - **Mesurer avant d'affirmer.** Ne citer que des nombres calculés dans le cycle.
+
+## Travail hors cycle : la conversation de développement
+
+Ajouté le 02/10/2026, à la demande de Claudia. Deux acteurs poussent sur `main` :
+**la boucle** (tâche planifiée « BRVM — boucle des chantiers (2 passages/jour) »,
+06h53 et 18h53 UTC, une session neuve à chaque passage) et **la conversation de
+développement**, où Claudia demande des évolutions en direct (titre : *Fiche de
+reprise — Profilage BRVM (application Streamlit)*). Ils ne se parlent pas : **ce
+fichier est leur seul point de contact.** Ce qui suit les empêche de se marcher
+dessus et garantit que chacun voit le travail de l'autre.
+
+**Pour la conversation de développement :**
+
+- **Jamais pendant un passage.** Ne rien commencer entre **06h40 et 07h45 UTC**, ni
+  entre **18h40 et 19h45 UTC** (un passage dure une vingtaine de minutes ; la marge
+  couvre un retard de déclenchement). Un travail plus long que le temps restant
+  avant la fenêtre attend qu'elle soit passée.
+- **Même contrôle anti-collision que la boucle**, avant tout travail.
+- **Annoncer, puis clore.** Pousser seul un commit `Annonce hors cycle : <objet>`
+  avant de travailler, et terminer par un commit `Cloture hors cycle : <objet>`
+  (qui peut être le commit de livraison lui-même). Si le travail est abandonné, le
+  commit de clôture le dit.
+- **Mêmes règles, mêmes barrières** que la boucle : celles de ce fichier valent pour
+  les deux.
+- **Tracer.** Entrée `hors cycle` en tête de `docs/JOURNAL.md` ; et si le travail
+  touche un chantier de la file, mettre à jour son bloc (statut, mesure). Une
+  demande nouvelle de Claudia qui ne sera pas finie dans la conversation devient un
+  **chantier de la file**, avec sa classe : c'est ainsi que la boucle la reprend.
+
+**Pour la boucle :** une annonce hors cycle ouverte l'arrête comme une annonce de
+cycle (étape 2). Les commits hors cycle sont du travail validé par Claudia en
+direct : les relire au contrôle d'état (étape 3), ne jamais les défaire.
 
 ## Barrières : lesquelles, et quand
 
