@@ -1274,6 +1274,21 @@ inscrit ici, et la lecture retenue est figée par un test portant son contre-exe
 
 # Dernier cycle
 
+> **ANNONCE — cycle 13 en cours, 2026-10-02 07h00 UTC (cycle du matin).**
+> Chantier pris : **C20** (ORANGE, priorite 3) — Claudia a ecrit
+> `validation : OK option (a)`. Rang 1 de l'ordre deterministe, et la ligne `statut`
+> ne porte aucune passe consommee. L'option (a) ne change aucune donnee : le cycle
+> mesure les lectures (b) *laisser-un-dehors* et (c) *plancher de bassin* titre par
+> titre sur les 47 titres, inscrit le tableau, et **fige (a) par un test portant son
+> contre-exemple**.
+> **Famille chassee ce matin** : le **rattachement** d'un dividende a son exercice —
+> la coherence entre `dividendes.date_paiement` et `exercice_couvert`. C10 a laisse
+> cette mesure explicitement **non faite** (`substr(date,1,4)` rendait `24-j`) ; la
+> colonne est ISO depuis le cycle 10, donc elle est desormais calculable, et c'est le
+> **second axe de C2**, celui que C17 n'a pas tranche.
+> Cette annonce disparait au commit de cloture ; si elle est encore la sans commit
+> de cloture, la session a echoue.
+
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
 ## 2026-10-01 — cycle 12 (soir)
