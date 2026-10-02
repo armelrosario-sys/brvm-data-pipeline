@@ -49,6 +49,45 @@ LIBELLES = {
 ORDRE = ["GARP", "VALUE", "GROWTH", "RENDEMENT", "AUCUN_PROFIL",
          "VIGILANCE_CONTRACTION", "RETOURNEMENT", "MUTATION", "NON_ANALYSABLE"]
 
+# PER (02/10/2026, decision de Claudia) : partout ou le PER du BOC s'affiche, le
+# PER glissant l'accompagne, juste a sa droite, et SEULEMENT quand il existe --
+# case vide sinon, sans motif. Les analyses (axes, PEGY, medianes) lisent le
+# glissant en priorite et le BOC a defaut : voir per_analyse dans profils.json.
+AIDE_PER_BOC = ("PER publie par la BRVM au Bulletin Officiel de la Cote (BOC) : "
+                "cours sur le benefice par action du dernier exercice clos.")
+AIDE_PER_GLISSANT = ("PER sur douze mois glissants : meme cours, rapporte au benefice "
+                     "des douze derniers mois (dernier exercice corrige des periodes "
+                     "intermediaires publiees). Quand il existe, c'est lui que lisent "
+                     "les analyses.")
+
+
+def vide_si_absent(table, colonnes, decimales):
+    """Case VIDE, et non "None", quand le PER glissant manque.
+
+    st.dataframe (1.64) affiche "None" dans toute case nulle d'une colonne
+    numerique, et ignore pour ces cases le na_rep et la couleur d'un Styler
+    (verifie a l'ecran le 02/10/2026). La colonne devient donc TEXTE, mais un
+    texte qui se TRIE comme un nombre : chaque valeur est cadree a droite sur
+    une largeur fixe, completee d'espaces, et l'espace se classe avant tout
+    chiffre -- "   9.1" passe devant "  12.9". Le defaut que C10 a corrige (un
+    tri alphabetique qui met 9.3 apres 14.0) ne peut donc pas revenir. Un PER
+    n'est jamais negatif : aucun signe ne vient perturber l'ordre."""
+    table = table.copy()
+    for c in colonnes:
+        if c in table.columns:
+            table[c] = table[c].map(
+                lambda x: "" if pd.isna(x) else f"{x:>10.{decimales}f}")
+    return table
+
+
+def texte_per(r):
+    """PER pour une infobulle : '12.93 (glissant 12.89)' ou '10.88'."""
+    if pd.isna(r.per):
+        return "n/d"
+    if pd.notna(r.per_ttm):
+        return f"{r.per:.2f} (glissant {r.per_ttm:.2f})"
+    return f"{r.per:.2f}"
+
 st.markdown("""<style>
 .bloc-verite{border-left:4px solid #b45f3f;background:#faf6f4;padding:.8rem 1rem;
  border-radius:4px;font-size:.88rem;line-height:1.5;margin-bottom:1rem}
@@ -192,6 +231,11 @@ def charger(_empreinte):
             part_op=v.get("part_operationnelle"),
             per_ttm=v.get("per_ttm"), ttm_detail=v.get("ttm_detail"),
             ttm_motif=v.get("ttm_motif"),
+            # PER d'analyse (02/10/2026) : le glissant quand il existe, le BOC a
+            # defaut. C'est lui que le moteur a lu pour les axes, le PEGY et les
+            # medianes. "per" reste le PER publie par le BOC, affiche en premier.
+            per_analyse=v.get("per_analyse", v.get("per")),
+            per_source=v.get("per_source"),
             prime=v.get("prime_rendement"), taux_ref=v.get("taux_reference"),
             statut_cotation=v.get("statut_cotation", "NEGOCIABLE"),
             date_statut=v.get("date_statut_cotation"),
@@ -549,12 +593,16 @@ with o1:
         if piege:
             st.caption(piege)
         grp = df[df.profil == ouvert][
-            ["ticker", "nom", "secteur", "grade", "per", "dy", "croissance", "motif"]].copy()
-        grp.columns = ["Ticker", "Societe", "Secteur", "Grade", "PER", "Rdt %",
-                       "Croiss. %/an", "Motif du classement"]
-        st.dataframe(grp.sort_values(["Grade", "Ticker"]), hide_index=True, width='stretch',
+            ["ticker", "nom", "secteur", "grade", "per", "per_ttm", "dy", "croissance",
+             "motif"]].copy()
+        grp.columns = ["Ticker", "Societe", "Secteur", "Grade", "PER", "PER glissant",
+                       "Rdt %", "Croiss. %/an", "Motif du classement"]
+        st.dataframe(vide_si_absent(grp.sort_values(["Grade", "Ticker"]), ["PER glissant"],
+                                    2), hide_index=True, width='stretch',
                      column_config={
-                         "PER": st.column_config.NumberColumn(format="%.1f"),
+                         "PER": st.column_config.NumberColumn(format="%.2f", help=AIDE_PER_BOC),
+                         "PER glissant": st.column_config.TextColumn(
+                             help=AIDE_PER_GLISSANT, alignment="right"),
                          "Rdt %": st.column_config.NumberColumn(format="%.1f"),
                          "Croiss. %/an": st.column_config.NumberColumn(format="%.1f"),
                          "Motif du classement": st.column_config.TextColumn(width="large")})
@@ -590,7 +638,10 @@ with o1:
                "secteur si celui-ci compte au moins 8 titres, sinon au sein du marche "
                "(reference indiquee dans la fiche titre). Des rangs voisins ne sont pas "
                "significativement differents : lire des zones, pas des positions.")
-    plan = vue.dropna(subset=["decote_pctl", "croissance_pctl"])
+    plan = vue.dropna(subset=["decote_pctl", "croissance_pctl"]).copy()
+    # Une infobulle n'a pas a se trier : le PER y est donc une CHAINE, qui porte
+    # le glissant entre parentheses quand il existe, et rien sinon.
+    plan["PER"] = plan.apply(texte_per, axis=1)
     if len(plan):
         base = alt.Chart(plan).mark_circle(size=220, opacity=.85).encode(
             x=alt.X("decote_pctl:Q",
@@ -602,7 +653,7 @@ with o1:
                 domain=[p for p in ORDRE if p in plan.profil.unique()],
                 range=[COULEURS[p] for p in ORDRE if p in plan.profil.unique()]),
                 legend=alt.Legend(title="Profil", orient="right")),
-            tooltip=["ticker", "nom", "profil", "grade", "per", "dy", "croissance", "pegy"])
+            tooltip=["ticker", "nom", "profil", "grade", "PER", "dy", "croissance", "pegy"])
         texte = base.mark_text(dy=-14, fontSize=10, color="#333").encode(text="ticker:N")
         regles = (alt.Chart(pd.DataFrame({"v": [67]})).mark_rule(strokeDash=[4, 4], color="#bbb")
                   .encode(x="v:Q"))
@@ -733,12 +784,13 @@ with o1:
                     "Profil": r.profil.replace("_", " ").lower(),
                     "Grade": r.grade,
                     "PER": r.per if pd.notna(r.per) else None,
+                    "PER gl.": r.per_ttm if pd.notna(r.per_ttm) else None,
                     "Rendement": r.dy if pd.notna(r.dy) else None,
                     "Croissance": r.croissance if pd.notna(r.croissance) else None,
                     "Decote": r.decote_pctl if pd.notna(r.decote_pctl) else None,
                     "Signaux": " · ".join(signaux),
                 })
-            return pd.DataFrame(lignes)
+            return vide_si_absent(pd.DataFrame(lignes), ["PER gl."], 1)
 
         # Largeurs en pixels plutot que "small"/"medium" : les huit premieres
         # colonnes sont calibrees sur leur contenu reel, pour que la colonne
@@ -749,22 +801,23 @@ with o1:
         # revenir a la ligne dans une cellule (ni TextColumn ni st.dataframe ne
         # l'offrent en 1.64) : la seule marge de manoeuvre est la largeur.
         COLONNES_ZONE = {
-            "Code": st.column_config.TextColumn("Code", width=62),
+            "Code": st.column_config.TextColumn("Code", width=56),
             "Societe": st.column_config.TextColumn("Societe", width=150),
             "Profil": st.column_config.TextColumn("Profil", width=95),
-            "Grade": st.column_config.TextColumn("Grade", width=55),
+            "Grade": st.column_config.TextColumn("Grade", width=52),
             "PER": st.column_config.NumberColumn(
-                "PER", format="%.1f", width=65,
-                help="Cours sur dernier benefice par action, publie par le BOC."),
+                "PER", format="%.1f", width=58, help=AIDE_PER_BOC),
+            "PER gl.": st.column_config.TextColumn(
+                "PER gl.", width=58, help=AIDE_PER_GLISSANT, alignment="right"),
             "Rendement": st.column_config.NumberColumn(
-                "Rdt", format="%.1f %%", width=70,
+                "Rdt", format="%.1f %%", width=64,
                 help="Dernier dividende sur cours. Les titres a dividende perime "
                      "ou exceptionnel sont hors classement (chantier C1)."),
             "Croissance": st.column_config.NumberColumn(
-                "Croissance", format="%+.0f %%/an", width=95,
+                "Croissance", format="%+.0f %%/an", width=82,
                 help="Croissance moyenne du benefice sur les exercices disponibles."),
             "Decote": st.column_config.NumberColumn(
-                "Decote", format="P%d", width=70,
+                "Decote", format="P%d", width=60,
                 help="Rang de decote, de P0 a P100, RELATIF a la cote BRVM. "
                      "C'est l'axe horizontal du plan et la clef de tri."),
             "Signaux": st.column_config.TextColumn("Signaux", width="large"),
@@ -841,15 +894,13 @@ with o2:
                    "PEGY", "Payout", "Drapeaux", "Arbitrage", "Notation",
                    "Contradiction", "Motif"]
     st.dataframe(
-        aff.sort_values(["Grade", "Profil", "Ticker"]), hide_index=True,
+        vide_si_absent(aff.sort_values(["Grade", "Profil", "Ticker"]), ["PER glissant"],
+                       2), hide_index=True,
         width='stretch', height=560,
         column_config={
-            "PER": st.column_config.NumberColumn(format="%.1f"),
-            "PER glissant": st.column_config.NumberColumn(
-                format="%.2f", width="small",
-                help="PER sur douze mois glissants : cours rapporte au resultat du "
-                     "dernier exercice clos, corrige des periodes intermediaires "
-                     "deja publiees. Renseigne seulement quand il est disponible."),
+            "PER": st.column_config.NumberColumn(format="%.2f", help=AIDE_PER_BOC),
+            "PER glissant": st.column_config.TextColumn(
+                width=100, help=AIDE_PER_GLISSANT, alignment="right"),
             "Rdt %": st.column_config.NumberColumn(format="%.1f"),
             "Croiss. %/an": st.column_config.NumberColumn(format="%.1f"),
             "PEGY": st.column_config.NumberColumn(format="%.2f"),
@@ -901,7 +952,7 @@ with o3:
         # sur 46 fiches sur 47 n'apprenait rien. Le motif reste dans
         # profils.json (ttm_motif) pour qui en a besoin.
         aide_per = (_ctx("per") or "") + ("\n\n" if _ctx("per") else "") + \
-            "PER publie par la BRVM au Bulletin Officiel de la Cote (BOC)."
+            AIDE_PER_BOC
         ecart_ttm = ((r.per_ttm / r.per - 1) * 100
                      if pd.notna(r.per_ttm) and pd.notna(r.per) and r.per else None)
         p1, p2 = st.columns(2)
@@ -1030,7 +1081,8 @@ with o3:
               help=f"Source : {r.source}\n\n" + contexte("g", " %"))
     m2.metric("PEGY", f"{r.pegy:.2f}" if pd.notna(r.pegy) else "n/d",
               help="PER / (croissance % + rendement %). Lynch 1989 ; fondement Easton 2004. "
-                   "Sous 0,25 : protocole de revue obligatoire.")
+                   "Sous 0,25 : protocole de revue obligatoire."
+                   + ("\n\nCalcule sur le PER glissant." if r.per_source == "GLISSANT" else ""))
     m3.metric("Payout", f"{r.payout:.0%}" if pd.notna(r.payout) else "non disponible",
               help=(f"Source : {r.payout_source}\n\n" if pd.notna(r.payout_source) else "")
                    + contexte("payout", pct=True))
@@ -1162,6 +1214,16 @@ with o4:
                "il vient de la BRVM elle-meme. Validation croisee faite sur NSBC "
                "uniquement (1 646,5 implicite contre 1 646 certifie). "
                "Chantier de validation 8-10 titres non clos.")
+
+    n_gl = int((df.per_source == "GLISSANT").sum())
+    st.markdown("#### Quel PER lisent les analyses")
+    st.caption("Le PER **affiche en premier** est toujours celui du BOC. Les **analyses** "
+               "(axe de decote, PEGY, perimetre analysable, medianes de comparaison) "
+               "lisent le **PER glissant** quand il existe, et le PER du BOC a defaut. "
+               f"Aujourd'hui : **{n_gl} titre(s) sur {len(df)}** analyse(s) sur le PER "
+               "glissant. Seule exception : le payout implicite reste calcule sur le PER "
+               "du BOC, parce qu'il rapporte le dividende d'un exercice au benefice de ce "
+               "meme exercice.")
 
     st.markdown("#### Verification externe : notations d'agences")
     n_notes = int(df.notation.notna().sum())

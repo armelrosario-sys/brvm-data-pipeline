@@ -2769,6 +2769,40 @@ def test_per_glissant():
     verifie("per_ttm" in code and "PER glissant" in code,
             "app.py affiche le PER glissant (fiche titre et onglet Explorer)")
 
+    # --- PER D'ANALYSE (02/10/2026, decision de Claudia) -----------------------
+    # Les analyses lisent le glissant quand il existe, le BOC a defaut ; "per"
+    # reste le PER PUBLIE. Une inversion des deux passerait inapercue a l'oeil :
+    # le glissant est aujourd'hui a 0,3 % du BOC sur le seul titre qui en a un.
+    mal_choisis = sorted(
+        t for t, v in profils.items()
+        if v.get("per_analyse") != (v.get("per_ttm") if v.get("per_ttm") is not None
+                                    else (round(v["per"], 2) if v.get("per") is not None
+                                          else None)))
+    verifie(not mal_choisis,
+            "per_analyse vaut le PER glissant quand il existe, le PER du BOC sinon"
+            + ("" if not mal_choisis else f" — ECART : {mal_choisis}"))
+    sources_fausses = sorted(
+        t for t, v in profils.items()
+        if v.get("per_source") != ("GLISSANT" if v.get("per_ttm") is not None
+                                   else ("BOC" if v.get("per") else None)))
+    verifie(not sources_fausses,
+            "per_source dit lequel des deux a ete lu"
+            + ("" if not sources_fausses else f" — ECART : {sources_fausses}"))
+    # Le payout IMPLICITE reste une identite sur un exercice : rendement x PER du
+    # BOC, jamais x PER glissant. Contre-exemple pose : s'il lisait le glissant,
+    # l'egalite ci-dessous tomberait sur tout titre dont le glissant differe.
+    payout_glisse = sorted(
+        t for t, v in profils.items()
+        if str(v.get("payout_source", "")).startswith("IMPLICITE")
+        and v.get("per") and v.get("dy") is not None and v.get("payout") is not None
+        and abs(v["payout"] - v["dy"] / 100 * v["per"]) > 1e-6)
+    verifie(not payout_glisse,
+            "le payout implicite est calcule sur le PER du BOC, pas sur le glissant"
+            + ("" if not payout_glisse else f" — ECART : {payout_glisse}"))
+    src = (RACINE / "moteur" / "profils.py").read_text(encoding="utf-8")
+    verifie("dy * per_boc" in src and "dy * per," not in src,
+            "profils.py : le payout implicite multiplie par per_boc (ancrage du source)")
+
 
 REFERENCES_IDENTIFIEES_MIN = 44
 

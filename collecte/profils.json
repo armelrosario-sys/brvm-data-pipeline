@@ -97,6 +97,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 27.63,
+  "per_analyse": 27.63,
+  "per_source": "BOC",
   "payout": 1.652274,
   "roe": 26.3,
   "pegy": 3.68,
@@ -233,6 +235,8 @@
    "ECART_AGREGATEUR"
   ],
   "per": 14.03,
+  "per_analyse": 14.03,
+  "per_source": "BOC",
   "payout": 0.405467,
   "roe": 26.8,
   "pegy": null,
@@ -344,6 +348,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 15.43,
+  "per_analyse": 15.43,
+  "per_source": "BOC",
   "payout": 0.527706,
   "roe": 30.3,
   "pegy": 0.33,
@@ -430,6 +436,8 @@
    "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 563.92,
+  "per_analyse": 563.92,
+  "per_source": "BOC",
   "payout": 44.49328799999999,
   "roe": 0.1,
   "pegy": null,
@@ -562,6 +570,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 18.93,
+  "per_analyse": 18.93,
+  "per_source": "BOC",
   "payout": 1.179339,
   "roe": 17.1,
   "pegy": 1.98,
@@ -685,6 +695,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 18.28,
+  "per_analyse": 18.28,
+  "per_source": "BOC",
   "payout": 1.037,
   "roe": 34.3,
   "pegy": null,
@@ -717,14 +729,14 @@
   "GROWTH": null,
   "GARP": null,
   "alerte_peg": false,
-  "peg": 0.62,
+  "peg": 0.61,
   "dy": 5.2,
   "confiance": "HAUTE",
   "profil": "GARP",
   "motif": "croissance de 21.0 %/an dans la fenetre soutenable (8-30 %), payee PEGY 0.49 — la croissance n'est pas encore dans le prix",
   "comparaisons": {
    "per": {
-    "titre": 12.93,
+    "titre": 12.89,
     "mediane_secteur": 14.29,
     "n_secteur": 14,
     "mediane_marche": 14.68,
@@ -804,6 +816,8 @@
    "CONTREDIT_PAR_INTERMEDIAIRE"
   ],
   "per": 12.93,
+  "per_analyse": 12.89,
+  "per_source": "GLISSANT",
   "payout": 0.76,
   "roe": 27.9,
   "pegy": 0.49,
@@ -939,6 +953,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 15.09,
+  "per_analyse": 15.09,
+  "per_source": "BOC",
   "payout": 0.7560089999999999,
   "roe": 22.2,
   "pegy": 0.31,
@@ -1025,6 +1041,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 254.11,
+  "per_analyse": 254.11,
+  "per_source": "BOC",
   "payout": 10.647209000000002,
   "roe": 1.1,
   "pegy": null,
@@ -1145,6 +1163,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 13.44,
+  "per_analyse": 13.44,
+  "per_source": "BOC",
   "payout": 0.7392,
   "roe": 24.7,
   "pegy": 4.0,
@@ -1263,6 +1283,8 @@
    "ECART_AGREGATEUR"
   ],
   "per": 13.96,
+  "per_analyse": 13.96,
+  "per_source": "BOC",
   "payout": 0.527,
   "roe": 15.4,
   "pegy": 0.53,
@@ -1400,6 +1422,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 14.8,
+  "per_analyse": 14.8,
+  "per_source": "BOC",
   "payout": 0.44,
   "roe": 19.8,
   "pegy": 1.84,
@@ -1540,6 +1564,8 @@
    "FONDAMENTAL_EN_RETARD"
   ],
   "per": 32.76,
+  "per_analyse": 32.76,
+  "per_source": "BOC",
   "payout": 1.1957399999999998,
   "roe": 24.1,
   "pegy": null,
@@ -1655,6 +1681,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 27.73,
+  "per_analyse": 27.73,
+  "per_source": "BOC",
   "payout": 1.0,
   "roe": 26.4,
   "pegy": 2.09,
@@ -1789,6 +1817,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 14.56,
+  "per_analyse": 14.56,
+  "per_source": "BOC",
   "payout": 0.6770400000000001,
   "roe": 31.8,
   "pegy": 0.85,
@@ -1920,6 +1950,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 3.51,
+  "per_analyse": 3.51,
+  "per_source": "BOC",
   "payout": 0.048087,
   "roe": 21.6,
   "pegy": 0.22,
@@ -1999,6 +2031,8 @@
    "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 60.38,
+  "per_analyse": 60.38,
+  "per_source": "BOC",
   "payout": 52.252852000000004,
   "roe": 3.0,
   "pegy": 2.37,
@@ -2149,6 +2183,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 16.83,
+  "per_analyse": 16.83,
+  "per_source": "BOC",
   "payout": 0.7102259999999998,
   "roe": 19.6,
   "pegy": 0.26,
@@ -2275,6 +2311,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 14.07,
+  "per_analyse": 14.07,
+  "per_source": "BOC",
   "payout": 0.879375,
   "roe": 54.8,
   "pegy": 0.56,
@@ -2390,6 +2428,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 13.37,
+  "per_analyse": 13.37,
+  "per_source": "BOC",
   "payout": 0.41045899999999996,
   "roe": 17.5,
   "pegy": 1.22,
@@ -2520,6 +2560,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 17.85,
+  "per_analyse": 17.85,
+  "per_source": "BOC",
   "payout": 0.503,
   "roe": 63.0,
   "pegy": 2.99,
@@ -2649,6 +2691,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 13.75,
+  "per_analyse": 13.75,
+  "per_source": "BOC",
   "payout": 0.680625,
   "roe": 27.6,
   "pegy": null,
@@ -2779,6 +2823,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 19.57,
+  "per_analyse": 19.57,
+  "per_source": "BOC",
   "payout": 0.6321110000000001,
   "roe": 27.2,
   "pegy": 2.68,
@@ -2904,6 +2950,8 @@
    "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 9.62,
+  "per_analyse": 9.62,
+  "per_source": "BOC",
   "payout": 0.0,
   "roe": 19.2,
   "pegy": 1.93,
@@ -3019,6 +3067,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 8.27,
+  "per_analyse": 8.27,
+  "per_source": "BOC",
   "payout": 0.43913699999999994,
   "roe": 11.7,
   "pegy": null,
@@ -3157,6 +3207,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 16.89,
+  "per_analyse": 16.89,
+  "per_source": "BOC",
   "payout": 0.787074,
   "roe": 20.8,
   "pegy": 2.5,
@@ -3236,6 +3288,8 @@
   "source_croissance": "AUCUNE",
   "drapeaux": [],
   "per": 75.35,
+  "per_analyse": 75.35,
+  "per_source": "BOC",
   "payout": null,
   "roe": 11.8,
   "pegy": null,
@@ -3330,6 +3384,8 @@
    "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 15.09,
+  "per_analyse": 15.09,
+  "per_source": "BOC",
   "payout": 0.21880499999999997,
   "roe": 46.1,
   "pegy": 1.03,
@@ -3498,6 +3554,8 @@
    "ECART_AGREGATEUR"
   ],
   "per": 19.8,
+  "per_analyse": 19.8,
+  "per_source": "BOC",
   "payout": 0.7068599999999999,
   "roe": 15.3,
   "pegy": 20.69,
@@ -3596,6 +3654,8 @@
    "RESULTAT_NON_OPERATIONNEL"
   ],
   "per": 202.15,
+  "per_analyse": 202.15,
+  "per_source": "BOC",
   "payout": 0.6935,
   "roe": 1.1,
   "pegy": null,
@@ -3733,6 +3793,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 37.21,
+  "per_analyse": 37.21,
+  "per_source": "BOC",
   "payout": 0.349774,
   "roe": 0.3,
   "pegy": null,
@@ -3878,6 +3940,8 @@
    "ROE_SOURCE_EXTERIEURE"
   ],
   "per": 11.97,
+  "per_analyse": 11.97,
+  "per_source": "BOC",
   "payout": 0.513,
   "roe": 22.4,
   "pegy": 0.55,
@@ -4007,6 +4071,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 24.04,
+  "per_analyse": 24.04,
+  "per_source": "BOC",
   "payout": 1.0103,
   "roe": 22.2,
   "pegy": 1.04,
@@ -4146,6 +4212,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 16.47,
+  "per_analyse": 16.47,
+  "per_source": "BOC",
   "payout": 0.671976,
   "roe": 27.2,
   "pegy": null,
@@ -4223,6 +4291,8 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 139.98,
+  "per_analyse": 139.98,
+  "per_source": "BOC",
   "payout": null,
   "roe": -4.3,
   "pegy": null,
@@ -4326,6 +4396,8 @@
    "DISTRIBUTION_NON_RECURRENTE"
   ],
   "per": 97.43,
+  "per_analyse": 97.43,
+  "per_source": "BOC",
   "payout": 26.120983000000003,
   "roe": 7.1,
   "pegy": 30.77,
@@ -4463,6 +4535,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 13.3,
+  "per_analyse": 13.3,
+  "per_source": "BOC",
   "payout": 0.7648,
   "roe": 23.5,
   "pegy": 0.2,
@@ -4595,6 +4669,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 9.78,
+  "per_analyse": 9.78,
+  "per_source": "BOC",
   "payout": 0.419562,
   "roe": 30.5,
   "pegy": 0.62,
@@ -4735,6 +4811,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 10.88,
+  "per_analyse": 10.88,
+  "per_source": "BOC",
   "payout": 0.421056,
   "roe": 29.6,
   "pegy": 0.61,
@@ -4869,6 +4947,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 13.73,
+  "per_analyse": 13.73,
+  "per_source": "BOC",
   "payout": 0.8677360000000001,
   "roe": 18.3,
   "pegy": null,
@@ -4991,6 +5071,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 8.08,
+  "per_analyse": 8.08,
+  "per_source": "BOC",
   "payout": 0.44036000000000003,
   "roe": 18.1,
   "pegy": 0.41,
@@ -5086,6 +5168,8 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 14.11,
+  "per_analyse": 14.11,
+  "per_source": "BOC",
   "payout": 0.434588,
   "roe": -27.1,
   "pegy": 1.17,
@@ -5210,6 +5294,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 10.82,
+  "per_analyse": 10.82,
+  "per_source": "BOC",
   "payout": 0.8,
   "roe": 79.9,
   "pegy": 0.2,
@@ -5353,6 +5439,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 20.86,
+  "per_analyse": 20.86,
+  "per_source": "BOC",
   "payout": 1.1,
   "roe": 25.1,
   "pegy": null,
@@ -5483,6 +5571,8 @@
    "CROISSANCE_CORROBOREE"
   ],
   "per": 17.73,
+  "per_analyse": 17.73,
+  "per_source": "BOC",
   "payout": 0.849267,
   "roe": null,
   "pegy": 3.01,
@@ -5573,6 +5663,8 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 731.42,
+  "per_analyse": 731.42,
+  "per_source": "BOC",
   "payout": null,
   "roe": -6.0,
   "pegy": null,
@@ -5656,6 +5748,8 @@
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [],
   "per": 11.11,
+  "per_analyse": 11.11,
+  "per_source": "BOC",
   "payout": 0.285527,
   "roe": -14.0,
   "pegy": null,

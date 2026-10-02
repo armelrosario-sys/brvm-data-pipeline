@@ -1629,6 +1629,13 @@ ne sert à rien pour le glissant, puisque c'est la soustraction qui fait la fen�
 source ; le nombre de titres à PER glissant calculable est figé par un test qui ne peut que
 monter ; et ce qui n'a pas pu être versé est écarté avec un motif daté.
 
+**Ajouté le 02/10/2026 (hors cycle), et cela change la portée de C26.** Le PER glissant
+est désormais le **PER d'analyse** quand il existe (`per_analyse`, `per_source` dans
+`profils.json`) : axe de décote, PEGY, périmètre analysable et médianes le lisent avant le
+PER du BOC. Chaque ligne intermédiaire versée peut donc **déplacer des rangs, des profils
+et des grades**, et plus seulement remplir une case. Le cycle qui exécute C26 doit mesurer
+et publier cet effet titre par titre (avant/après sur `profils.json`), comme C16 et C20.
+
 
 ---
 

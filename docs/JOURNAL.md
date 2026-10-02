@@ -9,6 +9,64 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — hors cycle : le PER glissant devient le PER d'analyse, et s'affiche partout
+
+**La demande de Claudia** (11h25 UTC, en validant C26). Le PER glissant doit être visible
+partout où le PER du BOC l'est, sans charger l'affichage ; toutes les analyses qui lisent un
+PER doivent lire le glissant en priorité, et le PER du BOC à défaut.
+
+### Le moteur (`moteur/profils.py`)
+
+`ingredients()` calcule désormais le PER glissant (il le faisait plus tard, dans
+`calculer()`) et en tire le **PER d'analyse** : le glissant s'il existe, le BOC sinon. C'est
+lui que lisent l'axe de décote (rendement bénéficiaire), le PEG, le PEGY, le périmètre
+analysable (PER > 50) et les médianes de comparaison. Nouveaux champs de `profils.json` :
+`per_analyse` et `per_source` (`GLISSANT` / `BOC`). **`per` reste le PER publié par le BOC**,
+pour l'affichage et pour les lecteurs existants (`generer_poste_decision.py`).
+
+**Une exception, délibérée** : le payout implicite reste `rendement × PER du BOC`. C'est
+une identité sur un exercice — le dividende d'un exercice rapporté au bénéfice de ce même
+exercice ; le bénéfice glissant ne correspond à aucun dividende versé.
+
+**Effet mesuré aujourd'hui, sur les 47 titres** : 46 analysés sur le BOC, 1 sur le glissant
+(BOAC, 12,89 contre 12,93). Seuls changent pour BOAC son PEG (0,62 → 0,61) et ses
+comparaisons ; **0 profil, 0 grade, 0 rang de décote** ne bouge. L'effet grandira avec C26 :
+son bloc le dit désormais, et demande de le mesurer titre par titre.
+
+### L'affichage (`app.py`)
+
+Le PER glissant se place **juste à droite** du PER du BOC partout où celui-ci apparaît :
+fiche titre (fait le matin), tableau d'un profil ouvert (vue d'ensemble), quatre cadrans du
+plan (colonne « PER gl. »), onglet Explorer. Dans l'infobulle du nuage de points, le PER
+s'écrit « 12.93 (glissant 12.89) », ou seul. Case **vide** quand il manque, sans motif.
+
+**Deux contraintes rencontrées, vérifiées à l'écran** (Chromium, 1 440 px, app lancée en
+local) :
+- `st.dataframe` 1.64 écrit « None » dans toute case nulle d'une colonne numérique, et
+  ignore pour elles le `na_rep` et la couleur d'un Styler. La colonne du glissant est donc
+  un **texte cadré à droite sur largeur fixe** : l'espace se classant avant les chiffres,
+  le tri de l'en-tête reste numérique (« 9.10 » avant « 12.89 » avant « 105.00 »). Le
+  défaut corrigé par C10 ne peut pas revenir. L'export CSV, lui, reste numérique.
+- Les cadrans avaient des largeurs calibrées au pixel. La colonne ajoutée (58 px, PER réduit
+  de 65 à 58) a été compensée sur Code 62→56, Grade 55→52, Rdt 70→64, Croissance 95→82,
+  Décote 70→60 : la ligne STBC, la plus chargée en signaux, s'affiche entière.
+
+L'onglet *Qualité des données & méthode* gagne un paragraphe « Quel PER lisent les
+analyses », avec le compte des titres analysés sur le glissant.
+
+### Tests et barrières
+
+Section 27 de `tester_donnees.py` : 4 contrôles de plus (choix du PER d'analyse, source
+déclarée, payout implicite sur le BOC, ancrage du source). **Vérifiée par injection** :
+moteur remis sur le seul PER du BOC et payout passé au PER d'analyse → 2 échecs.
+Golden tests verts ; `tester_donnees.py` **235 OK**, code 2 (alertes connues C4, C5) ;
+`avis_brvm.py --test`, `notations.py --test` verts ; `generer_dashboard.py` 48 titres ;
+AppTest : BOAC 12,93 / 12,89 (−0,3 %), SNTS 10,88 seul. Base et classeur supprimés avant
+le commit.
+
+**Non touché** : le site statique GitHub Pages (`dashboard/generer_dashboard_html.py`), qui
+lit les tables de cours et non `profils.json`, et dont l'extinction est le chantier C9.
+
 ## 2026-10-02 — hors cycle : le PER glissant à côté du PER du BOC, et seulement s'il existe
 
 **La demande de Claudia.** « Afficher le PER du BOC BRVM en premier lieu, puis à côté le PER

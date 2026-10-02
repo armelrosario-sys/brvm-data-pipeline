@@ -640,6 +640,21 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50,
     per = per_row[0] if per_row else None
     dy = dy_row[0] if dy_row else None  # fraction (0,056 = 5,6 %)
 
+    # PER D'ANALYSE (02/10/2026, decision de Claudia en conversation) : toute
+    # analyse qui lit un PER lit le PER GLISSANT (12 mois) quand il existe, et le
+    # PER du BOC a defaut. Le PER du BOC reste la valeur PUBLIEE et AFFICHEE en
+    # premier ("per_boc", et "per" dans profils.json pour les consommateurs
+    # existants). Le glissant porte deja ses gardes (paliers du BPA implicite
+    # verifies, fenetre sans recouvrement) : quand il est refuse, rien ne change.
+    # SEULE EXCEPTION, deliberee : le payout implicite ci-dessous reste calcule
+    # sur le PER du BOC. C'est une identite sur UN exercice (dividende de
+    # l'exercice / BPA du meme exercice) ; le BPA glissant ne correspond a aucun
+    # dividende verse, et le melanger fausserait le ratio au lieu de l'actualiser.
+    per_boc = per
+    per_ttm, ttm_detail, ttm_motif = per_glissant(cur, ticker, per_boc)
+    per = per_ttm if per_ttm is not None else per_boc
+    per_source = "GLISSANT" if per_ttm is not None else ("BOC" if per_boc else None)
+
     roe, roe_exercice = None, None
     for exercice, rn, cp, _payout in etats:
         if rn is not None and cp:
@@ -678,7 +693,7 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50,
         if p is not None:
             payout, payout_source = p, "ETATS_FINANCIERS"
             break
-    if payout is None and per and dy is not None:
+    if payout is None and per_boc and dy is not None:
         # Identite comptable : DPA/BPA = (DPA/cours) x (cours/BPA) = rendement x PER.
         # CHANTIER OUVERT (31/07/2026) : la convention brut/net du champ rendement
         # du BOC n'est PAS tranchee. Test sur 11 titres a payout certifie :
@@ -687,7 +702,7 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50,
         # 5,0 %, alors que le BOC affiche 4,40 % = exactement le net personnes
         # physiques). Tant que ce n'est pas tranche, le payout implicite est
         # affiche avec sa source et n'est jamais promu au rang de donnee certifiee.
-        payout, payout_source = dy * per, "IMPLICITE(rendement x PER)"
+        payout, payout_source = dy * per_boc, "IMPLICITE(rendement x PER)"
 
     # Drapeau RESULTAT_NON_OPERATIONNEL (06/08/2026, jurisprudence AGL CI) : quand le
     # resultat net provient majoritairement du financier ou de l'exceptionnel, une
@@ -798,7 +813,9 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50,
                 arbitrage_detail=arb.get("detail"),
                 arbitrage_corroboree=bool(arb.get("corroboree")),
                 arbitrage_bloquant=bool(arb.get("bloquant")),
-                per=per, dy=100.0 * dy if dy is not None else None,
+                per=per, per_boc=per_boc, per_source=per_source,
+                per_ttm=per_ttm, ttm_detail=ttm_detail, ttm_motif=ttm_motif,
+                dy=100.0 * dy if dy is not None else None,
                 dy_axe=100.0 * dy_axe if dy_axe is not None else None,
                 distribution_non_recurrente=non_rec, distribution_detail=detail_dist,
                 payout=payout,
@@ -1499,12 +1516,10 @@ def calculer():
                 if "CONTREDIT_PAR_INTERMEDIAIRE" not in v["drapeaux"]:
                     v["drapeaux"] = v["drapeaux"] + ["CONTREDIT_PAR_INTERMEDIAIRE"]
 
-        # PER glissant (TTM), demande de Claudia le 02/10/2026. Il ne remplace
-        # jamais le PER du bulletin, qui reste la reference affichee : il le
-        # double sur les titres dont une publication intermediaire permet de
-        # refaire la fenetre de douze mois. Le motif de refus est conserve et
-        # expose, parce qu'une case vide sans explication ne vaut rien.
-        per_ttm, ttm_detail, ttm_motif = per_glissant(cur, t, v.get("per"))
+        # PER glissant (TTM) : calcule dans ingredients() depuis le 02/10/2026,
+        # parce qu'il y devient le PER d'analyse. Le PER du BOC reste la valeur
+        # publiee, affichee en premier ; le motif de refus reste dans le fichier.
+        per_ttm, ttm_detail, ttm_motif = v["per_ttm"], v["ttm_detail"], v["ttm_motif"]
 
         motif = motif_du_profil(principal, v, decote, croissance, sp)
         if v.get("arbitrage_bloquant"):
@@ -1635,7 +1650,12 @@ def calculer():
             "g": round(v["g"], 1) if v["g"] is not None else None,
             "source_croissance": v["source_croissance"],
             "drapeaux": v["drapeaux"],
-            "per": v["per"],
+            # "per" reste le PER PUBLIE par le BOC (affiche en premier, lu par les
+            # consommateurs existants). "per_analyse" est celui que le moteur a lu
+            # pour les axes, le PEGY, le perimetre et les medianes.
+            "per": v["per_boc"],
+            "per_analyse": round(v["per"], 2) if v["per"] is not None else None,
+            "per_source": v["per_source"],
             "payout": v["payout"],
             "roe": round(v["roe"], 1) if v["roe"] is not None else None,
             "pegy": v["pegy"],
