@@ -1579,7 +1579,7 @@ rendre une table vide.
 
 - classe : ORANGE — saisie d'exercices intermédiaires certifiés ; le diagnostic est fait
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : partielle — première passe **sans réseau** sur le corpus déjà collecté
 - priorité : 3
 
