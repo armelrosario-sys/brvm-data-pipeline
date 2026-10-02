@@ -190,6 +190,8 @@ def charger(_empreinte):
             confiance=v.get("confiance"), gate=v.get("gate"),
             motif=v.get("motif"), payout_source=v.get("payout_source"),
             part_op=v.get("part_operationnelle"),
+            per_ttm=v.get("per_ttm"), ttm_detail=v.get("ttm_detail"),
+            ttm_motif=v.get("ttm_motif"),
             prime=v.get("prime_rendement"), taux_ref=v.get("taux_reference"),
             statut_cotation=v.get("statut_cotation", "NEGOCIABLE"),
             date_statut=v.get("date_statut_cotation"),
@@ -828,18 +830,28 @@ with o2:
     st.caption("Le grade dit ce que vaut l'etiquette : "
                "**A** source certifiee et etiquette stable · **B** solide, reserve nommee · "
                "**C** travail complementaire requis avant tout usage.")
-    aff = vue[["ticker", "nom", "secteur", "profil", "secondaire", "grade", "per", "dy",
+    # Le PER glissant figure ici des le 02/10/2026 : c'est la seule vue ou il se
+    # TRIE et s'exporte, donc la seule ou il se compare d'un titre a l'autre.
+    aff = vue[["ticker", "nom", "secteur", "profil", "secondaire", "grade", "per",
+               "per_ttm", "dy",
                "croissance", "source", "pegy", "payout", "drapeaux",
                "arbitrage", "notation", "contradiction", "motif"]].copy()
     aff.columns = ["Ticker", "Societe", "Secteur", "Profil", "Secondaire", "Grade",
-                   "PER", "Rdt %", "Croiss. %/an", "Source croissance", "PEGY",
-                   "Payout", "Drapeaux", "Arbitrage", "Notation", "Contradiction",
-                   "Motif"]
+                   "PER", "PER glissant", "Rdt %", "Croiss. %/an", "Source croissance",
+                   "PEGY", "Payout", "Drapeaux", "Arbitrage", "Notation",
+                   "Contradiction", "Motif"]
     st.dataframe(
         aff.sort_values(["Grade", "Profil", "Ticker"]), hide_index=True,
         width='stretch', height=560,
         column_config={
             "PER": st.column_config.NumberColumn(format="%.1f"),
+            "PER glissant": st.column_config.NumberColumn(
+                format="%.2f", width="small",
+                help="PER sur douze mois glissants : cours rapporte au resultat du "
+                     "dernier exercice clos, corrige des periodes intermediaires "
+                     "deja publiees. Vide quand aucune publication intermediaire ne "
+                     "permet de refaire la fenetre, ou quand la reference du "
+                     "bulletin n'a pas pu etre verifiee — le motif figure sur la fiche."),
             "Rdt %": st.column_config.NumberColumn(format="%.1f"),
             "Croiss. %/an": st.column_config.NumberColumn(format="%.1f"),
             "PEGY": st.column_config.NumberColumn(format="%.2f"),
@@ -882,9 +894,32 @@ with o3:
         # Retire des deux. Le PER affiche est celui du BOC, et il est juste :
         # verifie contre brvm.org le 01/10, BOAN et BICC a 0,0 % une fois
         # appliquee la variation de seance du jour.
+        #
+        # PER GLISSANT (TTM), 02/10/2026. Il vient en delta de la metrique, pas a
+        # sa place : le PER du bulletin reste la reference, le glissant est une
+        # lecture plus FRAICHE du meme rapport. Il n'apparait que la ou une
+        # publication intermediaire permet de refaire la fenetre de douze mois et
+        # ou la reference du bulletin a ete verifiee ; partout ailleurs, l'aide
+        # dit POURQUOI il manque, parce qu'une case vide sans motif ne vaut rien.
         aide_per = _ctx("per") or ""
+        aide_per += "\n\n**PER glissant (12 mois)** — "
+        if pd.notna(r.per_ttm):
+            aide_per += f"{r.per_ttm:.2f}. {r.ttm_detail}"
+        else:
+            aide_per += f"non calcule : {r.ttm_motif or 'motif non renseigne'}."
+        # Le delta porte l'ECART SIGNE et non la valeur : Streamlit lit le signe
+        # pour orienter sa fleche, et "glissant 12.9" sans signe affichait une
+        # fleche MONTANTE sur un PER glissant plus BAS que le PER publie.
+        ecart_ttm = ((r.per_ttm / r.per - 1) * 100
+                     if pd.notna(r.per_ttm) and pd.notna(r.per) and r.per else None)
         st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d", help=aide_per,
+                  delta=(f"{ecart_ttm:+.1f} % sur 12 mois glissants"
+                         if ecart_ttm is not None else None),
                   delta_color="off")
+        if ecart_ttm is not None:
+            st.caption(
+                f"**PER glissant (12 mois) : {r.per_ttm:.2f}** contre {r.per:.1f} "
+                f"au bulletin, soit {ecart_ttm:+.1f} %. {r.ttm_detail}")
         if isinstance(r.dist_non_rec, str) and r.dist_non_rec:
             st.warning(f"**Rendement facial {r.dy_facial:.1f} % — hors classement.** {r.dist_non_rec}")
         st.metric("Rendement", f"{r.dy_facial:.1f} %" if pd.notna(r.dy_facial) else "n/d",

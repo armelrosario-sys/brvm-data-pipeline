@@ -905,6 +905,186 @@ def tendance_intermediaire(cur, ticker):
     return (rn / rn1 - 1), periode, exercice, note
 
 
+# Familles de periodes acceptees pour le cumul glissant. Un exercice doit etre
+# couvert par UNE SEULE famille : melanger des trimestres et un semestre
+# compterait deux fois les memes mois (S1 vaut T1+T2). Rang = nombre de periodes
+# couvertes depuis le debut de l'exercice.
+PERIODES_TTM = {"T1": ("T", 1), "T2": ("T", 2), "T3": ("T", 3), "T4": ("T", 4),
+                "S1": ("S", 2), "S2": ("S", 4), "9M": ("M", 3)}
+
+
+def benefice_glissant(cur, ticker):
+    """Resultat net sur DOUZE MOIS GLISSANTS (TTM), ou None avec son motif.
+
+    TTM = resultat du dernier exercice CLOS
+          + cumul des periodes intermediaires de l'exercice EN COURS
+          - cumul des MEMES periodes de l'exercice precedent.
+
+    La soustraction est ce qui fait la fenetre glissante : elle retire du dernier
+    exercice clos les mois que l'exercice en cours a deja remplaces. Elle est
+    possible parce que resultats_intermediaires porte resultat_net_n1, la meme
+    periode un an plus tot, lue dans le document lui-meme -- jamais reconstruite.
+
+    CE QUI EST REFUSE, et pourquoi (une case vide vaut mieux qu'une valeur
+    approchee) :
+      - une periode sans son comparatif N-1 : la soustraction serait inventee ;
+      - un exercice couvert par deux familles de periodes (T1, T2 et S1) :
+        S1 vaut T1+T2, les compter ensemble double un semestre ;
+      - des periodes non consecutives depuis le debut de l'exercice (T1 absent,
+        T3 present) : le cumul sauterait des mois sans le dire ;
+      - un exercice intermediaire qui ne suit pas immediatement l'exercice clos
+        de reference ;
+      - un resultat glissant negatif ou nul : aucun PER n'a de sens dessus.
+
+    Retourne (rn_ttm, rn_annuel, exercice_annuel, libelle_periodes, motif_refus).
+    """
+    lignes = cur.execute(
+        "SELECT exercice, periode, resultat_net, resultat_net_n1 "
+        "FROM resultats_intermediaires WHERE ticker=? AND resultat_net IS NOT NULL "
+        "ORDER BY exercice DESC", (ticker,)).fetchall()
+    if not lignes:
+        return None, None, None, None, "aucune publication intermediaire en base"
+    exercice = max(x[0] for x in lignes)
+    courantes = [x for x in lignes if x[0] == exercice]
+
+    inconnues = sorted({p for _e, p, _rn, _n1 in courantes if p not in PERIODES_TTM})
+    if inconnues:
+        return None, None, None, None, f"periode(s) non reconnue(s) : {inconnues}"
+    familles = {PERIODES_TTM[p][0] for _e, p, _rn, _n1 in courantes}
+    if len(familles) > 1:
+        return None, None, None, None, (
+            "deux familles de periodes sur le meme exercice (%s) : un semestre "
+            "recouvre deux trimestres, les cumuler les compterait deux fois"
+            % ", ".join(sorted(p for _e, p, _rn, _n1 in courantes)))
+    manquants = [p for _e, p, _rn, n1 in courantes if n1 is None]
+    if manquants:
+        return None, None, None, None, (
+            "periode(s) sans comparatif N-1 : %s — la soustraction serait inventee"
+            % ", ".join(sorted(manquants)))
+
+    # Le cumul doit partir du DEBUT de l'exercice, sans trou. Les lignes
+    # trimestrielles portent un trimestre chacune et doivent donc paver T1..Tk ;
+    # une ligne semestrielle ou de neuf mois porte deja le cumul, donc elle doit
+    # etre seule, et commencer a l'ouverture de l'exercice (S1, 9M — jamais S2).
+    famille = familles.pop()
+    periodes = sorted((p for _e, p, _rn, _n1 in courantes),
+                      key=lambda p: PERIODES_TTM[p][1])
+    if famille == "T":
+        depart_ok = [PERIODES_TTM[p][1] for p in periodes] == list(
+            range(1, len(periodes) + 1))
+    else:
+        depart_ok = len(periodes) == 1 and periodes[0] in ("S1", "9M")
+    if not depart_ok:
+        return None, None, None, None, (
+            "le cumul ne part pas du debut de l'exercice, ou saute une periode (%s)"
+            % ", ".join(periodes))
+
+    annuel = cur.execute(
+        "SELECT exercice, resultat_net FROM etats_financiers WHERE ticker=? "
+        "AND resultat_net IS NOT NULL ORDER BY exercice DESC LIMIT 1", (ticker,)).fetchone()
+    if not annuel:
+        return None, None, None, None, "aucun exercice annuel en base"
+    ex_annuel, rn_annuel = annuel
+    if ex_annuel != exercice - 1:
+        return None, None, None, None, (
+            "le dernier exercice clos en base est %d, l'intermediaire porte sur %d : "
+            "ils ne se suivent pas" % (ex_annuel, exercice))
+
+    cumul = sum(x[2] for x in courantes)
+    cumul_n1 = sum(x[3] for x in courantes)
+    rn_ttm = rn_annuel + cumul - cumul_n1
+    if rn_ttm <= 0:
+        return None, None, None, None, (
+            "resultat glissant negatif ou nul (%.0f) : aucun PER n'a de sens dessus"
+            % rn_ttm)
+    return rn_ttm, rn_annuel, ex_annuel, f"{'+'.join(periodes)} {exercice}", None
+
+
+def boc_divise_par_notre_resultat(cur, ticker, ex_annuel, tolerance=0.02):
+    """Le PER publie par le BOC repose-t-il bien sur NOTRE dernier resultat annuel ?
+
+    POURQUOI CETTE VERIFICATION EXISTE. Le PER glissant se calcule en rapport :
+    PER_TTM = PER_affiche x (RN_annuel / RN_TTM). Le nombre d'actions s'annule,
+    ce qui evite de l'estimer -- mais l'egalite n'est vraie QUE si le PER du BOC
+    divise par le MEME resultat annuel que celui de notre base. Si le bulletin
+    est reste sur l'exercice precedent, ou s'il retient un resultat different du
+    notre, le rapport est faux et le PER glissant serait un nombre invente.
+    C'est exactement l'erreur que le chantier C23 a fait payer au PER normalise :
+    une formule juste appliquee a un denominateur non verifie.
+
+    METHODE, sans estimer le nombre d'actions. Le benefice par action implicite
+    du bulletin, cours / PER, forme des PALIERS : il ne bouge qu'a la publication
+    d'un resultat annuel. Si le BOC suit notre serie, le rapport entre les deux
+    derniers paliers doit egaler le rapport de nos deux derniers resultats
+    annuels. Verifie sur BOAC le 02/10/2026 : paliers 801,08 -> 888,52, soit
+    1,1091, contre RN 2025/2024 = 35540/32044 = 1,1091. Ecart 0,00 %.
+
+    Retourne (True/False, detail).
+    """
+    precedent = cur.execute(
+        "SELECT resultat_net FROM etats_financiers WHERE ticker=? AND exercice=? "
+        "AND resultat_net IS NOT NULL", (ticker, ex_annuel - 1)).fetchone()
+    courant = cur.execute(
+        "SELECT resultat_net FROM etats_financiers WHERE ticker=? AND exercice=? "
+        "AND resultat_net IS NOT NULL", (ticker, ex_annuel)).fetchone()
+    if not precedent or not courant or precedent[0] <= 0 or courant[0] <= 0:
+        return False, ("les exercices %d et %d ne sont pas tous deux en base : le "
+                       "rapport des paliers n'a rien a confronter"
+                       % (ex_annuel - 1, ex_annuel))
+
+    table, col = source_cours(cur)
+    seances = cur.execute(
+        f"SELECT {col}, cours, per FROM {table} WHERE ticker=? AND per IS NOT NULL "
+        f"AND per > 0 AND cours IS NOT NULL AND cours > 0 ORDER BY {col}",
+        (ticker,)).fetchall()
+    paliers = []
+    for _d, cours, per in seances:
+        bpa = cours / per
+        if paliers and abs(bpa - paliers[-1][0]) / paliers[-1][0] < tolerance:
+            paliers[-1][0] = (paliers[-1][0] * paliers[-1][1] + bpa) / (paliers[-1][1] + 1)
+            paliers[-1][1] += 1
+        else:
+            paliers.append([bpa, 1])
+    paliers = [p for p in paliers if p[1] >= 5]  # un palier d'une seance est du bruit
+    if len(paliers) < 2:
+        return False, ("moins de deux paliers de BPA implicite dans la serie : rien "
+                       "a confronter")
+    observe = paliers[-1][0] / paliers[-2][0]
+    attendu = courant[0] / precedent[0]
+    ecart = abs(observe / attendu - 1)
+    if ecart > tolerance:
+        return False, ("le BOC ne suit pas notre serie : dernier saut du BPA "
+                       "implicite x%.4f, rapport RN %d/%d x%.4f, ecart %.1f %%"
+                       % (observe, ex_annuel, ex_annuel - 1, attendu, ecart * 100))
+    return True, ("saut du BPA implicite x%.4f contre rapport RN %d/%d x%.4f, "
+                  "ecart %.2f %%" % (observe, ex_annuel, ex_annuel - 1, attendu,
+                                     ecart * 100))
+
+
+def per_glissant(cur, ticker, per):
+    """PER sur douze mois glissants. Retourne (per_ttm, detail, motif_refus).
+
+    PER_TTM = PER_affiche x (RN_annuel / RN_TTM). Le nombre d'actions s'annule :
+    inutile de l'estimer, a condition que le PER affiche repose bien sur
+    RN_annuel -- ce que boc_divise_par_notre_resultat() verifie, et sans quoi on
+    ne calcule rien.
+    """
+    if not per or per <= 0:
+        return None, None, "aucun PER publie par le bulletin"
+    rn_ttm, rn_annuel, ex_annuel, periodes, motif = benefice_glissant(cur, ticker)
+    if rn_ttm is None:
+        return None, None, motif
+    ok, detail_boc = boc_divise_par_notre_resultat(cur, ticker, ex_annuel)
+    if not ok:
+        return None, None, detail_boc
+    valeur = per * rn_annuel / rn_ttm
+    detail = ("%s : resultat glissant %.0f M contre %.0f M pour l'exercice %d "
+              "(%+.1f %%). Reference verifiee — %s."
+              % (periodes, rn_ttm, rn_annuel, ex_annuel,
+                 (rn_ttm / rn_annuel - 1) * 100, detail_boc))
+    return valeur, detail, None
+
+
 # ----------------------------------------------------------------------
 # POURQUOI LE PER NORMALISE N'EXISTE PLUS — chantier C23, retire le 02/10/2026
 # ----------------------------------------------------------------------
@@ -1319,6 +1499,13 @@ def calculer():
                 if "CONTREDIT_PAR_INTERMEDIAIRE" not in v["drapeaux"]:
                     v["drapeaux"] = v["drapeaux"] + ["CONTREDIT_PAR_INTERMEDIAIRE"]
 
+        # PER glissant (TTM), demande de Claudia le 02/10/2026. Il ne remplace
+        # jamais le PER du bulletin, qui reste la reference affichee : il le
+        # double sur les titres dont une publication intermediaire permet de
+        # refaire la fenetre de douze mois. Le motif de refus est conserve et
+        # expose, parce qu'une case vide sans explication ne vaut rien.
+        per_ttm, ttm_detail, ttm_motif = per_glissant(cur, t, v.get("per"))
+
         motif = motif_du_profil(principal, v, decote, croissance, sp)
         if v.get("arbitrage_bloquant"):
             motif = ("profil suspendu : la base est en desaccord avec une source "
@@ -1408,6 +1595,9 @@ def calculer():
             "tendance_intermediaire": (round(var_int, 4) if var_int is not None else None),
             "periode_intermediaire": (f"{periode_int} {ex_int}" if var_int is not None
                                       else None),
+            "per_ttm": round(per_ttm, 2) if per_ttm is not None else None,
+            "ttm_detail": ttm_detail,
+            "ttm_motif": ttm_motif,
             "roe_exercice": v.get("roe_exercice"),
             # Prime du rendement sur le taux sans risque regional. Negative =
             # le titre rapporte MOINS qu'une obligation d'Etat de la zone.

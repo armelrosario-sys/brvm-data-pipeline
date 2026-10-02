@@ -2640,6 +2640,136 @@ def test_dates_dividendes_iso():
 # rendement BOC ont leur dividende de reference identifie en base. Il etait de
 # 31 avant le chargement de collecte/dividendes_boc.csv. Il ne doit que monter :
 # une baisse signifie que le pont a ete debranche ou que la collecte recule.
+# ----------------------------------------------------------------------
+# 27. LE PER GLISSANT (TTM) — sa regle, et ses refus (bloquant)
+# ----------------------------------------------------------------------
+def test_per_glissant():
+    """Le PER sur douze mois glissants ne se calcule que sur une reference verifiee.
+
+    POURQUOI CETTE SECTION EXISTE (02/10/2026, demande de Claudia : afficher un
+    PER glissant pour refleter la situation financiere la plus actuelle).
+
+    LA FORMULE EST UN RAPPORT : PER_TTM = PER_affiche x (RN_annuel / RN_TTM), ou
+    RN_TTM = RN du dernier exercice clos + cumul des periodes intermediaires de
+    l'exercice en cours - cumul des MEMES periodes un an plus tot. Le nombre
+    d'actions s'annule, donc on n'a pas a l'estimer.
+
+    MAIS L'EGALITE N'EST VRAIE QUE SI LE BULLETIN DIVISE PAR LE MEME RN_annuel.
+    C'est precisement l'erreur qui a coute le PER normalise (C23) : une formule
+    juste posee sur un denominateur non verifie. La verification se fait sans
+    estimer le nombre d'actions : le BPA implicite du bulletin (cours / PER)
+    forme des PALIERS, et le rapport des deux derniers paliers doit egaler le
+    rapport de nos deux derniers resultats annuels. Mesure du 02/10/2026 sur
+    BOAC : paliers 801,08 -> 888,52 soit x1,1091, contre RN 2025/2024 =
+    35540/32044 = x1,1091. Ecart 0,00 %.
+
+    CE QUE LA REGLE REFUSE, et c'est le coeur de ces controles : une periode sans
+    comparatif N-1, deux familles de periodes sur le meme exercice (S1 recouvre
+    T1+T2), un cumul qui ne part pas du debut de l'exercice, un exercice
+    intermediaire qui ne suit pas l'exercice clos, un resultat glissant negatif,
+    et une reference que les paliers ne confirment pas. Chaque refus porte son
+    motif, expose dans profils.json et sur la fiche : une case vide sans
+    explication ne vaut rien.
+
+    CE QUE LA BASE PERMET AUJOURD'HUI, dit franchement : resultats_intermediaires
+    porte 3 lignes pour 2 titres. BOAC donne 12,93 -> 12,89 (+0,3 % de resultat
+    glissant). SGBC est refuse parce que nos exercices 2022 a 2024 manquent, donc
+    le rapport des paliers n'a rien a confronter. Le PER glissant vaut donc pour
+    1 titre sur 47, et ce qui le limite est la COLLECTE des publications
+    intermediaires, pas le calcul.
+    """
+    print("\n=== 27. PER glissant sur douze mois (bloquant) ===")
+    import json
+    sys.path.insert(0, str(ICI))
+    from profils import benefice_glissant, per_glissant
+
+    # --- La regle, sur une base jetable, avec ses contre-exemples -------------
+    conn = sqlite3.connect(":memory:")
+    conn.execute("CREATE TABLE etats_financiers (ticker TEXT, exercice INT, "
+                 "resultat_net REAL)")
+    conn.execute("CREATE TABLE resultats_intermediaires (ticker TEXT, exercice INT, "
+                 "periode TEXT, resultat_net REAL, resultat_net_n1 REAL)")
+
+    def _cas(t, annuels, inters):
+        conn.executemany("INSERT INTO etats_financiers VALUES (?,?,?)",
+                         [(t, e, rn) for e, rn in annuels])
+        conn.executemany("INSERT INTO resultats_intermediaires VALUES (?,?,?,?,?)",
+                         [(t, e, p, rn, n1) for e, p, rn, n1 in inters])
+
+    # A. deux trimestres consecutifs : 1000 + (300-200) + (350-250) = 1200
+    _cas("A", [(2025, 1000.0)], [(2026, "T1", 300.0, 200.0), (2026, "T2", 350.0, 250.0)])
+    # B. T2 sans T1 : le cumul sauterait un trimestre
+    _cas("B", [(2025, 1000.0)], [(2026, "T2", 350.0, 250.0)])
+    # C. T1 et S1 ensemble : S1 recouvre T1, le cumul doublerait des mois
+    _cas("C", [(2025, 1000.0)], [(2026, "T1", 300.0, 200.0), (2026, "S1", 650.0, 450.0)])
+    # D. comparatif N-1 absent : la soustraction serait inventee
+    _cas("D", [(2025, 1000.0)], [(2026, "T1", 300.0, None)])
+    # E. l'intermediaire ne suit pas l'exercice clos (2024 puis 2026)
+    _cas("E", [(2024, 1000.0)], [(2026, "T1", 300.0, 200.0)])
+    # F. resultat glissant negatif
+    _cas("F", [(2025, 100.0)], [(2026, "T1", 10.0, 500.0)])
+    cur_j = conn.cursor()
+
+    rn, rn_an, ex, per, motif = benefice_glissant(cur_j, "A")
+    verifie(motif is None and rn == 1200.0 and rn_an == 1000.0 and ex == 2025
+            and per == "T1+T2 2026",
+            "deux trimestres consecutifs se cumulent : 1000 + (300-200) + (350-250) "
+            f"= 1200 (obtenu : {rn}, periodes {per!r})")
+    for nom, attendu in (("B", "ne part pas du debut"), ("C", "deux familles"),
+                         ("D", "sans comparatif N-1"), ("E", "ne se suivent pas"),
+                         ("F", "negatif ou nul")):
+        rn_x, _a, _b, _c, motif_x = benefice_glissant(cur_j, nom)
+        verifie(rn_x is None and motif_x is not None and attendu in motif_x,
+                f"cas {nom} refuse avec son motif ({attendu})"
+                + ("" if rn_x is None else f" — CALCULE QUAND MEME : {rn_x}")
+                + ("" if motif_x and attendu in (motif_x or "") else
+                   f" — motif obtenu : {motif_x!r}"))
+
+    # Sans serie de cours, la reference du bulletin ne peut pas etre verifiee :
+    # le PER glissant doit etre refuse meme quand le cumul, lui, est bon.
+    conn.execute("CREATE TABLE cours_quotidien_boc (ticker TEXT, date_bulletin TEXT, "
+                 "cours REAL, per REAL, rendement REAL)")
+    conn.execute("CREATE TABLE cours_mensuels (ticker TEXT, fin_mois TEXT, cours REAL, "
+                 "per REAL, rendement REAL)")
+    valeur, _d, motif_v = per_glissant(cur_j, "A", 10.0)
+    verifie(valeur is None and motif_v is not None,
+            "sans paliers de BPA implicite, le PER glissant est refuse meme quand le "
+            f"cumul est bon — c'est la garde que C23 avait manquee (motif : {motif_v!r})")
+    conn.close()
+
+    # --- La propriete sur la base du jour -------------------------------------
+    f = RACINE / "collecte" / "profils.json"
+    if not f.exists() or not DB.exists():
+        verifie(False, "profils.json ou brvm.db absent", bloquant=False)
+        return
+    profils = json.loads(f.read_text(encoding="utf-8"))
+    calcules = {t: v for t, v in profils.items() if v.get("per_ttm") is not None}
+    sans_detail = sorted(t for t, v in calcules.items() if not v.get("ttm_detail"))
+    verifie(not sans_detail,
+            f"les {len(calcules)} PER glissants publies portent leur detail de calcul"
+            + ("" if not sans_detail else f" — MUETS : {sans_detail}"))
+    sans_motif = sorted(t for t, v in profils.items()
+                        if v.get("per_ttm") is None and not v.get("ttm_motif"))
+    verifie(not sans_motif,
+            "chaque titre SANS PER glissant porte le motif du refus"
+            + ("" if not sans_motif else f" — MUETS : {sans_motif}"))
+
+    # Un PER glissant qui s'eloignerait enormement du PER publie signalerait que
+    # la reference a change sans que la verification l'ait vu. Alerte, pas blocage :
+    # un resultat intermediaire peut legitimement s'effondrer.
+    aberrants = sorted(f"{t} {v['per']:.1f} -> {v['per_ttm']:.1f}"
+                       for t, v in calcules.items()
+                       if v.get("per") and not 0.2 <= v["per_ttm"] / v["per"] <= 5)
+    verifie(not aberrants,
+            "aucun PER glissant ne s'ecarte du PER publie d'un facteur superieur a 5"
+            + ("" if not aberrants else f" — A VERIFIER : {aberrants}"),
+            bloquant=False)
+
+    code = APP.read_text(encoding="utf-8")
+    verifie("per_ttm" in code and "PER glissant" in code,
+            "app.py affiche le PER glissant (fiche titre et onglet Explorer)")
+
+
 REFERENCES_IDENTIFIEES_MIN = 44
 
 
@@ -3227,6 +3357,7 @@ def main():
     test_forme_profils_json()
     test_distribution_non_recurrente()
     test_dates_dividendes_iso()
+    test_per_glissant()
     test_reference_dividende_boc()
     test_lecture_des_bassins()
     test_rattachement_exercice()

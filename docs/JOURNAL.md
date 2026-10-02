@@ -9,6 +9,108 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — hors cycle : le PER glissant (TTM)
+
+**La demande.** « Intégrer le PER glissant (Trailing 12 Months) et l'afficher sur le
+tableau de bord afin de refléter la situation financière la plus actuelle des titres. »
+
+### La méthode, et la garde que C23 a rendue obligatoire
+
+`PER_TTM = PER_affiché × (RN_annuel / RN_TTM)`, avec
+`RN_TTM = RN du dernier exercice clos + cumul des périodes intermédiaires de l'exercice en
+cours − cumul des mêmes périodes un an plus tôt`. Le nombre d'actions s'annule dans le
+rapport : inutile de l'estimer, ce qui évite d'inventer une donnée que nous n'avons pas.
+
+**Mais l'égalité n'est vraie que si le bulletin divise par le même `RN_annuel`.** C'est
+exactement l'erreur qui a coûté le PER normalisé la veille : une formule juste posée sur un
+dénominateur non vérifié. La vérification se fait **sans estimer le nombre d'actions** : le
+BPA implicite du bulletin, `cours / PER`, forme des **paliers** — il ne bouge qu'à la
+publication d'un résultat annuel — et le rapport des deux derniers paliers doit égaler le
+rapport de nos deux derniers résultats annuels.
+
+**Mesuré sur BOAC** : paliers 801,08 → 888,52 à partir du 12/06/2026, soit **×1,1091** ;
+RN 2025/2024 = 35 540/32 044 = **×1,1091**. Écart **0,00 %**. Le bulletin suit bien notre
+série, et le PER glissant est calculable.
+
+### Ce que la règle refuse, et pourquoi
+
+| refus | motif |
+|---|---|
+| période sans comparatif N−1 | la soustraction serait inventée |
+| deux familles de périodes (T1, T2 **et** S1) | S1 recouvre T1+T2 : le cumul compterait deux fois un semestre |
+| cumul qui ne part pas du début de l'exercice | des mois sauteraient sans que rien ne le dise |
+| exercice intermédiaire qui ne suit pas l'exercice clos | 2024 puis 2026 ne se raccordent pas |
+| résultat glissant négatif ou nul | aucun PER n'a de sens dessus |
+| paliers qui ne confirment pas la référence | c'est la garde ci-dessus |
+
+Chaque refus porte son **motif**, exposé dans `profils.json` (`ttm_motif`) et dans l'aide
+de la métrique PER sur la fiche. Une case vide sans explication ne vaut rien.
+
+### Ce que la base permet aujourd'hui, dit franchement
+
+`resultats_intermediaires` compte **3 lignes, pour 2 titres**.
+
+- **BOAC** : T1 2026 à 10 801 contre 10 703 un an plus tôt → RN glissant **35 638 M**
+  contre 35 540 M pour 2025, soit **+0,3 %**. PER **12,93 → 12,89**.
+- **SGBC** : **refusé**, et pas faute d'intermédiaire — T1 et T2 2026 sont là. Nos
+  exercices **2022, 2023 et 2024 manquent**, donc le rapport des paliers n'a rien à
+  confronter. Même lacune que C5 et C6, vue par une troisième porte.
+
+**Le PER glissant vaut donc pour 1 titre sur 47, et il diffère de 0,3 %.** Ce n'est pas le
+calcul qui limite, c'est la collecte — inscrite en **C26**.
+
+**Ce qui fait quand même la valeur de la mesure**, et c'est visible sur BOAC : sa fiche
+porte déjà « CONTREDIT PAR L'EXERCICE EN COURS — le profil affiche +21 %/an, le T1 2026
+ressort à +0,9 % ». Le PER glissant met le même fait du côté de la **valorisation** au lieu
+du côté de la croissance. Le jour où un intermédiaire s'effondrera vraiment, c'est le PER
+glissant qui le dira en premier.
+
+### Ce que le gisement d'extraction contient, et pourquoi il n'a pas été chargé
+
+`collecte/fondamentaux_extraits.csv` porte **260 lignes**, dont **138 tirées d'un rapport
+trimestriel ou semestriel**, sur **32 titres**. Tentant — c'était le schéma de C17 la
+veille, un fichier commité que personne ne chargeait. Mais ici la mesure dit non :
+**94 de ces 138 n'ont aucun exercice**, **254 des 260 sont `PROBABLE`**, et les unités sont
+incohérentes — BOABF porte `RN = 20,0` à côté de `RN_n1 = 9 043,0`, SHEC un résultat en
+unités là où la base est en millions. **Ce n'est pas un pont manquant, c'est une extraction
+à reprendre**, et la charger telle quelle violerait les deux premières règles du dépôt.
+Inscrit en C26 avec ces chiffres.
+
+### Où cela s'affiche
+
+- **Fiche titre** : le PER porte un delta « −0,3 % sur 12 mois glissants » et une légende
+  donnant la valeur, l'écart et **tout le calcul**, vérification des paliers comprise.
+  L'aide de la métrique porte le motif quand le glissant manque.
+- **Onglet Explorer** : colonne « PER glissant », **triable et exportée en CSV** — la seule
+  vue où il se compare d'un titre à l'autre.
+- **Pas de colonne dans les quadrants du plan**, et c'est délibéré : elle serait vide à
+  **46/47**, et les largeurs y ont été calibrées hier au pixel pour que la colonne Signaux
+  ne tronque pas. Une ligne suffira à l'ajouter quand C26 aura rempli la base.
+
+**Un détail corrigé après la première capture** : le delta affichait « glissant 12.9 » sans
+signe, et Streamlit en déduisait une flèche **montante** sur un PER glissant plus **bas**
+que le PER publié. Le delta porte désormais l'écart signé, et la flèche descend.
+
+### Test
+
+**Section 27, 11 contrôles.** Sept sur une **base jetable** — donc indépendants des données
+du jour — dont **six contre-exemples**, un par refus : A cumule correctement
+(1000 + (300−200) + (350−250) = 1200), B saute T1, C mélange T1 et S1, D n'a pas de N−1,
+E ne se raccorde pas, F devient négatif. Le septième est le plus important : **sans paliers
+de BPA implicite, le PER glissant est refusé même quand le cumul est bon** — c'est
+précisément la garde qui manquait au PER normalisé. Les quatre derniers portent sur la base
+du jour : chaque valeur publiée porte son détail, chaque absence porte son motif, aucun
+écart d'un facteur supérieur à 5, et `app.py` affiche bien la mesure.
+
+### Barrières
+
+Golden tests tous verts ; `tester_donnees.py` **231 OK, 0 ÉCHEC**, code 2 (alertes de
+fraîcheur connues C4 et C5) — 220 avant, les 11 de la section 27 en plus. `app.py` démarre
+et rend ses 4 onglets. `avis_brvm.py --test`, `notations.py --test`,
+`generer_dashboard.py` (48 titres) verts. `collecte/profils.json` : seuls `per_ttm`,
+`ttm_detail` et `ttm_motif` changent — **0 profil, 0 secondaire, 0 grade, 0 gate**.
+**Rendu vérifié à l'écran** sur la fiche BOAC, pas seulement en test.
+
 ## 2026-10-02 — hors cycle : C23, retrait définitif du PER normalisé
 
 **La décision.** « Retrait définitif pour C23. » Ni (a) la moyenne, ni (b) la tendance :

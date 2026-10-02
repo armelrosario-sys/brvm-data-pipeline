@@ -1541,6 +1541,61 @@ un test qui ne peut que monter, et un relevé illisible fait échouer le workflo
 rendre une table vide.
 
 
+## C26 — La collecte des publications intermédiaires : 3 lignes pour 47 titres
+
+- classe : ORANGE — saisie d'exercices intermédiaires certifiés ; le diagnostic est fait
+- statut : PROPOSÉ
+- validation : —
+- autonomie : partielle — première passe **sans réseau** sur le corpus déjà collecté
+- priorité : 3
+
+**D'où vient ce chantier.** Claudia a demandé le 02/10/2026 un **PER glissant (TTM)** sur
+le tableau de bord. Il est construit et branché le jour même. Mais il ne s'affiche que sur
+**1 titre sur 47**, et ce qui le limite n'est pas le calcul : c'est la collecte.
+
+**Ce que la base porte aujourd'hui.** `resultats_intermediaires` compte **3 lignes, pour
+2 titres** : BOAC (T1 2026) et SGBC (T1 et T2 2026). Sur ces deux-là :
+
+- **BOAC** donne un PER glissant de **12,89** contre 12,93 au bulletin, référence vérifiée
+  à **0,00 %** par le rapport des paliers du BPA implicite ;
+- **SGBC** est **refusé**, non pas faute d'intermédiaire mais parce que nos exercices
+  **2022, 2023 et 2024 manquent** : le rapport des paliers n'a rien à confronter. C'est la
+  même lacune que C5 et C6, vue par une troisième porte.
+
+**Le gisement existe, et il n'est pas exploitable en l'état.**
+`collecte/fondamentaux_extraits.csv` porte **260 lignes**, dont **138 tirées d'un rapport
+trimestriel ou semestriel**, sur **32 titres**. Mais : **94 de ces 138 n'ont aucun
+exercice**, **254 des 260 sont `PROBABLE`** et jamais validées, et les unités sont
+visiblement incohérentes — BOABF y porte `RN = 20,0` à côté de `RN_n1 = 9 043,0`, SHEC un
+résultat en unités là où la base est en millions. Le charger tel quel violerait les deux
+premières règles du dépôt. **Ce n'est donc pas un pont manquant comme C17 : c'est une
+extraction à reprendre.**
+
+**Pourquoi cela vaut le travail, et c'est mesurable.** Le moteur lit des exercices
+**clos**, donc le passé. Les deux seules publications intermédiaires en base ont déjà
+contredit les deux profils bancaires les mieux notés : SGBC affichait +15,9 %/an et son
+premier semestre 2026 ressort à **+0,6 %** ; BOAC affichait +21 %/an certifiés et son
+premier trimestre à **+0,91 %**. Chaque titre dont l'intermédiaire manque est un profil
+qui peut dire la même chose sans que rien ne le signale.
+
+**Ce qu'il faut faire.** Première passe **sans réseau** : reprendre les 138 lignes
+d'extraction intermédiaire, en retenir celles dont l'exercice, la période et l'unité sont
+déterminables **sans deviner**, et les verser dans `donnees/base/resultats_intermediaires.csv`
+avec leur source. Ce qui reste indéterminable après cela justifie seul un passage par
+`extraction_etats.yml`.
+
+**Attention, deux pièges mesurés.** (1) Les lignes trimestrielles portent **un trimestre
+chacune**, pas un cumul — vérifié sur SGBC, dont la note écrit « cumul du semestre : 53,4 »
+pour T1 24,0 + T2 29,4. Une ligne semestrielle, elle, porte déjà le cumul : les mélanger
+compte deux fois les mêmes mois, et `benefice_glissant()` refuse pour cette raison.
+(2) `resultat_net_n1` est **lu dans le document**, jamais reconstruit ; une ligne sans lui
+ne sert à rien pour le glissant, puisque c'est la soustraction qui fait la fenêtre.
+
+**Terminé quand** : chaque ligne versée porte son exercice, sa période, son unité et sa
+source ; le nombre de titres à PER glissant calculable est figé par un test qui ne peut que
+monter ; et ce qui n'a pas pu être versé est écarté avec un motif daté.
+
+
 ---
 
 # Veille datée, hors file
