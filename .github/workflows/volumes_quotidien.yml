@@ -48,8 +48,9 @@ jobs:
         env:
           REBUILD: "true"
         run: |
-          SEANCE=$(python -c "import csv;r=list(csv.DictReader(open('collecte/releve_volumes.csv')));print(r[-1]['date_seance'] if r else 'vide')")
-          bash pipeline/publier.sh "collecte/releve_volumes.csv" "Releve Volumes / Valeurs, seance du $SEANCE"
+          JOUR=$(python -c "import csv;r=list(csv.DictReader(open('collecte/releve_volumes.csv')));print(r[-1]['date_releve'] if r else 'vide')")
+          bash pipeline/publier.sh "collecte/releve_volumes.csv" "Releve Volumes / Valeurs du $JOUR"
+          bash pipeline/publier.sh "collecte/releve_volumes_marche.csv" "Totaux de marche Volumes / Valeurs du $JOUR"
 
       - name: Conserver la page recue
         if: always()
