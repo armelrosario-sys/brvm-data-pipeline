@@ -1429,7 +1429,7 @@ et l'autotest de `collecte/avis_brvm.py` porte les cas de la liste.
 
 - classe : ORANGE — ouvre une seconde source de données certifiées ; le diagnostic est fait
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : partielle — **la page est hors de portée du bac à sable**, il faut un workflow
 - priorité : 3
 
