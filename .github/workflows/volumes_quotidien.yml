@@ -1,0 +1,61 @@
+name: Volumes quotidien (seconde source)
+
+# Releve la page HTML brvm.org/fr/volumes/0, SECONDE SOURCE des cours, et depose
+# son releve horodate dans collecte/releve_volumes.csv. Chantier C25.
+#
+# Pourquoi ce workflow existe et pas un script local : la page est hors de portee
+# du bac a sable de la boucle. Seul un runner GitHub l'atteint.
+#
+# Pourquoi ces heures. La page est mise a jour a 19h30 UTC ; boc_quotidien.yml
+# passe a 18h et 21h. On releve donc a 19h45 (apres la mise a jour de la page) et
+# a 21h30 (apres le second passage du bulletin), de sorte que les deux sources
+# couvrent la meme seance avant la confrontation. Le releveur echoue bruyamment
+# plutot que de rendre une table vide : un echec ici est un signal, pas du bruit.
+
+on:
+  schedule:
+    - cron: '45 19 * * 1-5'
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: donnees-brvm
+  cancel-in-progress: false
+
+jobs:
+  releve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer les dependances
+        run: pip install requests beautifulsoup4
+
+      - name: Verifier la compatibilite Python 3.11 du releveur
+        run: python pipeline/lint_fstring.py pipeline/collecte_volumes.py
+
+      - name: Relever la page Volumes / Valeurs
+        run: python pipeline/collecte_volumes.py --trace /tmp/volumes.html
+
+      - name: Publier le releve sur main
+        env:
+          REBUILD: "true"
+        run: |
+          SEANCE=$(python -c "import csv;r=list(csv.DictReader(open('collecte/releve_volumes.csv')));print(r[-1]['date_seance'] if r else 'vide')")
+          bash pipeline/publier.sh "collecte/releve_volumes.csv" "Releve Volumes / Valeurs, seance du $SEANCE"
+
+      - name: Conserver la page recue
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: page-volumes
+          path: /tmp/volumes.html
+          if-no-files-found: warn
+          retention-days: 7
