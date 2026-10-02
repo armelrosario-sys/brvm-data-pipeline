@@ -1282,9 +1282,10 @@ nouveau n'apparaît sans être inscrit.
 ## C23 — Le PER normalisé mesure la croissance, pas un pic
 
 - classe : ORANGE — arbitrage de méthode sur une mesure publiée ; le diagnostic est fait
-- statut : **AFFICHAGE RETIRÉ le 02/10/2026** — option (c) appliquée ; la mesure, elle,
-  reste à trancher et ce chantier reste ouvert
-- validation : OK (c) retirer l'affichage
+- statut : **FAIT le 02/10/2026** — **retrait définitif** tranché par Claudia : la mesure
+  et son drapeau sont retirés du code, pas seulement de l'affichage. Les deux passes de ce
+  chantier sont consommées. **Aucun cycle ne le reprend.**
+- validation : OK — retrait définitif
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 2 — **une mesure fausse est publiée et lue**
 
@@ -1367,6 +1368,57 @@ fait tomber le premier en ÉCHEC. La colonne `per_norm` reste dans le DataFrame 
 
 **Ce qui reste à trancher est tout le reste** : (a) la moyenne, (b) la tendance, (c) le
 retrait définitif. L'affichage est suspendu, pas supprimé du code.
+
+### Fait le 02/10/2026 — retrait définitif
+
+Claudia a tranché : non pas (a) la moyenne, non pas (b) la tendance, mais le **retrait
+définitif**. Ce n'est donc plus l'affichage qui est suspendu, c'est la mesure qui
+disparaît.
+
+**Retiré de `moteur/profils.py`** : la fonction `per_normalise()` (93 lignes), son appel,
+les trois champs `per_normalise`, `ecart_benefice`, `n_ex_normalise` de la sortie JSON, et
+le seuil `ecart_benefice_max` devenu sans objet (paramètre, argument, valeur par défaut).
+**Retiré de `app.py`** : les deux colonnes du DataFrame et les trois derniers points
+d'affichage. À la place, un bloc de **procès-verbal** dans `profils.py` qui dit pourquoi la
+mesure n'existe plus, avec le tableau des cinq titres monotones, les trois lectures
+mesurées, et une consigne explicite de ne pas la reconstruire sous un autre nom sans
+résoudre d'abord ce que ni (a) ni (b) ne résolvent.
+
+**Le drapeau `BENEFICE_NON_REPRESENTATIF` est parti avec**, et c'était inévitable : il se
+déclenchait sur le **même rapport** (`écart > ecart_benefice_max`) et portait donc le même
+défaut — il retenait BICC et SLBC, qui croissent sans pic. Son texte avait déjà été amputé
+le matin même de sa conclusion sur la cherté ; il ne restait qu'un constat sans portée.
+
+**Effet mesuré, titre par titre, avant/après sur les 47 :**
+
+| | avant | après |
+|---|---|---|
+| titres portant `per_normalise` | 19 | **0** |
+| titres portant `ecart_benefice` | 19 | **0** |
+| titres portant `n_ex_normalise` | 47 | **0** |
+| titres portant le drapeau | 4 | **0** |
+| `profil`, `secondaire`, `grade`, `gate` | — | **0, 0, 0, 0** |
+
+**Aucun grade ne monte, et ce n'est pas un hasard.** Le drapeau bloquait le grade A
+(`grade_confiance` teste l'ensemble des drapeaux). Les quatre titres concernés en portent
+d'autres qui bloquaient déjà : BICC `RATTRAPAGE`, SLBC `PIC_YOY` + `CAP_60` +
+`RATTRAPAGE`, SPHC `PIC_YOY`, STBC quatre autres. Vérifié après coup : B, B, B, C
+inchangés.
+
+**Une conséquence visible à dire** : dans les tableaux des cadrans, **SPHC** perd son seul
+signal et sa cellule devient vide. BICC et SLBC gardent « croissance de rattrapage ».
+
+**Test : section 7 réécrite, 4 contrôles**, qui gardent le retrait **des deux côtés** — le
+code ne porte plus la mesure (`def per_normalise(`, l'émission du drapeau), et le fichier
+publié ne porte plus ses champs. Un seul des deux ne suffirait pas : une fonction
+rebranchée sans champ exposé, ou un champ réintroduit depuis ailleurs, passeraient l'autre.
+**Vérifié par injection** : en remettant une `per_normalise()` fictive et l'émission du
+drapeau, 2 contrôles tombent en ÉCHEC.
+
+**Non touchés, et volontairement** : `outils/branchement_agregateur.py` et
+`outils/lot2_referentiels_et_interimaires.py` nomment encore le drapeau. Ce sont des
+procès-verbaux exécutables de migrations déjà appliquées, à usage unique et portant leur
+garde « déjà appliqué » — les réécrire falsifierait l'archive.
 
 
 ## C24 — Douze avis de dividende nomment leur société et ne sont rattachés à rien

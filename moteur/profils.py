@@ -623,7 +623,7 @@ def diagnostic_distribution(cur, ticker, date_cours, sp, cours=None, dy=None):
     return False, None
 
 
-def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
+def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50,
                 sp_age_max_cp=3, arb=None):
     table, col = source_cours(cur)
     per_row = cur.execute(
@@ -777,9 +777,9 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
     if part_operationnelle is not None and part_operationnelle < sp_part_min:
         drapeaux = drapeaux + ["RESULTAT_NON_OPERATIONNEL"]
 
-    pern, ecart_ben, n_ex_pern = per_normalise(cur, ticker, per)
-    if ecart_ben is not None and ecart_ben > sp_ecart_max:
-        drapeaux = drapeaux + ["BENEFICE_NON_REPRESENTATIF"]
+    # C23, 02/10/2026 : per_normalise() et le drapeau BENEFICE_NON_REPRESENTATIF
+    # sont RETIRES. Voir le bloc « Pourquoi le PER normalise n'existe plus » en
+    # bas de ce fichier.
     if roe_perime:
         drapeaux = drapeaux + ["DONNEES_PERIMEES"]
     if non_rec:
@@ -805,7 +805,6 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50, sp_ecart_max=0.30,
                 payout_source=payout_source, part_operationnelle=part_operationnelle,
                 date_cours=date_cours, table_cours=table,
                 roe_exercice=roe_exercice, roe_perime=roe_perime,
-                per_normalise=pern, ecart_benefice=ecart_ben, n_ex_normalise=n_ex_pern,
                 roe=roe, g=100.0 * g if g is not None else None, source_croissance=source_g,
                 drapeaux=drapeaux, n_exercices=len(rn_dispo), dernier_rn=dernier_rn,
                 peg=round(peg, 2) if peg else None,
@@ -906,97 +905,56 @@ def tendance_intermediaire(cur, ticker):
     return (rn / rn1 - 1), periode, exercice, note
 
 
-def per_normalise(cur, ticker, per, fenetre=4):
-    """PER calcule sur le benefice MOYEN des derniers exercices, et non sur le
-    seul dernier.
+# ----------------------------------------------------------------------
+# POURQUOI LE PER NORMALISE N'EXISTE PLUS — chantier C23, retire le 02/10/2026
+# ----------------------------------------------------------------------
+# Il a vecu du 12/09 au 02/10/2026. Il rendait PER x (dernier benefice / moyenne
+# des quatre derniers) et se presentait comme une correction de PIC : "si ce
+# benefice est un pic, le PER parait bas alors que le titre est cher".
+#
+# CE QU'IL MESURAIT REELLEMENT, mesure le 01/10/2026 apres un signalement de
+# Claudia sur le tableau de bord publie : la CROISSANCE. Sur une serie
+# geometrique de taux g, le dernier terme depasse la moyenne de quatre termes
+# d'environ 1,5 g, sans qu'il y ait le moindre pic. Sur les huit titres a serie
+# strictement croissante -- ou un pic est impossible par construction -- il
+# gonflait le PER de 12 a 119 %, et le gonflement suivait g :
+#
+#     titre  serie des RN                            PER -> PERn   ratio   g %/an
+#     NSBC   32382 34813 38112 40712                13,1 -> 14,6    1,12      7,9
+#     SNTS   278912 331748 393662 413588            10,9 -> 12,7    1,17     14,0
+#     CABC   796 1135 1375 1439                     14,0 -> 16,9    1,21     21,9
+#     BOAC   20069 26075 32044 35540                12,9 -> 16,2    1,25     21,0
+#     SHEC   3549 4012 5354 6028                    24,7 -> 31,4    1,27     19,3
+#
+# Deux defauts de SELECTION ont ete corriges le 01/10 avant de conclure, pour ne
+# pas accuser la formule de ce qui venait de la fenetre : elle n'etait pas
+# consecutive (6 titres sur 25 enjambaient un trou, SICC n'avait aucun exercice
+# posterieur a 2021) et le filtre resultat_net > 0 ecartait 17 exercices
+# deficitaires en faisant paraitre le titre MOINS cher. Corriges, le defaut de
+# fond est reste entier : c'est bien la lecture du rapport qui est fausse.
+#
+# TROIS LECTURES ONT ETE MESUREES, et Claudia a tranche le 02/10 :
+#   (a) garder la moyenne -- c'est un CAPE a quatre ans, dont penaliser la
+#       croissance est une critique connue ; mais aux taux de croissance de la
+#       BRVM la penalite de croissance domine le signal de pic ;
+#   (b) normaliser sur la TENDANCE (regression log-lineaire) -- ramene les
+#       titres monotones a 0,93-1,02, mais sur un effondrement recent la
+#       regression extrapole l'ancienne pente et rendrait 327 pour SICC,
+#       875 pour BNBC ;
+#   (c) RETRAIT DEFINITIF. Retenu.
+#
+# CE QUI EST PARTI AVEC : le drapeau BENEFICE_NON_REPRESENTATIF, qui se
+# declenchait sur le MEME rapport (ecart > ecart_benefice_max) et portait donc
+# le meme defaut -- il retenait BICC et SLBC, qui croissent sans pic. Son texte
+# avait deja ete ampute le 02/10 de sa conclusion sur la cherte, ce qui ne
+# laissait qu'un constat sans portee.
+#
+# NE PAS LE RECONSTRUIRE SOUS UN AUTRE NOM sans resoudre d'abord ce que ni (a)
+# ni (b) ne resolvent : distinguer un pic d'une croissance reguliere sur trois
+# ou quatre points, quand un effondrement recent et une serie qui monte donnent
+# le meme rapport a la moyenne. La section 7 de tester_donnees.py tient un
+# controle qui echoue si la mesure revient.
 
-    Ajout du 12/09/2026. Un PER se calcule sur un benefice : si ce benefice est
-    un pic, le PER parait bas alors que le titre est cher.
-
-    Meme logique que le drapeau RESULTAT_NON_OPERATIONNEL : verifier que le
-    benefice qui sert de denominateur est representatif. Ici c'est sa
-    REGULARITE dans le temps ; la c'etait son ORIGINE.
-
-    CHIFFRES REFAITS SUR LA BASE DU 01/10/2026 -- ceux du 12/09 ne valent plus.
-    La version precedente de ce texte annoncait "SLBC 14,9 -> 32,7", "BICC
-    12,9 -> 25,1", "SHEC 23,7 -> 30,1", "STBC 12,1 -> 16,8", et concluait
-    "mediane de la cote : 14,0 en affiche, 17,3 en normalise, le marche est
-    environ un quart plus cher qu'il n'en a l'air". Cette conclusion ne se
-    deduisait pas de ses deux nombres : ils ne portaient pas sur la meme
-    population -- 47 titres ont un PER affiche, 19 seulement un PER normalise.
-
-    Mesure du jour, sur les 19 titres calculables et sur EUX SEULS des deux
-    cotes : mediane 14,0 en affiche contre 16,2 en normalise, soit +16 %. Les
-    quatre titres que le drapeau BENEFICE_NON_REPRESENTATIF retient :
-      BICC  14,9 -> 20,5  (dernier benefice +38 % au dessus de sa moyenne)
-      SLBC  13,5 -> 29,5  (+119 %)
-      SPHC   8,2 -> 12,7  (+56 %)
-      STBC  10,8 -> 15,0  (+39 %)
-    La mediane du PER affiche sur les 47 titres, elle, vaut 15,2 : ne jamais la
-    comparer a celle du normalise, c'est l'erreur que ce texte portait.
-
-    DEUX DEFAUTS DE SELECTION CORRIGES LE 01/10/2026 (signales par Claudia sur
-    le tableau de bord publie). Ils portaient tous deux sur la constitution de
-    la fenetre, pas sur la formule.
-
-    1. LA FENETRE N'ETAIT PAS CONSECUTIVE. Le `ORDER BY exercice DESC LIMIT 4`
-       prenait les quatre exercices les plus recents DISPONIBLES, pas les quatre
-       dernieres annees : sur 6 titres de 25 la fenetre enjambait un trou de la
-       base. BICC sautait 2022 (le trou de C6), ORGT sautait 2023 et 2024,
-       SDCC 2022 et 2023, et SICC n'avait AUCUN exercice posterieur a 2021 --
-       son PER normalise reposait sur 2018 a 2021, soit des benefices vieux de
-       quatre a sept ans, sans que rien ne le dise. La fenetre est desormais
-       prise par annees CONSECUTIVES a partir du dernier exercice connu ;
-       sous trois exercices consecutifs, on ne calcule pas (une case vide vaut
-       mieux qu'une valeur approchee).
-
-    2. LES PERTES ETAIENT ECARTEES EN SILENCE, et l'effet etait a l'envers.
-       Le filtre `resultat_net > 0` retirait 17 exercices deficitaires depuis
-       2021 (ORGT 2023 et 2024, STAC quatre annees, UNXC quatre annees, SCRC,
-       SAFC, NEIC, FTSC, SICC). Retirer une perte REMONTE la moyenne, donc
-       BAISSE le rapport dernier/moyenne, donc fait paraitre le titre MOINS
-       cher : un titre qui sort de pertes voyait sa normalisation jouer contre
-       le lecteur. Les exercices deficitaires entrent desormais dans la
-       moyenne. On refuse de conclure si la moyenne ou le dernier exercice
-       n'est pas strictement positif : un rapport a une moyenne negative n'a
-       pas de sens, et le PER du BOC se divise de toute facon par un benefice.
-
-    CE QUI RESTE NON TRANCHE, et qu'il faut lire avant de se fier a ce nombre.
-    Le rapport dernier/moyenne mesure autant la CROISSANCE qu'un pic : sur une
-    serie geometrique de taux g, le dernier terme depasse la moyenne de quatre
-    termes d'environ 1,5 g, sans aucun pic. Mesure du 01/10/2026 : 8 titres a
-    serie strictement croissante -- donc sans pic possible -- voyaient leur PER
-    gonfle de 12 a 119 % (BOAC 12,9 -> 16,2 ; CABC 14,0 -> 16,9 ; BICC
-    14,9 -> 24,4). C'est le chantier C23, et il n'est PAS corrige ici : ces deux
-    correctifs-ci portent sur la selection des exercices, pas sur la lecture.
-
-    Retourne (per_normalise, ecart_dernier_sur_moyenne, n_exercices).
-    """
-    if not per or per <= 0:
-        return None, None, 0
-    lignes = cur.execute(
-        "SELECT exercice, resultat_net FROM etats_financiers WHERE ticker=? "
-        "AND resultat_net IS NOT NULL ORDER BY exercice DESC", (ticker,)).fetchall()
-    # Fenetre CONSECUTIVE a partir du dernier exercice connu : on s'arrete au
-    # premier trou plutot que de l'enjamber. Sans cela la "moyenne des quatre
-    # derniers exercices" peut couvrir sept annees.
-    vals = []
-    for exercice, rn in lignes:
-        if vals and exercice != precedent - 1:
-            break
-        vals.append(rn)
-        precedent = exercice
-        if len(vals) == fenetre:
-            break
-    if len(vals) < 3:
-        return None, None, len(vals)
-    dernier = vals[0]
-    moyenne = sum(vals) / len(vals)
-    if moyenne <= 0 or dernier <= 0:
-        return None, None, len(vals)
-    # PER_normalise = PER_affiche x (dernier / moyenne) : le nombre d'actions
-    # s'annule, inutile de l'estimer.
-    return per * (dernier / moyenne), (dernier / moyenne - 1), len(vals)
 
 
 def motif_du_profil(profil, ing, decote, croissance, sp):
@@ -1121,16 +1079,6 @@ def grade_confiance(profil, ing, faits_titre):
         "CYCLE_SERIE_RESTAUREE": "serie certifiee restauree malgre une rupture d'echelle "
                                  "(creux de cycle) : la croissance porte sur l'ensemble du "
                                  "cycle, pas sur une phase",
-        # C23, 02/10/2026 : ce texte disait "le PER affiche SOUS-ESTIME la cherte
-        # reelle du titre (comparer au PER normalise)". Les deux moities sont
-        # tombees ensemble : la conclusion sur la cherte repose sur un rapport qui
-        # mesure autant la croissance qu'un pic, et le PER normalise auquel il
-        # renvoyait n'est plus affiche. Le drapeau ne dit plus que ce qui est
-        # mesure.
-        "BENEFICE_NON_REPRESENTATIF": "le dernier benefice depasse nettement la moyenne des "
-                                      "exercices precedents : le PER affiche se calcule sur "
-                                      "ce seul dernier benefice, le relire au prochain "
-                                      "exercice",
         "DONNEES_PERIMEES": "les capitaux propres en base ont plus de trois ans : le ROE "
                             "n'est plus calculable de facon fiable et n'est pas affiche",
         "CONTREDIT_PAR_INTERMEDIAIRE": "la derniere publication trimestrielle ou "
@@ -1218,7 +1166,7 @@ def calculer():
         croissance_cap=0.60, bpa_implicite_annees=3, rattrapage_min=0.25,
         rattrapage_bloquant=0.30, payout_max=1.0, per_max_analysable=50,
         base_gonflee_max=1.5, fenetre_exercices_etendue=8,
-        part_operationnelle_min=0.50, ecart_benefice_max=0.30,
+        part_operationnelle_min=0.50,
         age_max_capitaux_propres=3, ecart_intermediaire_max=0.08,
         n_secteur_min=8, value_pctl_min=67, growth_pctl_min=67,
         garp_g_min=0.08, garp_g_max=0.30, garp_pegy_max=1.5, growth_g_min=0.05,
@@ -1249,8 +1197,7 @@ def calculer():
             verdict["agregateur"] = (agregateur or {}).get(t) or {}
         verdicts[t] = verdict or {}
         ing = ingredients(cur, t, seuils, sp, sp["part_operationnelle_min"],
-                          sp["ecart_benefice_max"], sp["age_max_capitaux_propres"],
-                          arb=verdict)
+                          sp["age_max_capitaux_propres"], arb=verdict)
         statut_gate, _motifs = appliquer_gate(cur, t, secteurs.get(t, ""), seuils, marche)
         brut[t] = dict(ing, gate=statut_gate, secteur=secteurs.get(t, ""))
 
@@ -1476,11 +1423,6 @@ def calculer():
             "dy_recurrent": (round(v["dy_axe"], 2) if v["dy_axe"] is not None else None),
             "distribution_non_recurrente": v["distribution_detail"],
             "table_cours": v["table_cours"],
-            "per_normalise": (round(v["per_normalise"], 1)
-                              if v.get("per_normalise") is not None else None),
-            "ecart_benefice": (round(v["ecart_benefice"], 2)
-                               if v.get("ecart_benefice") is not None else None),
-            "n_ex_normalise": v.get("n_ex_normalise"),
             "part_operationnelle": (round(v["part_operationnelle"], 2)
                                     if v.get("part_operationnelle") is not None else None),
             "secondaire": secondaire,

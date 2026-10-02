@@ -9,6 +9,90 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — hors cycle : C23, retrait définitif du PER normalisé
+
+**La décision.** « Retrait définitif pour C23. » Ni (a) la moyenne, ni (b) la tendance :
+la mesure disparaît. Ce n'est donc plus l'affichage qui est suspendu, comme le matin même,
+c'est le calcul qui est retiré du code.
+
+### Ce qui a été retiré
+
+**`moteur/profils.py`** : la fonction `per_normalise()` (93 lignes), son appel, l'émission
+du drapeau, les trois champs `per_normalise`, `ecart_benefice` et `n_ex_normalise` de la
+sortie JSON, l'entrée du drapeau dans la table des explications, et le seuil
+`ecart_benefice_max` devenu sans objet — paramètre de `ingredients()`, argument à l'appel,
+et valeur par défaut. **`app.py`** : les deux colonnes `per_norm` et `ecart_ben` du
+DataFrame, et les trois derniers points où le drapeau sortait.
+
+À la place, un **procès-verbal** de cinquante lignes dans `profils.py` : pourquoi la mesure
+n'existe plus, le tableau des titres monotones, les trois lectures mesurées avec le défaut
+propre à chacune, et une consigne explicite — *ne pas la reconstruire sous un autre nom
+sans résoudre d'abord ce que ni (a) ni (b) ne résolvent : distinguer un pic d'une
+croissance régulière sur trois ou quatre points, quand un effondrement récent et une série
+qui monte donnent le même rapport à la moyenne.*
+
+### Le drapeau est parti avec la mesure
+
+`BENEFICE_NON_REPRESENTATIF` se déclenchait sur le **même rapport** — `écart >
+ecart_benefice_max` — et portait donc exactement le même défaut : il retenait BICC
+(9 603 → 16 694 → 26 226 → 36 520) et SLBC, qui croissent sans le moindre pic. Son texte
+avait déjà été amputé le matin de sa conclusion sur la cherté ; il ne restait qu'un constat
+sans portée. Le garder aurait été garder le verdict en ayant retiré ce qui permettait de le
+vérifier.
+
+### Effet mesuré, sur les 47 titres
+
+| | avant | après |
+|---|---|---|
+| titres portant `per_normalise` | 19 | **0** |
+| titres portant `ecart_benefice` | 19 | **0** |
+| titres portant `n_ex_normalise` | 47 | **0** |
+| titres portant `BENEFICE_NON_REPRESENTATIF` | 4 | **0** |
+| `profil` | — | **0** |
+| `secondaire` | — | **0** |
+| `grade` | — | **0** |
+| `gate` | — | **0** |
+
+**Le risque était réel et il a été vérifié, pas supposé.** `grade_confiance()` teste
+l'ENSEMBLE des drapeaux pour accorder le grade A : retirer un drapeau peut donc promouvoir
+un titre. Les quatre concernés en portent d'autres qui bloquaient déjà — BICC `RATTRAPAGE`,
+SLBC `PIC_YOY` + `CAP_60` + `RATTRAPAGE`, SPHC `PIC_YOY`, STBC quatre autres. Mesuré après
+coup : B, B, B et C inchangés. Si l'un d'eux n'avait porté que ce drapeau, le retrait
+l'aurait fait passer en A, et il aurait fallu le dire avant de committer.
+
+**Une conséquence visible** : dans les tableaux des cadrans publiés ce matin, **SPHC** perd
+son seul signal et sa cellule « Signaux » devient vide. BICC et SLBC gardent « croissance
+de rattrapage », STBC en garde deux.
+
+### Test
+
+**Section 7 réécrite** — elle vérifiait l'inverse il y a trois semaines (« le PER normalisé
+reste calculé », « le drapeau reste discriminant »). **4 contrôles**, qui gardent le retrait
+**des deux côtés** : le code ne porte plus la mesure (`def per_normalise(`, l'émission du
+drapeau), et le fichier publié ne porte plus ses champs ni le drapeau. Un seul des deux ne
+suffirait pas — une fonction rebranchée sans champ exposé, ou un champ réintroduit depuis
+ailleurs, passeraient l'autre. Un quatrième contrôle balaie `app.py` et `dashboard/*.py`.
+
+**Injection vérifiée** : en remettant une `per_normalise()` fictive et l'émission du
+drapeau dans `profils.py`, **2 contrôles tombent en ÉCHEC** et les deux autres restent
+verts, comme ils le doivent puisque `profils.json` n'a pas été régénéré.
+
+### Non touchés, et volontairement
+
+`outils/branchement_agregateur.py` et `outils/lot2_referentiels_et_interimaires.py`
+nomment encore `BENEFICE_NON_REPRESENTATIF`, de même qu'un message de commit figé dans
+`lot2_referentiels_et_interimaires.yml`. Ce sont des **procès-verbaux exécutables de
+migrations déjà appliquées**, à usage unique, portant leur garde « déjà appliqué » et
+jamais déclenchés par un calendrier. Les réécrire falsifierait l'archive : un procès-verbal
+décrit l'état du code au moment où il a tourné, pas l'état d'aujourd'hui.
+
+### Barrières
+
+Golden tests tous verts ; `tester_donnees.py` **220 OK, 0 ÉCHEC**, code 2 (alertes de
+fraîcheur connues C4 et C5) — 225 avant, le solde venant des 6 contrôles supprimés avec la
+mesure contre 4 ajoutés. `app.py` démarre et rend ses 4 onglets. `avis_brvm.py --test`,
+`notations.py --test`, `generer_dashboard.py` (48 titres) verts.
+
 ## 2026-10-02 — hors cycle : les quatre cadrans du plan passent en tableaux
 
 **La demande.** « Organise cette section sous forme de tableaux pour chaque cadran de la

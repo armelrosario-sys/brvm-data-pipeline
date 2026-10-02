@@ -389,12 +389,28 @@ def test_echelles():
 # 7. PER NORMALISE ET OPERATIONS SUR TITRE (bloquant)
 # ----------------------------------------------------------------------
 def test_per_normalise_et_operations():
-    """Deux controles issus des constats du 12/09/2026.
+    """(a) Le PER normalise est RETIRE et doit le rester. (b) Operations sur titre.
 
-    (a) PER normalise : le PER affiche se calcule sur le DERNIER benefice. Quand
-        celui-ci est un pic, le titre parait bon marche alors qu'il est cher.
-        Ecarts mesures : SLBC 13,6 -> 29,9 ; BICC 15,1 -> 29,4. Le drapeau
-        BENEFICE_NON_REPRESENTATIF doit rester actif et discriminant.
+    (a) POURQUOI CETTE MOITIE A CHANGE DE SENS (chantier C23, 02/10/2026). Elle
+        verifiait que le PER normalise restait calcule et que le drapeau
+        BENEFICE_NON_REPRESENTATIF restait discriminant. Claudia a signale le
+        01/10 que ce nombre etait faux sur le tableau de bord publie, et la
+        mesure lui a donne raison : PER x (dernier benefice / moyenne des quatre
+        derniers) mesure la CROISSANCE, pas un pic. Sur une serie geometrique de
+        taux g, le dernier terme depasse la moyenne de quatre termes d'environ
+        1,5 g sans qu'il y ait de pic ; les huit titres a serie strictement
+        croissante voyaient leur PER gonfle de 12 a 119 % (BOAC 12,9 -> 16,2 sur
+        20069-26075-32044-35540, CABC 14,0 -> 16,9, SHEC 24,7 -> 31,4).
+
+        Trois lectures ont ete mesurees -- la moyenne, la tendance par regression
+        log-lineaire, et le retrait. Claudia a tranche le 02/10 : RETRAIT
+        DEFINITIF. Le drapeau est parti avec la mesure : il se declenchait sur le
+        MEME rapport, et retenait donc BICC et SLBC, qui croissent sans pic.
+
+        Les controles ci-dessous gardent le retrait, des deux cotes : le code ne
+        porte plus la mesure, et le fichier publie ne porte plus ses champs. Un
+        seul des deux ne suffirait pas -- une fonction rebranchee sans champ
+        expose, ou un champ reintroduit depuis ailleurs, passeraient l'autre.
 
     (b) Operations sur titre : SOLIBRA a divise son nominal le 27/09/2024 (cours
         de ~95 000 a 10 215 en une seance) sans que l'operation soit enregistree.
@@ -402,7 +418,7 @@ def test_per_normalise_et_operations():
         plus de 60 % en une seule seance est presque toujours une division de
         nominal, pas un krach : on la signale.
     """
-    print("\n=== 7. PER normalise et operations sur titre (bloquant) ===")
+    print("\n=== 7. Retrait du PER normalise et operations sur titre (bloquant) ===")
     import json
     f = RACINE / "collecte" / "profils.json"
     if not f.exists():
@@ -410,134 +426,38 @@ def test_per_normalise_et_operations():
         return
     profils = json.loads(f.read_text(encoding="utf-8"))
 
-    calcules = [v for v in profils.values() if v.get("per_normalise") is not None]
-    verifie(len(calcules) >= 15,
-            f"PER normalise calcule pour {len(calcules)} titres "
-            f"(sous 15, l'historique des resultats est trop court)")
-    marques = [v for v in calcules
-               if "BENEFICE_NON_REPRESENTATIF" in (v.get("drapeaux") or [])]
-    verifie(1 <= len(marques) <= max(2, len(calcules) // 3),
-            f"le drapeau BENEFICE_NON_REPRESENTATIF reste discriminant : "
-            f"{len(marques)} titre(s) sur {len(calcules)}")
+    # --- (a) Le PER normalise est retire, et des deux cotes -------------------
+    moteur_src = (ICI / "profils.py").read_text(encoding="utf-8")
+    verifie("def per_normalise(" not in moteur_src,
+            "moteur/profils.py ne definit plus per_normalise() (C23, retrait "
+            "definitif tranche par Claudia le 02/10/2026)")
+    verifie('drapeaux + ["BENEFICE_NON_REPRESENTATIF"]' not in moteur_src,
+            "moteur/profils.py n'emet plus le drapeau BENEFICE_NON_REPRESENTATIF, "
+            "qui se declenchait sur le meme rapport et portait le meme defaut")
 
-    # --- (a ter) Le PER normalise N'EST PLUS AFFICHE (C23, 02/10/2026) -------
-    #
-    # Claudia a tranche le 02/10 : "OK (c) retirer l'affichage". Le nombre reste
-    # CALCULE et reste dans collecte/profils.json -- c'est l'affichage, et lui
-    # seul, qui est suspendu le temps que C23 tranche entre la moyenne, la
-    # tendance et le retrait definitif.
-    #
-    # POURQUOI UN TEST PLUTOT QU'UNE SUPPRESSION. Le nombre sortait a QUATRE
-    # endroits de app.py -- la liste du plan, le delta de la metrique PER, son
-    # aide, et l'encadre de la fiche -- et il est facile d'en reintroduire un
-    # sans y penser, puisque la colonne per_norm reste dans le DataFrame. Ce
-    # controle rend la reintroduction bruyante.
+    # Cote fichier publie : aucun titre ne doit plus porter ces champs ni ce
+    # drapeau. Le controle sur le code ne suffit pas -- profils.json pourrait
+    # garder d'anciennes valeurs si personne ne le regenerait.
+    restes = sorted(t for t, v in profils.items()
+                    if any(v.get(c) is not None for c in
+                           ("per_normalise", "ecart_benefice", "n_ex_normalise"))
+                    or "BENEFICE_NON_REPRESENTATIF" in (v.get("drapeaux") or []))
+    verifie(not restes,
+            f"aucun des {len(profils)} titres de collecte/profils.json ne porte "
+            f"encore per_normalise, ecart_benefice, n_ex_normalise ni le drapeau"
+            + ("" if not restes else f" — RESTES : {restes}"))
+
+    # Et l'affichage, qui etait le premier symptome vu par Claudia.
     rendu = []
     for chemin in [APP] + sorted((RACINE / "dashboard").glob("*.py")):
         texte = chemin.read_text(encoding="utf-8")
-        # On cherche un formatage, pas une mention : les commentaires de C23
-        # nomment per_norm en toutes lettres et ne doivent pas declencher.
-        for motif in ("{r.per_norm", "{vv['per_normalise']", '{v["per_normalise"]',
-                      "{v['per_normalise']", "r.per_norm:", "per_normalise']:"):
+        for motif in ("r.per_norm", "per_normalise", "ecart_ben",
+                      "BENEFICE_NON_REPRESENTATIF"):
             if motif in texte:
                 rendu.append(f"{chemin.name} : {motif}")
     verifie(not rendu,
-            "le PER normalise n'est formate dans aucun affichage (C23, "
-            "« OK (c) retirer l'affichage » du 02/10/2026)"
-            + ("" if not rendu else " — ENCORE AFFICHE : " + ", ".join(rendu)))
-    verifie(any(v.get("per_normalise") is not None for v in profils.values()),
-            "le PER normalise reste CALCULE dans collecte/profils.json : c'est "
-            "l'affichage qui est suspendu, pas la mesure")
-
-    # --- (a bis) La FENETRE du PER normalise, corrigee le 01/10/2026 ----------
-    #
-    # POURQUOI CES CONTROLES EXISTENT. Claudia a signale que les PER normalises
-    # du tableau de bord etaient faux. Deux defauts portaient sur la
-    # constitution de la fenetre -- pas sur la formule :
-    #
-    #   1. ORDER BY exercice DESC LIMIT 4 prend les quatre exercices les plus
-    #      recents DISPONIBLES, pas les quatre dernieres annees. Sur 6 titres de
-    #      25 la fenetre enjambait un trou : BICC sautait 2022 (trou de C6), ORGT
-    #      2023 et 2024, SDCC 2022 et 2023, et SICC n'avait aucun exercice
-    #      posterieur a 2021 -- son PER normalise reposait sur 2018-2021.
-    #   2. resultat_net > 0 ecartait 17 exercices deficitaires depuis 2021, et
-    #      l'effet etait a l'envers : retirer une perte REMONTE la moyenne, donc
-    #      BAISSE le rapport, donc fait paraitre le titre MOINS cher.
-    #
-    # Les deux controles ci-dessous portent sur la REGLE, sur une base jetable,
-    # et chacun porte son CONTRE-EXEMPLE : sous l'ancienne regle ils tombent.
-    # Un controle qui ne tombe pas sous injection ne surveille rien.
-    sys.path.insert(0, str(ICI))
-    from profils import per_normalise as _pern
-
-    conn = sqlite3.connect(":memory:")
-    conn.execute("CREATE TABLE etats_financiers (ticker TEXT, exercice INT, "
-                 "resultat_net REAL)")
-
-    def _serie(t, paires):
-        conn.executemany("INSERT INTO etats_financiers VALUES (?,?,?)",
-                         [(t, e, rn) for e, rn in paires])
-
-    # A. quatre annees CONSECUTIVES dont une en perte. Moyenne attendue :
-    #    (100 - 50 + 100 + 100) / 4 = 62,5 ; rapport 100/62,5 = 1,60.
-    #    Sous l'ancienne regle la perte disparaissait : moyenne 100, rapport 1,00.
-    _serie("A", [(2025, 100.0), (2024, -50.0), (2023, 100.0), (2022, 100.0)])
-    # B. un TROU en 2023 : la fenetre consecutive s'arrete a deux exercices,
-    #    donc on ne calcule pas. Sous l'ancienne regle elle enjambait le trou et
-    #    rendait un nombre sur quatre exercices couvrant cinq annees.
-    _serie("B", [(2025, 100.0), (2024, 90.0), (2022, 50.0), (2021, 40.0)])
-    # C. serie saine : la correction ne doit RIEN changer au cas courant.
-    _serie("C", [(2025, 120.0), (2024, 110.0), (2023, 100.0), (2022, 90.0)])
-    # D. moyenne negative : aucun rapport n'a de sens.
-    _serie("D", [(2025, 10.0), (2024, -100.0), (2023, -100.0), (2022, -100.0)])
-    cur_j = conn.cursor()
-
-    pa, ra, na = _pern(cur_j, "A", 10.0)
-    verifie(na == 4 and abs(ra - 0.60) < 1e-9 and abs(pa - 16.0) < 1e-9,
-            "un exercice en PERTE entre dans la moyenne : 100/-50/100/100 donne "
-            f"un rapport de 1,60 et un PER normalise de 16,0 (obtenu : "
-            f"{na} exercices, rapport {ra if ra is None else round(1 + ra, 2)}, "
-            f"PER {pa if pa is None else round(pa, 1)}) — sous l'ancienne regle "
-            "la perte etait ecartee et le rapport valait 1,00")
-    pb, rb, nb = _pern(cur_j, "B", 10.0)
-    verifie(pb is None and nb == 2,
-            "une fenetre a TROU ne se calcule pas : 2025, 2024, puis 2022 "
-            f"s'arrete a deux exercices consecutifs (obtenu : {nb} exercices, "
-            f"PER {pb}) — sous l'ancienne regle elle enjambait 2023 et rendait "
-            "un nombre sur cinq annees")
-    pc, rc, nc = _pern(cur_j, "C", 10.0)
-    verifie(nc == 4 and abs(pc - 10.0 * (120.0 / 105.0)) < 1e-9,
-            "une serie consecutive et beneficiaire est inchangee par la "
-            f"correction (4 exercices, PER 10,0 -> {pc:.2f})")
-    pd_, _rd, nd = _pern(cur_j, "D", 10.0)
-    verifie(pd_ is None and nd == 4,
-            "une moyenne negative ne rend aucun PER normalise, la perte "
-            f"etant desormais comptee (obtenu : {nd} exercices, PER {pd_})")
-    conn.close()
-
-    # Et la propriete sur la BASE du jour : toute fenetre reellement retenue est
-    # consecutive. Le controle sur base jetable ci-dessus prouve la regle ; ce
-    # controle-ci prouve qu'elle s'applique aux donnees publiees.
-    if DB.exists():
-        conn = sqlite3.connect(DB)
-        cur_r = conn.cursor()
-        non_consecutives = []
-        for ticker, v in sorted(profils.items()):
-            n = v.get("n_ex_normalise")
-            if v.get("per_normalise") is None or not n or n < 3:
-                continue
-            ex = [e for (e,) in cur_r.execute(
-                "SELECT exercice FROM etats_financiers WHERE ticker=? AND "
-                "resultat_net IS NOT NULL ORDER BY exercice DESC LIMIT ?",
-                (ticker, n))]
-            if ex and ex[0] - ex[-1] != len(ex) - 1:
-                non_consecutives.append(f"{ticker} {ex}")
-        verifie(not non_consecutives,
-                f"les {len(calcules)} fenetres retenues sur la base du jour sont "
-                f"consecutives"
-                + ("" if not non_consecutives else
-                   " — A TROU : " + ", ".join(non_consecutives)))
-        conn.close()
+            "ni app.py ni dashboard/*.py ne nomment plus la mesure retiree"
+            + ("" if not rendu else " — RESTES : " + ", ".join(rendu)))
 
     # Le taux sans risque doit etre present et plausible pour la zone.
     taux = {v.get("taux_reference") for v in profils.values() if v.get("taux_reference")}
