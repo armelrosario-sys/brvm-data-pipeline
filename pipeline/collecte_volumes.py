@@ -146,8 +146,38 @@ def nombre(t):
     return v, dec
 
 
+def dates_vues(texte):
+    """Rend toutes les dates lisibles dans un texte, sans filtre de plausibilite.
+
+    Sert au diagnostic : une page qui ne porte AUCUNE date et une page qui en
+    porte une trop vieille sont deux pannes differentes, et la seconde se repare.
+    """
+    t = sans_accent(net(texte)).lower()
+    vues = set()
+    for m in re.finditer(r"\b(\d{1,2})[/.-](\d{1,2})[/.-](20\d{2})\b", t):
+        vues.add((int(m.group(3)), int(m.group(2)), int(m.group(1))))
+    for m in re.finditer(r"\b(20\d{2})-(\d{1,2})-(\d{1,2})\b", t):
+        vues.add((int(m.group(1)), int(m.group(2)), int(m.group(3))))
+    motif = r"\b(\d{1,2})\s+(" + "|".join(MOIS) + r")\s+(20\d{2})\b"
+    for m in re.finditer(motif, t):
+        vues.add((int(m.group(3)), MOIS[m.group(2)], int(m.group(1))))
+    out = []
+    for a, mo, j in sorted(vues):
+        try:
+            out.append(date(a, mo, j))
+        except ValueError:
+            continue
+    return out
+
+
 def date_de_seance(texte):
-    """Lit la date de seance dans le texte de la page. Echoue si elle n'y est pas."""
+    """Lit la date de seance dans le texte de la page. Echoue si elle n'y est pas.
+
+    On balaie le HTML BRUT et non le seul texte rendu : la BRVM publie la date de
+    seance dans un attribut, un <option> de selecteur ou une variable de script
+    selon les pages, et un balayage du seul get_text() a conclu a tort, le
+    02/10/2026, que la page n'en portait aucune.
+    """
     t = sans_accent(net(texte)).lower()
     candidates = []
     for m in re.finditer(r"\b(\d{1,2})[/.-](\d{1,2})[/.-](20\d{2})\b", t):
@@ -173,8 +203,9 @@ def date_de_seance(texte):
         vues = sorted({"%04d-%02d-%02d" % (a, mo, j) for _, a, mo, j in candidates})
         raise PageInattendue(
             "aucune date de seance plausible dans la page (ecart tolere : -1 a "
-            + str(ECART_DATE_MAX_JOURS) + " jours) ; dates vues : "
-            + (", ".join(vues[:12]) if vues else "aucune"))
+            + str(ECART_DATE_MAX_JOURS) + " jours, aujourd'hui "
+            + aujourdhui.isoformat() + ") ; dates lisibles : "
+            + (", ".join(vues[:20]) if vues else "aucune"))
     # La plus recente ; a egalite, la premiere rencontree dans la page.
     valides.sort(key=lambda x: (x[0], x[1]))
     return valides[0][2]
@@ -220,6 +251,35 @@ def colonne_tickers(corps):
     return meilleur, part_max
 
 
+def reperes(soup, html):
+    """Ce qui permet de retrouver la date de seance quand l'analyse echoue.
+
+    Imprime a chaque execution. Sans ces reperes, un echec de lecture de date
+    n'est pas diagnosticable autrement qu'en telechargeant l'artefact a la main.
+    """
+    lignes = ["REPERES DE DATE"]
+    titre = soup.find("title")
+    lignes.append("  <title> : " + (net(titre.get_text(" ")) if titre else "absent"))
+    for balise in ("h1", "h2", "h3", "caption", "legend"):
+        vus = [net(e.get_text(" ")) for e in soup.find_all(balise)][:4]
+        if vus:
+            lignes.append("  <" + balise + "> : " + " / ".join(v[:90] for v in vus))
+    opts = [net(o.get_text(" ")) for o in soup.find_all("option")][:8]
+    if opts:
+        lignes.append("  <option> : " + " / ".join(o[:40] for o in opts))
+    for e in soup.find_all(attrs={"value": True})[:6]:
+        v = net(str(e.get("value")))
+        if v and re.search(r"\d", v):
+            lignes.append("  value= : " + v[:70])
+    d_texte = dates_vues(soup.get_text(" "))
+    d_brut = dates_vues(html)
+    lignes.append("  dates dans le texte rendu : "
+                  + (", ".join(d.isoformat() for d in d_texte[:12]) if d_texte else "aucune"))
+    lignes.append("  dates dans le HTML brut   : "
+                  + (", ".join(d.isoformat() for d in d_brut[:12]) if d_brut else "aucune"))
+    return "\n".join(lignes)
+
+
 def decrire(tbs):
     """Diagnostic imprime a chaque execution : ce que l'analyseur a vu."""
     lignes = ["DIAGNOSTIC DE STRUCTURE : " + str(len(tbs)) + " table(s) dans la page"]
@@ -240,7 +300,7 @@ def analyser(html):
     """Rend (date_seance, releves, rapport). Leve PageInattendue si la page a change."""
     soup = BeautifulSoup(html, "html.parser")
     tbs = tables(soup)
-    diag = decrire(tbs)
+    diag = decrire(tbs) + "\n" + reperes(soup, html)
 
     retenue = None
     for en_tetes, corps in tbs:
@@ -281,7 +341,15 @@ def analyser(html):
             "rendement) n'y est nommee ; en-tetes vus : "
             + " | ".join(en_tetes) + "\n" + diag)
 
-    seance = date_de_seance(soup.get_text(" "))
+    try:
+        seance = date_de_seance(soup.get_text(" "))
+    except PageInattendue:
+        # Second essai sur le HTML brut : la date peut vivre dans un attribut,
+        # un <option> ou un script, qu'aucun get_text() ne rend.
+        try:
+            seance = date_de_seance(html)
+        except PageInattendue as e:
+            raise PageInattendue(str(e) + "\n" + diag)
     maintenant = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
     releves, decimales, doublons = [], {}, []
