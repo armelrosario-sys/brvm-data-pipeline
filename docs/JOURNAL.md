@@ -9,6 +9,35 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — hors cycle : le PER glissant à côté du PER du BOC, et seulement s'il existe
+
+**La demande de Claudia.** « Afficher le PER du BOC BRVM en premier lieu, puis à côté le PER
+glissant s'il est disponible. S'il n'est pas disponible, ne rien mentionner. »
+
+**Ce qui change dans `app.py`.**
+
+- **Fiche titre** : deux métriques côte à côte. **« PER (BOC) »** d'abord, désormais à deux
+  décimales comme au bulletin ; à côté, **« PER glissant (12 mois) »**, avec son écart signé
+  au BOC en delta et le détail du calcul dans l'aide. Quand le glissant manque, la seconde
+  métrique n'est pas créée.
+- **Ce qui disparaît quand il manque** : le paragraphe « non calculé : motif » de l'aide du
+  PER, et la légende sous la métrique. Ce choix **renverse délibérément** la règle posée le
+  matin même (« une case vide sans motif ne vaut rien ») : sur 46 fiches sur 47, le motif
+  répétait la même absence. Le motif reste dans `collecte/profils.json` (`ttm_motif`).
+- **Onglet Explorer** : la colonne « PER glissant » reste à droite du PER ; son aide ne
+  parle plus des cases vides.
+- **Non touché** : les autres tableaux portant une colonne « PER », pour ne pas créer deux
+  libellés pour la même mesure.
+
+**Vérifié à l'écran** (AppTest Streamlit 1.64, sur la base reconstruite) : BOAC affiche
+PER (BOC) 12,93 et PER glissant 12,89, delta −0,3 % ; SNTS affiche PER (BOC) 10,88 et rien
+d'autre.
+
+**Barrières.** Golden tests verts ; `tester_donnees.py` 231 OK, code 2 (alertes connues C4
+et C5) ; `profils.py` exécuté, `profils.json` inchangé ; `avis_brvm.py --test` et
+`notations.py --test` verts ; `generer_dashboard.py` 48 titres. Base et classeur supprimés
+avant le commit.
+
 ## 2026-10-02 — hors cycle : la conversation de développement et la boucle, associées
 
 **Le contexte.** La conversation de développement qui avait livré le PER glissant a été

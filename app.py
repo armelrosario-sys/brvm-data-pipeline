@@ -849,9 +849,7 @@ with o2:
                 format="%.2f", width="small",
                 help="PER sur douze mois glissants : cours rapporte au resultat du "
                      "dernier exercice clos, corrige des periodes intermediaires "
-                     "deja publiees. Vide quand aucune publication intermediaire ne "
-                     "permet de refaire la fenetre, ou quand la reference du "
-                     "bulletin n'a pas pu etre verifiee — le motif figure sur la fiche."),
+                     "deja publiees. Renseigne seulement quand il est disponible."),
             "Rdt %": st.column_config.NumberColumn(format="%.1f"),
             "Croiss. %/an": st.column_config.NumberColumn(format="%.1f"),
             "PEGY": st.column_config.NumberColumn(format="%.2f"),
@@ -895,31 +893,26 @@ with o3:
         # verifie contre brvm.org le 01/10, BOAN et BICC a 0,0 % une fois
         # appliquee la variation de seance du jour.
         #
-        # PER GLISSANT (TTM), 02/10/2026. Il vient en delta de la metrique, pas a
-        # sa place : le PER du bulletin reste la reference, le glissant est une
-        # lecture plus FRAICHE du meme rapport. Il n'apparait que la ou une
-        # publication intermediaire permet de refaire la fenetre de douze mois et
-        # ou la reference du bulletin a ete verifiee ; partout ailleurs, l'aide
-        # dit POURQUOI il manque, parce qu'une case vide sans motif ne vaut rien.
-        aide_per = _ctx("per") or ""
-        aide_per += "\n\n**PER glissant (12 mois)** — "
-        if pd.notna(r.per_ttm):
-            aide_per += f"{r.per_ttm:.2f}. {r.ttm_detail}"
-        else:
-            aide_per += f"non calcule : {r.ttm_motif or 'motif non renseigne'}."
-        # Le delta porte l'ECART SIGNE et non la valeur : Streamlit lit le signe
-        # pour orienter sa fleche, et "glissant 12.9" sans signe affichait une
-        # fleche MONTANTE sur un PER glissant plus BAS que le PER publie.
+        # PER GLISSANT (TTM), 02/10/2026. Revu le meme jour sur demande de
+        # Claudia : le PER du BOC vient EN PREMIER, et le PER glissant se place A
+        # COTE, en seconde metrique, UNIQUEMENT quand il existe. Quand il manque,
+        # rien n'est affiche, ni valeur, ni motif : l'absence est la norme tant
+        # que C26 n'a pas rempli les publications intermediaires, et la repeter
+        # sur 46 fiches sur 47 n'apprenait rien. Le motif reste dans
+        # profils.json (ttm_motif) pour qui en a besoin.
+        aide_per = (_ctx("per") or "") + ("\n\n" if _ctx("per") else "") + \
+            "PER publie par la BRVM au Bulletin Officiel de la Cote (BOC)."
         ecart_ttm = ((r.per_ttm / r.per - 1) * 100
                      if pd.notna(r.per_ttm) and pd.notna(r.per) and r.per else None)
-        st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d", help=aide_per,
-                  delta=(f"{ecart_ttm:+.1f} % sur 12 mois glissants"
-                         if ecart_ttm is not None else None),
-                  delta_color="off")
-        if ecart_ttm is not None:
-            st.caption(
-                f"**PER glissant (12 mois) : {r.per_ttm:.2f}** contre {r.per:.1f} "
-                f"au bulletin, soit {ecart_ttm:+.1f} %. {r.ttm_detail}")
+        p1, p2 = st.columns(2)
+        p1.metric("PER (BOC)", f"{r.per:.2f}" if pd.notna(r.per) else "n/d", help=aide_per)
+        if pd.notna(r.per_ttm):
+            # Le delta porte l'ECART SIGNE au PER du BOC : Streamlit lit le signe
+            # pour orienter sa fleche (une valeur sans signe affichait une fleche
+            # montante sur un glissant plus bas).
+            p2.metric("PER glissant (12 mois)", f"{r.per_ttm:.2f}",
+                      delta=(f"{ecart_ttm:+.1f} % vs BOC" if ecart_ttm is not None else None),
+                      delta_color="off", help=str(r.ttm_detail or ""))
         if isinstance(r.dist_non_rec, str) and r.dist_non_rec:
             st.warning(f"**Rendement facial {r.dy_facial:.1f} % — hors classement.** {r.dist_non_rec}")
         st.metric("Rendement", f"{r.dy_facial:.1f} %" if pd.notna(r.dy_facial) else "n/d",
