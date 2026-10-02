@@ -9,6 +9,107 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — hors cycle : C23, retrait de l'affichage du PER normalisé
+
+**Le signalement.** « Le PER normalisé est toujours affiché malgré mon choix de (c)
+retirer l'affichage. »
+
+**Ce qui s'est passé, dit franchement.** La veille, la réponse de Claudia à ma question
+sur C23 m'était revenue sous la forme d'une question sur la collecte automatisée des PER,
+pas sous la forme du choix (c) : je l'ai traitée comme une question et j'ai inscrit C23
+avec `validation : —`. Elle a écrit `validation : OK (c) retirer l'affichage` le 02/10 à
+**07h53**, soit **quarante minutes après** la clôture du cycle 13 (07h11). Le cycle du
+matin avait donc raison d'exécuter C20 : au moment où il a lu le fichier, C23 n'était pas
+validé. Le cycle du soir l'aurait pris ; Claudia l'a demandé avant.
+
+### Ce qui a été retiré
+
+Le nombre sortait à **quatre endroits de `app.py`**, ce qui explique qu'une lecture
+rapide ne les trouve pas tous :
+
+| endroit | ce qui s'affichait |
+|---|---|
+| liste du plan (zones du quadrant) | `**16.2 normalise**` à côté du PER — la capture de Claudia |
+| métrique PER, `delta` | `normalise 16.2` sous le PER |
+| métrique PER, aide | « PER normalise (sur le benefice MOYEN des derniers exercices) : 16.2 » |
+| encadré de la fiche titre | « **Attention au PER affiche** — il vaut 12,9, mais calculé sur le bénéfice MOYEN il vaut **16,2** […] le titre est donc nettement plus cher qu'il n'en a l'air » |
+
+Les quatre sont retirés. **Vérifié : le tableau de bord publié
+(`dashboard/generer_dashboard_html.py`) et le classeur Excel ne l'affichaient pas** — rien
+à y faire de ce côté.
+
+**Le nombre reste calculé** et reste dans `collecte/profils.json`, sur 19 titres. C'est
+l'affichage qui est suspendu, pas la mesure : les trois lectures de C23 (moyenne, tendance,
+retrait définitif) se mesureront sur lui.
+
+### Le drapeau, et pourquoi son texte tombait avec le nombre
+
+`BENEFICE_NON_REPRESENTATIF` reste — Claudia n'a pas demandé de le retirer, et le fait
+qu'il porte est réel. Mais son texte disait : « le dernier bénéfice dépasse nettement la
+moyenne des exercices précédents : **le PER affiché SOUS-ESTIME la cherté réelle du titre
+(comparer au PER normalisé)** ». Les deux moitiés tombaient ensemble — la conclusion sur
+la cherté est exactement ce que C23 met en litige, et le nombre auquel elle renvoyait
+n'est plus affiché. Garder la conclusion en cachant le nombre aurait été pire que
+l'état d'avant : le lecteur aurait reçu le verdict sans pouvoir le vérifier.
+
+Le drapeau ne dit plus que ce qui est mesuré : l'écart du dernier bénéfice à la moyenne
+des exercices précédents, et que le PER affiché se calcule sur ce seul dernier bénéfice.
+Même traitement dans l'encadré de la fiche et dans la liste du plan.
+
+**Effet sur `profils.json`** : **4 champs `reserves`** seulement (BICC, SLBC, SPHC, STBC,
+les quatre titres drapeautés), rien d'autre. 0 profil, 0 secondaire, 0 grade, 0 gate.
+
+### Test, et son injection
+
+**2 contrôles ajoutés à la section 7.** Le premier cherche un **formatage** de `per_norm`
+— `{r.per_norm`, `r.per_norm:`, `{vv['per_normalise']` et leurs variantes — dans `app.py`
+et dans `dashboard/*.py`. Il cherche un formatage et non une mention, sinon les
+commentaires de ce chantier, qui nomment `per_norm` en toutes lettres, le déclencheraient.
+Le second exige que le nombre reste **calculé** dans `profils.json` : sans lui, supprimer
+la fonction passerait le premier contrôle.
+
+**Pourquoi un test et pas seulement une suppression** : la colonne `per_norm` reste dans
+le DataFrame de `app.py`, donc un affichage se réintroduit en une ligne sans qu'on y
+pense. **Injection vérifiée** : en remettant `bits.append(f"**{r.per_norm:.1f}
+normalise**")` dans la liste du plan, le contrôle tombe en ÉCHEC et nomme les deux motifs
+trouvés.
+
+### Chantier inscrit : C25, confronter le bulletin PDF à la page « Volumes / Valeurs »
+
+Claudia a demandé d'inscrire le contrôle de concordance. Ce qu'il est, et ce qu'il n'est
+pas, mesuré avant de l'écrire :
+
+- **Ce n'est pas un défaut de collecte.** `boc_quotidien.yml` tourne deux fois par jour du
+  lundi au vendredi, la table porte **79 206 PER**, et les dix-sept dernières séances
+  ouvrées en portent chacune 43 sans un trou. Un second collecteur de PER ne ramènerait
+  rien.
+- **Ce qui a de la valeur, c'est que ce soit une AUTRE source.** Tout ce que nous savons
+  des cours, du PER et du rendement vient d'**un seul document** lu par **un seul
+  analyseur**, `extracteur_boc.py`. La page publie les mêmes nombres en HTML, par une
+  autre chaîne. Aujourd'hui, une erreur d'extraction du PDF est **invisible** tant qu'elle
+  ne produit pas une valeur absurde.
+- **Ce qu'elle trancherait tout de suite** : C21. Le facteur 100 dans `rendement` se lit
+  aujourd'hui par la seule rupture entre séances voisines, méthode qui ne distingue pas
+  FTSC (247 séances au-dessus de 25 % de rendement, et c'est un **fait réel** établi par
+  C1) d'ORGT (403, et c'est une erreur d'échelle). Une seconde source tranche chaque
+  séance au lieu de raisonner sur la forme de la série.
+- **Ce qu'elle ne ferait pas**, et c'est écrit dans le chantier pour que personne ne s'y
+  trompe : elle ne corrige rien de ce qui a été signalé. Le PER affiché était déjà juste,
+  et le PER normalisé est notre calcul.
+
+Trois pièges mesurés sont inscrits : la page porte l'**intraday** (confronter sur la date,
+jamais « le dernier des deux » — l'erreur que C15 a dû défaire), les granularités
+d'arrondi sont à mesurer **avant** de fixer un seuil, et un analyseur HTML doit **échouer
+bruyamment** sur une structure inconnue plutôt que rendre une table vide, qui est le faux
+vert que la section 19 portait avant C15.
+
+### Barrières
+
+Golden tests tous verts ; `tester_donnees.py` **220 OK, 0 ÉCHEC**, code 2 (alertes de
+fraîcheur connues C4 et C5) — 218 au cycle 13, les 2 nouveaux en plus. Section 4 :
+`app.py` démarre sans exception et rend ses 4 onglets, ce qui vérifie que le retrait n'a
+rien cassé dans l'affichage.
+
 ## 2026-10-02 — cycle 13 (matin)
 
 **Chantier exécuté : C20 — l'effet de bassin.** Rang 1 de l'ordre déterminé : ORANGE

@@ -1282,7 +1282,8 @@ nouveau n'apparaît sans être inscrit.
 ## C23 — Le PER normalisé mesure la croissance, pas un pic
 
 - classe : ORANGE — arbitrage de méthode sur une mesure publiée ; le diagnostic est fait
-- statut : PROPOSÉ
+- statut : **AFFICHAGE RETIRÉ le 02/10/2026** — option (c) appliquée ; la mesure, elle,
+  reste à trancher et ce chantier reste ouvert
 - validation : OK (c) retirer l'affichage
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 2 — **une mesure fausse est publiée et lue**
@@ -1333,6 +1334,40 @@ portaient sur la sélection des exercices, pas sur la lecture du rapport.
 **Terminé quand** : les trois lectures sont mesurées titre par titre sur les titres
 calculables — PER normalisé avant/après, drapeaux qui basculent — le tableau est
 inscrit ici, et la lecture retenue est figée par un test portant son contre-exemple.
+
+### Fait le 02/10/2026 — l'affichage, et lui seul
+
+Claudia a écrit `validation : OK (c) retirer l'affichage` le 02/10 à 07h53, quarante
+minutes après la clôture du cycle 13 — qui avait donc raison d'exécuter C20.
+
+Le nombre sortait à **quatre endroits de `app.py`**, et c'est pour cela qu'il a survécu à
+une première lecture : la liste du plan (`**16.2 normalise**`), le `delta` de la métrique
+PER, l'aide de cette métrique, et l'encadré de la fiche. Les quatre sont retirés. Le
+tableau de bord publié (`generer_dashboard_html.py`) et le classeur Excel ne l'affichaient
+pas : vérifié, rien à y faire.
+
+**Le nombre reste calculé** et reste dans `collecte/profils.json` — 19 titres — parce que
+c'est l'affichage qui est suspendu, pas la mesure : les trois lectures ci-dessus se
+mesureront sur lui.
+
+**Le drapeau `BENEFICE_NON_REPRESENTATIF` reste**, mais son texte perdait les deux moitiés
+en même temps. Il disait « le PER affiché SOUS-ESTIME la cherté réelle du titre (comparer
+au PER normalisé) » : la conclusion sur la cherté est précisément ce qui est en litige, et
+le nombre auquel elle renvoyait n'est plus affiché. Il ne dit plus que ce qui est mesuré —
+l'écart du dernier bénéfice à la moyenne des exercices précédents — et renvoie ici.
+Effet sur `profils.json` : **4 champs `reserves`** (BICC, SLBC, SPHC, STBC), rien d'autre ;
+0 profil, 0 grade, 0 gate.
+
+**Test : 2 contrôles ajoutés à la section 7.** Le premier cherche un **formatage** de
+`per_norm` dans `app.py` et dans `dashboard/*.py` — pas une mention, sinon les commentaires
+de ce chantier le déclencheraient — et le second exige que le nombre reste calculé.
+Vérifié par **injection** : réintroduire `bits.append(f"**{r.per_norm:.1f} normalise**")`
+fait tomber le premier en ÉCHEC. La colonne `per_norm` reste dans le DataFrame de
+`app.py` : sans ce contrôle, un affichage se réintroduit sans qu'on y pense.
+
+**Ce qui reste à trancher est tout le reste** : (a) la moyenne, (b) la tendance, (c) le
+retrait définitif. L'affichage est suspendu, pas supprimé du code.
+
 
 ## C24 — Douze avis de dividende nomment leur société et ne sont rattachés à rien
 
@@ -1388,6 +1423,70 @@ une table ticker↔(sigle, code pays) construite depuis `societes`.
 **exacte** (jamais par préfixe), un contre-exemple `boab`/`boabf` est figé par un
 test, le plafond `AVIS_DIVIDENDE_SANS_TICKER_MAX` de la section 26 descend de 19 à 7,
 et l'autotest de `collecte/avis_brvm.py` porte les cas de la liste.
+
+
+## C25 — Confronter le bulletin PDF à la page « Volumes / Valeurs », source contre source
+
+- classe : ORANGE — ouvre une seconde source de données certifiées ; le diagnostic est fait
+- statut : PROPOSÉ
+- validation : —
+- autonomie : partielle — **la page est hors de portée du bac à sable**, il faut un workflow
+- priorité : 3
+
+**D'où vient ce chantier.** Claudia, le 01/10/2026, en signalant les PER du tableau de
+bord : « mettre en place un système automatisé permettant de récupérer périodiquement
+les PER de tous les titres cotés chaque fois qu'ils sont actualisés sur les sites de la
+BRVM ». Vérifié le jour même : **ce n'est pas un défaut de collecte**. `boc_quotidien.yml`
+tourne deux fois par jour du lundi au vendredi (18h et 21h UTC, le second passage
+rattrapant le différé de publication), la table porte **79 206 PER**, et les dix-sept
+dernières séances ouvrées en portent chacune 43 sans un seul trou. Un second collecteur
+de PER ne ramènerait rien de neuf.
+
+**Ce qui a de la valeur, en revanche, c'est que ce soit une AUTRE source.** Tout ce que
+nous savons des cours, du PER et du rendement vient d'**un seul document**, le bulletin
+officiel en PDF, lu par **un seul analyseur**, `extracteur_boc.py`. La page
+`brvm.org/fr/volumes/0` publie les mêmes nombres en **HTML**, mise à jour à 19h30, par
+une autre chaîne. Une divergence entre les deux ne peut venir que de l'une des deux, et
+c'est exactement la **preuve à deux côtés** que la doctrine du dépôt exige — celle qui a
+résolu C17 le 01/10, en confrontant deux colonnes du même bulletin.
+
+**Ce que la confrontation couvrirait, mesuré sur la base du jour** : `cours` (47 titres,
+90 469 lignes), `per` (43 titres, 79 206), `rendement` (43 titres, 75 551), et les
+volumes échangés contre `liquidite_quotidienne` (73 141 lignes).
+
+**Ce qu'elle trancherait tout de suite.** **C21** — le facteur 100 dans la colonne
+`rendement` — se lit aujourd'hui par la seule rupture entre séances voisines, méthode qui
+ne distingue pas FTSC (247 séances au-dessus de 25 %, et c'est un fait réel) d'ORGT (403,
+et c'est une erreur d'échelle). Une seconde source tranche chaque séance au lieu de
+raisonner sur la forme de la série. Elle armerait aussi un contrôle que rien ne fait :
+**aujourd'hui, une erreur d'extraction du PDF est invisible** tant qu'elle ne produit pas
+une valeur absurde.
+
+**Ce qu'elle ne ferait PAS, et qu'il faut écrire pour que personne ne s'y trompe.** Elle
+ne corrige rien de ce que Claudia a signalé : le PER affiché était déjà juste — vérifié
+contre le site, BOAN et BICC à **0,0 %** une fois appliquée la variation de séance du
+jour, ABJC à 0,3 % — et le PER normalisé est un calcul qui nous appartient, fait à partir
+de `etats_financiers`. Aucune collecte supplémentaire ne l'aurait touché. **C'est C23.**
+
+**Ce qu'il faut faire.** Un workflow quotidien, après `boc_quotidien.yml`, qui relève la
+page, écrit son relevé dans un CSV commité horodaté — jamais dans les tables existantes —
+et une section de `tester_donnees.py` qui confronte les deux sources séance par séance et
+**nomme** chaque divergence. Ne jamais corriger automatiquement sur la foi de la page :
+une divergence est un signalement, et c'est l'inspection qui dit laquelle des deux a tort.
+
+**Attention, trois pièges mesurés.** (1) La page porte l'**intraday** : à 19h30 elle peut
+publier une séance que le bulletin n'a pas encore arrêtée — confronter sur la **date**, pas
+sur « le dernier des deux », sans quoi la confrontation comparera deux jours différents,
+l'erreur exacte que C15 a dû défaire. (2) Les deux sources arrondissent peut-être
+différemment : mesurer la granularité publiée de chaque côté **avant** de fixer le moindre
+seuil. (3) Un analyseur HTML casse à la première refonte du site, en silence : il doit
+**échouer bruyamment** sur une page dont il ne reconnaît pas la structure, jamais rendre
+une table vide — c'est le faux vert que la section 19 portait avant C15.
+
+**Terminé quand** : le relevé quotidien existe et s'alimente, la confrontation porte sur
+plus de 40 titres et nomme ses divergences, le plancher de titres confrontés est figé par
+un test qui ne peut que monter, et un relevé illisible fait échouer le workflow au lieu de
+rendre une table vide.
 
 
 ---

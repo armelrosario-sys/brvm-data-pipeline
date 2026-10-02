@@ -627,9 +627,12 @@ with o1:
             dra = vv.get("drapeaux") or []
             if vv.get("statut_cotation") == "SUSPENDU":
                 bits.append("**cotation suspendue**")
-            if "BENEFICE_NON_REPRESENTATIF" in dra and vv.get("per_normalise"):
-                bits.append(f"PER trompeur ({r.per:.0f} affiche, "
-                            f"{vv['per_normalise']:.0f} sur benefice moyen)")
+            # C23, 02/10/2026 : le PER normalise n'est plus affiche (voir le bloc
+            # du meme nom plus bas). Le drapeau reste, mais il ne dit plus que
+            # le titre est plus cher : il ne dit que ce qui est mesure.
+            if "BENEFICE_NON_REPRESENTATIF" in dra and vv.get("ecart_benefice"):
+                bits.append(f"dernier benefice {vv['ecart_benefice'] * 100:+.0f} % "
+                            f"vs moyenne des exercices precedents")
             if "RESULTAT_NON_OPERATIONNEL" in dra:
                 bits.append("benefice non operationnel")
             if any(d in dra for d in ("RATTRAPAGE", "CAP_60", "BASE_ECRASEE", "PIC_YOY")):
@@ -719,8 +722,7 @@ with o1:
                 bits = []
                 if pd.notna(r.per):
                     bits.append(f"PER {r.per:.1f}")
-                if pd.notna(r.per_norm) and pd.notna(r.per) and abs(r.per_norm - r.per) > 1:
-                    bits.append(f"**{r.per_norm:.1f} normalise**")
+                # C23, 02/10/2026 : le PER normalise sortait ici. Retire.
                 if pd.notna(r.dy):
                     bits.append(f"rdt {r.dy:.1f} %")
                 if pd.notna(r.croissance):
@@ -829,12 +831,12 @@ with o3:
                     + ("  — secteur trop etroit pour etre significatif"
                        if c["n_secteur"] < 8 else "")
                     + f"\n\nMediane du marche analysable : {mm} (n={c['n_marche']})")
+        # C23, 02/10/2026 : le PER normalise sortait ici, en aide et en delta.
+        # Retire des deux. Le PER affiche est celui du BOC, et il est juste :
+        # verifie contre brvm.org le 01/10, BOAN et BICC a 0,0 % une fois
+        # appliquee la variation de seance du jour.
         aide_per = _ctx("per") or ""
-        if pd.notna(r.per_norm):
-            aide_per += (f"\n\nPER normalise (sur le benefice MOYEN des derniers "
-                         f"exercices) : {r.per_norm:.1f}")
         st.metric("PER", f"{r.per:.1f}" if pd.notna(r.per) else "n/d", help=aide_per,
-                  delta=(f"normalise {r.per_norm:.1f}" if pd.notna(r.per_norm) else None),
                   delta_color="off")
         if isinstance(r.dist_non_rec, str) and r.dist_non_rec:
             st.warning(f"**Rendement facial {r.dy_facial:.1f} % — hors classement.** {r.dist_non_rec}")
@@ -993,19 +995,31 @@ with o3:
                            "d'affaires recule : la hausse vient des couts ou du bas du "
                            "compte de resultat, pas des ventes.")
 
-    # Representativite du benefice : un PER se calcule sur un benefice ; si ce
-    # benefice est un pic, le PER parait bas alors que le titre est cher.
-    if pd.notna(r.per_norm) and pd.notna(r.per):
-        if "BENEFICE_NON_REPRESENTATIF" in str(v.get("drapeaux") or ""):
-            st.warning(
-                f"**Attention au PER affiche** — il vaut {r.per:.1f}, mais calcule sur "
-                f"le benefice MOYEN des derniers exercices il vaut **{r.per_norm:.1f}**. "
-                f"Le dernier benefice depasse de {r.ecart_ben*100:.0f} % la moyenne : "
-                f"le titre est donc nettement plus cher qu'il n'en a l'air. A confirmer "
-                f"au prochain exercice.")
-        else:
-            st.caption(f"**PER normalise** (sur le benefice moyen) : {r.per_norm:.1f} — "
-                       f"proche du PER affiche, le dernier benefice est representatif.")
+    # Representativite du benefice. CHANTIER C23, 02/10/2026 : le PER normalise
+    # ne s'affiche plus, et le texte ne conclut plus a la cherte.
+    #
+    # Ce bloc annoncait "le titre est donc nettement plus cher qu'il n'en a
+    # l'air", sur la foi de PER x (dernier benefice / moyenne des quatre
+    # derniers). Mesure du 01/10/2026 : ce rapport mesure autant la CROISSANCE
+    # qu'un pic -- sur une serie geometrique de taux g, le dernier terme depasse
+    # la moyenne de quatre termes d'environ 1,5 g sans aucun pic. Huit titres a
+    # serie strictement croissante, donc sans pic possible, voyaient leur PER
+    # gonfle de 12 a 119 % : BOAC 12,9 -> 16,2 sur 20069-26075-32044-35540,
+    # CABC 14,0 -> 16,9, SHEC 24,7 -> 31,4.
+    #
+    # Le nombre reste calcule et reste dans collecte/profils.json : c'est le
+    # seul affichage qui est suspendu, le temps que C23 tranche entre la
+    # moyenne, la tendance et le retrait definitif. Ce qui s'affiche ici est
+    # desormais le FAIT mesure -- l'ecart du dernier benefice a la moyenne --
+    # sans la conclusion sur la chertee, qui est precisement ce qui est en
+    # litige. Ne pas reintroduire un PER normalise ici sans avoir lu C23.
+    if pd.notna(r.ecart_ben) and "BENEFICE_NON_REPRESENTATIF" in str(v.get("drapeaux") or ""):
+        st.warning(
+            f"**Dernier benefice peu representatif** — il depasse de "
+            f"{r.ecart_ben*100:.0f} % la moyenne des exercices precedents. Le PER "
+            f"affiche ({r.per:.1f}) se calcule sur ce seul dernier benefice : le "
+            f"relire au prochain exercice. La mesure qui chiffrait cet effet est "
+            f"suspendue, elle confondait croissance reguliere et pic (chantier C23).")
 
     # Origine du resultat : la question que le cas AGL CI a rendue incontournable.
     if pd.notna(r.part_op):

@@ -1121,9 +1121,16 @@ def grade_confiance(profil, ing, faits_titre):
         "CYCLE_SERIE_RESTAUREE": "serie certifiee restauree malgre une rupture d'echelle "
                                  "(creux de cycle) : la croissance porte sur l'ensemble du "
                                  "cycle, pas sur une phase",
+        # C23, 02/10/2026 : ce texte disait "le PER affiche SOUS-ESTIME la cherte
+        # reelle du titre (comparer au PER normalise)". Les deux moities sont
+        # tombees ensemble : la conclusion sur la cherte repose sur un rapport qui
+        # mesure autant la croissance qu'un pic, et le PER normalise auquel il
+        # renvoyait n'est plus affiche. Le drapeau ne dit plus que ce qui est
+        # mesure.
         "BENEFICE_NON_REPRESENTATIF": "le dernier benefice depasse nettement la moyenne des "
-                                      "exercices precedents : le PER affiche SOUS-ESTIME la "
-                                      "cherte reelle du titre (comparer au PER normalise)",
+                                      "exercices precedents : le PER affiche se calcule sur "
+                                      "ce seul dernier benefice, le relire au prochain "
+                                      "exercice",
         "DONNEES_PERIMEES": "les capitaux propres en base ont plus de trois ans : le ROE "
                             "n'est plus calculable de facon fiable et n'est pas affiche",
         "CONTREDIT_PAR_INTERMEDIAIRE": "la derniere publication trimestrielle ou "

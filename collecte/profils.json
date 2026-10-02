@@ -320,7 +320,7 @@
    "SERIE_COMPLETEE_N1 : serie completee par le comparatif N-1 d'un document certifie",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche se calcule sur ce seul dernier benefice, le relire au prochain exercice",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 79563.0,
@@ -4440,7 +4440,7 @@
    "CAP_60 : croissance plafonnee",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche se calcule sur ce seul dernier benefice, le relire au prochain exercice",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 378123.0,
@@ -4971,7 +4971,7 @@
    "PIC_YOY : rupture d'echelle annuelle : serie tronquee au pic",
    "CYCLE_SERIE_RESTAUREE : serie certifiee restauree malgre une rupture d'echelle (creux de cycle) : la croissance porte sur l'ensemble du cycle, pas sur une phase",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche se calcule sur ce seul dernier benefice, le relire au prochain exercice",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 340831.0,
@@ -5190,7 +5190,7 @@
    "INFLEXION_RECENTE : le dernier exercice recule de plus de 10 % : la croissance moyenne affichee masque un retournement en cours",
    "RATTRAPAGE : croissance de rattrapage, non extrapolable",
    "CROISSANCE_CORROBOREE : le glissement du dernier exercice concorde avec une source exterieure independante : la transcription des comptes est corroboree",
-   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche SOUS-ESTIME la cherte reelle du titre (comparer au PER normalise)",
+   "BENEFICE_NON_REPRESENTATIF : le dernier benefice depasse nettement la moyenne des exercices precedents : le PER affiche se calcule sur ce seul dernier benefice, le relire au prochain exercice",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 268537.0,

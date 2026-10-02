@@ -420,6 +420,35 @@ def test_per_normalise_et_operations():
             f"le drapeau BENEFICE_NON_REPRESENTATIF reste discriminant : "
             f"{len(marques)} titre(s) sur {len(calcules)}")
 
+    # --- (a ter) Le PER normalise N'EST PLUS AFFICHE (C23, 02/10/2026) -------
+    #
+    # Claudia a tranche le 02/10 : "OK (c) retirer l'affichage". Le nombre reste
+    # CALCULE et reste dans collecte/profils.json -- c'est l'affichage, et lui
+    # seul, qui est suspendu le temps que C23 tranche entre la moyenne, la
+    # tendance et le retrait definitif.
+    #
+    # POURQUOI UN TEST PLUTOT QU'UNE SUPPRESSION. Le nombre sortait a QUATRE
+    # endroits de app.py -- la liste du plan, le delta de la metrique PER, son
+    # aide, et l'encadre de la fiche -- et il est facile d'en reintroduire un
+    # sans y penser, puisque la colonne per_norm reste dans le DataFrame. Ce
+    # controle rend la reintroduction bruyante.
+    rendu = []
+    for chemin in [APP] + sorted((RACINE / "dashboard").glob("*.py")):
+        texte = chemin.read_text(encoding="utf-8")
+        # On cherche un formatage, pas une mention : les commentaires de C23
+        # nomment per_norm en toutes lettres et ne doivent pas declencher.
+        for motif in ("{r.per_norm", "{vv['per_normalise']", '{v["per_normalise"]',
+                      "{v['per_normalise']", "r.per_norm:", "per_normalise']:"):
+            if motif in texte:
+                rendu.append(f"{chemin.name} : {motif}")
+    verifie(not rendu,
+            "le PER normalise n'est formate dans aucun affichage (C23, "
+            "« OK (c) retirer l'affichage » du 02/10/2026)"
+            + ("" if not rendu else " — ENCORE AFFICHE : " + ", ".join(rendu)))
+    verifie(any(v.get("per_normalise") is not None for v in profils.values()),
+            "le PER normalise reste CALCULE dans collecte/profils.json : c'est "
+            "l'affichage qui est suspendu, pas la mesure")
+
     # --- (a bis) La FENETRE du PER normalise, corrigee le 01/10/2026 ----------
     #
     # POURQUOI CES CONTROLES EXISTENT. Claudia a signale que les PER normalises
