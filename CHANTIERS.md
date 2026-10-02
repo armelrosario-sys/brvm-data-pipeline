@@ -1058,6 +1058,19 @@ plus rien en silence.
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 6
 
+**Mesuré le 02/10/2026 (cycle 14), en passant les barrières, et cela change l'enjeu de ce
+chantier.** Les doublons rendent **`collecte/profils.json` non reproductible** : reconstruire
+la base et relancer `profils.py` sur le dépôt inchangé redonne le fichier commité **au champ
+près sauf une valeur**, et cette valeur vient d'un doublon. `SEMC` porte **deux lignes pour
+l'exercice 2020**, 14,4 et 14,0 FCFA, même date de paiement — le `profils.json` commité a
+retenu 14,40, une reconstruction retient 14,00. Les deux sont de vraies observations du BOC
+(14,4 jusqu'au 13/05/2024, 14,0 depuis le 14/05/2024, lu dans `dividendes_historique.csv`),
+mais rien ne départage les lignes, donc **c'est l'ordre de lecture qui décide**. `SEMC` 2016
+en porte **trois** (677,0 / 676,8 / 16,92). Ce n'est donc pas une question de propreté : un
+artefact commité et publié dépend de l'ordre des lignes d'un CSV. **Rien n'a été écrit** —
+choisir la ligne est l'arbitrage de ce chantier. La boucle propose de porter sa **priorité
+de 6 à 2** ; seule Claudia édite cette ligne.
+
 **Le constat, mesuré le 30/09/2026 (cycle 10), trouvé par les gardes de C10.**
 Le script de migration de C10 a refusé de tourner au premier essai : son assertion
 d'unicité a buté sur les lignes 4 et 6 du fichier (`ABJC, 2017, 98,97,
@@ -1514,7 +1527,9 @@ et l'autotest de `collecte/avis_brvm.py` porte les cas de la liste.
 ## C25 — Confronter le bulletin PDF à la page « Volumes / Valeurs », source contre source
 
 - classe : ORANGE — ouvre une seconde source de données certifiées ; le diagnostic est fait
-- statut : PROPOSÉ
+- statut : **FAIT le 02/10/2026 (cycle 14)** — relevé, workflow et confrontation livrés ;
+  voir *Fait le 02/10/2026* en bas de ce bloc. **La passe autorisée est consommée, aucun
+  cycle ne le reprend.** Ce que la page ne permet pas est passé à **C27**.
 - validation : OK
 - autonomie : partielle — **la page est hors de portée du bac à sable**, il faut un workflow
 - priorité : 3
@@ -1574,6 +1589,59 @@ plus de 40 titres et nomme ses divergences, le plancher de titres confrontés es
 un test qui ne peut que monter, et un relevé illisible fait échouer le workflow au lieu de
 rendre une table vide.
 
+### Fait le 02/10/2026 (cycle 14)
+
+**Trois faits mesurés sur la page réelle contredisent le texte de ce chantier.** Deux
+déclenchements du workflow (runs 37070740659 et 37070996821), page à **HTTP 200, 53 773
+octets**, **cinq tables** : Top 5, Flop 5, *Activités du marché*, la cote, synthèse.
+
+1. **La page ne publie PAS le cours de la cote.** Les colonnes de la table de la cote sont
+   « Code obligation » (en fait le ticker), Nom, Nombre de titres échangés, Valeur échangée,
+   **PER**, Pourcentage de la valeur globale échangée. Seuls les dix titres du Top 5 et du
+   Flop 5 portent un cours. La confrontation des **90 469 cours** annoncée par ce chantier
+   **n'est pas possible par cette page**.
+2. **Elle ne publie pas le rendement non plus.** Donc **C21 ne peut pas être tranché par
+   elle** : ce que ce bloc annonçait comme « ce qu'elle trancherait tout de suite » est faux.
+3. **Elle ne publie aucune date.** Vérifié dans le texte rendu **et** dans le HTML brut,
+   attributs et scripts compris. `<title>` et `<h1>` disent « Volumes / Valeurs », rien de plus.
+
+**Ce qu'elle publie, et qui vaut le chantier : le PER des 48 titres**, à deux décimales —
+exactement la mesure que Claudia signalait le 01/10. Granularité mesurée **des deux côtés
+avant tout seuil** : page 43 valeurs à 2 décimales et 1 à 1 décimale ; bulletin 71 020 à 2
+décimales et 8 186 à 1 sur 79 206. D'où `TOLERANCE_PER = 0,005`, la moitié du dernier rang
+publié, et non un seuil choisi.
+
+**La date de séance n'est pas supposée, elle est prouvée.** `date_seance` reste **vide** et
+`date_seance_source` dit « absente de la page » : stamper la date du jour aurait été une
+estimation pour combler un trou. L'ancrage est **à deux côtés et indépendant du PER
+confronté** — les trois indices. Mesure du 02/10 à 22h16 UTC : page **BRVM-C 546,78** avec
+**variation veille −0,41 %**, bulletin de la séance du 01/10 **composite 549,02**. La veille
+implicite de la page vaut **549,031**, soit **0,0020 %** du composite du bulletin : la page
+montre donc la séance **suivante**, et elle le prouve sans passer par le PER.
+
+**Pourquoi l'ancrage n'est pas une précaution de style.** Confronter ce relevé au bulletin
+de la séance **voisine** du 01/10 donne **21 divergences sur 43 paires** au-delà de la
+tolérance ; au bulletin du 30/09, **35 sur 43**. Confronter « le dernier des deux » ne
+produirait donc pas du bruit : il **nommerait 21 fausses erreurs d'extraction**. C'est
+l'erreur exacte que C15 a dû défaire, et c'est le contre-exemple figé par le test.
+
+**Livré** : `pipeline/collecte_volumes.py`, `.github/workflows/volumes_quotidien.yml` (19h45
+et 21h30 UTC du lundi au vendredi, groupe `donnees-brvm`), `collecte/releve_volumes.csv`
+(48 lignes) et `collecte/releve_volumes_marche.csv` (10 totaux, dont la valeur des
+transactions du jour et les trois indices), **section 27 de `tester_donnees.py`, 7
+contrôles**. Le relevé n'écrit dans aucune table existante et ne corrige rien : une
+divergence est un **signalement**.
+
+**Vérifié par injection**, parce qu'un test qui garde un ancrage doit tomber quand on le
+contourne : relevé vidé → **1 bloquant** ; date de séance stampée sur 3 lignes → **1
+bloquant** ; indices forcés à ceux du bulletin, donc séance faussement établie → **1
+bloquant nommant les 21 divergences**. Les trois fichiers restaurés à l'identique après
+chaque injection. Sans la troisième, la confrontation aurait pu n'être qu'un ornement.
+
+**État au soir du 02/10 : la confrontation ne confronte encore rien, et c'est voulu.** Le
+bulletin de la séance du 02/10 n'est pas collecté (le plus récent en base est le 01/10) :
+la section le dit en **alerte**, nomme la séance du relevé, et **ne confronte rien**. Le
+premier verdict tombera au prochain passage de `boc_quotidien.yml`.
 
 ## C26 — La collecte des publications intermédiaires : 3 lignes pour 47 titres
 
@@ -1637,6 +1705,39 @@ et des grades**, et plus seulement remplir une case. Le cycle qui exécute C26 d
 et publier cet effet titre par titre (avant/après sur `profils.json`), comme C16 et C20.
 
 
+## C27 — La page confirme BBGC là où la base porte BBGCI, et le cours reste sans seconde source
+
+- classe : ORANGE — renomme un ticker dans une table certifiée, et choisit une seconde source
+- statut : PROPOSÉ
+- validation : —
+- autonomie : partielle — le renommage est sans réseau ; une seconde source de cours ne l'est pas
+- priorité : 4
+
+**D'où vient ce chantier.** C25 a ouvert la page « Volumes / Valeurs » et y a trouvé deux
+choses qu'il n'avait pas prévues, l'une qui se règle, l'autre qui reste ouverte.
+
+**Premier axe, mesuré et prouvé des deux côtés.** La page publie **`BBGC`** sur les 48 lignes
+de la cote. `donnees/base/societes.csv` porte **`BBGCI`**, et sa propre note dit : « Ticker
+*BBGCI* provisoire (non confirmé par mnémonique officiel BRVM, ISIN CI0000010609 connu) […] **À
+RECONFIRMER dès qu'un avis BRVM officiel de première cotation sera publié** ». La page officielle
+de la BRVM **est** cette confirmation. Le relevé l'enregistre tel quel avec `connu_en_base=non`,
+et la section 27 porte le registre `TICKERS_HORS_BASE = {"BBGC"}` : un ticker hors base de plus
+sera signalé, jamais silencieux. **Rien n'a été écrit** : renommer un ticker touche `societes.csv`
+et tout ce qui s'y adosse, c'est un arbitrage. Effet à mesurer avant d'écrire : combien de lignes
+de combien de tables portent `BBGCI`, et ce que le renommage déplace dans `profils.json`.
+
+**Second axe, et c'est le trou que C25 laisse ouvert.** Les **90 469 cours** et les **75 551
+rendements** n'ont **toujours aucune seconde source** : la page ne publie ni l'un ni l'autre pour
+la cote. Une erreur d'extraction du PDF sur un cours reste donc invisible tant qu'elle ne produit
+pas une valeur absurde, et **C21 (le facteur 100 dans la colonne `rendement`) ne peut pas être
+tranché séance par séance** — C25 annonçait le contraire, à tort. Les dix titres du Top 5 et du
+Flop 5 portent un cours : c'est une confrontation de dix lignes par séance, à peser contre les
+autres pistes (`sikafinance.json`, déjà collecté ; la page de cotation par titre).
+
+**Terminé quand** : le mnémonique officiel est tranché et, s'il change, un script de migration
+idempotent le porte partout avec son effet mesuré ; et la seconde source des cours est soit
+trouvée et branchée, soit écartée avec un motif daté qui dit ce qui reste non surveillé.
+
 ---
 
 # Veille datée, hors file
@@ -1649,53 +1750,33 @@ et publier cet effet titre par titre (avant/après sur `profils.json`), comme C1
 
 # Dernier cycle
 
-> **ANNONCE — cycle 14 en cours, 2026-10-02 22h05 UTC (cycle du soir).**
-> Chantier pris : **C25** (ORANGE, priorite 3) — Claudia a ecrit `validation : OK`
-> le 02/10 a 08h28 UTC (commit 1d86e36). Rang 1 de l'ordre deterministe, et sa ligne
-> `statut` (PROPOSE) ne porte aucune passe consommee. A priorite egale, C26 porte le
-> numero superieur : C25 passe d'abord.
-> Objet : **confronter le bulletin PDF a la page HTML `brvm.org/fr/volumes/0`**, source
-> contre source. La page est **hors de portee du bac a sable** : le releveur doit vivre
-> dans un workflow, donc etre sur `main` avant de pouvoir etre declenche. Ce chantier
-> portera donc **deux commits** — le releveur, puis la confrontation adossee a la
-> granularite reellement mesuree sur le premier releve. C'est dit ici pour que personne
-> n'y lise deux chantiers.
-> **Aucune chasse** : elle n'a lieu qu'au cycle du matin.
-> Cette annonce disparait au commit de cloture ; si elle est encore la sans commit de
-> cloture, la session a echoue.
-
-
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-10-02 — cycle 13 (matin)
+## 2026-10-02 — cycle 14 (soir)
 
-**Exécuté : C20**, sur `validation : OK option (a)`. (a) n'écrit rien dans le moteur : le
-cycle a mesuré les deux lectures refusées et posé le test qui interdit d'en changer par
-inadvertance. Garde : (a) reproduit `profils.json` au champ près, **0 écart sur 47**.
-**(b) : 31 / 47 bougent, −1 à −6 points, aucun ne monte** — un titre retiré de son propre
-bassin décale tout le monde vers le cher ; 0 profil, 0 grade, 0 gate. **(c) : 0 / 47**,
-et la mesure dit pourquoi : seul `SERVICES_FINANCIERS` est lu en sectoriel, ses trois
-bassins passent le plancher (14 / **13** / 13) — défaut réel dans le code, **latent** dans
-les données ; relever `n_secteur_min` ne bouge rien jusqu'à 14, et à 15 déplace 13 titres
-pour **0 verdict**. **Corrigé** : « six verdicts à portée d'un mouvement de bassin » n'en
-fait plus que **quatre**, seul **SMBC (P66)** reste à 3 points du seuil de décote.
-**Section 25, 7 contrôles** (bassin jetable : 46 en (a), 32 en (b), 41 en (c)),
-**vérifiée par injection** : (b) → 5 échecs, (c) → 3 échecs.
+**Exécuté : C25.** **Trois faits mesurés sur la page réelle contredisent le chantier** : elle **ne
+publie pas le cours** de la cote (seuls Top 5 et Flop 5 en portent un), **ni le rendement** — donc
+**C21 ne peut pas être tranché par elle** — et **aucune date**, vérifié dans le texte rendu comme
+dans le HTML brut. Elle publie le **PER des 48 titres** à 2 décimales, la mesure que Claudia signalait
+le 01/10. Granularité mesurée des deux côtés avant tout seuil (page 43 valeurs à 2 déc. ; bulletin
+71 020 sur 79 206) → tolérance **0,005**, moitié du dernier rang publié.
+**La séance n'est pas supposée, elle est prouvée** : `date_seance` reste vide, l'ancrage est
+l'indice composite, **indépendant du PER confronté** — page BRVM-C **546,78**, variation veille
+**−0,41 %** → veille implicite **549,031** contre **549,02** au bulletin du 01/10, soit **0,0020 %**.
+Sans lui, confronter « le dernier des deux » nommerait **21 fausses divergences sur 43 paires**
+(35 sur 43 contre le 30/09) : contre-exemple figé. **Section 27, 7 contrôles**, **vérifiée par
+injection** (relevé vidé, date stampée, indices forcés → **1 bloquant chacun**, le 3e nommant les
+21). Au soir du 02/10 elle **ne confronte rien**, et le dit en alerte : le bulletin du 02/10 n'est pas collecté.
 
-**Chasse : le rattachement d'un dividende à son exercice**, mesure laissée non faite par
-C10. `exercice_couvert` est **déduit** (paiement − 1 an) sur **314 des 321** lignes
-datées : le « +1 an partout » est une tautologie. Trois côtés indépendants existaient,
-**aucun n'était lu** — 9 rattachements manuels (règle reproduite 9/9), aucun double
-versement dans une même année civile (0 sur 324, ce qui ferme la faille de l'acompte de
-décembre), et **18 avis BRVM nommant l'exercice en clair** : **14 concordants, 1
-divergent, 0 absent**. Le divergent, **NSBC ex.2025**, est daté du 30/06/2026 en base et
-annoncé le 21/07 — un paiement ne précède pas son avis : date d'AGO, ce que **C22**
-supposait, prouvé des deux côtés. **Section 26, 15 contrôles**, vérifiée par injection.
+**Trouvé aux barrières, non écrit** : les doublons de C19 rendent **`profils.json` non
+reproductible** — `SEMC` 2020 porte 14,4 et 14,0, le commité a retenu 14,40, une reconstruction
+14,00, rien ne départage. Priorité de C19 proposée de 6 à 2. **Aucune chasse** : cycle du soir.
 
-**Barrières** : golden OK, `tester_donnees.py` **218 OK, 0 échec**, code 2 (mêmes alertes
-qu'hier : C4, C5) ; collecteurs OK ; dashboard compile (Python **3.13.15**). **Proposé :
-C24** — 12 avis de dividende sur 47 nomment leur société sans être rattachés (12
-concordants, 0 divergent ; piège : `boab` préfixe de `boabf`). **Prochain : C18**.
+**Barrières complètes** (5 chargeurs, comme `tests.yml` — j'en avais lancé 4, d'où 4 faux
+bloquants) : golden OK, `tester_donnees.py` **239 OK, 0 échec**, code 2 (C4, C5, et l'alerte voulue
+de la section 27) ; `avis_brvm --test`, `notations --test`, dashboard OK. **Proposé : C27** — la page confirme
+**BBGC** là où la base porte **BBGCI**, dont la note demandait elle-même cette confirmation ; et les
+90 469 cours restent **sans seconde source**. **Prochain : C26**.
 
 ---
 

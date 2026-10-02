@@ -40,6 +40,7 @@ Usage :
     python3 moteur/tester_donnees.py            # tout
     python3 moteur/tester_donnees.py --sans-app # sans le lancement Streamlit
 """
+import json
 import os
 import sqlite3
 import subprocess
@@ -3364,6 +3365,269 @@ def test_fonds_notations():
                 bloquant=False)
 
 
+# ----------------------------------------------------------------------
+# 27. LE BULLETIN PDF CONTRE LA PAGE « VOLUMES / VALEURS » (bloquant + alertes)
+# ----------------------------------------------------------------------
+# Tout ce que le depot sait du PER vient d'un seul document lu par un seul
+# analyseur. La page brvm.org/fr/volumes/0, relevee par pipeline/collecte_volumes.py,
+# publie le PER des 48 titres par une AUTRE chaine. Chantier C25.
+#
+# Plancher de titres releves. Mesure le 02/10/2026 (cycle 14) sur le premier
+# releve reel : 48 lignes, dont 44 portent un PER. Le plancher ne peut que monter.
+TITRES_RELEVES_MINIMUM = 40
+PER_RELEVES_MINIMUM = 40
+
+# Granularite publiee, MESUREE des deux cotes avant de fixer le moindre seuil,
+# parce que deux sources qui arrondissent differemment divergent sans qu'aucune
+# ait tort. Page : 43 valeurs a 2 decimales, 1 a 1 decimale. Bulletin : 71 020 a
+# 2 decimales, 8 186 a 1 decimale sur 79 206. Les deux cotes publient donc deux
+# decimales, et la tolerance est la moitie du dernier rang publie.
+TOLERANCE_PER = 0.005
+# Les indices sont publies a deux decimales des deux cotes.
+TOLERANCE_INDICE = 0.005
+
+# CONTRE-EXEMPLE FIGE, et c'est le controle qui donne son sens a l'ancrage.
+# Confronter le releve du 02/10/2026 au bulletin de la seance VOISINE du
+# 01/10/2026 donne 21 divergences sur 43 paires au-dela de TOLERANCE_PER ; au
+# bulletin du 30/09, 35 sur 43. Confronter « le dernier des deux » plutot que la
+# meme seance ne produirait donc pas du bruit : il nommerait 21 fausses
+# divergences. C'est l'erreur exacte que C15 a du defaire, et la section refuse
+# de confronter tant que la seance n'est pas ETABLIE.
+DIVERGENCES_SEANCE_VOISINE_MINIMUM = 15
+
+# La page publie BBGC la ou societes.csv porte BBGCI, dont la note dit elle-meme
+# que le mnemonique est provisoire et « A RECONFIRMER des qu'un avis BRVM officiel
+# sera publie ». Registre ADOSSE A LA VALEUR OBSERVEE : un ticker hors base de plus
+# est signale, jamais silencieux. Renommer un ticker en base est un arbitrage.
+TICKERS_HORS_BASE = {"BBGC"}
+
+# Libelles des indices, de chaque cote.
+INDICES_PAGE = {"composite": "BRVM-C", "brvm30": "BRVM-30", "prestige": "BRVM-PRES"}
+
+
+def test_confrontation_per_page():
+    """Le PER du bulletin PDF contre le PER de la page HTML, meme seance.
+
+    POURQUOI CETTE SECTION EXISTE (02/10/2026, cycle 14, chantier C25). Les cours,
+    le PER et le rendement viennent tous d'extracteur_boc.py, qui lit un PDF. Une
+    erreur d'extraction est invisible tant qu'elle ne produit pas une valeur
+    absurde. La page Volumes / Valeurs publie le PER par une autre chaine : une
+    divergence ne peut venir que de l'une des deux, et une divergence est un
+    SIGNALEMENT, jamais une correction automatique.
+
+    CE QUE LA MESURE A APPRIS, ET QUI N'ETAIT PAS PREVU PAR C25. La page ne publie
+    NI le cours de la cote (seuls le Top 5 et le Flop 5 en portent un) NI le
+    rendement : la confrontation des 90 469 cours et l'arbitrage de C21 ne passent
+    donc pas par elle. Elle publie le PER des 48 titres, et c'est tout.
+
+    ET ELLE NE PUBLIE AUCUNE DATE — verifie dans le texte rendu comme dans le HTML
+    brut. Le releveur laisse donc date_seance VIDE : stamper la date du jour serait
+    une estimation pour combler un trou. La garantie « ne jamais confronter deux
+    jours differents » est donc ICI, et elle tient a un ANCRAGE A DEUX COTES : les
+    trois indices. Mesure du 02/10/2026 a 22h16 UTC — page BRVM-C 546,78 avec une
+    variation veille de -0,41 %, bulletin de la seance du 01/10 composite 549,02.
+    La veille implicite de la page vaut 549,031, soit 0,0020 % du composite du
+    bulletin : la page montre donc la seance SUIVANTE, et elle le prouve sans
+    passer par le PER qu'on veut confronter.
+
+    Six controles. A : le releve porte au moins TITRES_RELEVES_MINIMUM titres
+    (plancher, il ne peut que monter) — sans quoi le vider suffirait a rendre la
+    section verte. B : la colonne PER reste renseignee, sinon la page a change de
+    structure. C : aucun releve ne porte une date de seance SUPPOSEE — un futur
+    cycle ne peut pas contourner l'ancrage en stampant la date du jour. D :
+    l'ancrage, qui dit si la seance est etablie. E : la confrontation du PER, sur
+    la seule seance etablie, divergences nommees. F : le registre des tickers que
+    la base ignore.
+    """
+    print("\n=== 27. Bulletin PDF contre page Volumes / Valeurs (bloquant) ===")
+    import csv as _csv
+    rel_f = RACINE / "collecte" / "releve_volumes.csv"
+    mar_f = RACINE / "collecte" / "releve_volumes_marche.csv"
+    boc_f = RACINE / "donnees" / "boc.json"
+    quot_f = RACINE / "collecte" / "cours_quotidien_boc.csv"
+    if not rel_f.exists():
+        verifie(False, "collecte/releve_volumes.csv absent : le releveur de la page "
+                       "n'a jamais tourne (workflow volumes_quotidien.yml)",
+                bloquant=False)
+        return
+
+    releves = list(_csv.DictReader(open(rel_f, encoding="utf-8")))
+    if not releves:
+        verifie(False, "collecte/releve_volumes.csv est vide : le releveur doit "
+                       "echouer bruyamment, jamais rendre une table vide")
+        return
+    dernier_jour = max(r["date_releve"] for r in releves)
+    dujour = [r for r in releves if r["date_releve"] == dernier_jour]
+
+    # A — le releve est PLEIN. Plancher adosse a la mesure du 02/10/2026 (48).
+    verifie(len(dujour) >= TITRES_RELEVES_MINIMUM,
+            f"{len(dujour)} titre(s) releve(s) le {dernier_jour} "
+            f"(plancher {TITRES_RELEVES_MINIMUM}, il ne peut que monter)"
+            + ("" if len(dujour) >= TITRES_RELEVES_MINIMUM else
+               " — LE RELEVE S'EST VIDE : vert sans rien confronter, l'etat que "
+               "la section 19 portait avant C15"))
+
+    # B — la structure de la page tient encore.
+    per_page = {}
+    for r in dujour:
+        if r.get("per"):
+            try:
+                per_page[r["ticker"]] = float(r["per"])
+            except ValueError:
+                pass
+    verifie(len(per_page) >= PER_RELEVES_MINIMUM,
+            f"{len(per_page)} PER releve(s) sur la page (plancher {PER_RELEVES_MINIMUM})"
+            + ("" if len(per_page) >= PER_RELEVES_MINIMUM else
+               " — la colonne PER a disparu ou change de nom : la page a ete "
+               "refondue, relire le diagnostic de pipeline/collecte_volumes.py"))
+
+    # C — aucune date de seance supposee. C'est ce controle qui empeche un futur
+    # cycle de contourner l'ancrage en stampant la date du jour.
+    suppposees = [r["ticker"] for r in dujour
+                  if (r.get("date_seance") or "")
+                  and (r.get("date_seance_source") or "") != "page"]
+    verifie(not suppposees,
+            f"aucune date de seance supposee dans le releve ({len(dujour)} lignes verifiees)"
+            + ("" if not suppposees else
+               f" — {len(suppposees)} ligne(s) portent une date_seance sans que la "
+               f"page la publie : une case vide vaut mieux qu'une valeur approchee "
+               f"(" + ", ".join(suppposees[:5]) + ")"))
+
+    # D — l'ancrage a deux cotes : les indices disent si la seance est etablie.
+    if not (mar_f.exists() and boc_f.exists()):
+        verifie(False, "releve_volumes_marche.csv ou donnees/boc.json absent : "
+                       "la seance du releve ne peut pas etre ancree, aucune "
+                       "confrontation n'est faite", bloquant=False)
+        return
+    marche = {r["libelle"]: r["valeur"] for r in _csv.DictReader(
+        open(mar_f, encoding="utf-8")) if r["date_releve"] == dernier_jour}
+    boc = json.loads(boc_f.read_text(encoding="utf-8"))
+    seance_boc = boc.get("seance")
+    indices_boc = boc.get("indices") or {}
+
+    def num(t):
+        if t is None:
+            return None
+        s = (str(t).replace("\xa0", "").replace(" ", "").replace(" ", "")
+             .replace("FCFA", "").replace("%", "").replace(",", "."))
+        try:
+            return float(s)
+        except ValueError:
+            return None
+
+    ecarts, lus = {}, 0
+    for cle_boc, libelle in INDICES_PAGE.items():
+        a = num(marche.get(libelle))
+        b = (indices_boc.get(cle_boc) or {}).get("niveau")
+        if a is None or b is None:
+            continue
+        lus += 1
+        ecarts[libelle] = a - b
+    verifie(lus == len(INDICES_PAGE),
+            f"les {len(INDICES_PAGE)} indices sont lisibles des deux cotes ({lus} lus)"
+            + ("" if lus == len(INDICES_PAGE) else
+               " — sans eux la seance du releve ne peut pas etre ancree"),
+            bloquant=False)
+
+    concordent = lus == len(INDICES_PAGE) and all(
+        abs(e) <= TOLERANCE_INDICE for e in ecarts.values())
+    detail = ", ".join(f"{k} {v:+.2f}" for k, v in sorted(ecarts.items()))
+
+    if concordent:
+        # E — la seance est ETABLIE : le releve et le bulletin montrent le meme
+        # jour. La confrontation du PER est legitime, et elle est bloquante.
+        print(f"    ancrage : les indices concordent, seance etablie {seance_boc} ({detail})")
+        per_boc = {}
+        for r in _csv.DictReader(open(quot_f, encoding="utf-8")):
+            if r["date_bulletin"] == seance_boc and r["per"]:
+                try:
+                    per_boc[r["ticker"]] = float(r["per"])
+                except ValueError:
+                    pass
+        communs = sorted(set(per_page) & set(per_boc))
+        verifie(len(communs) >= PER_RELEVES_MINIMUM,
+                f"{len(communs)} PER confrontables sur la seance etablie {seance_boc} "
+                f"(plancher {PER_RELEVES_MINIMUM})"
+                + ("" if len(communs) >= PER_RELEVES_MINIMUM else
+                   " — la confrontation s'est videe : verte sans rien confronter"))
+        diverg = [(t, per_page[t], per_boc[t]) for t in communs
+                  if abs(per_page[t] - per_boc[t]) > TOLERANCE_PER]
+        verifie(not diverg,
+                f"{len(communs)} PER confrontes sur la seance {seance_boc}, "
+                f"{len(diverg)} divergent(s) au-dela de {TOLERANCE_PER} "
+                f"— deux chaines independantes sur le meme jour"
+                + ("" if not diverg else
+                   " — SIGNALEMENT, pas une correction : l'inspection dit laquelle "
+                   "des deux sources a tort : " + " ; ".join(
+                       f"{t} page {a:g} contre bulletin {b:g}" for t, a, b in diverg[:8])))
+    else:
+        # La page montre une AUTRE seance que le bulletin. On verifie que c'est
+        # bien la seance SUIVANTE, par la variation veille, et on ne confronte
+        # RIEN. Alerte, jamais un faux vert.
+        comp = num(marche.get(INDICES_PAGE["composite"]))
+        var = num(marche.get("Variation veille (%)"))
+        ref = (indices_boc.get("composite") or {}).get("niveau")
+        veille = comp / (1 + var / 100) if (comp is not None and var not in (None, -100)) else None
+        if veille is not None and ref:
+            rel = abs(veille - ref) / ref
+            if rel <= 0.001:
+                verifie(False,
+                        f"le releve du {dernier_jour} porte la seance SUIVANTE celle du "
+                        f"bulletin ({seance_boc}) : la veille implicite de la page vaut "
+                        f"{veille:.3f} contre {ref:.2f} au bulletin, soit {100 * rel:.4f} % "
+                        f"— ancrage ferme des deux cotes, mais le bulletin de cette "
+                        f"seance n'est pas encore collecte : AUCUNE confrontation faite, "
+                        f"elle se fera au prochain passage de boc_quotidien.yml ({detail})",
+                        bloquant=False)
+            else:
+                verifie(False,
+                        f"la seance du releve du {dernier_jour} n'est pas identifiable : "
+                        f"les indices diffèrent du bulletin {seance_boc} ({detail}) et la "
+                        f"veille implicite de la page ({veille:.3f}) ne recouvre pas son "
+                        f"composite ({ref:.2f}) a {100 * rel:.4f} % — ne rien confronter "
+                        f"tant que la seance n'est pas etablie", bloquant=False)
+        else:
+            verifie(False,
+                    f"la seance du releve du {dernier_jour} n'est pas ancrable : indices "
+                    f"({detail}) et variation veille illisibles — aucune confrontation",
+                    bloquant=False)
+
+    # F — le contre-exemple qui donne son sens a l'ancrage. Confronter le releve a
+    # une seance VOISINE doit produire beaucoup de divergences : sans l'ancrage, la
+    # section nommerait ces fausses divergences comme des erreurs d'extraction.
+    if not concordent and seance_boc:
+        per_voisin = {}
+        for r in _csv.DictReader(open(quot_f, encoding="utf-8")):
+            if r["date_bulletin"] == seance_boc and r["per"]:
+                try:
+                    per_voisin[r["ticker"]] = float(r["per"])
+                except ValueError:
+                    pass
+        com = sorted(set(per_page) & set(per_voisin))
+        faux = [t for t in com if abs(per_page[t] - per_voisin[t]) > TOLERANCE_PER]
+        if com:
+            verifie(len(faux) >= DIVERGENCES_SEANCE_VOISINE_MINIMUM,
+                    f"contre-exemple : confronter ce releve au bulletin voisin "
+                    f"{seance_boc} donne {len(faux)} divergence(s) sur {len(com)} paires "
+                    f"(plancher {DIVERGENCES_SEANCE_VOISINE_MINIMUM}) — c'est ce que "
+                    f"confronter « le dernier des deux » nommerait a tort, et c'est "
+                    f"pourquoi l'ancrage porte quelque chose"
+                    + ("" if len(faux) >= DIVERGENCES_SEANCE_VOISINE_MINIMUM else
+                       " — SI CE NOMBRE S'EFFONDRE, verifier que l'ancrage n'est pas "
+                       "devenu inutile avant de baisser le plancher"))
+
+    # G — registre des tickers que la page porte et que la base ignore.
+    hors = {r["ticker"] for r in dujour if (r.get("connu_en_base") or "") == "non"}
+    nouveaux = sorted(hors - TICKERS_HORS_BASE)
+    verifie(not nouveaux,
+            f"{len(hors)} ticker(s) de la page hors de societes.csv, registre "
+            f"{sorted(TICKERS_HORS_BASE)}"
+            + ("" if not nouveaux else
+               f" — TICKER(S) NOUVEAU(X) SUR LA COTE : {nouveaux} ; les inscrire en "
+               f"base est un arbitrage, pas une passe pre-autorisee"),
+            bloquant=False)
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -3395,6 +3659,7 @@ def main():
     test_reference_dividende_boc()
     test_lecture_des_bassins()
     test_rattachement_exercice()
+    test_confrontation_per_page()
     if not sans_app:
         test_application()
 
