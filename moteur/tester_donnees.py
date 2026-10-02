@@ -745,6 +745,25 @@ def test_integrite_app():
     verifie("decote_pctl" in code,
             "app.py lit bien decote_pctl")
 
+    # Les quatre cadrans du plan sortent en TABLEAUX (02/10/2026, demande de
+    # Claudia). Ils sortaient en listes a puces, une phrase par titre, ou le PER,
+    # le rendement et la croissance se suivaient separes par des points mediums :
+    # illisible des cinq titres, et surtout incomparable d'une ligne a l'autre.
+    #
+    # Les deux controles ci-dessous gardent la propriete qui compte, et ce n'est
+    # pas la forme du tableau : c'est que les colonnes chiffrees restent
+    # NUMERIQUES, le formatage etant delegue a column_config. Mises en forme en
+    # chaines, elles se trieraient alphabetiquement a la premiere colonne cliquee
+    # et "9.3" passerait apres "14.0" -- le defaut que C10 a corrige dans la table
+    # des dividendes, reintroduit cette fois a l'ecran.
+    verifie("COLONNES_ZONE" in code and "st.dataframe(_table_zone(" in code,
+            "les cadrans du plan sortent en tableaux (st.dataframe + column_config)")
+    for colonne in ("PER", "Rendement", "Croissance", "Decote"):
+        motif = f'"{colonne}": st.column_config.NumberColumn'
+        verifie(motif in code,
+                f"la colonne {colonne} des cadrans reste NUMERIQUE (NumberColumn) : "
+                f"formatee en chaine, le tri de l'en-tete redeviendrait alphabetique")
+
 
 
 # ----------------------------------------------------------------------

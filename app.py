@@ -695,6 +695,88 @@ with o1:
                        else "Bon marche sans dynamique" if r.decote_pctl >= 67
                        else "Ni l'un ni l'autre"), axis=1)
 
+        # --- Un TABLEAU par cadran (02/10/2026, demande de Claudia) ------------
+        #
+        # Les quatre cadrans sortaient en listes a puces : une phrase par titre,
+        # ou le PER, le rendement, la croissance et les signaux se suivaient
+        # separes par des points mediums. Illisible des que le cadran passe
+        # quatre ou cinq titres, et surtout IMPOSSIBLE A COMPARER -- l'oeil ne
+        # peut pas aligner deux PER qui ne sont pas dans la meme colonne.
+        #
+        # Les colonnes restent NUMERIQUES et le formatage passe par
+        # column_config : si les nombres etaient mis en forme en chaines, le tri
+        # de l'en-tete redeviendrait alphabetique, et "9.3" se classerait apres
+        # "14.0". C'est exactement le defaut que le chantier C10 a corrige dans
+        # la table des dividendes -- ne pas le reintroduire ici.
+        #
+        # La decote est ajoutee en colonne : c'est la clef de tri des cadrans et
+        # l'un des deux axes du plan, et le lecteur ne pouvait pas voir pourquoi
+        # l'ordre etait celui-la.
+        def _table_zone(sub):
+            lignes = []
+            for _, r in sub.iterrows():
+                # L'ORDRE DES SIGNAUX EST DELIBERE, du plus grave au moins grave.
+                # La colonne est la derniere et peut se tronquer quand un titre
+                # en porte trois (STBC aujourd'hui) : ce qui disparait alors est
+                # "rend plus que l'Etat", qui est une information, jamais une
+                # cotation suspendue ni un benefice non representatif. Ne pas
+                # reordonner cette liste sans refaire ce raisonnement.
+                signaux = []
+                if r.statut_cotation == "SUSPENDU":
+                    signaux.append("COTATION SUSPENDUE")
+                if "BENEFICE_NON_REPRESENTATIF" in str(r.drapeaux):
+                    signaux.append("benefice non representatif")
+                if "RATTRAPAGE" in str(r.drapeaux) or "CAP_" in str(r.drapeaux):
+                    signaux.append("croissance de rattrapage")
+                if "RESULTAT_NON_OPERATIONNEL" in str(r.drapeaux):
+                    signaux.append("benefice non operationnel")
+                if pd.notna(r.payout) and r.payout > 1:
+                    signaux.append("dividende non couvert")
+                if pd.notna(r.prime) and r.prime > 0:
+                    signaux.append("rend plus que l'Etat")
+                lignes.append({
+                    "Code": r.ticker,
+                    "Societe": r.nom,
+                    "Profil": r.profil.replace("_", " ").lower(),
+                    "Grade": r.grade,
+                    "PER": r.per if pd.notna(r.per) else None,
+                    "Rendement": r.dy if pd.notna(r.dy) else None,
+                    "Croissance": r.croissance if pd.notna(r.croissance) else None,
+                    "Decote": r.decote_pctl if pd.notna(r.decote_pctl) else None,
+                    "Signaux": " · ".join(signaux),
+                })
+            return pd.DataFrame(lignes)
+
+        # Largeurs en pixels plutot que "small"/"medium" : les huit premieres
+        # colonnes sont calibrees sur leur contenu reel, pour que la colonne
+        # Signaux recoive tout le reste. Avec les largeurs par defaut elle etait
+        # tronquee des qu'un titre portait deux signaux, et "benefice non
+        # representatif · croissance de rattrapage" se coupait au milieu --
+        # exactement ce que ce tableau est cense eviter. Le composant ne sait pas
+        # revenir a la ligne dans une cellule (ni TextColumn ni st.dataframe ne
+        # l'offrent en 1.64) : la seule marge de manoeuvre est la largeur.
+        COLONNES_ZONE = {
+            "Code": st.column_config.TextColumn("Code", width=62),
+            "Societe": st.column_config.TextColumn("Societe", width=150),
+            "Profil": st.column_config.TextColumn("Profil", width=95),
+            "Grade": st.column_config.TextColumn("Grade", width=55),
+            "PER": st.column_config.NumberColumn(
+                "PER", format="%.1f", width=65,
+                help="Cours sur dernier benefice par action, publie par le BOC."),
+            "Rendement": st.column_config.NumberColumn(
+                "Rdt", format="%.1f %%", width=70,
+                help="Dernier dividende sur cours. Les titres a dividende perime "
+                     "ou exceptionnel sont hors classement (chantier C1)."),
+            "Croissance": st.column_config.NumberColumn(
+                "Croissance", format="%+.0f %%/an", width=95,
+                help="Croissance moyenne du benefice sur les exercices disponibles."),
+            "Decote": st.column_config.NumberColumn(
+                "Decote", format="P%d", width=70,
+                help="Rang de decote, de P0 a P100, RELATIF a la cote BRVM. "
+                     "C'est l'axe horizontal du plan et la clef de tri."),
+            "Signaux": st.column_config.TextColumn("Signaux", width="large"),
+        }
+
         ZONES = {
             "Decote ET croissance": (
                 "**Haut a droite — decote ET croissance.** La zone la plus "
@@ -718,34 +800,8 @@ with o1:
             if not len(sub):
                 continue
             st.markdown(ZONES[zone] + f"  ({len(sub)} titre(s))")
-            for _, r in sub.iterrows():
-                bits = []
-                if pd.notna(r.per):
-                    bits.append(f"PER {r.per:.1f}")
-                # C23, 02/10/2026 : le PER normalise sortait ici. Retire.
-                if pd.notna(r.dy):
-                    bits.append(f"rdt {r.dy:.1f} %")
-                if pd.notna(r.croissance):
-                    bits.append(f"croiss. {r.croissance:+.0f} %/an")
-                alertes = []
-                if r.statut_cotation == "SUSPENDU":
-                    alertes.append("COTATION SUSPENDUE")
-                if "BENEFICE_NON_REPRESENTATIF" in str(r.drapeaux):
-                    alertes.append("benefice non representatif")
-                if "RATTRAPAGE" in str(r.drapeaux) or "CAP_" in str(r.drapeaux):
-                    alertes.append("croissance de rattrapage")
-                if "RESULTAT_NON_OPERATIONNEL" in str(r.drapeaux):
-                    alertes.append("benefice non operationnel")
-                if pd.notna(r.payout) and r.payout > 1:
-                    alertes.append("dividende non couvert")
-                if pd.notna(r.prime) and r.prime > 0:
-                    alertes.append("rend plus que l'Etat")
-                suffixe = (f" — <span style='color:#b45f3f'>{' · '.join(alertes)}</span>"
-                           if alertes else "")
-                st.markdown(
-                    f"<div class='reserve'><b>{r.ticker}</b> ({r.nom}) · "
-                    f"{r.profil.replace('_', ' ').lower()} · grade {r.grade} · "
-                    f"{' · '.join(bits)}{suffixe}</div>", unsafe_allow_html=True)
+            st.dataframe(_table_zone(sub), hide_index=True, use_container_width=True,
+                         height=38 + 35 * len(sub), column_config=COLONNES_ZONE)
 
         # Les titres hors axes ne doivent pas DISPARAITRE du tableau de bord :
         # un plan qui n'affiche que 34 titres sur 47 laisse croire que les 13

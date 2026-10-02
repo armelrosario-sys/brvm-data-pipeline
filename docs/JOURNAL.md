@@ -9,6 +9,88 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — hors cycle : les quatre cadrans du plan passent en tableaux
+
+**La demande.** « Organise cette section sous forme de tableaux pour chaque cadran de la
+figure, pour faciliter la lecture. »
+
+**Ce qui n'allait pas.** Chaque cadran sortait en liste à puces, une phrase par titre :
+`STBC (Sitab) · value · grade C · PER 10.8 · rdt 7.8 % · croiss. +47 %/an — bénéfice non
+représentatif · croissance de rattrapage · rend plus que l'État`. Le défaut n'est pas la
+longueur, c'est que **rien n'est aligné** : pour comparer deux PER il faut les retrouver à
+des positions différentes de deux phrases différentes. Un cadran de six titres demande
+donc six lectures séquentielles là où un tableau en demande une.
+
+### Ce qui remplace
+
+Un `st.dataframe` par cadran, trié comme avant par décote décroissante, avec neuf
+colonnes : Code, Societe, Profil, Grade, PER, Rdt, Croissance, **Decote**, Signaux.
+
+**La colonne Decote est une addition, pas une transposition.** C'est la clef de tri des
+cadrans et l'un des deux axes du plan, et le lecteur ne pouvait pas voir pourquoi l'ordre
+était celui-là. Elle s'affiche au format `P93`, comme ailleurs dans l'application.
+
+**Les colonnes chiffrées restent NUMÉRIQUES**, le formatage étant délégué à
+`column_config` (`%.1f`, `%.1f %%`, `%+.0f %%/an`, `P%d`). C'est le point qui mérite d'être
+écrit : mises en forme en chaînes de caractères — ce qui aurait été plus simple — elles se
+trieraient **alphabétiquement** au premier clic sur un en-tête, et `9.3` passerait après
+`14.0`. C'est exactement le défaut que **C10** a corrigé dans la table des dividendes, et
+il serait réintroduit à l'écran au lieu de l'être en base. Le tri par en-tête, que la liste
+à puces n'offrait pas du tout, est d'ailleurs le gain principal de ce changement.
+
+### Les largeurs, mesurées à l'écran et pas devinées
+
+Vérifié en lançant l'application localement et en la photographiant avec Playwright, à
+1 500 px de large, barre latérale **ouverte** — soit le cas le plus défavorable, celui qui
+laisse le moins de place.
+
+| essai | largeurs | résultat observé |
+|---|---|---|
+| 1 | `small` / `medium` par défaut | « bénéfice non représentatif · croissance de rattrapa**ge** » coupé — deux signaux ne tiennent pas |
+| 2 | 740 px fixes sur les 8 premières | toujours coupé de quelques caractères |
+| 3 | **662 px fixes** | deux signaux tiennent en entier (SLBC) ; seul un titre à **trois** signaux se coupe |
+
+Le coût de l'essai 3 est que « Société Générale Côte d'Ivoire » se tronque à 150 px. C'est
+le bon arbitrage : le **Code** est l'identifiant, le nom n'est qu'un rappel, alors qu'un
+signal tronqué est une information perdue.
+
+**Le cas à trois signaux reste tronqué, et c'est assumé** — le composant ne sait pas
+revenir à la ligne dans une cellule, ni `TextColumn` ni `st.dataframe` ne l'offrent en
+Streamlit 1.64 ; la seule marge est la largeur. Deux recours restent au lecteur : la
+colonne se redimensionne à la souris, et replier la barre latérale rend environ 460 px.
+
+**L'ordre des signaux est donc devenu une décision**, et il est écrit dans le code :
+cotation suspendue, bénéfice non représentatif, croissance de rattrapage, bénéfice non
+opérationnel, dividende non couvert, rend plus que l'État. Du plus grave au moins grave,
+de sorte que **ce qui se coupe soit toujours le moins important**. Aujourd'hui seul STBC
+porte trois signaux, et ce qui disparaît est « rend plus que l'État », qui est une
+information et non un avertissement. Ne pas réordonner cette liste sans refaire ce
+raisonnement.
+
+**Une perte, dite franchement** : les signaux étaient rendus en orangé par du HTML inline,
+et un tableau ne le permet pas sans passer par un Styler, dont la combinaison avec
+`column_config` n'est pas garantie. La hiérarchie repose désormais sur l'ordre et sur
+`COTATION SUSPENDUE` en capitales.
+
+### Test
+
+**4 contrôles ajoutés à la section 11** (intégrité du fichier application). Ils ne gardent
+pas la forme du tableau — ce serait figer une mise en page — mais la propriété qui compte :
+que `COLONNES_ZONE` et `st.dataframe(_table_zone(` existent, et que les quatre colonnes
+chiffrées soient déclarées en `NumberColumn`. Formater en chaîne passerait le premier
+contrôle et casserait le tri : c'est pour cela qu'il y en a quatre et pas un.
+
+### Barrières
+
+Golden tests tous verts ; `tester_donnees.py` **225 OK, 0 ÉCHEC**, code 2 (alertes de
+fraîcheur connues C4 et C5) — 220 avant, les 5 nouveaux en plus (4 ici, 1 déjà compté).
+Section 11 : `app.py` démarre et rend ses 4 onglets. `collecte/profils.json` **inchangé** :
+ce commit ne touche qu'à l'affichage. `avis_brvm.py --test`, `notations.py --test`,
+`generer_dashboard.py` (48 titres) verts.
+
+**Rendu vérifié à l'écran**, pas seulement en test : capture de la section « Comment lire
+ce plan » avec les quatre tableaux en place, barre latérale ouverte.
+
 ## 2026-10-02 — hors cycle : C23, retrait de l'affichage du PER normalisé
 
 **Le signalement.** « Le PER normalisé est toujours affiché malgré mon choix de (c)
