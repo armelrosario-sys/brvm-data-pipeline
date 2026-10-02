@@ -9,6 +9,183 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-02 — cycle 13 (matin)
+
+**Chantier exécuté : C20 — l'effet de bassin.** Rang 1 de l'ordre déterminé : ORANGE
+portant `validation : OK option (a)`, priorité 3, ligne `statut` sans passe consommée.
+Contrôle anti-collision passé (dernier commit sur `main` à 00h57 UTC, `Sikafinance perf`,
+soit 6h00 ; aucune annonce ouverte).
+
+### Ce que l'option (a) demandait, et pourquoi le cycle a quand même produit un livrable
+
+Claudia a tranché « laisser tel quel ». Un chantier dont la décision est *ne rien
+changer* n'est pas un chantier vide : ce qui manquait, c'était (1) la mesure des deux
+lectures refusées, que le texte du chantier exigeait titre par titre, et (2) un test —
+sans lui, un cycle futur pourrait basculer sur (b) ou (c) sans que rien ne tombe.
+
+**Méthode.** `bassins_et_axes()` a été hissée au niveau module par le cycle 11 ; les
+trois variantes ont donc été substituées **à l'attribut de module**, sans toucher au
+dépôt, chacune écrivant son `profils.json` hors du dépôt. **Garde posée avant de
+mesurer** : la variante (a) reproduit le `profils.json` commité au champ près — 0 titre
+d'écart sur 47, sur `profil`, `secondaire`, `grade`, `gate`, `drapeaux`, `decote_pctl`,
+`croissance_pctl` et `reference_axes`. Sans cette garde la mesure n'aurait rien valu.
+
+### Les trois lectures, mesurées sur la base du jour
+
+| | (b) laisser-un-dehors | (c) plancher par axe |
+|---|---|---|
+| `decote_pctl` bouge | **31 / 47** | **0 / 47** |
+| amplitude | **−1 à −6 points**, jamais à la hausse | aucune |
+| écart absolu moyen | 2,84 point | 0 |
+| `croissance_pctl` bouge | 30 | 0 |
+| `profil` / `secondaire` / `grade` / `gate` / `drapeaux` | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 / 0 / 0 |
+
+Titres qui bougent sous (b), décote (a) → (b) : BICB 36→31, BICC 34→28, CBIBF 33→28,
+SIBC 34→28, SEMC 3→0, BOABF 38→33, ECOC 52→48, ETIT 54→50, BOAB 54→50, NSBC 51→47,
+BOAM 52→49, CIEC 13→10, ORAC 22→19, SHEC 23→20, TTLC 34→31, CFAC 18→15, SDCC 22→20,
+ABJC 50→48, CABC 54→52, PRSC 46→44, TTLS 46→44, LNBB 40→38, NTLC 18→16, BOAC 78→76,
+BOAS 74→72, SGBC 89→88, ORGT 93→92, SNTS 59→58, ONTBF 63→62, SLBC 73→72, NEIC 75→74.
+
+**Quatre enseignements, dont trois n'étaient pas prévus.**
+
+1. **(b) est un décalage, pas un recentrage.** 31 titres perdent 1 à 6 points et
+   **aucun n'en gagne** : retirer sa propre valeur d'un bassin ne peut que faire monter
+   le titre dans le classement par le cher. La marge aux seuils est rognée partout — les
+   trois titres proches du seuil GROWTH descendent tous les trois (ETIT 69→67, SNTS
+   66→65, SPHC 69→68) — au lieu d'être protégée.
+2. **(c) est un non-événement aujourd'hui, et la mesure dit pourquoi.** Un seul secteur
+   est lu en sectoriel, `SERVICES_FINANCIERS` (14 titres), et ses trois bassins passent
+   le plancher de 8 : **14** en bénéfice/prix, **13** en rendement, **13** en croissance.
+   Le défaut que C20 décrivait — la borne porte sur le bassin bénéfice/prix, pas sur
+   celui du rendement — est **réel dans le code et latent dans les données**.
+3. **La variante « relever `n_secteur_min` » ne change rien jusqu'à 14.** Mesurée à 8,
+   10, 12, 14, 15 et 20 : aucun mouvement jusqu'à 14 ; à **15**, `SERVICES_FINANCIERS`
+   bascule sur le marché, **13 titres sur 47** bougent, et **0 profil, 0 secondaire, 0
+   grade**. Le levier est brutal et n'achète aucun verdict.
+4. **Deux des trois chiffres de portée du diagnostic d'origine ont bougé en un jour.**
+   Le cran du percentile est confirmé exactement (marché 2,8 et 2,9 points ;
+   `SERVICES_FINANCIERS` 7,1 et 7,7), et le plancher par auto-inclusion aussi (P7 en
+   bénéfice/prix, **P8** en rendement dans ce secteur, P3 sur le marché). Mais « six
+   verdicts à portée d'un seul mouvement de bassin » n'en fait plus que **quatre** : sur
+   l'axe de décote, seul **SMBC (P66)** est encore à 3 points ou moins du seuil 67 —
+   ONTBF est passé à **P63** et SLBC à **P73**. Sur l'axe de croissance, les trois
+   nommés y sont toujours (ETIT P69, SNTS P66, SPHC P69). C'est l'illustration du
+   chantier lui-même : ces rangs bougent sans qu'aucune donnée de ces titres ne change.
+
+### Le livrable : section 25, et sa vérification par injection
+
+**7 contrôles** sur un bassin **jetable** de 12 titres — donc indépendant des données du
+jour — construit pour que les trois lectures rendent trois nombres différents sur le
+même titre : **46** en (a), **32** en (b), **41** en (c). Le bassin porte 8 valeurs en
+bénéfice/prix et 3 en rendement, exactement la configuration que (c) traiterait
+autrement. Le test fige aussi le plancher d'auto-inclusion (T1 rend 22 en (a) contre 0
+en (b)) et le cran de 33 points du petit bassin de rendement.
+
+**Vérification par injection**, parce qu'un test qui fige un choix doit tomber sur les
+choix refusés. `profils.py` substitué textuellement (ancre unique assertée) :
+
+- bascule sur **(b)** — `pctl()` retire une occurrence de la valeur du titre →
+  **5 contrôles en ÉCHEC** ;
+- bascule sur **(c)** — la bascule exige aussi `len(dy) >= n_secteur_min` →
+  **3 contrôles en ÉCHEC**.
+
+La section porte enfin une **alerte de veille** : si un secteur lu en sectoriel porte un
+jour un axe sous le plancher de 8, elle le nomme. 0 cas aujourd'hui.
+
+### Chasse du matin : le rattachement d'un dividende à son exercice
+
+Famille choisie parce que **C10 avait laissé cette mesure explicitement non faite** —
+`substr(date_paiement,1,4)` rendait `24-j`, l'année de paiement était inextractible. La
+colonne est ISO depuis le cycle 10 : la confrontation est devenue possible.
+
+**Premier résultat, et il invalide la mesure naïve.** Sur les 324 lignes datées, l'année
+de paiement vaut l'exercice + 1 pour **324 sur 324**. Ce nombre ne vaut rien : en lisant
+`historiser_dividendes_exercice.py::deduire_exercice()`, l'exercice **est** calculé comme
+`année de paiement − 1` pour tout paiement d'avril à décembre. Par source :
+**296** lignes de la Piste D + **18** du pont BOC = **314 exercices déduits**, contre
+**7** seulement écrits à la main dans `donnees/base/dividendes.csv` (plus 2 dont le
+pont BOC a réécrit la source). Le « +1 an partout » est donc une **tautologie sur 97 %
+de la table** : il mesure la règle, pas la réalité.
+
+**Trois côtés indépendants existaient dans le dépôt, et aucun n'était lu.**
+
+1. **Les 9 rattachements écrits à la main** (TEST\_ exclus) : la règle les reproduit
+   **9 fois sur 9**. Corroboration réelle, mais étroite.
+2. **Aucun titre ne verse deux fois dans la même année civile** : **0 cas sur 324**.
+   C'est ce qui ferme la faille principale de la règle — un acompte de l'exercice N
+   versé en décembre N serait rattaché à N−1. Six lignes réelles sont payées en
+   novembre ou décembre (SHEC 2020-11-26, SDSC 2020-12-18, TTLS 2020-12-22, SEMC
+   2021-12-28, SHEC 2023-12-28, SDSC 2024-12-12) ; aucune n'a de jumelle dans l'année,
+   donc toutes sont le versement annuel unique.
+3. **18 avis BRVM nomment l'exercice en clair dans leur titre** (« paiement de
+   dividendes exercice 2025 smb ci »). **Aucun script du dépôt ne les lisait.**
+   Confrontés à la table : **14 concordants, 1 divergent, 0 absent**, sur les 15 qui
+   portent un ticker.
+
+**Le divergent : NSBC ex.2025.** La base date le versement du **30/06/2026** ; l'avis de
+paiement est du **21/07/2026**, et `collecte/dividendes_boc.csv` donne **675,98 le
+04/08/2026**. Un paiement ne précède pas l'avis qui l'annonce : la date de la base est
+celle de l'**AGO**. C'est exactement la lecture que **C22** proposait pour cette ligne,
+désormais établie par deux sources indépendantes au lieu d'une hypothèse. Rien n'a été
+écrit : C22 n'est pas le chantier de ce cycle, et la ligne est inscrite dans le registre
+de la section 26.
+
+**Test : section 26, 15 contrôles.** Les bornes de la règle sont figées (avril-décembre
+→ N−1 ELEVEE ; janvier, février et mars → MANQUANT, jamais la règle −2 que l'avis BRVM
+N 072-2017 contredit pour FTSC) ; une seule définition de `deduire_exercice()` dans le
+dépôt et un seul appelant hors de son fichier ; la corroboration manuelle ; la cohérence
+date/exercice en base ; l'unicité du versement annuel ; et la confrontation aux avis.
+**Vérifié par injection** sur une copie jetable de la base — exercice de SMBC 2025
+faussé en 2023 et second versement SOGC inséré en décembre 2026 : **2 contrôles en
+ÉCHEC** et **1 alerte**.
+
+### Barrières
+
+Complètes (le commit touche `moteur/`). Chaîne des six scripts : base peuplée, 90 660
+lignes de cours quotidien, 73 141 de liquidité, table `dividendes` à **327** lignes (16
+ajouts BOC, 2 compléments, 8 refus, comme au cycle 12). `profils.py` : `profils.json`
+**identique au commité**. `tester.py` : tous les golden tests passent. `avis_brvm.py
+--test` et `notations.py --test` : OK. `generer_dashboard.py` et
+`generer_dashboard_html.py` : OK, et le fichier compile — bac à sable en Python
+**3.13.15**, toujours pas 3.11. `tester_donnees.py` : **218 OK, 0 échec**, code 2 sur
+les deux mêmes alertes qu'hier (C4 à 13 dates, C5 : CFAC et NEIC).
+
+**Note sur `docs_site/index.html`** : la régénération locale produit un fichier très
+différent du commité (744 insertions, 501 suppressions). Ce n'est pas un défaut —
+`pages.yml` régénère et republie ce fichier en CI, puis y injecte `bloc_signaux.py`, que
+la régénération locale ne lance pas. Le fichier a été **restauré** par `git checkout` :
+aucune régénération de dashboard ne voyage avec ce commit.
+
+### Proposé : C24 — douze avis de dividende nomment leur société et ne sont rattachés à rien
+
+Trouvé par la chasse. Sur 47 avis de dividende, **19 n'ont pas de ticker** : 7 sont le
+générique « Avis : Calendrier de paiement de dividendes », qui ne nomme personne et dont
+le non-rattachement est correct ; les **12 autres nomment leur société en clair** et
+`ticker_depuis()` les manque tous. Les causes sont lisibles une par une : un trait
+d'union (`nei ceda ci` contre `NEI-CEDA CI`), une dénomination changée (`cfao motors ci`
+contre `CFAO Mobility`), un code pays abrégé (`biic bn`, `boa sn`, `boa bf`), un sigle
+(`sib ci`, `eti tg`, `boam`, `boab`), une espace (`bicici` contre `BICI CI`).
+
+**Effet mesuré avant de proposer** : rattachés selon cette lecture, les 12 donnent
+**12 concordants, 0 divergent, 0 absent** contre la table `dividendes` — ils
+corroboreraient donc douze rattachements de plus et porteraient le côté indépendant de
+la section 26 de **15 à 27** avis. Deux d'entre eux concernent **NEIC ex.2025** et
+**CFAC ex.2025**, les deux titres de C5 : l'avis date le paiement (27/08 et 30/07/2026)
+et la table porte déjà le dividende — ce qui manque à C5 est le document d'états
+financiers, pas le dividende.
+
+**Classé ORANGE, et le piège est dans la liste** : `boab` est un **préfixe** de `boabf`,
+et `boa bf` contient `boa b`. Toute règle par préfixe rattacherait BOA Burkina à BOA
+Benin, ce que `ticker_depuis()` refuse par principe (« un mauvais rattachement poserait
+une suspension sur le mauvais titre »). C10 a déjà tranché la même question dans l'autre
+sens : liste blanche exacte, aucune correspondance par préfixe.
+
+### Prochain chantier, par l'ordre déterminé
+
+**C18** — cinq collisions d'échelle dans la série de cours. ORANGE portant
+`validation : OK`, priorité 4, ligne `statut` sans passe consommée ; à égalité de
+priorité avec C21, le plus petit numéro passe.
+
 ## 2026-10-01 — hors cycle, signalement de Claudia : les PER normalisés
 
 **Le signalement.** « Les PER normalisés que le tableau de bord affiche sont

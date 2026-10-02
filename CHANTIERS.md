@@ -1078,7 +1078,10 @@ test de la section 23 fige l'égalité entre le fichier et sa régénération.
 ## C20 — L'effet de bassin : un titre qui sort d'un axe déplace le rang des autres
 
 - classe : ORANGE — arbitrage de méthode sur la lecture des axes ; le diagnostic est fait
-- statut : PROPOSÉ
+- statut : **FAIT le 02/10/2026 (cycle 13)** — les trois lectures sont mesurées (tableau
+  en bas de ce bloc) et l'option (a) est figée par la section 25, vérifiée par injection.
+  **Les deux passes de ce chantier sont consommées** : la mesure et l'application.
+  **Aucun cycle ne le reprend.**
 - validation : OK option (a)
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 3
@@ -1119,6 +1122,76 @@ sur le bassin bénéfice/prix et non sur celui du rendement, qui peut être plus
 **Terminé quand** : les trois lectures sont mesurées titre par titre sur les
 47 titres — décote avant/après, profils et grades qui basculent — et le tableau est
 inscrit ici. L'application attend un mot de Claudia, comme pour C16.
+
+### La mesure, faite le 02/10/2026 (cycle 13)
+
+Trois variantes de `bassins_et_axes()` substituées au niveau module — le hissage du
+cycle 11 rend la mesure possible sans toucher au dépôt — exécutées sur la base du
+jour, chacune écrivant son `profils.json` hors du dépôt. **Garde vérifiée** : la
+variante (a) reproduit le `profils.json` commité au champ près, **0 titre d'écart sur
+47**, sur les huit champs `profil`, `secondaire`, `grade`, `gate`, `drapeaux`,
+`decote_pctl`, `croissance_pctl`, `reference_axes`. Aucun fichier du dépôt modifié.
+
+| | (b) laisser-un-dehors | (c) plancher par axe |
+|---|---|---|
+| `decote_pctl` bouge | **31 / 47** | **0 / 47** |
+| amplitude | **−1 à −6 points**, jamais à la hausse | aucune |
+| écart absolu moyen | 2,84 point | 0 |
+| `croissance_pctl` bouge | 30 | 0 |
+| `profil`, `secondaire`, `grade`, `gate`, `drapeaux` | **0, 0, 0, 0, 0** | 0, 0, 0, 0, 0 |
+| `reference_axes` bouge | 0 | 0 |
+
+**Ce que la mesure apprend, et qui n'était pas prévu.**
+
+1. **L'option (b) ne déplace aucun verdict, mais elle déplace tout le monde dans le
+   même sens.** 31 titres sur 47 perdent de 1 à 6 points, **aucun n'en gagne** :
+   retirer sa propre valeur d'un bassin ne peut que faire remonter le titre dans le
+   classement par le cher. Ce n'est donc pas un recentrage, c'est un décalage
+   systématique — et la marge aux seuils s'en trouve rognée partout, pas corrigée.
+   Les trois titres proches du seuil GROWTH descendent de 2 à 3 points tous les
+   trois (ETIT 69→67, SNTS 66→65, SPHC 69→68).
+2. **L'option (c) est un non-événement sur les données du jour, et la mesure dit
+   pourquoi.** Un seul secteur est lu en sectoriel — `SERVICES_FINANCIERS`, 14 titres
+   — et ses trois bassins passent le plancher : 14 en bénéfice/prix, **13** en
+   rendement, 13 en croissance. Le défaut que le texte de ce chantier décrivait (« la
+   borne porte sur le bassin bénéfice/prix et non sur celui du rendement ») est donc
+   **réel dans le code et latent dans les données**. La section 25 porte désormais une
+   alerte qui s'allumera le jour où un axe sectoriel descendra sous 8.
+3. **La variante « relever `n_secteur_min` » de l'option (c) ne change rien jusqu'à
+   15.** Mesurée à 8, 10, 12, 14, 15 et 20 : aucun mouvement jusqu'à 14 ; à **15**,
+   `SERVICES_FINANCIERS` bascule sur le marché et **13 titres sur 47** bougent, mais
+   **0 profil, 0 secondaire, 0 grade**. Le levier existe, il est brutal, et il
+   n'achète aucun verdict.
+4. **Les trois chiffres de portée du diagnostic d'origine ont bougé en un jour, deux
+   sur trois dans le bon sens.** Le cran du percentile est confirmé exactement (marché
+   2,8 et 2,9 points ; `SERVICES_FINANCIERS` 7,1 et 7,7). Mais **« six verdicts à
+   portée d'un seul mouvement de bassin » n'en fait plus que quatre** : sur l'axe de
+   décote, seul **SMBC (P66)** est encore à 3 points ou moins du seuil 67 — ONTBF est
+   passé à P63 et SLBC à P73. Sur l'axe de croissance, les trois nommés y sont
+   toujours (ETIT P69, SNTS P66, SPHC P69). Le plancher par auto-inclusion est
+   confirmé : P7 en bénéfice/prix et **P8** en rendement dans `SERVICES_FINANCIERS`,
+   P3 sur le marché.
+
+### Fait le 02/10/2026 (cycle 13)
+
+**L'option (a) est appliquée, c'est-à-dire que rien n'est écrit dans le moteur** —
+c'est le sens du choix : le rang est relatif, un bassin qui change EST une
+information. Ce que le cycle écrit, c'est le **test qui empêche de changer d'avis par
+inadvertance** : **section 25 de `tester_donnees.py`, 7 contrôles**, sur un bassin
+**jetable** de 12 titres — donc indépendant des données du jour — construit pour que
+les trois lectures donnent trois nombres différents sur le même titre : **46** en (a),
+**32** en (b), **41** en (c). Le bassin jetable porte 8 valeurs en bénéfice/prix et 3
+en rendement, exactement la configuration que l'option (c) traiterait autrement.
+
+**Vérifié par injection**, parce qu'un test qui fige un choix doit tomber sur les
+choix refusés : `profils.py` basculé par substitution textuelle sur (b) → **5
+contrôles en ÉCHEC** ; basculé sur (c) → **3 contrôles en ÉCHEC**. Sans cette
+vérification le test aurait pu passer sur les trois options.
+
+**Ce qui reste ouvert, et c'est volontaire** : l'option (a) accepte que le rang d'un
+titre dépende de qui est dans son bassin. La seule chose que le cycle a armée est la
+veille : si un secteur lu en sectoriel porte un jour un axe sous 8, la section 25 le
+nomme. Rien d'autre n'est à reprendre ici.
 
 ## C21 — Un facteur 100 dans la colonne `rendement` du BOC
 
@@ -1261,6 +1334,61 @@ portaient sur la sélection des exercices, pas sur la lecture du rapport.
 calculables — PER normalisé avant/après, drapeaux qui basculent — le tableau est
 inscrit ici, et la lecture retenue est figée par un test portant son contre-exemple.
 
+## C24 — Douze avis de dividende nomment leur société et ne sont rattachés à rien
+
+- classe : ORANGE — un mauvais rattachement est pire que pas de rattachement, et le
+  piège est démontré ci-dessous ; le diagnostic et l'effet sont mesurés
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau** — tout est dans `collecte/avis_brvm.csv`
+- priorité : 5
+
+**Le constat, mesuré le 02/10/2026 (cycle 13) par la chasse du matin.** Sur les
+**47** avis de type `DIVIDENDE`/`DIVIDENDE_EXCEPTIONNEL` du corpus, **19 ne portent
+aucun ticker**. Sept d'entre eux sont le générique « Avis : Calendrier de paiement de
+dividendes », qui ne nomme aucune société : ceux-là sont correctement non rattachés et
+ne sont pas le sujet. Les **douze autres nomment leur société en clair** et le
+résolveur `ticker_depuis()` les manque tous les douze :
+
+| titre de l'avis | base | ce qui bloque |
+|---|---|---|
+| `nei ceda ci` | NEI-CEDA CI (NEIC) | le **trait d'union** : `reduire()` ne l'enlève pas |
+| `cfao motors ci` | CFAO Mobility CI (CFAC) | **changement de dénomination** (Motors → Mobility) |
+| `biic bn` ×2 | BIIC Benin (BICB) | pays **abrégé** en code ISO |
+| `eti tg` ×2 | Ecobank Transnational… Togo (ETIT) | **sigle** + code pays |
+| `sib ci` | Société Ivoirienne de Banque (SIBC) | **sigle** |
+| `bicici` | BICI CI (BICC) | une **espace** de différence |
+| `boam` | BOA Mali (BOAM) | sigle collé au code pays |
+| `boa sn` | BOA Senegal (BOAS) | pays abrégé |
+| `boab` | BOA Benin (BOAB) | sigle collé — **et préfixe de BOABF** |
+| `boa bf` | BOA Burkina Faso (BOABF) | pays abrégé |
+
+**Pourquoi c'est un chantier et pas du ménage.** Un avis sans ticker ne corrobore
+rien : il ne peut ni dater une suspension, ni confirmer un fractionnement, ni servir
+de second côté à un rattachement d'exercice. Et l'effet est **mesuré** : les douze
+nomment tous leur exercice en clair, et confrontés à la table `dividendes` avec le
+rattachement lu ci-dessus ils donnent **12 concordants, 0 divergent, 0 absent** — ils
+corroboreraient donc douze rattachements de plus, faisant passer le côté indépendant
+de la section 26 de **15 à 27** avis. Deux d'entre eux portent sur **NEIC ex.2025 et
+CFAC ex.2025**, soit exactement les deux titres de **C5** : l'avis date le paiement du
+dividende (27/08 et 30/07/2026) et la table le porte déjà — ce qui manque à C5, c'est
+le document d'états financiers, pas le dividende.
+
+**Pourquoi ORANGE, et le piège est dans la liste.** `ticker_depuis()` refuse
+explicitement de devenir : « un mauvais rattachement poserait une suspension sur le
+mauvais titre, ce qui serait pire que de n'avoir rien collecté ». La liste ci-dessus
+le prouve : **`boab` est un préfixe de `boabf`**, et `boa bf` contient `boa b`. Toute
+règle par préfixe ou par sous-chaîne rattacherait BOA Burkina à BOA Benin. C10 avait
+déjà tranché la même question dans l'autre sens — liste blanche exacte, pas de
+correspondance par préfixe. C'est cette méthode-là qu'il faut, et c'est elle qui
+demande un arbitrage : écrire douze alias exacts à la main, ou ajouter au résolveur
+une table ticker↔(sigle, code pays) construite depuis `societes`.
+
+**Terminé quand** : les douze avis portent leur ticker par une correspondance
+**exacte** (jamais par préfixe), un contre-exemple `boab`/`boabf` est figé par un
+test, le plafond `AVIS_DIVIDENDE_SANS_TICKER_MAX` de la section 26 descend de 19 à 7,
+et l'autotest de `collecte/avis_brvm.py` porte les cas de la liste.
+
 
 ---
 
@@ -1274,52 +1402,37 @@ inscrit ici, et la lecture retenue est figée par un test portant son contre-exe
 
 # Dernier cycle
 
-> **ANNONCE — cycle 13 en cours, 2026-10-02 07h00 UTC (cycle du matin).**
-> Chantier pris : **C20** (ORANGE, priorite 3) — Claudia a ecrit
-> `validation : OK option (a)`. Rang 1 de l'ordre deterministe, et la ligne `statut`
-> ne porte aucune passe consommee. L'option (a) ne change aucune donnee : le cycle
-> mesure les lectures (b) *laisser-un-dehors* et (c) *plancher de bassin* titre par
-> titre sur les 47 titres, inscrit le tableau, et **fige (a) par un test portant son
-> contre-exemple**.
-> **Famille chassee ce matin** : le **rattachement** d'un dividende a son exercice —
-> la coherence entre `dividendes.date_paiement` et `exercice_couvert`. C10 a laisse
-> cette mesure explicitement **non faite** (`substr(date,1,4)` rendait `24-j`) ; la
-> colonne est ISO depuis le cycle 10, donc elle est desormais calculable, et c'est le
-> **second axe de C2**, celui que C17 n'a pas tranche.
-> Cette annonce disparait au commit de cloture ; si elle est encore la sans commit
-> de cloture, la session a echoue.
-
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-10-01 — cycle 12 (soir)
+## 2026-10-02 — cycle 13 (matin)
 
-**Exécuté : C17**, sur le `validation : OK` du 01/10 à 08h32. **Son diagnostic était
-faux, et c'est le résultat du cycle.** Il parlait d'une « lacune de collecte » sur 13
-titres ; il n'y en avait aucune. Les 13 références étaient dans
-`collecte/dividendes_boc.csv` — **commité**, colonne « Dernier dividende payé » du
-bulletin, collectées du 28/07 au 30/09/2026 — et **aucun chargeur de la chaîne ne lisait
-ce fichier**. Donnée collectée, commitée, perdue à l'entrée. Trouvé en datant l'implicite
-séance par séance : il forme des **paliers**, et celui d'avant chaque bascule égale à
-0,1 % près le versement déjà en base — pas un dividende introuvable, le **suivant**.
+**Exécuté : C20**, sur `validation : OK option (a)`. (a) n'écrit rien dans le moteur : le
+cycle a mesuré les deux lectures refusées et posé le test qui interdit d'en changer par
+inadvertance. Garde : (a) reproduit `profils.json` au champ près, **0 écart sur 47**.
+**(b) : 31 / 47 bougent, −1 à −6 points, aucun ne monte** — un titre retiré de son propre
+bassin décale tout le monde vers le cher ; 0 profil, 0 grade, 0 gate. **(c) : 0 / 47**,
+et la mesure dit pourquoi : seul `SERVICES_FINANCIERS` est lu en sectoriel, ses trois
+bassins passent le plancher (14 / **13** / 13) — défaut réel dans le code, **latent** dans
+les données ; relever `n_secteur_min` ne bouge rien jusqu'à 14, et à 15 déplace 13 titres
+pour **0 verdict**. **Corrigé** : « six verdicts à portée d'un mouvement de bassin » n'en
+fait plus que **quatre**, seul **SMBC (P66)** reste à 3 points du seuil de décote.
+**Section 25, 7 contrôles** (bassin jetable : 46 en (a), 32 en (b), 41 en (c)),
+**vérifiée par injection** : (b) → 5 échecs, (c) → 3 échecs.
 
-**Écrit** : `collecte/charger_dividendes_boc.py`, cinquième chargeur, branché dans
-`app.py` et les **8** workflows. **16 ajouts, 2 compléments, 8 refus**, table de **311 à
-327** lignes, concordance **0,01 % à 0,16 %** (preuve à deux côtés : deux colonnes du même
-bulletin). Les 2 compléments étaient **masqués** par un marqueur à montant vide ; et
-`peupler.py` **réinsérait ce marqueur** à côté de la ligne complétée — corrigé dans le
-même commit, 3 passages, 327 lignes stable.
+**Chasse : le rattachement d'un dividende à son exercice**, mesure laissée non faite par
+C10. `exercice_couvert` est **déduit** (paiement − 1 an) sur **314 des 321** lignes
+datées : le « +1 an partout » est une tautologie. Trois côtés indépendants existaient,
+**aucun n'était lu** — 9 rattachements manuels (règle reproduite 9/9), aucun double
+versement dans une même année civile (0 sur 324, ce qui ferme la faille de l'acompte de
+décembre), et **18 avis BRVM nommant l'exercice en clair** : **14 concordants, 1
+divergent, 0 absent**. Le divergent, **NSBC ex.2025**, est daté du 30/06/2026 en base et
+annoncé le 21/07 — un paiement ne précède pas son avis : date d'AGO, ce que **C22**
+supposait, prouvé des deux côtés. **Section 26, 15 contrôles**, vérifiée par injection.
 
-**Effet, franchement : aucun verdict ne bouge.** `profils.json` identique à l'octet, 0
-titre d'écart sur 47. Le gain était invisible : la règle 1 de C1 était **inapplicable sur
-13 des 44 titres**, 30 % du marché, sans qu'aucun contrôle ne le dise. **44 / 44**
-désormais. **Test : section 24, 9 contrôles**, vérifiés par injection (sans le chargeur :
-2 échecs, alerte à 31 / 44 nommant les 13).
-
-**Pas de chasse** (réservée au matin). **Barrières** : golden OK, `tester_donnees.py`
-**192 OK, 0 échec**, code 2 (C4 à 13 dates, C5) ; `generer_dashboard_html.py` compile, le
-bac à sable est en **Python 3.13.15**. **Proposé : C21** (facteur 100 dans `rendement`) et
-**C22** (les 8 refus du pont). **Prochain, par l'ordre déterminé : C20** (`OK option (a)`,
-priorité 3) : (a) ne change aucune donnée — mesurer (b) et (c), puis figer (a) par un test.
+**Barrières** : golden OK, `tester_donnees.py` **218 OK, 0 échec**, code 2 (mêmes alertes
+qu'hier : C4, C5) ; collecteurs OK ; dashboard compile (Python **3.13.15**). **Proposé :
+C24** — 12 avis de dividende sur 47 nomment leur société sans être rattachés (12
+concordants, 0 divergent ; piège : `boab` préfixe de `boabf`). **Prochain : C18**.
 
 ---
 

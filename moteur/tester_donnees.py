@@ -2831,6 +2831,317 @@ def test_reference_dividende_boc():
 
 
 # ----------------------------------------------------------------------
+# 25. LECTURE DES BASSINS DE PERCENTILE (bloquant + alerte)
+# ----------------------------------------------------------------------
+def test_lecture_des_bassins():
+    """L'effet de bassin est assume : option (a), tranchee par Claudia (C20).
+
+    POURQUOI CETTE SECTION EXISTE (chantier C20, 02/10/2026, cycle 13).
+    En appliquant C16 le 01/10, retirer deux rendements BAS du bassin a fait
+    perdre 1 a 3 points de decote a 28 titres sur 47 sans qu'aucune de leurs
+    donnees ait change, et SMBC a perdu son secondaire VALUE pour cette seule
+    raison. Trois lectures etaient defendables ; Claudia a ecrit
+    "validation : OK option (a)" : le rang est relatif, un bassin qui change EST
+    une information. Cette section fige ce choix, et porte son CONTRE-EXEMPLE —
+    sans quoi elle passerait aussi sur les options refusees.
+
+    Les deux proprietes de l'option (a), et ce que les autres lectures auraient
+    rendu sur le MEME bassin jetable (donc independant des donnees du jour) :
+
+      1. un titre est dans son propre bassin — pctl() compte "val <= x" en
+         incluant la valeur du titre. T2 rend donc une decote de 46 ; l'option
+         (b) laisser-un-dehors aurait rendu 32. Et le titre le moins cher du
+         bassin ne peut pas descendre a P0 : T1 rend 22, contre 0 en (b).
+      2. la bascule secteur/marche se decide sur le SEUL bassin benefice/prix,
+         pour les trois axes a la fois. Le secteur jetable porte 8 valeurs de
+         benefice/prix et 3 seulement de rendement : l'option (a) lit le
+         rendement sur ces 3 valeurs (33 points par cran) ; l'option (c)
+         plancher-par-axe serait basculee sur le marche et aurait rendu 41.
+
+    L'alerte en fin de section surveille la seule chose que l'option (a) laisse
+    ouverte : le jour ou un secteur lu en sectoriel portera un axe sous le
+    plancher, le cran de ce percentile depassera la marge des seuils. Mesure du
+    02/10/2026 : 0 cas (SERVICES_FINANCIERS, seul secteur lu en sectoriel, porte
+    14 valeurs en benefice/prix et 13 en rendement comme en croissance).
+    """
+    print("\n=== 25. Lecture des bassins de percentile (bloquant) ===")
+    import json
+    sys.path.insert(0, str(ICI))
+    from profils import bassins_et_axes, pctl
+
+    # --- Bassin jetable, independant des donnees du jour ----------------------
+    # BANQUE : 8 titres en benefice/prix (le plancher est a 8), 3 seulement en
+    # rendement. AUTRE : 4 titres, qui grossissent le bassin MARCHE.
+    sp = {"n_secteur_min": 8}
+    per = dict(T1=100.0, T2=50.0, T3=40.0, T4=25.0, T5=20.0, T6=10.0, T7=8.0,
+               T8=5.0, U1=200.0, U2=25.0, U3=12.5, U4=4.0)
+    dy = dict(T1=0.01, T2=0.05, T3=0.09, U1=0.02, U2=0.04, U3=0.06, U4=0.08)
+    jetable = {t: {"per": per[t], "dy_axe": dy.get(t), "g": None,
+                   "secteur": "BANQUE" if t.startswith("T") else "AUTRE"}
+               for t in per}
+    _ep, par_secteur, axes = bassins_et_axes(jetable, sp)
+
+    verifie(len(par_secteur["BANQUE"]["ep"]) == 8
+            and len(par_secteur["BANQUE"]["dy"]) == 3,
+            "bassin jetable conforme : BANQUE porte 8 valeurs en benefice/prix "
+            "et 3 en rendement, donc la bascule et l'axe divergent")
+
+    d2, _g2, ref2 = axes("T2", jetable["T2"])
+    verifie(ref2 == "secteur (n=8)" and d2 == 46,
+            f"T2 est classe dans son propre bassin : decote {d2} (attendu 46, "
+            f"reference '{ref2}')")
+    # CONTRE-EXEMPLE 1 : laisser-un-dehors, option (b), refusee.
+    ep_banque = sorted(par_secteur["BANQUE"]["ep"])
+    dy_banque = sorted(par_secteur["BANQUE"]["dy"])
+    sans_t2_ep = [v for v in ep_banque if v != 100.0 / 50.0]
+    sans_t2_dy = [v for v in dy_banque if v != 0.05]
+    d2_b = round((pctl(sans_t2_ep, 100.0 / 50.0) + pctl(sans_t2_dy, 0.05)) / 2)
+    verifie(d2_b == 32 and d2 != d2_b,
+            f"contre-exemple (b) : laisser-un-dehors aurait rendu {d2_b} pour T2 "
+            f"(soit {d2 - d2_b:+d} point(s)), l'option (a) rend {d2}")
+
+    d1, _g1, _r1 = axes("T1", jetable["T1"])
+    d1_b = round((pctl([v for v in ep_banque if v != 1.0], 1.0)
+                  + pctl([v for v in dy_banque if v != 0.01], 0.01)) / 2)
+    verifie(d1 == 22 and d1_b == 0,
+            f"le moins cher du bassin ne descend pas a P0 sous (a) : T1 rend {d1}, "
+            f"contre {d1_b} en laisser-un-dehors — le rang mesure en partie la "
+            f"presence du titre lui-meme, et c'est assume")
+
+    # CONTRE-EXEMPLE 2 : plancher-par-axe, option (c), refusee. Le rendement de
+    # T2 est lu sur les 3 valeurs du secteur, pas sur les 7 du marche.
+    marche_dy = sorted(v for v in dy.values())
+    d2_c = round((pctl(ep_banque, 100.0 / 50.0) + pctl(marche_dy, 0.05)) / 2)
+    verifie(len(marche_dy) == 7 and d2_c == 41 and d2 != d2_c,
+            f"contre-exemple (c) : un plancher par axe aurait bascule le rendement "
+            f"de T2 sur le marche (n=7) et rendu {d2_c} ; l'option (a) le lit sur "
+            f"les 3 valeurs du secteur et rend {d2}")
+    verifie(pctl(dy_banque, 0.05) == 67 and round(100 / 3) == 33,
+            "le cran du percentile de rendement de BANQUE vaut 33 points : "
+            "l'option (a) accepte un bassin plus petit que le plancher sur un axe "
+            "que la bascule ne regarde pas")
+
+    # --- Veille sur les donnees du jour : le defaut latent est-il reste latent ?
+    chemin = RACINE / "collecte" / "profils.json"
+    if not chemin.exists() or not DB.exists():
+        return
+    pj = json.loads(chemin.read_text(encoding="utf-8"))
+    secteurs = {}
+    for t, v in pj.items():
+        if v.get("decote_pctl") is None and v.get("croissance_pctl") is None:
+            continue
+        d = secteurs.setdefault(v.get("secteur") or "", {"dy": 0, "g": 0, "n": 0})
+        d["n"] += 1
+        if v.get("dy_recurrent") is not None:
+            d["dy"] += 1
+        if v.get("croissance_pctl") is not None:
+            d["g"] += 1
+    sectoriels = {t: v for t, v in pj.items()
+                  if (v.get("reference_axes") or "").startswith("secteur")}
+    etroits = sorted({
+        "%s (benefice/prix %d, rendement %d, croissance %d)"
+        % (v["secteur"], v.get("n_secteur") or 0,
+           secteurs.get(v["secteur"], {}).get("dy", 0),
+           secteurs.get(v["secteur"], {}).get("g", 0))
+        for v in sectoriels.values()
+        if min(secteurs.get(v["secteur"], {}).get("dy", 0),
+               secteurs.get(v["secteur"], {}).get("g", 0)) < 8})
+    verifie(not etroits,
+            "aucun secteur lu en sectoriel ne porte un axe sous le plancher de 8 "
+            "(C20 : le defaut reste latent)"
+            + ("" if not etroits else " — DEVENU ACTIF sur " + " ; ".join(etroits)),
+            bloquant=False)
+
+
+# ----------------------------------------------------------------------
+# 26. RATTACHEMENT D'UN DIVIDENDE A SON EXERCICE (bloquant + alertes)
+# ----------------------------------------------------------------------
+# Chaque divergence connue entre l'avis BRVM et la base, avec le chantier dont
+# elle releve. Un cas NON inscrit ici fait tomber ou alerter la section.
+RATTACHEMENTS_CONNUS = {
+    ("NSBC", 2025): "C22 — la date de la base (2026-06-30) est celle de l'AGO, "
+                    "pas du paiement ; l'avis du 21/07/2026 et "
+                    "collecte/dividendes_boc.csv (04/08/2026) le disent tous deux",
+}
+# Avis de dividende que le collecteur n'a pas su rattacher a un ticker. Plafond
+# qui ne peut que DESCENDRE : 19 sur 47 mesures le 02/10/2026.
+AVIS_DIVIDENDE_SANS_TICKER_MAX = 19
+
+
+def test_rattachement_exercice():
+    """L'exercice d'un dividende est DEDUIT d'une regle ; la source qui le dit est ignoree.
+
+    POURQUOI CETTE SECTION EXISTE (chasse du cycle 13, 02/10/2026). C10 avait
+    laisse cette mesure explicitement non faite : `substr(date_paiement,1,4)`
+    rendait `24-j` et l'annee de paiement etait inextractible. La colonne est ISO
+    depuis le cycle 10, donc la confrontation est devenue possible — et elle
+    montre que RIEN ne surveillait cette famille.
+
+    Mesure du 02/10/2026, sur la base du jour : sur les 321 lignes datees et
+    rattachees, 314 portent un exercice **deduit** par la seule regle
+    `deduire_exercice()` (annee de paiement moins un, avril a decembre), que les
+    DEUX chargeurs de dividendes appellent ; 7 seulement viennent de
+    `donnees/base/dividendes.csv`, ou l'exercice est ecrit a la main. Le "+1 an
+    sur 324 lignes sur 324" est donc une TAUTOLOGIE pour 97 % de la table : il
+    mesure la regle, pas la realite. Trois cotes independants existent, et
+    aucun n'etait lu :
+
+      - les 9 rattachements ecrits a la main dans `donnees/base/dividendes.csv`
+        (le TEST_ exclu) : la regle les reproduit 9 fois sur 9 ;
+      - aucun titre ne verse deux fois dans la meme annee civile (0 cas sur
+        324) : c'est ce qui ferme la faille principale de la regle, un acompte
+        de l'exercice N verse en decembre N qu'elle rattacherait a N-1 ;
+      - 18 avis BRVM NOMMENT l'exercice en clair dans leur titre
+        ("paiement de dividendes exercice 2025 smb ci"). Aucun script du depot
+        ne les lit. Confrontes ici : 14 concordants, 1 divergent (NSBC, deja
+        inscrit en C22), 0 absent, sur les 15 qui portent un ticker.
+
+    Le divergent est le meme defaut que C22 avait vu d'un autre cote : la base
+    date NSBC ex.2025 du 30/06/2026, soit AVANT l'avis de paiement du
+    21/07/2026. Un paiement ne precede pas son avis : c'est la date d'AGO.
+    """
+    print("\n=== 26. Rattachement d'un dividende a son exercice (bloquant) ===")
+    import csv as _csv
+    import re as _re
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from historiser_dividendes_exercice import deduire_exercice
+
+    # --- 1. La regle, bornes figees, et une seule definition dans le depot ----
+    verifie(deduire_exercice(2025, 4) == (2024, "ELEVEE", deduire_exercice(2025, 4)[2])
+            and deduire_exercice(2025, 12)[0] == 2024
+            and deduire_exercice(2025, 7)[0] == 2024,
+            "avril a decembre : exercice = annee de paiement - 1, confiance ELEVEE")
+    for mois in (1, 2, 3):
+        e, conf, _n = deduire_exercice(2025, mois)
+        verifie(e is None and conf == "MANQUANT",
+                f"mois {mois} : aucun exercice devine (MANQUANT), pas de regle -2 "
+                f"inventee — l'avis BRVM N 072-2017 contredit le cas FTSC de janvier")
+
+    definitions = sorted(
+        p.relative_to(RACINE).as_posix()
+        for p in RACINE.rglob("*.py")
+        if p.name != "tester_donnees.py"  # ce fichier-ci porte la chaine cherchee
+        and "def deduire_exercice" in p.read_text(encoding="utf-8", errors="ignore"))
+    verifie(definitions == ["collecte/historiser_dividendes_exercice.py"],
+            f"une seule definition de deduire_exercice dans le depot ({definitions})")
+    appels = sorted(
+        p.relative_to(RACINE).as_posix()
+        for p in RACINE.rglob("*.py")
+        if "deduire_exercice" in p.read_text(encoding="utf-8", errors="ignore")
+        and p.name not in ("tester_donnees.py", "historiser_dividendes_exercice.py"))
+    verifie(appels == ["collecte/charger_dividendes_boc.py"],
+            f"les chargeurs passent par cette definition, aucun ne rededuit ({appels})")
+
+    # --- 2. Le cote INDEPENDANT : les rattachements ecrits a la main ----------
+    chemin_main = RACINE / "donnees" / "base" / "dividendes.csv"
+    if chemin_main.exists():
+        mains, desaccords = 0, []
+        with chemin_main.open(encoding="utf-8") as f:
+            for r in _csv.DictReader(f):
+                if r["ticker"].startswith("TEST") or not r["date_paiement"] \
+                        or not r["exercice_couvert"]:
+                    continue
+                mains += 1
+                an, mois = int(r["date_paiement"][:4]), int(r["date_paiement"][5:7])
+                if deduire_exercice(an, mois)[0] != int(r["exercice_couvert"]):
+                    desaccords.append("%s ex.%s paye %s"
+                                      % (r["ticker"], r["exercice_couvert"],
+                                         r["date_paiement"]))
+        verifie(mains >= 9 and not desaccords,
+                f"la regle reproduit les {mains} rattachements ecrits a la main "
+                f"(corroboration independante)"
+                + ("" if not desaccords else " — desaccords : " + ", ".join(desaccords)))
+
+    if not DB.exists():
+        verifie(False, "moteur/brvm.db absent — confrontation en base non faite",
+                bloquant=False)
+        return
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+
+    # --- 3. En base : le rattachement est coherent avec sa date ---------------
+    lignes = cur.execute(
+        "SELECT ticker, date_paiement, exercice_couvert FROM dividendes "
+        "WHERE date_paiement IS NOT NULL AND exercice_couvert IS NOT NULL "
+        "AND ticker NOT LIKE 'TEST%'").fetchall()
+    faux = ["%s ex.%d paye %s" % (t, e, d) for t, d, e in lignes
+            if int(d[:4]) != e + 1]
+    verifie(lignes and not faux,
+            f"les {len(lignes)} rattachements dates valent exercice + 1 an"
+            + ("" if not faux else " — hors regle : " + ", ".join(faux[:6])))
+
+    # La propriete sur laquelle la regle -1 REPOSE : un titre ne verse qu'une
+    # fois par annee civile. Un acompte de l'exercice N verse en decembre N
+    # serait rattache a N-1 par la regle, sans qu'aucun controle ne le dise.
+    doubles = cur.execute(
+        "SELECT ticker, substr(date_paiement,1,4) a, COUNT(*) n FROM dividendes "
+        "WHERE date_paiement IS NOT NULL AND ticker NOT LIKE 'TEST%' "
+        "GROUP BY 1,2 HAVING n > 1").fetchall()
+    verifie(not doubles,
+            "aucun titre ne verse deux fois dans la meme annee civile — la regle "
+            "-1 ne peut donc pas confondre un acompte avec un solde"
+            + ("" if not doubles else " — a trancher : " + str(doubles[:6])))
+
+    # --- 4. Le cote independant que personne ne lisait : les avis BRVM -------
+    chemin_avis = RACINE / "collecte" / "avis_brvm.csv"
+    if not chemin_avis.exists():
+        conn.close()
+        return
+    with chemin_avis.open(encoding="utf-8") as f:
+        avis = list(_csv.DictReader(f))
+    divid = [r for r in avis
+             if r.get("type") in ("DIVIDENDE", "DIVIDENDE_EXCEPTIONNEL")]
+    nommes = []
+    for r in divid:
+        m = _re.search(r"exercice\s*(20\d\d)", r.get("titre") or "", _re.I)
+        if m and (r.get("ticker") or "").strip():
+            nommes.append((r["ticker"].strip(), int(m.group(1)), r["date_avis"]))
+
+    absents, mal_dates, anterieurs, connus = [], [], [], []
+    for tk, ex, da in sorted(set(nommes)):
+        rs = cur.execute("SELECT date_paiement FROM dividendes "
+                         "WHERE ticker=? AND exercice_couvert=?", (tk, ex)).fetchall()
+        if (tk, ex) in RATTACHEMENTS_CONNUS:
+            connus.append("%s ex.%d" % (tk, ex))
+            continue
+        if not rs:
+            absents.append("%s ex.%d (avis %s)" % (tk, ex, da))
+            continue
+        for (d,) in rs:
+            if d is None or int(d[:4]) != ex + 1:
+                mal_dates.append("%s ex.%d : avis %s, base %s" % (tk, ex, da, d))
+            elif d < da:
+                anterieurs.append("%s ex.%d : paye %s, avis %s" % (tk, ex, d, da))
+    verifie(len(nommes) >= 15,
+            f"{len(set(nommes))} avis BRVM nomment leur exercice et portent un "
+            f"ticker — c'est le seul cote independant du rattachement")
+    verifie(not mal_dates,
+            "aucun avis BRVM ne contredit l'exercice que la base porte"
+            + ("" if not mal_dates else " — " + " ; ".join(mal_dates)))
+    for cle in sorted(RATTACHEMENTS_CONNUS):
+        if "%s ex.%d" % cle in connus:
+            print("  [CONNU] %s ex.%d — %s" % (cle[0], cle[1], RATTACHEMENTS_CONNUS[cle]))
+    verifie(not anterieurs,
+            "aucun dividende n'est paye AVANT l'avis qui l'annonce (signature "
+            "d'une date d'AGO prise pour une date de paiement)"
+            + ("" if not anterieurs else " — " + " ; ".join(anterieurs)),
+            bloquant=False)
+    verifie(not absents,
+            "tout exercice nomme par un avis est rattache en base"
+            + ("" if not absents else " — manquants : " + ", ".join(absents)),
+            bloquant=False)
+
+    sans_ticker = len([r for r in divid if not (r.get("ticker") or "").strip()])
+    verifie(sans_ticker <= AVIS_DIVIDENDE_SANS_TICKER_MAX,
+            f"{sans_ticker} avis de dividende sur {len(divid)} ne sont rattaches a "
+            f"aucun ticker (plafond {AVIS_DIVIDENDE_SANS_TICKER_MAX}, il ne peut "
+            f"que descendre) — un avis sans ticker ne peut corroborer aucun "
+            f"rattachement",
+            bloquant=False)
+    conn.close()
+
+
+# ----------------------------------------------------------------------
 # 15. FONDS DES NOTATIONS FINANCIERES (bloquant)
 # ----------------------------------------------------------------------
 def test_fonds_notations():
@@ -2949,6 +3260,8 @@ def main():
     test_distribution_non_recurrente()
     test_dates_dividendes_iso()
     test_reference_dividende_boc()
+    test_lecture_des_bassins()
+    test_rattachement_exercice()
     if not sans_app:
         test_application()
 
