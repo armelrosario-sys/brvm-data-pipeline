@@ -1283,7 +1283,7 @@ nouveau n'apparaît sans être inscrit.
 
 - classe : ORANGE — arbitrage de méthode sur une mesure publiée ; le diagnostic est fait
 - statut : PROPOSÉ
-- validation : —
+- validation : OK (c) retirer l'affichage
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 2 — **une mesure fausse est publiée et lue**
 
