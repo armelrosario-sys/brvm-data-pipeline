@@ -1752,6 +1752,16 @@ trouvée et branchée, soit écartée avec un motif daté qui dit ce qui reste n
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
+## 2026-10-03 — cycle 15 (matin) — EN COURS
+
+**Chantier : C19** (ORANGE, `validation : OK — remettre FTSC 2016`, priorite portee a 2 par
+Claudia le 03/10 a 05h37) : retrait des doublons stricts de
+`collecte/dividendes_par_exercice.csv`, remise de FTSC 2016, et egalite entre le fichier
+commite et sa regeneration.
+
+**Chasse du matin** : les **fichiers derives commites que leur propre generateur ne
+reproduit pas**. C19 en est un cas ; la famille n'est surveillee par rien.
+
 ## 2026-10-02 — cycle 14 (soir)
 
 **Exécuté : C25.** **Trois faits mesurés sur la page réelle contredisent le chantier** : elle **ne
