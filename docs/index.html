@@ -238,7 +238,8 @@ pre.schema{background:#F7F9FC;border:1px solid var(--trait);padding:10px 12px;fo
           <option value="per">PER</option><option value="rdt">Rendement net</option>
           <option value="ytd">Perf. depuis le 1er janvier</option><option value="v1an">Perf. 1 an</option>
           <option value="v3a">Perf. 3 ans</option><option value="v5a">Perf. 5 ans</option>
-          <option value="bnpa">BNPA</option></select></div>
+          <option value="bnpa">BNPA</option>
+          <option value="croiBNPA">Croiss. BNPA</option></select></div>
       <div class="champ"><label>Mode de lecture</label>
         <div class="vues" role="group">
           <button type="button" data-vue="brut" aria-pressed="true">Valeurs brutes</button>
@@ -551,6 +552,10 @@ const COLS = [
  {title:'RN (M FCFA)',data:'rn',className:'mono',render:num(0,'rn')},
  {title:'Croiss. RN',data:'croiRN',className:'mono',render:perf(2,'croiRN')},
  {title:'BNPA',data:'bnpa',className:'mono',render:num(2,'bnpa')},
+ /* Progression du bénéfice par action d'un exercice à l'autre. Elle reste vide
+    quand elle s'écarte trop de la croissance du résultat net : le motif s'affiche
+    alors au survol, et le symbole porte un triangle. */
+ {title:'Croiss. BNPA',data:'croiBNPA',className:'mono',render:perf(2,'croiBNPA')},
  {title:'ROE',data:'roe',className:'mono',render:perf(2,'roe')},
  {title:'PER',data:'per',className:'mono',render:num(2,'per')},
  {title:'PEG',data:'peg',className:'mono',render:peg},
