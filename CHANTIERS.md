@@ -1878,6 +1878,18 @@ qui reproduit à nouveau le soit aussi, pour que le registre ne pourrisse pas.
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
+## 2026-10-03 — cycle 16 — EN COURS
+
+**Chantier : C26** (ORANGE, `validation : OK`, priorité 3) : première passe **sans réseau**
+sur les lignes d'extraction intermédiaire de `collecte/fondamentaux_extraits.csv` — ne verser
+dans `donnees/base/resultats_intermediaires.csv` que celles dont l'exercice, la période et
+l'unité sont déterminables **sans deviner**, et mesurer l'effet titre par titre sur
+`profils.json`, le PER glissant étant devenu le PER d'analyse.
+
+**Pas de chasse ce cycle** : le cycle 15 a tenu la chasse du matin il y a une heure (05h37 →
+05h53 UTC, inscrite en C28). La règle n'en prévoit qu'une par jour, et deux sessions qui
+lisent le même fichier arrivent aux mêmes soupçons.
+
 ## 2026-10-03 — cycle 15 (matin)
 
 **Exécuté : C19. Rien n'a été écrit : l'arbitrage validé fait tomber la barrière.** « Remettre
