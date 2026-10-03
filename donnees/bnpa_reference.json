@@ -1,0 +1,212 @@
+{
+ "numero": 249,
+ "seance": "2025-12-31",
+ "annee": 2025,
+ "source": "brvm.org — bulletin de clôture d'exercice",
+ "methode": "cours de clôture / PER publié",
+ "valeurs": {
+  "NTLC": {
+   "cours": 10650,
+   "per": 12.95,
+   "bnpa": 822.39
+  },
+  "PALC": {
+   "cours": 8100,
+   "per": 7.89,
+   "bnpa": 1026.62
+  },
+  "TTLC": {
+   "cours": 2335,
+   "per": 15.68,
+   "bnpa": 148.92
+  },
+  "TTLS": {
+   "cours": 2500,
+   "per": 11.41,
+   "bnpa": 219.11
+  },
+  "ECOC": {
+   "cours": 16000,
+   "per": 15.32,
+   "bnpa": 1044.39
+  },
+  "NSBC": {
+   "cours": 11445,
+   "per": 7.43,
+   "bnpa": 1540.38
+  },
+  "SGBC": {
+   "cours": 29895,
+   "per": 9.19,
+   "bnpa": 3252.99
+  },
+  "ONTBF": {
+   "cours": 2485,
+   "per": 8.21,
+   "bnpa": 302.68
+  },
+  "ORAC": {
+   "cours": 14250,
+   "per": 13.57,
+   "bnpa": 1050.11
+  },
+  "SNTS": {
+   "cours": 26120,
+   "per": 6.64,
+   "bnpa": 3933.73
+  },
+  "SCRC": {
+   "cours": 1060,
+   "per": 8.02,
+   "bnpa": 132.17
+  },
+  "SICC": {
+   "cours": 3300,
+   "per": 102.88,
+   "bnpa": 32.08
+  },
+  "SLBC": {
+   "cours": 28900,
+   "per": 22.16,
+   "bnpa": 1304.15
+  },
+  "SOGC": {
+   "cours": 7900,
+   "per": 13.02,
+   "bnpa": 606.76
+  },
+  "SPHC": {
+   "cours": 7900,
+   "per": 10.75,
+   "bnpa": 734.88
+  },
+  "STBC": {
+   "cours": 19780,
+   "per": 7.94,
+   "bnpa": 2491.18
+  },
+  "UNLC": {
+   "cours": 34225,
+   "per": 490.84,
+   "bnpa": 69.73
+  },
+  "ABJC": {
+   "cours": 2900,
+   "per": 20.89,
+   "bnpa": 138.82
+  },
+  "CFAC": {
+   "cours": 1430,
+   "per": 55.26,
+   "bnpa": 25.88
+  },
+  "LNBB": {
+   "cours": 4295,
+   "per": 11.97,
+   "bnpa": 358.81
+  },
+  "PRSC": {
+   "cours": 3875,
+   "per": 16.91,
+   "bnpa": 229.15
+  },
+  "SHEC": {
+   "cours": 1445,
+   "per": 17.0,
+   "bnpa": 85.0
+  },
+  "SMBC": {
+   "cours": 9500,
+   "per": 8.51,
+   "bnpa": 1116.33
+  },
+  "BICC": {
+   "cours": 19445,
+   "per": 12.36,
+   "bnpa": 1573.22
+  },
+  "BOAB": {
+   "cours": 5850,
+   "per": 12.08,
+   "bnpa": 484.27
+  },
+  "BOABF": {
+   "cours": 3750,
+   "per": 7.36,
+   "bnpa": 509.51
+  },
+  "BOAC": {
+   "cours": 7180,
+   "per": 8.96,
+   "bnpa": 801.34
+  },
+  "BOAM": {
+   "cours": 4000,
+   "per": 12.03,
+   "bnpa": 332.5
+  },
+  "BOAN": {
+   "cours": 2610,
+   "per": 10.85,
+   "bnpa": 240.55
+  },
+  "BOAS": {
+   "cours": 5240,
+   "per": 9.44,
+   "bnpa": 555.08
+  },
+  "CBIBF": {
+   "cours": 10780,
+   "per": 7.2,
+   "bnpa": 1497.22
+  },
+  "ETIT": {
+   "cours": 23,
+   "per": 1.39,
+   "bnpa": 16.55
+  },
+  "SIBC": {
+   "cours": 5750,
+   "per": 11.45,
+   "bnpa": 502.18
+  },
+  "CABC": {
+   "cours": 2360,
+   "per": 11.41,
+   "bnpa": 206.84
+  },
+  "FTSC": {
+   "cours": 2220,
+   "per": 1.68,
+   "bnpa": 1321.43
+  },
+  "SDSC": {
+   "cours": 1515,
+   "per": 3.91,
+   "bnpa": 387.47
+  },
+  "SIVC": {
+   "cours": 1580,
+   "per": 36.61,
+   "bnpa": 43.16
+  },
+  "CIEC": {
+   "cours": 2360,
+   "per": 13.08,
+   "bnpa": 180.43
+  },
+  "SDCC": {
+   "cours": 5800,
+   "per": 13.19,
+   "bnpa": 439.73
+  }
+ },
+ "sans_per": [
+  "BNBC",
+  "NEIC",
+  "ORGT",
+  "SAFC",
+  "STAC",
+  "UNXC"
+ ]
+}
