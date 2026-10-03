@@ -1053,7 +1053,11 @@ plus rien en silence.
 ## C19 — `dividendes_par_exercice.csv` porte des doublons, et son générateur ne le rend plus
 
 - classe : ORANGE — décider quelle ligne est la bonne est un arbitrage ; la mesure est faite
-- statut : PROPOSÉ
+- statut : **MESURÉ le 03/10/2026 (cycle 15) — la passe autorisée est consommée, aucun cycle
+  ne la refait.** L'arbitrage « remettre FTSC 2016 » **fait tomber la barrière** : trois
+  contrôles passent en ÉCHEC et la prime de rendement de **+79,5 points** revient sur FTSC.
+  **Rien n'a été écrit.** Le dédoublonnage seul, lui, est mesuré **vert**. Voir *La mesure,
+  faite le 03/10/2026* en bas de ce bloc : il faut un nouveau mot de Claudia.
 - validation : OK — remettre FTSC 2016
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 2
@@ -1070,6 +1074,17 @@ en porte **trois** (677,0 / 676,8 / 16,92). Ce n'est donc pas une question de pr
 artefact commité et publié dépend de l'ordre des lignes d'un CSV. **Rien n'a été écrit** —
 choisir la ligne est l'arbitrage de ce chantier. La boucle propose de porter sa **priorité
 de 6 à 2** ; seule Claudia édite cette ligne.
+
+**CORRIGÉ le 03/10/2026 (cycle 15) : ce paragraphe est faux, et c'est un artefact de la
+barrière amputée du cycle 14.** Sur la chaîne **complète** des cinq chargeurs, `profils.json`
+est reproduit **identique à l'octet** et `SEMC` 2020 vaut **14,4**, la valeur commitée — parce
+que la ligne 14,4 précède la 14,0 dans le CSV (lignes 247 et 248) et que
+`charger_dividendes_exercice.py` garde la première. Rejoué ce cycle sur la chaîne **amputée**
+du cycle 14, sans `charger_dividendes_exercice.py` : la table tombe à **72 lignes** au lieu de
+327 et `SEMC` 2020 vaut **14,00**, chargé par `charger_dividendes_boc.py` sur une case laissée
+vide. C'est le même quatrième-chargeur-manquant que le cycle 14 a reconnu dans son propre
+message de commit. **Les doublons ne rendent donc rien d'irreproductible**, et la priorité 2
+repose sur une mesure qui ne tient pas.
 
 **Le constat, mesuré le 30/09/2026 (cycle 10), trouvé par les gardes de C10.**
 Le script de migration de C10 a refusé de tourner au premier essai : son assertion
@@ -1121,6 +1136,60 @@ défendent, et la doctrine du projet interdit de deviner laquelle.
 `outils/`, le cas FTSC 2016 est tranché avec son motif écrit, une régénération par
 `historiser_dividendes_exercice.py` rend **exactement** le fichier commité, et un
 test de la section 23 fige l'égalité entre le fichier et sa régénération.
+
+### La mesure, faite le 03/10/2026 (cycle 15)
+
+Trois états du fichier construits dans des copies jetables du dépôt, base reconstruite à
+chaque fois par la chaîne complète des cinq chargeurs. **Aucun fichier du dépôt modifié.**
+
+**L'état des lieux, recompté ce cycle.** Le fichier commité porte **364 lignes de données
+pour 348 clés** : **16 lignes excédentaires en 10 groupes** — ABJC 2017 ×3, ETIT 2016 ×7,
+puis BOAM 2024 (deux montants, ×2 chacun), ECOC 2022, ETIT 2021, ORAC 2023, SLBC 2017 et
+STBC 2016 (deux montants) ×2. La régénération rend **365 lignes**, la ligne de plus étant
+`FTSC,2016,1045.0,2017-07-31,ELEVEE`. **Et elle ne reproduirait pas le fichier même sans
+cela** : le générateur écrit en **CRLF** (défaut du module `csv`) là où le fichier commité
+est en **LF**. L'égalité exigée par le critère de terminaison demande donc trois choses, pas
+une.
+
+| | dédoublonnage seul (348 lignes) | dédoublonnage + FTSC 2016 (349 lignes) |
+|---|---|---|
+| `collecte/profils.json` | **identique à l'octet** | **4 champs bougent, tous sur FTSC** |
+| `tester_donnees.py` | **241 OK, 0 ÉCHEC**, code 2 (alertes de fraîcheur seules) | **3 INCOHÉRENCES BLOQUANTES** |
+| `profil`, `secondaire`, `grade`, `gate` | 0, 0, 0, 0 | **0, 0, 0, 0** |
+| `decote_pctl` sur les 47 | **0** | **0** — FTSC n'est pas analysable, aucun effet de bassin |
+
+**Pourquoi la barrière tombe, et ce n'est pas le test qui a tort.** La règle 2 de C1 compare
+le dernier versement au **plus fort des précédents**. Aujourd'hui ce plus fort vaut **235,00**
+(2021-07-30) et le rapport fait **7,35**, au-delà de `distribution_ratio_max` = 3,0 : FTSC
+porte `DISTRIBUTION_NON_RECURRENTE`. Avec FTSC 2016 à **1 045,00**, le plus fort des
+précédents devient 1 045,00 et le rapport tombe à **1,65** : le drapeau disparaît, `dy_axe` et
+`dy_recurrent` se remplissent du rendement facial de **86,54 %**, et la **prime de +79,5
+points** que C1 existe pour éteindre revient. Les trois ÉCHEC le disent mot pour mot :
+« FTSC porte le drapeau… », « aucune prime au-delà de +10 points sans le drapeau — SANS
+DRAPEAU : FTSC », « la plus forte prime restante est de +79,5 points ».
+
+**Ce que la boucle ne peut pas trancher seule, et pourquoi elle s'arrête.** Le montant de
+1 045,00 n'a **qu'un seul côté**. L'avis BRVM N° 072-2017/DC/BR/DG, cité par le générateur
+lui-même, corrobore la **date** (exercice 2016 payé le 31/07/2017) — pas le montant. Et
+l'identité de couverture ne peut pas être fermée : la base **ne porte aucun exercice FTSC
+avant 2021** (le plus ancien est 2021, résultat net **−1 276,336 M**), donc rien à confronter
+à 1 045,00 × 14,1 millions d'actions. Écrire cette ligne serait écrire une donnée certifiée
+sur une source unique, **et** défaire une analyse humaine — les deux règles que la boucle ne
+franchit pas.
+
+**Les trois issues, pour que la décision tienne en un mot.**
+
+1. **Dédoublonner seul**, et corriger le générateur pour qu'il écarte FTSC 2016 avec le motif
+   écrit ci-dessus (source unique, identité infermable). Mesuré : **vert**, effet nul.
+2. **Remettre FTSC 2016 et réviser la règle 2 de C1** — comparer la distribution au
+   **résultat** de l'exercice et non au plus fort des versements passés, puisqu'une seconde
+   distribution exceptionnelle dans l'historique désarme la règle actuelle. C'est un chantier,
+   pas une passe : il touche la règle que C1 a figée.
+3. **Remettre FTSC 2016 et retirer les trois contrôles** : à écrire, mais c'est rendre à FTSC
+   la prime de +79,5 points pour laquelle C1 a été ouvert.
+
+La boucle ne propose rien entre les trois : (1) est mécanique, (2) est un arbitrage de
+méthode, (3) défait C1.
 
 ## C20 — L'effet de bassin : un titre qui sort d'un axe déplace le rang des autres
 
@@ -1738,6 +1807,63 @@ autres pistes (`sikafinance.json`, déjà collecté ; la page de cotation par ti
 idempotent le porte partout avec son effet mesuré ; et la seconde source des cours est soit
 trouvée et branchée, soit écartée avec un motif daté qui dit ce qui reste non surveillé.
 
+## C28 — Trois fichiers dérivés commités que leur propre générateur ne reproduit pas
+
+- classe : ORANGE — l'un des trois écrase un fichier commité par un faux rapport complet, et
+  choisir ce que chacun doit rendre est un arbitrage ; le diagnostic et l'effet sont mesurés
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau** — tout est dans le dépôt
+- priorité : 3
+
+**Le constat, mesuré le 03/10/2026 (cycle 15) par la chasse du matin.** Le dépôt commite des
+fichiers **dérivés** : produits par un script à partir d'autres fichiers du dépôt ou de la
+base. Rien ne vérifie qu'un de ces fichiers est encore ce que son générateur rend. Les **cinq**
+générateurs hors réseau ont été relancés dans une copie jetable et leur sortie comparée à
+l'octet au fichier commité. **Deux reproduisent** — `docs/data_brvm.json` et
+`collecte/arbitrage_croissance.csv`, identiques à l'octet. **Trois ne reproduisent pas, et
+pour trois causes différentes :**
+
+| fichier | commité | régénéré | cause |
+|---|---|---|---|
+| `collecte/a_reteleverser.json` | **148** entrées | **2 908** entrées | le générateur ne distingue pas « asset absent » de « je n'ai pas pu demander » |
+| `collecte/dividendes_par_exercice.csv` | 364 lignes, LF | 365 lignes, **CRLF** | doublons, FTSC 2016, et terminaison de ligne — **C19** |
+| `collecte/continuite_suspecte.jsonl` | 75 lignes | 81 lignes | le fichier commité est **antérieur à C15** |
+
+**Le premier est le seul des trois qui soit armé, et il est grave.**
+`collecte/verifier_releases.py::assets_du_tag()` rend `None` dès que `gh release view` sort en
+non-zéro — binaire absent, jeton sans droit, limite d'API, tag renommé — et l'appelant traite
+ce `None` comme « release introuvable », donc inscrit **toutes** les lignes du tag en
+`"asset absent"`, avec le **même libellé** que les vrais manquants. Mesuré ce cycle : `gh` sort
+en erreur dans le bac à sable, et le fichier régénéré porte alors les **2 908** lignes de
+`MANIFESTE.csv` sur ses **26** tags, contre 148 manquants réels, soit **38 654 → 868 318
+octets**. Ce n'est pas théorique : `.github/workflows/reparation.yml` lance ce script avec
+`if: always()` **et committe `collecte/a_reteleverser.json`** à l'étape suivante ;
+`collecte.yml` fait de même. Un seul échec de `gh` remplace donc 148 cas réels par 2 908 faux,
+poussés sur `main`. **C'est le faux vert de la section 19 d'avant C15, pris dans l'autre sens :
+un outil qui ne peut pas faire son travail rend un rapport complet et confiant.**
+
+**Le troisième est bénin et le dire franchement vaut mieux que le corriger vite.**
+`continuite_suspecte.jsonl` est un rapport d'état, **lu par aucun `.py` du dépôt** (vérifié par
+balayage), et l'écart vient de C15 : les 101 séances mensuelles versées dans le quotidien ont
+changé la séance *précédente* de plusieurs lignes — BNBC passe de `2021-07-07 / +129,6 %` à
+`2021-06-25 / +113,8 %`, BOAB de `2024-08-29 / 7 300` à `2024-08-30 / 7 500`. Le fichier
+commité décrit donc une série qui n'existe plus.
+
+**Ce qui demande un arbitrage.** Pour chacun des trois, il faut dire ce que le fichier commité
+**est censé être** : la dernière sortie du générateur, ou une archive datée qu'on ne régénère
+pas. Les deux se défendent et le dépôt ne l'a jamais écrit. `a_reteleverser.json` demande en
+plus que `verifier_releases.py` distingue les deux cas et **échoue bruyamment** sur le second
+plutôt que d'écrire un faux — c'est la seule pièce des trois qui soit du code pur, donc
+VERTE si Claudia la détache.
+
+**Terminé quand** : chacun des trois est soit régénéré et commité, soit déclaré archive avec
+son motif daté ; `verifier_releases.py` ne peut plus écrire « asset absent » quand il n'a pas
+pu interroger la release ; et une section de `tester_donnees.py` relance chaque générateur hors
+réseau, exige l'égalité à l'octet, et porte un registre des paires déclarées archives — de
+sorte qu'une paire neuve qui ne reproduit pas soit **bloquante** et qu'une paire du registre
+qui reproduit à nouveau le soit aussi, pour que le registre ne pourrisse pas.
+
 ---
 
 # Veille datée, hors file
@@ -1752,41 +1878,36 @@ trouvée et branchée, soit écartée avec un motif daté qui dit ce qui reste n
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-10-03 — cycle 15 (matin) — EN COURS
+## 2026-10-03 — cycle 15 (matin)
 
-**Chantier : C19** (ORANGE, `validation : OK — remettre FTSC 2016`, priorite portee a 2 par
-Claudia le 03/10 a 05h37) : retrait des doublons stricts de
-`collecte/dividendes_par_exercice.csv`, remise de FTSC 2016, et egalite entre le fichier
-commite et sa regeneration.
+**Exécuté : C19. Rien n'a été écrit : l'arbitrage validé fait tomber la barrière.** « Remettre
+FTSC 2016 » charge un versement de **1 045,00 FCFA** daté du 31/07/2017. La règle 2 de C1
+compare le dernier versement au **plus fort des précédents** : celui-ci passe de **235,00** à
+1 045,00, le rapport de **7,35** à **1,65**, sous `distribution_ratio_max` = 3,0. FTSC perd
+`DISTRIBUTION_NON_RECURRENTE`, son rendement facial de **86,54 %** redevient « récurrent » et
+la **prime de +79,5 points** que C1 existe pour éteindre revient : **3 incohérences bloquantes**.
+Le montant n'a **qu'un côté** — l'avis BRVM N° 072-2017 corrobore la date, pas le montant, et
+la base ne porte **aucun exercice FTSC avant 2021**, donc l'identité de couverture est
+infermable. **Le dédoublonnage seul est mesuré vert** : 364 → 348 lignes (16 excédentaires en
+10 groupes), `profils.json` **identique à l'octet**, `tester_donnees.py` **241 OK, 0 ÉCHEC**.
+Trois issues écrites dans le bloc C19 ; la boucle n'en propose aucune, (2) et (3) touchent C1.
 
-**Chasse du matin** : les **fichiers derives commites que leur propre generateur ne
-reproduit pas**. C19 en est un cas ; la famille n'est surveillee par rien.
+**Corrigé : la prémisse du cycle 14 ne tient pas.** `profils.json` **est** reproductible sur la
+chaîne complète des cinq chargeurs, et `SEMC` 2020 vaut **14,4**, la valeur commitée. Rejoué sur
+la chaîne **amputée** du cycle 14 (sans `charger_dividendes_exercice.py`) : table à **72 lignes**
+au lieu de 327 et `SEMC` 2020 à **14,00**. C'est le quatrième-chargeur-manquant que le cycle 14
+avait déjà reconnu. La priorité 2 de C19 repose donc sur une mesure fausse.
 
-## 2026-10-02 — cycle 14 (soir)
+**Chasse du matin : les fichiers dérivés commités que leur générateur ne reproduit pas.** Cinq
+générateurs hors réseau relancés : **2 reproduisent à l'octet**, **3 non** — inscrit en **C28**.
+Le plus grave est armé : `verifier_releases.py` écrit **2 908** faux « asset absent » (les
+2 908 lignes de `MANIFESTE.csv` sur 26 tags) contre **148** réels dès que `gh` sort en erreur,
+et `reparation.yml` committe ce fichier avec `if: always()`.
 
-**Exécuté : C25.** **Trois faits mesurés sur la page réelle contredisent le chantier** : elle **ne
-publie pas le cours** de la cote (seuls Top 5 et Flop 5 en portent un), **ni le rendement** — donc
-**C21 ne peut pas être tranché par elle** — et **aucune date**, vérifié dans le texte rendu comme
-dans le HTML brut. Elle publie le **PER des 48 titres** à 2 décimales, la mesure que Claudia signalait
-le 01/10. Granularité mesurée des deux côtés avant tout seuil (page 43 valeurs à 2 déc. ; bulletin
-71 020 sur 79 206) → tolérance **0,005**, moitié du dernier rang publié.
-**La séance n'est pas supposée, elle est prouvée** : `date_seance` reste vide, l'ancrage est
-l'indice composite, **indépendant du PER confronté** — page BRVM-C **546,78**, variation veille
-**−0,41 %** → veille implicite **549,031** contre **549,02** au bulletin du 01/10, soit **0,0020 %**.
-Sans lui, confronter « le dernier des deux » nommerait **21 fausses divergences sur 43 paires**
-(35 sur 43 contre le 30/09) : contre-exemple figé. **Section 27, 7 contrôles**, **vérifiée par
-injection** (relevé vidé, date stampée, indices forcés → **1 bloquant chacun**, le 3e nommant les
-21). Au soir du 02/10 elle **ne confronte rien**, et le dit en alerte : le bulletin du 02/10 n'est pas collecté.
-
-**Trouvé aux barrières, non écrit** : les doublons de C19 rendent **`profils.json` non
-reproductible** — `SEMC` 2020 porte 14,4 et 14,0, le commité a retenu 14,40, une reconstruction
-14,00, rien ne départage. Priorité de C19 proposée de 6 à 2. **Aucune chasse** : cycle du soir.
-
-**Barrières complètes** (5 chargeurs, comme `tests.yml` — j'en avais lancé 4, d'où 4 faux
-bloquants) : golden OK, `tester_donnees.py` **239 OK, 0 échec**, code 2 (C4, C5, et l'alerte voulue
-de la section 27) ; `avis_brvm --test`, `notations --test`, dashboard OK. **Proposé : C27** — la page confirme
-**BBGC** là où la base porte **BBGCI**, dont la note demandait elle-même cette confirmation ; et les
-90 469 cours restent **sans seconde source**. **Prochain : C26**.
+**Barrières** : base complète (5 chargeurs, 327 dividendes), golden tests tous passent,
+`tester_donnees.py` **241 OK, 0 ÉCHEC**, code 2 (C4, C5, alerte voulue de la section 27).
+Commit de texte seul (`CHANTIERS.md`, `docs/`), aucune donnée touchée.
+**Proposé : C28. Prochain : C26.**
 
 ---
 
