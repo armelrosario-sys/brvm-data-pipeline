@@ -5447,11 +5447,11 @@
    "note": "A+(WU)",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-12-30",
+   "date": "2026-09-30",
    "validite": "",
-   "marge_nette": "",
-   "ca_mds": "621.0",
-   "url": "https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_totalenergies_marketing_ci.pdf"
+   "marge_nette": "3.0",
+   "ca_mds": "",
+   "url": "https://www.brvm.org/sites/default/files/20260930_-_totalenergies_marketing_ci_-_notation_financiere_-_totalenergies_marketing_ci.pdf"
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
