@@ -9,6 +9,198 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-03 — cycle 16 : C26, le gisement des intermédiaires n'a pas d'unité
+
+**Contrôle anti-collision.** Un seul commit sur `main` depuis trois heures : `44fedd9`,
+**clôture** du cycle 15 à **05h53 UTC**, une heure avant le démarrage de celui-ci. Le cycle 15
+est donc fermé (`bba370b` annonce → `44fedd9` clôture) et aucune annonce — de cycle ou hors
+cycle — n'est ouverte. Annonce de ce cycle poussée seule : `8076115`.
+
+**Note de cadence, pour le cycle suivant.** Le protocole annonce deux passages, 06h53 et 18h53
+UTC, « douze heures d'écart : deux cycles ne peuvent plus se croiser ». Le cycle 15 a en fait
+tourné de **05h37 à 05h53 UTC** et s'est déclaré « (matin) » ; celui-ci a démarré à **06h53**.
+Deux cycles se sont donc succédé à une heure d'intervalle le même matin. Rien n'a collisionné —
+le premier était clos — mais la fenêtre de garde que la section *Travail hors cycle* promet à
+Claudia (06h40–07h45) a été ouverte deux fois dans la matinée. À vérifier du côté de la tâche
+planifiée si cela se reproduit.
+
+**Chasse du matin : NON TENUE, délibérément.** Le cycle 15 a tenu la sienne une heure plus tôt
+(les fichiers dérivés que leur générateur ne reproduit pas, inscrite en C28). La règle n'en
+prévoit **qu'une par jour, au cycle du matin**, et la raison écrite dans le protocole est
+exactement celle-ci : « deux sessions qui lisent le même fichier arrivent aux mêmes soupçons ».
+Le cycle a donc consacré son temps à l'exécution.
+
+**Chantier pris : C26**, ORANGE, `validation : OK`, priorité 3. Rang 1 de l'ordre déterministe :
+C16, C17, C19, C20, C23 et C25 portent `validation : OK` mais leur statut dit la passe
+consommée ; restent C26 (priorité 3), puis C18, C21, C27 (4) et C22 (7). C26 est le plus
+prioritaire.
+
+### Ce que C26 demandait, et ce que la mesure a répondu
+
+Première passe **sans réseau** : reprendre les lignes d'extraction intermédiaire de
+`collecte/fondamentaux_extraits.csv`, verser celles dont **l'exercice, la période et l'unité**
+sont déterminables *sans deviner*, et mesurer l'effet titre par titre sur `profils.json`, le PER
+glissant étant devenu le PER d'analyse le 02/10.
+
+**Le compte d'abord : elles sont 139, pas 138.** Le texte de C26 annonçait 138 lignes tirées
+d'un rapport trimestriel ou semestriel. Recompté ce cycle sur le même critère (le titre du
+document nomme un trimestre ou un semestre) : **139**, sur **32 tickers**, toutes `PROBABLE`.
+
+**L'exercice et la période sont déterminables.** Le titre du document les nomme, et le lire
+n'est pas deviner. Une liste blanche exacte de rangs (`1er`, `2eme`, `3eme`, `4eme` et leurs
+formes longues — sans correspondance par préfixe, pour que « 4e trimestre » échoue plutôt
+qu'être pris pour un T4 deviné) rend le couple (période, millésime) sur **134** lignes sur 139.
+Les 5 refus sont des titres qui ne tranchent pas : 2 nomment **aussi** un exercice annuel
+(« états financiers provisoires 2023 + rapport T1 2024 » de TotalEnergies Marketing CI,
+« états financiers 2024 + rapport T1 2025 » de Vivo Energy CI), 1 nomme **deux** périodes
+(« 4ᵉ trimestre 2025 et 1ᵉʳ trimestre 2026 », Vivo Energy), 2 n'ont ni millésime ni rang
+reconnu (SAFC « 4e trimestre 2024 » — rang hors liste blanche ; SOGC « 1ᵉʳ trimestre exercice
+2022 », où le millésime est séparé du mot période).
+
+**L'unité, non — et c'est ce qui arrête tout.** Trois mesures, toutes trois négatives.
+
+1. La colonne `unite` est **vide sur 138 des 139** lignes. Une seule dit « milliers ».
+2. **Aucun exercice n'est entièrement pavé par ses intermédiaires** : ni T1..T4, ni S1+S2,
+   **0 cas** sur l'ensemble du fichier. C'est pourtant la seule preuve d'unité disponible sans
+   réseau — si les quatre trimestres d'un exercice étaient là, leur somme devrait égaler le
+   résultat annuel certifié, et le rapport des deux **mesurerait** le facteur au lieu de le
+   supposer. Le fichier porte 45 `S1`, 44 `T3`, 40 `T1`, 3 `T2`, 2 `T4` et **aucun `S2`** : les
+   publications collectées sont les ouvertures d'exercice et les troisièmes trimestres, jamais
+   une série complète.
+3. **Le facteur n'est pas une propriété du ticker.** Sur les **37** lignes **annuelles** du même
+   fichier qui portent un exercice et sont confrontables à une valeur certifiée de
+   `etats_financiers`, **17** tombent sur un rapport qui est une puissance de 10 — donc le bon
+   montant, à l'unité près — et elles emploient **quatre** conventions différentes : ×1
+   (6 lignes), ×10³ (5), ×10⁶ (5), ×10⁻³ (1). Les **20 autres** ne tombent sur aucune puissance
+   de 10 : NSBC 0,3037 / 0,7323 / 0,9302 / 0,9134 / 0,9361 ; CIEC 0,924 et 0,957 ; ECOC 0,9054 ;
+   CABC 890 721 (×2) et 1 184 079 ; SPHC 584 398 ; STBC 927 751 ; BOAN 24,78 et 874,11 ; FTSC
+   165,42 ; SNTS 0,0001 et 0,0008 ; TTLS 906,70. Pour celles-là, le nombre extrait **n'est pas
+   le résultat net** du document : l'extracteur a pris une autre ligne du PDF. Un facteur lu sur
+   une ligne ne peut donc pas être transporté sur une autre, même du même ticker.
+
+Convertir une valeur reviendrait à choisir 10^k par vraisemblance d'ordre de grandeur. C'est
+l'estimation que la première règle du dépôt interdit : une case vide vaut mieux qu'une valeur
+approchée.
+
+### Le gisement utile fait 10 lignes, pas 138 — et c'est mesuré
+
+`benefice_glissant()` exige que l'exercice intermédiaire **suive immédiatement** le dernier
+exercice clos en base. Le dernier clos vaut 2025 sur tous les tickers concernés : **seules les
+lignes d'exercice 2026 peuvent produire un PER glissant**. Il y en a **10**, sur 9 tickers —
+BNBC, CABC, ECOC, NSBC, ORAC, PALC, SAFC, SPHC et deux lignes sous TTLS. Les **124** autres
+lignes lisibles (2020 à 2025) seraient refusées même versées, avec le motif « ils ne se suivent
+pas ». Et sur ces 10 : 1 sans résultat net (SAFC), 2 mal rattachées (documents CI sous TTLS,
+voir C29), 1 dont le contrôle des paliers échouerait de toute façon faute de l'exercice 2024 en
+base (ECOC), et **aucune** dont l'unité soit déclarée. **Le chantier ne valait donc jamais 138
+lignes de gain.** C'est la mesure la plus utile du cycle : elle corrige l'ordre de grandeur que
+le texte de C26 laissait croire.
+
+### Troisième trouvaille : « 3ᵉ trimestre » peut être un cumul de neuf mois
+
+C26 avait vérifié sur les T1/T2 de SGBC que les lignes trimestrielles portent **un trimestre
+chacune**, et mettait en garde contre le mélange avec une ligne semestrielle. La seule ligne du
+fichier dont l'unité soit déclarée mesure l'inverse sur un T3 :
+
+> **PALC « rapport d'activités — 3ᵉ trimestre 2024 »**, unité « milliers », résultat net
+> **16 156 388 k = 16 156,388 M** — contre un exercice **2024 certifié à 15 861,643 M**.
+
+Un trimestre seul ne peut pas dépasser son exercice entier sans que les trois autres se soldent
+en négatif ; un cumul de neuf mois, si (il implique ici un T4 à −295 M). Au moins un document
+« 3ᵉ trimestre » porte donc le cumul depuis l'ouverture, et le coder `T3` ferait compter neuf
+mois pour trois dans `benefice_glissant()`. Le fichier en porte **44**. Conclusion retenue :
+seuls **`T1` et `S1`** ont une lecture unique — la période et le cumul depuis l'ouverture y
+coïncident ; `T2`, `T3`, `T4` et `S2` sont refusés tant que le document ne tranche pas.
+
+### Ce qui est livré
+
+**`outils/versement_intermediaires.py`** — procès-verbal exécutable, relançable en une
+commande. Rapport par défaut, `--verser` pour écrire, `--test` pour l'autotest (**18 cas,
+0 échec**). Quatre contrôles, dans cet ordre : rattachement au document, lecture du titre,
+présence du résultat net et de son comparatif N-1, unité prouvée, nature de la période. Sur la
+base du jour : **139 lignes examinées, 0 versable, 139 refusées**, chacune avec son motif —
+119 « unité non déclarée et aucune identité à fermer », 12 « résultat net absent », 2 « le titre
+nomme aussi un exercice annuel », 2 « rattachée à un autre ticker », 2 « période ou millésime
+absent », 1 « T3 : période seule ou cumul », 1 « deux périodes nommées ». `--verser` constate
+qu'il n'a rien à écrire et **laisse `donnees/base/resultats_intermediaires.csv` intact**.
+
+Le script refuse explicitement d'inventer son chemin d'écriture : n'ayant aucun cas réel à
+écrire, il s'arrête plutôt que de porter du code jamais exécuté, et dit que l'ajouter est le
+travail du cycle qui verra la première ligne versable. C'est délibéré, et c'est écrit dans son
+message de refus.
+
+**Le plancher que le critère de terminaison de C26 réclamait.**
+`TITRES_PER_GLISSANT_MIN = 1` dans `moteur/tester_donnees.py`, avec son contrôle : « au moins
+1 titre porte un PER glissant calculable — plancher qui ne peut que monter ». La mesure à
+1 titre (BOAC) n'était écrite nulle part qu'en prose dans un docstring ; une collecte
+intermédiaire qui disparaîtrait, ou un refus qui s'élargirait, ne se serait vu nulle part.
+
+**La section 28, qui était la deuxième à porter le 27.** La section du PER glissant et celle de
+la confrontation bulletin / page « Volumes / Valeurs » (C25) portaient toutes deux le numéro
+**27**, ajoutées le même jour, le 02/10. `CHANTIERS.md` désigne « la section 27 » pour le
+registre `TICKERS_HORS_BASE`, qui appartient à celle de C25 : c'est donc le PER glissant qui est
+renuméroté **28**. Le rapport de la barrière ne nomme plus deux sections différentes sous un
+même numéro.
+
+### Effet mesuré : nul, et c'est le bon résultat
+
+`collecte/profils.json` est **identique à l'octet** après reconstruction complète de la base et
+relance de `profils.py` — `git status` ne le signale pas. Aucun fichier de `donnees/base/` n'est
+touché. Le PER glissant reste à **1 titre sur 47** (BOAC). C'est l'effet attendu d'un cycle qui
+n'a versé aucune donnée : l'absence d'effet est la preuve que les gardes ont tenu, pas un cycle
+vide — le livrable est le verdict chiffré, le script qui le rejoue et le plancher qui le fige.
+
+Au passage, cela **reconfirme la correction du cycle 15** : sur la chaîne complète des cinq
+chargeurs, `profils.json` est bien reproductible (327 dividendes en base).
+
+### Chantier proposé : C29 — quinze extractions sous le ticker d'une autre société
+
+Trouvé en écrivant le contrôle de rattachement. `collecte/fondamentaux_extraits.csv` rattache
+**15 lignes à un ticker qui n'est pas la société nommée dans l'URL de son propre document** :
+**12** du slug `totalenergies_marketing_ci` sous **TTLS** (TotalEnergies Marketing **Sénégal**)
+alors qu'elles sont celles de **TTLC** (Côte d'Ivoire) — et **TTLC n'a aucune ligne à son nom** ;
+1 de `filtisac_ci` sous LNBB (Loterie Nationale du Bénin) au lieu de FTSC ; 1 de `setao_ci` sous
+LNBB au lieu de STAC ; 1 de `agl_cote_divoire` sous ECOC, pour une société hors cote.
+
+**Pourquoi c'est grave et pas cosmétique.** TTLS est exactement le ticker de **C7**, « TTLS,
+dernier titre sans ROE », dont les capitaux propres manquent. Un cycle qui aurait puisé dans ce
+fichier pour combler C7 aurait écrit la Côte d'Ivoire dans le Sénégal, avec un `source_url` qui
+l'aurait dit et que personne ne relit. C29 est donc inscrit **priorité 2, devant C7**.
+
+**La base certifiée est saine, vérifié ce cycle** : les lignes annuelles de TTLC portent les
+documents CI et leurs valeurs (11 143 / 12 279 / 8 709 / 9 374 / 9 087), celles de TTLS les
+documents SN. La contamination est confinée au fichier d'extraction. **Un point à éclaircir** :
+`TTLS 2022 = 6 559,0` est `PROBABLE` **sans source**, et c'est exactement la valeur qu'une ligne
+tirée du document **CI** « 1ᵉʳ semestre 2023 » porte dans le fichier d'extraction. La
+coïncidence ne prouve rien — TTLC 2022 certifié vaut 12 279, donc 6 559 n'est pas non plus le
+résultat CI de cet exercice — mais elle demande le document.
+
+**Et la limite de la garde de C26, dite franchement.** Le contrôle de rattachement lit le
+fichier contre lui-même (slug majoritaire). Il n'attrape que les erreurs **isolées** — 2 des 15.
+La TTLC → TTLS est **systématique** : TTLS étant le ticker majoritaire de son slug, le
+majoritaire **est** l'erreur. Les attraper demande de confronter le nom du document à
+`donnees/base/societes.csv`. C'est le travail de C29, pas une garde de ce script.
+
+### Barrières
+
+Complètes, le commit touchant `moteur/` et `outils/`.
+
+- base reconstruite par la **chaîne des cinq chargeurs** : 50 sociétés, 185 lignes d'états
+  financiers, 4 509 cours mensuels, 90 660 cours quotidiens (2018-01-02 → 2026-10-01),
+  **327 dividendes**, 73 141 lignes de liquidité ;
+- `moteur/tester.py` : **tous les golden tests passent** ;
+- `moteur/tester_donnees.py` : **242 OK, 0 ÉCHEC**, code de sortie **2** — trois alertes de
+  fraîcheur, les mêmes que le cycle 15 : les 13 chutes de cours de C4, les exercices CFAC et
+  NEIC de C5, et l'alerte voulue de la section 27 (le relevé du 02/10 porte la séance suivant le
+  bulletin ; ancrage fermé à 0,0020 %, confrontation reportée au prochain `boc_quotidien.yml`).
+  Le 242ᵉ contrôle est le plancher posé ce cycle ;
+- `collecte/avis_brvm.py --test` : 11 avis, 10 rattachés, classification 8/8 ;
+- `collecte/notations.py --test` : index 15/15, PDF GCR 10/10, Bloomfield 6/6, pièges 3/3 ;
+- `dashboard/generer_dashboard.py` : 48 titres ;
+- `dashboard/generer_dashboard_html.py` compile (Python **3.13.16** dans le bac à sable — la
+  conclusion de 2026-09-30 tient toujours : c'était l'environnement, jamais le fichier).
+
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
 ## 2026-10-03 — cycle 15 (matin) : C19, l'arbitrage validé fait tomber la barrière
 
 **Contrôle anti-collision.** Un seul commit sur `main` depuis trois heures : `20c8117`

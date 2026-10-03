@@ -2642,8 +2642,17 @@ def test_dates_dividendes_iso():
 # 31 avant le chargement de collecte/dividendes_boc.csv. Il ne doit que monter :
 # une baisse signifie que le pont a ete debranche ou que la collecte recule.
 # ----------------------------------------------------------------------
-# 27. LE PER GLISSANT (TTM) — sa regle, et ses refus (bloquant)
+# 28. LE PER GLISSANT (TTM) — sa regle, et ses refus (bloquant)
 # ----------------------------------------------------------------------
+# Plancher pose le 03/10/2026 (cycle 16, C26) : nombre de titres dont le PER
+# glissant se calcule. Il vaut 1 — BOAC, seul titre dont les publications
+# intermediaires, les deux exercices annuels encadrants et les paliers du BPA
+# implicite soient tous les trois en base. Il ne doit que MONTER : une baisse
+# signifie qu'une collecte intermediaire a disparu ou qu'un refus s'est elargi.
+# Le cycle qui versera des lignes dans resultats_intermediaires l'eleve ici.
+TITRES_PER_GLISSANT_MIN = 1
+
+
 def test_per_glissant():
     """Le PER sur douze mois glissants ne se calcule que sur une reference verifiee.
 
@@ -2678,8 +2687,20 @@ def test_per_glissant():
     le rapport des paliers n'a rien a confronter. Le PER glissant vaut donc pour
     1 titre sur 47, et ce qui le limite est la COLLECTE des publications
     intermediaires, pas le calcul.
+
+    LE PLANCHER, pose le 03/10/2026 (cycle 16, C26). Le critere de terminaison de
+    C26 demande que le nombre de titres a PER glissant calculable soit fige par un
+    test qui ne peut que MONTER. Sans cela, une collecte intermediaire qui
+    disparait ou un refus qui s'elargit se verrait a l'oeil ou pas du tout : la
+    mesure a 1 titre n'etait ecrite nulle part qu'en prose. Quand le plancher
+    monte, c'est au cycle qui verse les lignes de l'elever ici.
+
+    NUMERO : cette section etait la DEUXIEME a porter le 27 -- la confrontation
+    du bulletin a la page Volumes / Valeurs (C25) portait le meme numero le meme
+    jour. CHANTIERS.md designe la section 27 pour le registre TICKERS_HORS_BASE,
+    qui appartient a celle de C25 ; c'est donc celle-ci qui est renumerotee 28.
     """
-    print("\n=== 27. PER glissant sur douze mois (bloquant) ===")
+    print("\n=== 28. PER glissant sur douze mois (bloquant) ===")
     import json
     sys.path.insert(0, str(ICI))
     from profils import benefice_glissant, per_glissant
@@ -2745,6 +2766,11 @@ def test_per_glissant():
         return
     profils = json.loads(f.read_text(encoding="utf-8"))
     calcules = {t: v for t, v in profils.items() if v.get("per_ttm") is not None}
+    verifie(len(calcules) >= TITRES_PER_GLISSANT_MIN,
+            "au moins %d titre(s) portent un PER glissant calculable — plancher qui "
+            "ne peut que monter (obtenu : %d%s)"
+            % (TITRES_PER_GLISSANT_MIN, len(calcules),
+               ", " + ", ".join(sorted(calcules)) if calcules else ""))
     sans_detail = sorted(t for t, v in calcules.items() if not v.get("ttm_detail"))
     verifie(not sans_detail,
             f"les {len(calcules)} PER glissants publies portent leur detail de calcul"
