@@ -63,7 +63,10 @@ jobs:
           set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- donnees/bnpa_reference.json; then
+          # git diff ignore les fichiers que git ne suit pas encore : au premier
+          # passage, le relevé vient d'être créé, et le test aurait conclu qu'il
+          # n'y a rien à publier. git status, lui, voit aussi les nouveaux fichiers.
+          if [ -z "$(git status --porcelain -- donnees/bnpa_reference.json)" ]; then
             echo "Relevé inchangé, rien à publier."
             exit 0
           fi
