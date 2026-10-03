@@ -1,0 +1,88 @@
+name: BNPA de reference
+
+# Relève le bénéfice par action de clôture d'exercice dans le dernier bulletin de
+# décembre, et le fige dans donnees/bnpa_reference.json. C'est la base de la
+# colonne « Croiss. BNPA ».
+#
+# Une fois par an suffit : le fichier ne change plus une fois l'exercice clos.
+# Le passage de janvier le renouvelle ; le bouton « Run workflow » permet de le
+# produire tout de suite, ou de le refaire pour une autre année.
+
+on:
+  workflow_dispatch:
+    inputs:
+      annee:
+        description: "Année de clôture à relever (vide = année précédente)"
+        required: false
+        default: ''
+  schedule:
+    - cron: '23 7 8 1 *'        # le 8 janvier, une fois l'exercice bien clos
+
+permissions:
+  contents: write
+
+concurrency:
+  group: donnees-brvm
+  cancel-in-progress: false
+
+jobs:
+  relever:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: Relever le bulletin de clôture
+        run: |
+          set -euo pipefail
+          if [ -n "${{ github.event.inputs.annee }}" ]; then
+            python pipeline/bnpa_reference.py --annee "${{ github.event.inputs.annee }}"
+          else
+            python pipeline/bnpa_reference.py
+          fi
+
+      - name: Conserver le relevé en artefact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bnpa-reference
+          path: donnees/bnpa_reference.json
+          if-no-files-found: warn
+
+      - name: Publier
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- donnees/bnpa_reference.json; then
+            echo "Relevé inchangé, rien à publier."
+            exit 0
+          fi
+          # D'autres chaînes écrivent sur main : on se recale avant de pousser,
+          # et on repose notre fichier par-dessus plutôt que de forcer.
+          cp donnees/bnpa_reference.json /tmp/bnpa_reference.json
+          for essai in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p donnees
+            cp /tmp/bnpa_reference.json donnees/bnpa_reference.json
+            git add donnees/bnpa_reference.json
+            git commit -m "BNPA de cloture d'exercice" || { echo "Rien a committer."; exit 0; }
+            if git push origin HEAD:main; then
+              echo "Publié à la tentative $essai."
+              exit 0
+            fi
+            echo "Poussée refusée, nouvelle tentative."
+            sleep 5
+          done
+          echo "Publication impossible après 3 tentatives." >&2
+          exit 1
