@@ -28,7 +28,7 @@ import argparse, json, os, sys, tempfile
 from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from collecte_boc import (DOSSIER, entete, lignes_actions, pdf_si_present,
+from collecte_boc import (DOSSIER, PAGE_LISTE, entete, lignes_actions, pdf_si_present,
                           session_http, texte_pdf, SUFFIXES, URL)
 
 SORTIE = os.path.join(DOSSIER, "bnpa_reference.json")
@@ -37,20 +37,64 @@ SORTIE = os.path.join(DOSSIER, "bnpa_reference.json")
 RECUL_MAX = 10
 
 
+def session_amorcee():
+    """Session HTTP ayant déjà obtenu son cookie auprès du site.
+
+    Le pare-feu applicatif de brvm.org refuse en 403 un GET isolé sur un PDF, même
+    avec un en-tête d'agent correct : il attend le cookie que pose une page
+    ordinaire. La collecte quotidienne ne s'en aperçoit pas, parce qu'elle lit la
+    page des publications avant de demander le fichier. Ici, où l'adresse du
+    bulletin se déduit de la date, cette visite n'a aucune utilité pour trouver
+    l'URL — elle reste pourtant nécessaire pour être servi.
+    """
+    s = session_http()
+    try:
+        r = s.get(PAGE_LISTE, timeout=45)
+        print(f"  amorçage de session : {PAGE_LISTE} -> {r.status_code}, "
+              f"{len(s.cookies)} cookie(s)")
+    except Exception as e:                      # noqa: BLE001 — l'échec n'est pas bloquant
+        print(f"  page d'accueil injoignable ({type(e).__name__}) — on tente quand même")
+    return s
+
+
+def essayer(s, url):
+    """Télécharge le bulletin, en disant ce que le serveur a répondu.
+
+    Un échec muet se diagnostique mal : trois tentatives silencieuses et dix jours
+    de recul produisent le même message qu'un changement d'adresse, qu'un refus du
+    pare-feu ou qu'une coupure réseau. Le code de réponse les sépare d'emblée.
+    """
+    try:
+        r = s.get(url, timeout=45)
+    except Exception as e:                      # noqa: BLE001
+        print(f"    {url} -> échec réseau ({type(e).__name__})")
+        return None
+    if r.status_code != 200:
+        print(f"    {url} -> {r.status_code}")
+        return None
+    if r.content[:4] != b"%PDF":
+        print(f"    {url} -> 200 mais ce n'est pas un PDF ({len(r.content)} octets)")
+        return None
+    return r.content
+
+
 def dernier_bulletin_de_lannee(annee):
     """Contenu du dernier bulletin publié en décembre de cette année-là."""
-    s = session_http()
+    s = session_amorcee()
     jour = date(annee, 12, 31)
     essais = []
     for _ in range(RECUL_MAX):
         if jour.weekday() < 5:
             for n in SUFFIXES:
                 u = URL.format(aaaammjj=jour.strftime("%Y%m%d"), n=n)
-                contenu = pdf_si_present(s, u)
+                contenu = essayer(s, u)
                 if contenu:
-                    print(f"Bulletin de clôture {annee} : {u}")
+                    print(f"Bulletin de clôture {annee} : {u} "
+                          f"({len(contenu):,} octets)".replace(",", " "))
                     return contenu
                 essais.append(u)
+        else:
+            print(f"    {jour.isoformat()} : week-end, ignoré sans requête")
         jour -= timedelta(days=1)
     raise SystemExit(
         f"Aucun bulletin trouvé sur les {RECUL_MAX} derniers jours de {annee}.\n  "
