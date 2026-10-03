@@ -32,7 +32,20 @@ REGISTRE = os.path.join("donnees", "cote_reference.json")
 SECTEURS = {"TEL": "Télécommunications", "FIN": "Services financiers",
             "CD": "Consommation discrétionnaire", "CB": "Consommation de base",
             "IND": "Industriels", "ENE": "Énergie", "SPU": "Services publics"}
-METRIQUES = ["per", "rdt", "ytd", "v1an", "v3a", "v5a", "bnpa", "roe", "croiRN", "croiCA", "margeN"]
+METRIQUES = ["per", "rdt", "ytd", "v1an", "v3a", "v5a", "bnpa", "croiBNPA", "roe",
+             "croiRN", "croiCA", "margeN"]
+# BNPA de clôture de l'exercice précédent, relevé une fois par an par
+# bnpa_reference.py dans le dernier bulletin de décembre.
+BNPA_REF = os.path.join("donnees", "bnpa_reference.json")
+# Écart toléré, en points, entre la croissance du bénéfice par action et celle du
+# résultat net. Les deux ne peuvent diverger que si le nombre d'actions a changé.
+# Sur le bulletin de clôture 2025 rapproché de la cote de septembre 2026, quinze
+# titres contrôlés se répartissent nettement : dix tiennent sous 0,15 point, un
+# s'écarte de 1,04, et quatre dépassent 8 points. Ces quatre-là — BICB, CABC,
+# SDCC, TTLS — sont précisément ceux dont le BNPA du bulletin et celui de
+# Sikafinance se contredisent déjà de 10 à 50 %. Leur écart ne traduit donc pas
+# une dilution mais une donnée fausse, et la croissance reste vide pour eux.
+ECART_BNPA_MAX = 2.0
 N_MIN_Z = 5
 
 
@@ -182,6 +195,11 @@ def zrob(v, s):
 
 def main():
     print("Lecture des collectes")
+    ref_bnpa = lit(BNPA_REF) or {}
+    table_ref = ref_bnpa.get("valeurs") or {}
+    seance_ref = ref_bnpa.get("seance")
+    if table_ref:
+        print(f"  BNPA de référence : {len(table_ref)} titres au bulletin du {seance_ref}")
     boc = lit(os.path.join("donnees", "boc.json"))
     sika = lit(os.path.join("donnees", "sikafinance.json"), {"valeurs": {}})
     fp = fonds_propres()
@@ -240,6 +258,48 @@ def main():
                 motifs[dst] = "non publié par la source"
         r["exercice"] = ch.get("exercice")
         r["margeN"] = round(r["rn"] / r["ca"] * 100, 2) if (r["ca"] and r["rn"] is not None) else None
+
+        # --- croissance du BNPA : le même calcul, un exercice plus tôt
+        #
+        # Elle recoupe la croissance du résultat net plus qu'elle ne la complète :
+        # les deux ne divergent que si le nombre d'actions a bougé. C'est justement
+        # ce qui en fait un contrôle — un écart important sans opération sur le
+        # capital désigne une donnée fausse, et la case reste alors vide plutôt que
+        # d'afficher une progression à laquelle on ne peut pas se fier.
+        ref = table_ref.get(sym)
+        r["bnpaRef"] = ref["bnpa"] if ref else None
+        r["bnpaRefSeance"] = seance_ref if ref else None
+        r["croiBNPA"] = None
+        r["ecartBNPA"] = None
+        if not table_ref:
+            motifs["croiBNPA"] = ("relevé de clôture absent — lancer "
+                                  "pipeline/bnpa_reference.py")
+        elif r["bnpa"] is None:
+            motifs["croiBNPA"] = "BNPA de l'exercice en cours indisponible"
+        elif ref is None:
+            motifs["croiBNPA"] = (f"aucun BNPA au bulletin du {seance_ref} — "
+                                  "titre non coté ou sans PER à cette date")
+        elif ref["bnpa"] <= 0:
+            motifs["croiBNPA"] = f"BNPA de référence nul ou négatif ({ref['bnpa']})"
+        else:
+            brut = round((r["bnpa"] / ref["bnpa"] - 1) * 100, 2)
+            if r["croiRN"] is None:
+                # Rien pour contredire la mesure : on l'affiche, en disant qu'elle
+                # n'a pas pu être recoupée. C'est le seul indicateur de progression
+                # du bénéfice dont ces titres disposent.
+                r["croiBNPA"] = brut
+                motifs["croiBNPA_reserve"] = ("croissance du résultat net non publiée — "
+                                              "valeur non recoupée")
+            else:
+                r["ecartBNPA"] = round(brut - r["croiRN"], 2)
+                if abs(r["ecartBNPA"]) > ECART_BNPA_MAX:
+                    motifs["croiBNPA"] = (
+                        f"{brut:+.2f} % calculé contre {r['croiRN']:+.2f} % pour le résultat "
+                        f"net, soit {abs(r['ecartBNPA']):.2f} points d'écart — les deux ne "
+                        "peuvent diverger ainsi sans opération sur le capital ; valeur "
+                        "retenue comme non fiable et laissée vide")
+                else:
+                    r["croiBNPA"] = brut
 
         # --- ROE : impossible sans capitaux propres
         e = fp.get(sym)
@@ -320,10 +380,12 @@ def main():
         sika_perf=sika.get("releve_perf") or sika.get("releve_le"),
         sika_fond=sika.get("releve_fondamentaux") or sika.get("releve_le"),
         sika_exercice=sika.get("exercice"),
+        bnpa_ref_seance=seance_ref, bnpa_ref_numero=ref_bnpa.get("numero"),
+        bnpa_ecart_max=ECART_BNPA_MAX,
         construit_le=date.today().isoformat(),
         hors_seance=[dict(symbole=s, derniere_cotation=d, jours=j) for s, d, j in reportes],
         couverture={c: sum(1 for r in lignes if r[c] is not None)
-                    for c in ("per", "rdt", "bnpa", "ca", "rn", "croiRN", "roe", "peg",
+                    for c in ("per", "rdt", "bnpa", "croiBNPA", "ca", "rn", "croiRN", "roe", "peg",
                               "v1s", "v1m", "ytd", "v1an", "v3a", "v5a")},
         total=len(lignes))
 
@@ -363,6 +425,9 @@ def signalements(r):
                  .replace(",", " "))
     if r.get("cp") is not None and not r.get("cp_exercice"):
         f.append("Exercice des capitaux propres non identifié — ROE à confirmer")
+    if r.get("ecartBNPA") is not None and abs(r["ecartBNPA"]) > 2.0:
+        f.append(f"Bénéfice par action et résultat net divergent de "
+                 f"{abs(r['ecartBNPA']):.1f} points — croissance du BNPA non publiée")
     if r["croiRN"] is not None and r["croiRN"] > 100:
         f.append(f"Croissance du résultat de {r['croiRN']} % — effet de base, PEG peu fiable")
     for cle, lib in (("v3a", "3 ans"), ("v5a", "5 ans")):
