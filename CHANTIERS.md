@@ -1056,7 +1056,7 @@ plus rien en silence.
 - statut : PROPOSÉ
 - validation : OK — remettre FTSC 2016
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
-- priorité : 6
+- priorité : 2
 
 **Mesuré le 02/10/2026 (cycle 14), en passant les barrières, et cela change l'enjeu de ce
 chantier.** Les doublons rendent **`collecte/profils.json` non reproductible** : reconstruire
@@ -1709,7 +1709,7 @@ et publier cet effet titre par titre (avant/après sur `profils.json`), comme C1
 
 - classe : ORANGE — renomme un ticker dans une table certifiée, et choisit une seconde source
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : partielle — le renommage est sans réseau ; une seconde source de cours ne l'est pas
 - priorité : 4
 
