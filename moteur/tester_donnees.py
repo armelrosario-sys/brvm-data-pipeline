@@ -476,12 +476,25 @@ def test_per_normalise_et_operations():
         c = pd.read_csv(csv_cours, parse_dates=["date_bulletin"])
         c = c.sort_values(["ticker", "date_bulletin"])
         c["var"] = c.groupby("ticker").cours.pct_change()
-        # on ignore les erreurs de saisie manifestes (facteur ~1000)
-        suspects = c[(c["var"] < -0.60) & (c["var"] > -0.995)]
+        # SEUIL BAS RETIRE le 03/10/2026 (C18, cycle 17). Ce controle triait sur
+        # `var < -0.60 ET var > -0.995`, en commentant « on ignore les erreurs de
+        # saisie manifestes (facteur ~1000) ». Les deux seules chutes que cette
+        # borne ecartait etaient SLBC 2022-01-12 et 2023-06-02 : elles n'etaient
+        # enregistrees NULLE PART, ni ici, ni dans operations_sur_titre.csv, et
+        # restaient dans le CSV commite et dans la base. Un controle qui ecarte
+        # en silence ne surveille pas, il rassure. Les deux sont corrigees par
+        # outils/correction_collisions_echelle.py ; la borne disparait, et ce qui
+        # reste a ecarter doit l'etre nommement, par le registre COLLISIONS_ECHELLE.
+        suspects = c[c["var"] < -0.60]
         connues = set()
         if ops.exists():
             o = pd.read_csv(ops)
             connues = {(r.ticker, str(r.date)[:7]) for r in o.itertuples()}
+        # Volontairement SANS exclure le registre COLLISIONS_ECHELLE : ses deux
+        # entrees restantes sont une division de nominal REELLE (SAFC 2018-12-21)
+        # et son artefact, c'est-a-dire exactement ce que cette alerte doit
+        # continuer de reclamer a C4. Filtrer sur le registre reviendrait a
+        # masquer la seule date que C4 doit documenter.
         non_tracees = [(r.ticker, str(r.date_bulletin)[:10])
                        for r in suspects.itertuples()
                        if (r.ticker, str(r.date_bulletin)[:7]) not in connues]
@@ -490,6 +503,22 @@ def test_per_normalise_et_operations():
                 + ("" if not non_tracees
                    else f" — a documenter dans operations_sur_titre.csv : {non_tracees}"),
                 bloquant=False)
+
+        # Ce que l'ancienne borne basse cachait : une chute de plus de 99,5 % en
+        # une seance n'est pas un fait de marche. Elle est maintenant NOMMEE,
+        # qu'elle soit au registre des collisions ou non.
+        enormes = [(r.ticker, str(r.date_bulletin)[:10], round(r.var, 5))
+                   for r in c[c["var"] <= -0.995].itertuples()]
+        hors_registre = [e for e in enormes if (e[0], e[1]) not in COLLISIONS_ECHELLE]
+        verifie(not hors_registre,
+                f"aucune chute de plus de 99,5 % dans la serie ({len(enormes)} vue(s))"
+                + ("" if not hors_registre else
+                   " — : " + ", ".join(f"{t} {d} ({v})" for t, d, v in hors_registre)
+                   + " — un cours ne perd pas 99,5 % en une seance : mesurer, puis "
+                     "corriger la serie par un script de migration dans outils/ ou "
+                     "inscrire au registre COLLISIONS_ECHELLE avec son motif ; ce "
+                     "controle ne les ecarte plus en silence, comme le faisait le "
+                     "seuil bas retire ci-dessus"))
 
 
 # ----------------------------------------------------------------------
@@ -1944,19 +1973,41 @@ BPA_ANNUEL_SUR_PER_FIGE = {("BOAS", "2024-12-31"): 6.66}
 
 # Collisions d'echelle : une chute de plus de 60 % en une seance, suivie dans les
 # quinze seances d'un RETOUR a moins de 5 % du niveau d'avant. Une division de
-# nominal ne revient jamais sur ses pas : ces cinq cas sont donc des valeurs d'une
-# AUTRE echelle deposees dans la serie, pas des operations sur titre. Registre
-# adosse aux valeurs observees, avec le facteur mesure. Voir C18.
-# Les deux SLBC sont des facteurs 1000 : le controle de la section 7 les ecarte
-# explicitement comme « erreurs de saisie manifestes » (var > -0.995) et ne les
-# enregistre nulle part. Les trois autres, lui, les compte a tort comme divisions
-# de nominal non enregistrees.
+# nominal ne revient jamais sur ses pas : un tel cas est une valeur d'une AUTRE
+# echelle deposee dans la serie, pas une operation sur titre. Voir C18.
+#
+# DE CINQ A DEUX le 03/10/2026 (C18, cycle 17). Trois entrees sont parties parce
+# que la serie est corrigee ; les deux qui restent sont la pour une tout autre
+# raison, et il faut la lire avant d'y toucher.
+#
+#   * SLBC 2022-01-12 (154 -> 154 000) et 2023-06-02 (67,6 -> 67 600) : facteur
+#     1 000 exact des deux cotes, confirme par le PER publie sur la ligne meme.
+#     Le facteur 1 080,99 qui etait inscrit ici pour la seconde etait mesure
+#     contre la seance d'avant, alors que le cours de SLBC BAISSAIT dans cette
+#     fenetre : la seance n'avait aucune raison de revenir a 73 075.
+#   * STBC 2018-07-12 (11 315 -> 44 995) : pas une erreur d'echelle (facteur 3,98,
+#     aucun facteur rond) mais une valeur fausse, le rendement 9,17 % publie sur
+#     la ligne imposant un cours entre 44 948 et 45 001 avec le dividende de
+#     4 124 FCFA alors en vigueur.
+#
+# LES DEUX QUI RESTENT NE SONT PAS DES COLLISIONS, et le detecteur ne peut pas le
+# voir : il signale la seance de CHUTE, jamais celle du RETOUR. SAFC a subi une
+# DIVISION DE NOMINAL AU VINGT-CINQUIEME fin decembre 2018 -- le dividende que le
+# BOC publie passe de 576,00 a 23,04 entre les bulletins de novembre et de
+# decembre (576 / 23,04 = 25,0 exact) et la serie reste a 215, 210, 200 pendant
+# toute l'annee 2019. La chute est donc l'evenement reel ; ce sont les retours a
+# 5 300 des 2018-12-31 et 2019-01-04 qui sont fautifs.
+#
+# Ces deux lignes fautives ne sont PAS corrigees : le 31/12 est une copie de la
+# ligne mensuelle versee par C15, et la corriger ferait tomber la section 19, qui
+# exige l'egalite au franc entre les deux series. Arbitrage inscrit en C30.
+# Les deux entrees ci-dessous disparaitront d'elles-memes quand il sera tranche.
+#
+# Proces-verbal : outils/correction_collisions_echelle.py (idempotent).
+# Une entree nouvelle ici doit porter son facteur mesure et son motif ecrit.
 COLLISIONS_ECHELLE = {
     ("SAFC", "2018-12-21"): 24.65,
     ("SAFC", "2019-01-02"): 24.65,
-    ("SLBC", "2022-01-12"): 1000.0,
-    ("SLBC", "2023-06-02"): 1080.99,
-    ("STBC", "2018-07-12"): 3.98,
 }
 
 

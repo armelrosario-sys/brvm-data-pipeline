@@ -9,6 +9,137 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-03 — cycle 17 (soir) : C18, le détecteur nommait la mauvaise séance
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun
+commit**. Le dernier cycle (16) est clos (`8076115` annonce → `c88d4bc` clôture), suivi de
+deux commits de collecte automatique (`072746a`, `58eb9ce`). Aucune annonce ouverte, de cycle
+ou hors cycle. Annonce de ce cycle poussée seule : `055ddbd`.
+
+**Incident de poussée, à savoir pour les cycles suivants.** Le clone fourni par
+l'environnement était en **HEAD détaché**, la branche locale `main` restant 17 commits en
+arrière. `git push origin main` poussait donc la vieille branche et était rejeté
+(« behind its remote counterpart »), ce qu'un `git pull --rebase` ne corrige pas puisqu'il
+rebase le HEAD détaché. Réparé par `git branch -f main HEAD && git checkout main`. Vérifier
+`git status -sb` avant la première poussée.
+
+**Chasse : NON TENUE.** Passage du soir ; la règle n'en prévoit qu'une par jour, au cycle du
+matin. Le cycle 15 a tenu celle d'aujourd'hui (C28).
+
+**Chantier exécuté : C18** (ORANGE, `validation : OK`, priorité 4), premier du rang 1 par
+l'ordre déterministe — C19, C23, C25, C26, C16, C17, C20 ayant tous leur passe consommée.
+
+### Ce que la mesure a trouvé, et pourquoi le chantier se trompait
+
+Le détecteur `_collisions_echelle` de la section 22 signale la séance de **chute**, jamais
+celle du **retour**. Sur SAFC, la chute est l'événement réel :
+
+**SAFC a subi une division de nominal au vingt-cinquième fin décembre 2018.** Preuve
+indépendante, lue dans `collecte/cours_extraits.csv`, colonne `dividende_montant` : le
+dividende publié par le BOC passe de **576,00** (bulletin de novembre 2018) à **23,04**
+(bulletin de décembre), soit **576 / 23,04 = 25,0 exact**. Le cours passe de 5 300 à 215 le
+21/12/2018 et la série reste à 215, 210, 200 pendant toute l'année 2019 — elle ne remonte
+jamais. Le facteur de cours (24,65) n'est pas exactement 25 parce que le titre a aussi bougé.
+
+Les deux séances que le tableau de C18 nommait — `SAFC 2018-12-21` et `SAFC 2019-01-02` — sont
+donc **correctes**. Les fautives sont les **retours à 5 300** des **31/12/2018** et
+**04/01/2019**, valeurs d'avant division déposées dans une série post-division. Le texte
+d'ouverture de C18 nommait d'ailleurs le 31/12 — c'est son tableau, bâti par le détecteur, qui
+avait dérivé.
+
+### Les sept séances, une par une
+
+| séance | valeur | tranché | preuve à deux côtés |
+|---|---|---|---|
+| SLBC 12/01/2022 | 154,0 | corrigée → **154 000** | PER 14,47 de la ligne × BPA 10 642,71 = 154 000 ; encadrantes 154 000 / 154 000 ; facteur **1 000** exact |
+| SLBC 02/06/2023 | 67,6 | corrigée → **67 600** | BPA 739,48 identique le 01/06 (73 075/98,82) et le 05/06 (62 530/84,56) ; PER 91,41 de la ligne ⇒ 67 596, à 0,005 % ; facteur **1 000** — **pas 1 081** : le registre mesurait contre la séance d'avant alors que SLBC baissait dans la fenêtre |
+| STBC 12/07/2018 | 11 315 | corrigée → **44 995** | facteur 3,98, rien de rond : ce n'est pas une erreur d'échelle. Le rendement **9,17 %** publié sur la ligne, avec le dividende 4 124 alors en vigueur, impose un cours dans **[44 948 ; 45 001]** (bornes de l'arrondi à 2 décimales) ; 11 315 donnerait 36,45 %. Encadrantes 44 995 / 44 995 |
+| SAFC 21/12/2018 | 215 | **laissée** | division 1:25 réelle (ci-dessus) ; à documenter dans C4, pas ici |
+| SAFC 02/01/2019 | 215 | **laissée** | la chute n'existe que par la ligne fautive du 31/12 |
+| SAFC 31/12/2018 | 5 300 | **fautive, non écrite** | vaut 215 : bulletin de janvier 2019, cours 200 et variation annuelle −6,98 % ⇒ clôture 2018 = 200/(1−0,0698) = **215,0**. Le bulletin de décembre se contredit lui-même : dividende déjà rebasé (23,04), cours d'avant division |
+| SAFC 04/01/2019 | 5 300 | **fautive, non écrite** | encadrantes 215 (03/01) et 215 (07/01) |
+
+### Pourquoi deux séances prouvées ne sont pas écrites — et ce que cela a révélé
+
+Les corriger fait tomber la **section 19**, contrôle bloquant : `4508 paires confrontées,
+1 divergente au franc — SAFC 2018-12-31 : mensuel 5300 contre quotidien 215`. Tout a été
+annulé (`git checkout -- collecte/cours_quotidien_boc.csv`) et le script modifié pour les
+porter en `apres: None`.
+
+En cherchant pourquoi, un défaut plus large est apparu. L'en-tête de la section 19 affirme :
+*« deux extractions indépendantes des mêmes bulletins, faites à des dates différentes par des
+codes différents, donnent exactement le même cours partout »*. **Les 4 508 paires confrontées
+sont exactement les lignes que C15 a copiées du mensuel vers le quotidien.** Avant C15 les
+deux séries ne partageaient aucune date (0 sur 101, mesuré au cycle 6 puis au cycle 8), et le
+script de versement refusait d'écrire sur une paire déjà présente et différente. Le contrôle
+vérifie donc qu'une **copie est fidèle à sa source** — utile, mais ce n'est pas ce qu'il dit
+mesurer, et c'est ce qui lui fait interdire la correction d'une valeur fausse. Inscrit en
+**C30**, avec les deux séances SAFC, l'arbitrage de préséance entre les deux séries et la
+question d'un registre nommé `DIVERGENCES_COURS_SOURCE`.
+
+### Livré
+
+- **`outils/correction_collisions_echelle.py`** — procès-verbal exécutable. **3 lignes
+  modifiées sur 90 660**, aucune autre case touchée. Gardes : entête et comptes attendus
+  (90 660 lignes, 2 029 dates, 47 tickers) ; ancres `(ticker, jour)` avec assertion
+  d'unicité ; garde `ATTENDU` sur la valeur fautive **et** sur les deux séances encadrantes de
+  chacune des sept ; témoins de la division 1:25 **relus dans `cours_extraits.csv`** à
+  l'exécution, et identité de variation annuelle recalculée (le script refuse de tourner si la
+  preuve s'évapore du dépôt) ; SHA-256 avant (`1ec8b539…`) et après (`fc019ab4…`) ;
+  réserialisation exigée à l'octet près **avant** toute écriture ; relecture après écriture
+  vérifiant que les lignes modifiées sont exactement celles prévues. **Relancé deux fois : sans
+  effet**, il constate « correction DEJA APPLIQUEE ».
+- **Section 7 : le seuil bas est retiré.** Le tri valait `var < −0,60` **et** `var > −0,995`,
+  commenté « on ignore les erreurs de saisie manifestes (facteur ~1000) ». Les deux seules
+  chutes que cette borne écartait étaient les deux SLBC — écartées, et **enregistrées nulle
+  part** : ni ici, ni dans `operations_sur_titre.csv`. Un contrôle qui écarte en silence ne
+  surveille pas, il rassure. La borne disparaît ; un **contrôle neuf nomme** toute chute de
+  plus de 99,5 % qui ne serait pas au registre `COLLISIONS_ECHELLE`.
+- **Registre `COLLISIONS_ECHELLE` : 5 → 2**, avec le motif écrit de chaque départ et la raison
+  explicite pour laquelle les deux restantes n'en sont pas (elles disparaîtront avec C30).
+
+### Effet mesuré, avant/après, sur la base du jour
+
+| | avant | après |
+|---|---|---|
+| dates à l'alerte « divisions de nominal » (section 7) | 13 | **12** |
+| chutes de plus de 99,5 % dans la série | 2, **écartées en silence** | **0**, seuil bas retiré |
+| registre `COLLISIONS_ECHELLE` | 5 | **2** |
+| paires confrontées par la section 19 | 4 508, 0 divergence | 4 508, **0 divergence** |
+| champs de `collecte/profils.json` déplacés | — | **0** (fichier identique) |
+
+Le défaut était bien **latent**, comme C18 l'annonçait : aucun profil, grade ni gate ne bouge.
+Ce qui en dépendait, ce sont les trois backtests du dépôt, qui lisent la série entière.
+
+### Trouvé en chemin, versé à C4
+
+La colonne `dividende_montant` du mensuel **prouve une division de nominal par son
+rebasement**, sans réseau et sans chercher le moindre avis de fractionnement :
+
+- **SAFC, 1 pour 25, fin décembre 2018** : 576,00 → 23,04 (**÷25 exact**) ; cours 5 300 → 215.
+- **STBC, 1 pour 20, le 27/07/2018** : 4 124,0 → 206,2 (**÷20 exact**) ; cours 40 000 → 2 000
+  (**÷20 exact** lui aussi). Deux sources se ferment sur le même facteur. C'est aussi
+  l'explication du rendement STBC de **210,41 %** au 31/07/2018 que C15 avait laissé vide
+  faute de pouvoir le représenter : un dividende non ajusté de la division.
+
+Cette voie est à appliquer aux dix autres dates de C4 **avant** tout recours au réseau.
+
+### Barrières
+
+Complètes (le commit touche `collecte/`, `moteur/` et `outils/`) : 6 chargeurs code 0, base
+reconstruite ; `tester.py` **tous les golden tests passent** ; `profils.py` code 0 et
+`profils.json` **identique** ; `tester_donnees.py` **243 OK, 0 ÉCHEC**, code 2 (3 alertes de
+fraîcheur : divisions de nominal, CFAC/NEIC, décalage de la collecte) ; `avis_brvm.py --test`
+et `notations.py --test` passent ; `generer_dashboard.py` rend 48 titres.
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
+### Proposé
+
+**C30** — la section 19 compare une copie à sa source. Diagnostic fait, effet mesuré, classe
+**ORANGE** (inscrire une exception nommée dans un contrôle bloquant et désigner la série qui
+fait foi sont deux arbitrages de méthode). **Prochain par l'ordre déterministe : C21** (ORANGE,
+`validation : OK`, priorité 4, le facteur 100 de la colonne `rendement`).
+
 ## 2026-10-03 — cycle 16 : C26, le gisement des intermédiaires n'a pas d'unité
 
 **Contrôle anti-collision.** Un seul commit sur `main` depuis trois heures : `44fedd9`,

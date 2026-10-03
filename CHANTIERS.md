@@ -314,9 +314,35 @@ Première passe **sans réseau** : `collecte/avis_brvm.py` sait déjà reconnaî
 un fractionnement, donc fouiller d'abord le corpus d'avis déjà collecté. Ce qui
 manque après cela seulement justifie un `collecte.yml`.
 
-**Terminé quand** : chacune des 13 dates est soit documentée avec sa source, soit
-explicitement écartée avec son motif — les trois collisions d'échelle relèvent de
-C18 et s'écartent par là ; l'alerte de fraîcheur s'éteint.
+**Mise à jour du 03/10/2026 (cycle 17) : elles sont 12, et DEUX d'entre elles sont
+des divisions réelles, prouvées.** C18 a corrigé STBC 12/07/2018, qui sort donc de
+l'alerte. Surtout, il a trouvé la preuve indépendante de deux divisions de nominal
+que ce chantier cherchait à l'aveugle — le **rebasement du dividende publié par le
+BOC** dans `collecte/cours_extraits.csv`, colonne `dividende_montant` :
+
+- **SAFC, 1 pour 25, fin décembre 2018** : dividende **576,00 → 23,04** entre le
+  bulletin de novembre et celui de décembre, soit **576 / 23,04 = 25,0 exact**. Le
+  cours passe de 5 300 à 215 le 21/12/2018 et la série reste à 215, 210, 200 toute
+  l'année 2019. C'est la date `SAFC 2018-12-21` de l'alerte.
+- **STBC, 1 pour 20, le 27/07/2018** : dividende **4 124,0 → 206,2** entre le
+  bulletin de juillet et celui d'août, soit **÷20 exact** ; le cours passe de
+  40 000 à 2 000 le 27/07/2018, **÷20 exact** lui aussi. C'est la date
+  `STBC 2018-07-27` de l'alerte. (C'est aussi l'explication du rendement STBC de
+  210,41 % au 31/07/2018 que C15 avait laissé vide : un dividende non ajusté de la
+  division.)
+
+Deux sources indépendantes se ferment donc sur chacune : le dividende et le cours,
+du même facteur. **Cette voie — relire la colonne `dividende_montant` du mensuel —
+est à appliquer aux dix autres dates avant de chercher le moindre avis de
+fractionnement.** Elle est gratuite, sans réseau, et elle vient du BOC lui-même.
+
+Les deux dates `SAFC 2019-01-02` et `SAFC 2019-01-07` restantes ne sont pas des
+divisions : elles tomberont d'elles-mêmes quand **C30** aura tranché le sort des
+lignes fautives du 31/12/2018 et du 04/01/2019.
+
+**Terminé quand** : chacune des 12 dates est soit documentée avec sa source, soit
+explicitement écartée avec son motif — les deux artefacts SAFC relèvent de C30 et
+s'écartent par là ; l'alerte de fraîcheur s'éteint.
 
 ## C5 — Exercices manquants : CFAC 2025 et NEIC 2025
 
@@ -998,7 +1024,10 @@ découvre les chargeurs par `glob("charger_*.py")`.
 ## C18 — Cinq collisions d'échelle dans la série de cours
 
 - classe : ORANGE — corriger une série de cours commitée exige la preuve à deux côtés ; la mesure est faite
-- statut : PROPOSÉ
+- statut : **FAIT le 03/10/2026 (cycle 17) pour 5 des 7 séances** — 3 corrigées, 2
+  requalifiées, 2 mesurées et **non écrites** parce que les corriger fait tomber la
+  section 19 : cet arbitrage-là part en **C30**. La passe autorisée est consommée ;
+  **aucun cycle ne reprend C18.** Voir *Ce qu'a trouvé le cycle 17*, au bas du bloc.
 - validation : OK
 - autonomie : complète, **sans réseau** — tout est dans `collecte/cours_quotidien_boc.csv`
 - priorité : 4 — **avant C4**, dont il retire trois dates
@@ -1049,6 +1078,62 @@ sorte que la section 7 cesse de compter les collisions comme des divisions.
 registre `COLLISIONS_ECHELLE` de la section 22 reflète ce qui reste, l'alerte de
 C4 retombe de 13 à 10 dates, et le seuil `var > -0,995` de la section 7 n'écarte
 plus rien en silence.
+
+### Ce qu'a trouvé le cycle 17 (03/10/2026) : le tableau ci-dessus se trompait de séance sur deux cas
+
+Le détecteur de la section 22 signale la séance de **chute**, jamais celle du
+**retour**. Sur SAFC, la chute est l'événement réel et c'est le retour qui est
+fautif — le texte d'ouverture de ce bloc le disait déjà (« la séance du 31/12/2018
+de SAFC … porte 5 300 quand elles portent 215 ») ; c'est son tableau, bâti par le
+détecteur, qui nommait les mauvaises lignes.
+
+| séance | valeur | tranché | preuve à deux côtés, vérifiée à l'exécution |
+|---|---|---|---|
+| SLBC 12/01/2022 | 154,0 | **corrigée → 154 000** | PER 14,47 publié *sur la ligne* × BPA 10 642,71 (154 000 / 14,47 des deux côtés) = 154 000 ; facteur **1 000** exact |
+| SLBC 02/06/2023 | 67,6 | **corrigée → 67 600** | BPA 739,48 identique le 01/06 (73 075 / 98,82) et le 05/06 (62 530 / 84,56) ; PER 91,41 de la ligne ⇒ 67 596, à 0,005 % de 67 600 — facteur **1 000**, pas 1 081 : le cours de SLBC *baissait* dans cette fenêtre |
+| STBC 12/07/2018 | 11 315 | **corrigée → 44 995** | pas une erreur d'échelle (facteur 3,98, rien de rond) ; le rendement 9,17 % publié sur la ligne, avec le dividende 4 124 alors en vigueur, impose un cours dans **[44 948 ; 45 001]** ; 11 315 donnerait 36,45 % |
+| SAFC 21/12/2018 | 215 | **laissée — ce n'est pas une collision** | **division de nominal 1:25 réelle** : le dividende publié par le BOC passe de **576,00 à 23,04** entre les bulletins de nov. et déc. 2018, soit **576 / 23,04 = 25,0 exact** ; la série reste à 215, 210, 200 toute l'année 2019 |
+| SAFC 02/01/2019 | 215 | **laissée** | la « chute » n'existe que par la ligne fautive du 31/12 ; elle disparaît dès que celle-ci est corrigée |
+| SAFC 31/12/2018 | 5 300 | **fautive, NON écrite — C30** | vaut **215** : le bulletin de **janvier 2019** publie cours 200 et variation annuelle **−6,98 %**, donc clôture 2018 = 200 / (1 − 0,0698) = **215,0**. Le BOC se contredit d'un bulletin à l'autre et c'est son propre calcul qui tranche |
+| SAFC 04/01/2019 | 5 300 | **fautive, NON écrite — C30** | valeur d'avant division réapparue ; encadrantes à 215 le 03/01 et le 07/01 |
+
+**Pourquoi les deux dernières ne sont pas écrites.** Les corriger fait tomber la
+**section 19** : la ligne du 31/12 est une **copie** de la ligne mensuelle versée par
+C15, et ce contrôle bloquant exige l'égalité au franc entre les deux séries, plafond
+zéro. Vérifié en le faisant : `4508 paires confrontées, 1 divergente — SAFC 2018-12-31 :
+mensuel 5300 contre quotidien 215`. Tout a été annulé. Trancher laquelle des deux
+extractions fait foi, et inscrire une exception nommée dans un contrôle bloquant, est un
+arbitrage de méthode qui ne revient pas à la boucle. **C30.**
+
+**Livré** : `outils/correction_collisions_echelle.py` (idempotent — relancé deux fois,
+« correction DEJA APPLIQUEE » ; entête et comptes attendus, ancres avec assertion
+d'unicité, garde `ATTENDU` sur la valeur fautive **et** sur les deux encadrantes,
+témoins de la division 1:25 relus dans `cours_extraits.csv`, SHA-256 avant/après,
+réserialisation exigée à l'octet près, relecture après écriture) ; **3 lignes modifiées
+sur 90 660**, aucune autre case touchée.
+
+**Effet mesuré, avant/après, sur la base du jour.**
+
+| | avant | après |
+|---|---|---|
+| dates à l'alerte « divisions de nominal » (section 7) | 13 | **12** |
+| chutes de plus de 99,5 % dans la série | 2, **écartées en silence** | **0**, et le seuil bas est retiré |
+| registre `COLLISIONS_ECHELLE` | 5 | **2** (les deux SAFC, requalifiées, en attente de C30) |
+| champs de `collecte/profils.json` déplacés | — | **0** (fichier identique) |
+
+Le défaut était bien **latent** : 0 champ de `profils.json` bouge. Ce qui en dépendait,
+ce sont les trois backtests du dépôt, qui lisent la série entière.
+
+**Le seuil de la section 7 est retiré, et remplacé.** Le tri valait `var < −0,60` **et**
+`var > −0,995`, avec pour commentaire « on ignore les erreurs de saisie manifestes ». Les
+deux seules chutes que cette borne écartait étaient les deux SLBC — écartées, et
+enregistrées nulle part. La borne basse disparaît ; un contrôle neuf **nomme** désormais
+toute chute de plus de 99,5 % qui ne serait pas au registre.
+
+**Trouvé en chemin, et inscrit en C4** : deux divisions de nominal réelles, toutes deux
+corroborées par le rebasement du dividende publié — **SAFC 1:25 fin décembre 2018** et
+**STBC 1:20 le 27/07/2018** (dividende 4 124,0 → 206,2, soit **÷20 exact**, et cours
+40 000 → 2 000, **÷20 exact** lui aussi).
 
 ## C19 — `dividendes_par_exercice.csv` porte des doublons, et son générateur ne le rend plus
 
@@ -1989,6 +2074,61 @@ nom ne correspond pas à son document.
 avec son motif ; `TTLS 2022` est soit sourcé, soit déclaré sans source avec son motif daté ;
 et un test de `tester_donnees.py` empêche le retour du mélange.
 
+## C30 — La confrontation des deux séries compare une copie à sa source
+
+- classe : ORANGE — inscrire une exception nommée dans un contrôle bloquant, et dire laquelle des deux extractions fait foi, sont deux arbitrages de méthode ; le diagnostic est fait
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau**
+- priorité : 3 — un contrôle bloquant qui se croit indépendant est plus dangereux qu'un contrôle absent
+
+**Le constat, mesuré le 03/10/2026 (cycle 17) en butant dessus.** La section 19 est
+présentée dans son propre en-tête comme « le premier verdict que le projet possède sur
+la qualité de ses prix » : *« deux extractions indépendantes des mêmes bulletins, faites
+à des dates différentes par des codes différents, donnent exactement le même cours
+partout »*, **4 508 paires, 0 divergence**.
+
+**Ces 4 508 paires sont exactement les lignes que C15 a copiées du mensuel vers le
+quotidien.** Avant C15, les deux séries ne partageaient **aucune** date — 0 sur 101, le
+chantier le dit lui-même. Toutes les paires communes sont donc nées de la copie, et le
+script de versement **refusait déjà d'écrire sur une paire différente**. La section 19
+ne confronte pas deux extractions : elle vérifie que la copie est fidèle à sa source.
+C'est un contrôle utile — une régression du versement se verrait — mais ce n'est pas ce
+que son en-tête affirme, et le projet s'appuie sur cette affirmation.
+
+**La preuve par l'exemple, faite ce cycle.** C18 a prouvé que `SAFC 2018-12-31` porte
+5 300, valeur d'avant la division de nominal 1:25, là où la séance vaut **215** — le
+bulletin de janvier 2019 publie cours 200 et variation annuelle −6,98 %, donc clôture
+2018 = 200 / (1 − 0,0698) = 215,0, et le bulletin de décembre se contredit lui-même en
+portant déjà le dividende rebasé (23,04) avec un cours d'avant division. Corriger le
+quotidien fait aussitôt tomber la section 19 : `4508 paires confrontées, 1 divergente —
+SAFC 2018-12-31 : mensuel 5300 contre quotidien 215`. **Le contrôle interdit donc de
+corriger une valeur fausse** — parce qu'il prend la copie pour une corroboration.
+
+**Ce qu'il faut trancher, et c'est Claudia.**
+
+1. **Laquelle des deux séries fait foi** quand elles divergent sur un bulletin dont la
+   source est elle-même incohérente ? Ici le quotidien a raison, prouvé des deux côtés.
+2. **Faut-il un registre nommé** `DIVERGENCES_COURS_SOURCE`, sur le modèle de
+   `BPA_ANNUEL_SUR_PER_FIGE` et de `COLLISIONS_ECHELLE` — chaque exception portant sa
+   preuve écrite, le plafond restant à zéro partout ailleurs — ou faut-il corriger aussi
+   `cours_extraits.csv`, au risque d'écraser une transcription fidèle d'un document
+   officiel ?
+3. **L'en-tête de la section 19 doit dire ce qu'elle mesure vraiment** : la fidélité
+   d'une copie, et non l'accord de deux lectures indépendantes. Tant qu'il affirme
+   l'inverse, un cycle futur y lira une garantie qui n'existe pas.
+
+**Les deux séances concernées, prouvées et non écrites** : `SAFC 2018-12-31` (5 300 →
+215) et `SAFC 2019-01-04` (5 300 → 215). Le script existe et les porte déjà, en
+`apres: None` : `outils/correction_collisions_echelle.py`. Une fois l'arbitrage rendu,
+les faire passer coûte une ligne. Elles éteindront du même coup les deux dernières
+fausses dates de C4 (`SAFC 2019-01-02` et `SAFC 2019-01-07`) et videront le registre
+`COLLISIONS_ECHELLE`.
+
+**Terminé quand** : la règle de préséance entre les deux séries est écrite, la section
+19 dit ce qu'elle mesure, les deux séances SAFC sont corrigées ou motivées, et un test
+empêche qu'une divergence nouvelle passe sans être nommée.
+
 ---
 
 # Veille datée, hors file
@@ -2003,16 +2143,36 @@ et un test de `tester_donnees.py` empêche le retour du mélange.
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-10-03 — cycle 17 (soir) — EN COURS
+## 2026-10-03 — cycle 17 (soir)
 
-**Chantier : C18** (ORANGE, `validation : OK`, priorité 4) : les **cinq collisions d'échelle**
-de `collecte/cours_quotidien_boc.csv` — SLBC 12/01/2022 et 02/06/2023, SAFC 21/12/2018 et
-02/01/2019, STBC 12/07/2018. Trancher une par une, **preuve à deux côtés** par les séances qui
-encadrent, script de migration idempotent dans `outils/`, puis faire en sorte que le seuil
-`var > -0,995` de la section 7 n'écarte plus rien en silence et que l'alerte de C4 retombe de
-13 à 10 dates.
+**Exécuté : C18. Le tableau du chantier se trompait de séance sur deux cas sur cinq.** Le
+détecteur signale la séance de **chute**, jamais celle du **retour** : sur SAFC la chute est
+l'événement réel. **SAFC 21/12/2018 n'est pas une collision, c'est une division de nominal
+1:25** — le dividende publié par le BOC passe de **576,00 à 23,04** entre les bulletins de
+nov. et déc. 2018, **÷25 exact**, et la série reste à 215 toute l'année 2019. Les lignes
+fautives sont les retours à 5 300 des **31/12/2018** et **04/01/2019**.
 
-**Pas de chasse ce cycle** : c'est le passage du soir, la chasse n'a lieu qu'au cycle du matin.
+**Trois séances corrigées** par `outils/correction_collisions_echelle.py` (idempotent,
+relancé deux fois sans effet ; **3 lignes sur 90 660**) : SLBC 12/01/2022 **154 → 154 000** et
+02/06/2023 **67,6 → 67 600** (facteur **1 000** exact des deux, confirmé par le PER de la
+ligne — pas 1 081 : le cours baissait) ; STBC 12/07/2018 **11 315 → 44 995** (le rendement
+9,17 % de la ligne, avec le dividende 4 124, impose [44 948 ; 45 001]).
+
+**Deux séances prouvées et NON écrites, parce que les corriger fait tomber la section 19** :
+`4508 paires confrontées, 1 divergente`. Tout annulé. Et la raison est plus grave que le cas :
+**les 4 508 paires que la section 19 confronte sont exactement les lignes que C15 a copiées du
+mensuel vers le quotidien.** Elle vérifie qu'une copie est fidèle à sa source, pas que deux
+extractions s'accordent — alors que son en-tête affirme l'inverse. Inscrit en **C30**.
+
+**Effet** : alerte des divisions de nominal **13 → 12** dates ; chutes de plus de 99,5 %
+**2, écartées en silence → 0**, et le **seuil bas `var > −0,995` de la section 7 est retiré**,
+remplacé par un contrôle qui les nomme ; registre `COLLISIONS_ECHELLE` **5 → 2** ;
+`profils.json` **identique** — le défaut était bien latent. **Pas de chasse** : passage du soir.
+**Barrières** : 6 chargeurs, golden tests tous passent, `tester_donnees.py` **243 OK, 0 ÉCHEC**,
+code 2 (alertes de fraîcheur), `avis_brvm --test` et `notations --test` passent, dashboard
+48 titres. **Trouvé en chemin, versé à C4** : la colonne `dividende_montant` du mensuel prouve
+une division par son rebasement — **STBC 1:20 le 27/07/2018** (4 124,0 → 206,2, ÷20, et cours
+40 000 → 2 000, ÷20). **Proposé : C30. Prochain, par l'ordre déterministe : C21.**
 
 ## 2026-10-03 — cycle 16
 
