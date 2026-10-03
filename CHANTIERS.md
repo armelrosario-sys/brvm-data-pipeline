@@ -2003,6 +2003,17 @@ et un test de `tester_donnees.py` empêche le retour du mélange.
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
+## 2026-10-03 — cycle 17 (soir) — EN COURS
+
+**Chantier : C18** (ORANGE, `validation : OK`, priorité 4) : les **cinq collisions d'échelle**
+de `collecte/cours_quotidien_boc.csv` — SLBC 12/01/2022 et 02/06/2023, SAFC 21/12/2018 et
+02/01/2019, STBC 12/07/2018. Trancher une par une, **preuve à deux côtés** par les séances qui
+encadrent, script de migration idempotent dans `outils/`, puis faire en sorte que le seuil
+`var > -0,995` de la section 7 n'écarte plus rien en silence et que l'alerte de C4 retombe de
+13 à 10 dates.
+
+**Pas de chasse ce cycle** : c'est le passage du soir, la chasse n'a lieu qu'au cycle du matin.
+
 ## 2026-10-03 — cycle 16
 
 **Exécuté : C26, première passe sans réseau. 0 ligne versable sur 139, chacune refusée avec son
