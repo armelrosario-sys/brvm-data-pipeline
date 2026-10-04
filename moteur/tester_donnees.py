@@ -3704,6 +3704,237 @@ def test_confrontation_per_page():
                f"base est un arbitrage, pas une passe pre-autorisee"),
             bloquant=False)
 
+# ---------------------------------------------------------------------------
+# SECTION 29 — l'echelle de la colonne rendement du BOC quotidien (chantier C21)
+# ---------------------------------------------------------------------------
+
+# Plafonds mesures le 04/10/2026 (cycle 18), APRES la normalisation livree par
+# outils/normalisation_rendement_boc.py. Ils ne peuvent que BAISSER.
+POURCENTAGE_RESIDUEL_MAX = 1        # STBC 2018-08-01, 206,2 % : hors plafond du chargeur
+MAL_ECHELONNEES_MAX = 0             # le defaut lui-meme : zero, et il y reste
+NON_TRANCHEES_MAX = 1756            # lignes qu'aucun des deux cotes ne tranche
+RUPTURES_VOISINES_MAX = 291         # frontieres de changement de dividende, alerte seule
+FTSC_RENDEMENT_REEL_MIN = 0.50      # C1 : la distribution 2025 de FTSC est exacte
+
+
+def test_echelle_rendement_boc():
+    """La colonne `rendement` du BOC porte-t-elle UNE seule unite ?
+
+    POURQUOI CETTE SECTION EXISTE (04/10/2026, cycle 18, chantier C21). C21
+    annoncait « 29 seances sur 7 titres » portant un facteur 100, et un defaut
+    LATENT. La mesure ligne a ligne dit autre chose : le fichier
+    `collecte/cours_quotidien_boc.csv` melangeait DEUX unites depuis l'origine
+    — 68 426 lignes en POURCENTAGE contre 5 370 en FRACTION — et le pont
+    `charger_cours_quotidien.py` tranchait entre elles **par la grandeur**
+    (au-dessus de 1,5 on divise par cent). C'est une estimation, que la
+    premiere regle du depot interdit, et elle etait fausse sur **1 683**
+    lignes : un rendement publie SOUS 1,5 % restait non divise et entrait en
+    base cent fois trop grand.
+
+    Le defaut etait bien latent au sens de C21 — aucune de ces lignes n'est la
+    derniere seance d'un titre, et `collecte/profils.json` n'a pas bouge d'un
+    champ — mais il ne l'etait pas pour les trois backtests du depot, qui
+    lisent la serie entiere.
+
+    Cinq controles. A : plus aucune ligne prouvee en pourcentage, sauf le
+    residu nomme. B : zero ligne mal echelonnee par le chargeur — c'est le
+    defaut lui-meme. C : le residu non tranche ne grossit pas. D : aucune
+    valeur superieure a 1,5 en base. E : FTSC n'est pas balaye — son rendement
+    de 86,5 % est REEL (C1), et toute regle qui l'effacerait effacerait un
+    fait. Plus une alerte : les ruptures d'echelle restantes entre deux seances
+    voisines, qui sont des changements de dividende, pas des defauts.
+    """
+    print("\n=== 29. Echelle de la colonne rendement du BOC (bloquant) ===")
+    sys.path.insert(0, str(RACINE / "outils"))
+    import normalisation_rendement_boc as nrb
+
+    sha, entete, _corps, lignes = nrb.lire()
+    verdict = nrb.classer(lignes, nrb.dividendes_mensuels())
+
+    pourcentage, fraction, non_tranchees, mal = 0, 0, 0, []
+    for i, r in enumerate(lignes):
+        v = nrb._flot(r["rendement"])
+        if v is None:
+            continue
+        g = verdict.get(i)
+        if g == "P":
+            pourcentage += 1
+            if v <= nrb.SEUIL_CHARGEUR:
+                mal.append((r["ticker"], r["date_bulletin"], v))
+        elif g == "F":
+            fraction += 1
+        else:
+            non_tranchees += 1
+
+    # --- A : le fichier ne porte plus qu'un residu nomme en pourcentage
+    verifie(pourcentage <= POURCENTAGE_RESIDUEL_MAX,
+            f"{pourcentage} ligne(s) prouvee(s) en pourcentage, plafond "
+            f"{POURCENTAGE_RESIDUEL_MAX} (STBC 2018-08-01, 206,2 % : au-dela du "
+            f"plafond du chargeur, laissee telle quelle pour que la case reste "
+            f"VIDE plutot que fausse) ; {fraction} en fraction")
+
+    # --- B : le defaut lui-meme
+    verifie(len(mal) <= MAL_ECHELONNEES_MAX,
+            f"{len(mal)} ligne(s) en pourcentage sous le seuil {nrb.SEUIL_CHARGEUR} du "
+            f"chargeur — elles entreraient en base CENT FOIS trop grandes (plafond "
+            f"{MAL_ECHELONNEES_MAX})"
+            + ("" if not mal else f" : {mal[:8]}"))
+
+    # --- C : le residu non tranche ne grossit pas
+    verifie(non_tranchees <= NON_TRANCHEES_MAX,
+            f"{non_tranchees} ligne(s) qu'aucun des deux cotes ne tranche, plafond "
+            f"{NON_TRANCHEES_MAX} — un plafond qui ne peut que baisser")
+
+    # --- D : la base ne porte aucune valeur hors echelle
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    hors = cur.execute(
+        "SELECT ticker, date_bulletin, rendement FROM cours_quotidien_boc "
+        "WHERE rendement IS NOT NULL AND rendement > ? ORDER BY rendement DESC LIMIT 5",
+        (nrb.SEUIL_CHARGEUR,)).fetchall()
+    verifie(not hors,
+            f"aucun rendement superieur a {nrb.SEUIL_CHARGEUR} en base"
+            + ("" if not hors else f" — {hors}"))
+
+    # --- E : FTSC n'est pas balaye par une regle de niveau (C1)
+    ftsc = cur.execute(
+        "SELECT rendement FROM cours_quotidien_boc WHERE ticker='FTSC' "
+        "AND rendement IS NOT NULL ORDER BY date_bulletin DESC LIMIT 1").fetchone()
+    verifie(ftsc is not None and FTSC_RENDEMENT_REEL_MIN <= ftsc[0] <= nrb.SEUIL_CHARGEUR,
+            f"FTSC garde son rendement REEL (C1) : {ftsc[0] if ftsc else None} — "
+            f"entre {FTSC_RENDEMENT_REEL_MIN} et {nrb.SEUIL_CHARGEUR}, donc ni efface "
+            f"par un seuil de niveau ni divise une seconde fois")
+    conn.close()
+
+    # --- alerte : les ruptures residuelles sont des changements de dividende
+    par = {}
+    for i, r in enumerate(lignes):
+        par.setdefault(r["ticker"], []).append(i)
+    ruptures = 0
+    for ind in par.values():
+        ind.sort(key=lambda i: lignes[i]["date_bulletin"])
+        for a, b in zip(ind, ind[1:]):
+            ra, rb = nrb._flot(lignes[a]["rendement"]), nrb._flot(lignes[b]["rendement"])
+            ca, cb = nrb._flot(lignes[a]["cours"]), nrb._flot(lignes[b]["cours"])
+            if not ra or not rb or not ca or not cb:
+                continue
+            if 50 <= max(ra / rb, rb / ra) <= 200 and abs(cb / ca - 1) < 0.20:
+                ruptures += 1
+    verifie(ruptures <= RUPTURES_VOISINES_MAX,
+            f"{ruptures} rupture(s) d'echelle entre deux seances voisines, plafond "
+            f"{RUPTURES_VOISINES_MAX} — ce sont les seances ou le dividende de "
+            f"reference CHANGE, et le residu non tranche les borde ; un plafond qui "
+            f"ne peut que baisser",
+            bloquant=False)
+
+# ---------------------------------------------------------------------------
+# SECTION 30 — le PER du BOC bascule entre deux branches (chasse du cycle 18)
+# ---------------------------------------------------------------------------
+
+BASCULES_PER_MAX = 23               # mesure du 04/10/2026 ; ne peut que baisser
+TICKERS_A_BASCULE_PER = {"BNBC", "BOAN", "CABC", "CIEC", "FTSC", "PALC",
+                         "SDSC", "SICC", "SLBC", "SMBC", "SPHC", "UNXC"}
+# Titres dont le PER DU JOUR est plus de cinq fois leur propre mediane. FTSC est
+# explique (C1 : resultat 2025 de 466 M contre 18 595 M en 2024) ; les quatre
+# autres ne le sont pas, et c'est l'objet du chantier propose.
+PER_DU_JOUR_HORS_BRANCHE = {"BNBC", "BOAN", "SDSC", "SICC", "FTSC"}
+FACTEUR_BASCULE = 5.0
+
+
+def test_bascule_per_boc():
+    """Le PER du BOC saute d'une branche a l'autre sans que le cours bouge.
+
+    POURQUOI CETTE SECTION EXISTE (chasse du cycle 18, 04/10/2026). Trois
+    choses lisent le PER du BOC : l'axe de decote, le PEG/PEGY, et le payout
+    implicite (`rendement x PER`). Une seule le confronte a quoi que ce soit —
+    la section 27, et seulement sur UNE seance, contre la page Volumes /
+    Valeurs. Les 75 000 autres valeurs ne sont confrontees a rien.
+
+    L'identite disponible sans rien ouvrir : le BPA implicite d'une ligne vaut
+    `cours / PER`, et il ne change qu'a la publication d'un resultat. Le cours
+    et le rendement de la MEME ligne servent de temoins : s'ils sont continus
+    et que le PER saute d'un facteur cinq, ce n'est pas le marche qui a bouge,
+    c'est la definition du PER.
+
+    Mesure du 04/10/2026 : **23 bascules** sur **12 titres**, toutes entre mars
+    et juillet, et plusieurs ALTERNENT d'une annee sur l'autre — SLBC passe de
+    4,60 a 29,82 en 2018, de 78,20 a 5,83 en 2021, de 6,43 a 116,29 en 2023, de
+    112,57 a 9,09 en 2024. Un benefice n'alterne pas d'un facteur douze tous
+    les ans ; deux definitions du BPA, si.
+
+    **Le defaut n'est pas latent.** Le moteur ne lit que la DERNIERE valeur, et
+    quatre titres portent aujourd'hui celle de la branche haute :
+    BNBC 563,92 (51 fois sa propre mediane), BOAN 254,11 (34 fois),
+    SDSC 202,15 (28 fois), SICC 139,98 (12 fois). Ces quatre PER sont le `per`
+    publie dans `collecte/profils.json`. FTSC, cinquieme, est explique : C1 a
+    etabli que son resultat 2025 s'est effondre.
+
+    Trancher QUELLE branche fait foi demande une source exterieure (le nombre
+    d'actions, que la base ne porte pas) : c'est un arbitrage, donc un chantier.
+    Ce test fige ce qui est mesure et empeche la famille de grossir en silence.
+    """
+    print("\n=== 30. Bascule d'echelle du PER du BOC (bloquant) ===")
+    import csv as _csv
+    import statistics as _st
+
+    chemin = RACINE / "collecte" / "cours_quotidien_boc.csv"
+    par = {}
+    with open(chemin, newline="", encoding="utf-8") as fh:
+        for r in _csv.DictReader(fh):
+            par.setdefault(r["ticker"], []).append(r)
+
+    def nombre(x):
+        try:
+            return float(x)
+        except (TypeError, ValueError):
+            return None
+
+    bascules, derniers = {}, {}
+    for t, serie in par.items():
+        serie.sort(key=lambda r: r["date_bulletin"])
+        n = 0
+        for a, b in zip(serie, serie[1:]):
+            pa, pb = nombre(a["per"]), nombre(b["per"])
+            ca, cb = nombre(a["cours"]), nombre(b["cours"])
+            ra, rb = nombre(a["rendement"]), nombre(b["rendement"])
+            if not pa or not pb or not ca or not cb or pa <= 0 or pb <= 0:
+                continue
+            if max(pa / pb, pb / pa) < FACTEUR_BASCULE:
+                continue
+            if abs(cb / ca - 1) >= 0.20:          # temoin 1 : le cours
+                continue
+            if ra and rb and abs(rb / ra - 1) >= 0.20:   # temoin 2 : le rendement
+                continue
+            n += 1
+        if n:
+            bascules[t] = n
+        pers = [nombre(r["per"]) for r in serie if nombre(r["per"])]
+        if pers:
+            derniers[t] = (pers[-1], _st.median(pers))
+
+    total = sum(bascules.values())
+    verifie(total <= BASCULES_PER_MAX,
+            f"{total} bascule(s) d'echelle du PER a cours ET rendement continus, "
+            f"plafond {BASCULES_PER_MAX} — un plafond qui ne peut que baisser")
+
+    nouveaux = sorted(set(bascules) - TICKERS_A_BASCULE_PER)
+    verifie(not nouveaux,
+            f"{len(bascules)} titre(s) a bascule, registre {sorted(TICKERS_A_BASCULE_PER)}"
+            + ("" if not nouveaux else
+               f" — TITRE(S) NOUVEAU(X) : {nouveaux} ; trancher la branche demande "
+               f"le nombre d'actions, que la base ne porte pas : c'est un arbitrage"))
+
+    hors = sorted(t for t, (d, m) in derniers.items()
+                  if t in bascules and m > 0 and max(d / m, m / d) > FACTEUR_BASCULE)
+    verifie(set(hors) <= PER_DU_JOUR_HORS_BRANCHE,
+            f"PER du jour a plus de {FACTEUR_BASCULE:.0f} fois la mediane du titre : "
+            f"{hors} — registre {sorted(PER_DU_JOUR_HORS_BRANCHE)} (FTSC explique par C1)"
+            + ("" if set(hors) <= PER_DU_JOUR_HORS_BRANCHE else
+               f" ; NOUVEAU(X) : {sorted(set(hors) - PER_DU_JOUR_HORS_BRANCHE)}"),
+            bloquant=False)
+
+
+
 
 def main():
     sans_app = "--sans-app" in sys.argv
@@ -3737,6 +3968,8 @@ def main():
     test_lecture_des_bassins()
     test_rattachement_exercice()
     test_confrontation_per_page()
+    test_echelle_rendement_boc()
+    test_bascule_per_boc()
     if not sans_app:
         test_application()
 

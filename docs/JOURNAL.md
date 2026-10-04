@@ -9,6 +9,155 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-04 — cycle 18 (matin) : C21, la colonne n'avait jamais eu une seule convention
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun
+commit**. Le cycle 17 est clos (`055ddbd` annonce → `9c42e14` clôture). Suivent dix commits
+de la conversation de développement du 03/10 entre 22h41 et 23h17 UTC (BNPA de référence,
+colonne « Croiss. BNPA », Dependabot) et la collecte `BOC séance du 2026-10-01` — **aucun
+ne porte `Annonce hors cycle :`, et ils datent de plus de sept heures** : rien d'ouvert.
+Annonce de ce cycle poussée seule : `1abeb93`.
+
+**État.** CI verte sur `7a30c54` (Pages, BOC quotidien, P11, P5b tous `success`). Base
+reconstruite : 50 sociétés, 185 lignes d'états, 4 509 cours mensuels, 90 660 cours
+quotidiens, 327 dividendes, 73 141 lignes de liquidité. Barrière de référence avant tout
+travail : golden tests tous passent, `tester_donnees.py` **243 OK, 0 ÉCHEC**, code 2
+(trois alertes de fraîcheur, les mêmes qu'au cycle 17).
+
+### Le chantier : C21, et son diagnostic était faux d'un facteur 40
+
+**Ce que la signature de C21 mesurait vraiment.** « Une séance dont le rendement vaut 50 à
+200 fois celui de la veille **et** celui du lendemain, à cours quasi constant » rend
+aujourd'hui **136** séances, pas 29. Mais ces séances ne sont pas le défaut : ce sont les
+**frontières** entre deux conventions. Elles se concentrent sur quatre dates (2023-06-01,
+2026-07-20, -22, -24), ce qu'un défaut par titre ne fait pas.
+
+**La mesure, ligne à ligne.** `collecte/cours_quotidien_boc.csv`, 90 660 lignes, 75 552
+renseignées :
+
+| | lignes |
+|---|---|
+| prouvées **POURCENTAGE** (`6.28` pour 6,28 %) | **68 426** |
+| prouvées **FRACTION** (`0.0628` pour le même 6,28 %) | **5 370** |
+| qu'aucun des deux côtés ne tranche | **1 756** |
+
+Les lignes en fraction sont **exactement** les 101 dates mensuelles versées par C15 (les
+101 sans exception) plus les 52 séances depuis le **2026-07-17**, où la collecte
+quotidienne P11 écrit désormais la fraction. Tout le reste est en pourcentage.
+
+**Ce n'était pas une découverte, et c'est ce qui rend la mesure utile.** Le docstring de
+`_rendement_normalise` dans `collecte/charger_cours_quotidien.py` décrit ce mélange depuis
+le 12/09/2026, et le corrige par une **règle de grandeur** : au-dessus de 1,5 c'est un
+pourcentage, on divise par cent ; en dessous c'est déjà une fraction. Personne n'avait
+compté combien de lignes cette règle met du mauvais côté.
+
+**1 683 lignes**, sur 11 tickers : ORGT 403, NSBC 291, CFAC 211, UNXC 184, BICC 174,
+PALC 150, SEMC 121, SPHC 91, SCRC 33, SLBC 17, ETIT 8. Toutes portent un rendement publié
+**sous 1,5 %** — donc non divisé, donc entré en base **cent fois trop grand**. C'est une
+estimation par vraisemblance d'ordre de grandeur, exactement ce que la première règle du
+dépôt interdit.
+
+**La preuve à deux côtés, par ligne.** Côté 1 : le **dividende que le BOC publie
+lui-même**, colonne `dividende_montant` de `collecte/cours_extraits.csv`, pris à la date de
+la séance — une seule des deux lectures (`rendement × cours` ou `rendement / 100 × cours`)
+retombe à moins de 5 % de lui. Côté 2 : **les séances qui l'encadrent**, dont le dividende
+implicite est constant par morceaux ; médiane des six voisines déjà tranchées, tolérance
+10 %. Côté 1 tranche 72 663 lignes, côté 2 en ajoute 1 133. Une ligne qu'aucun des deux ne
+tranche n'est **pas** convertie.
+
+**Livré : `outils/normalisation_rendement_boc.py`.** Autotest `--test` : **15 cas, 0
+échec**. Rapport par défaut, `--appliquer` pour écrire. Idempotent : relancé, il constate
+« normalisation DEJA APPLIQUEE », et la seconde exécution rend le même SHA-256
+(`e38a362d…`). Six gardes : entête et six comptes attendus ; SHA-256 avant
+(`fc019ab4…`) et après ; conversion par **décalage décimal exact** (`Decimal` / 100, jamais
+une division flottante — `2.61` devient `0.0261` et non `0.026099999999999998`) ; ancre
+(ticker, date) et garde `ATTENDU` sur chaque valeur avant écriture ; réécriture en texte
+brut, fins de ligne **CRLF** conservées, **22 235 lignes intactes à l'octet** ; relecture et
+reclassement après écriture.
+
+**Une ligne n'est pas convertie, à dessein.** `STBC 2018-08-01`, **206,2 %** : le dividende
+de 4 124 FCFA non réajusté après la division de nominal 1:20 du 27/07/2018 (c'est le même
+fait que C4 a versé au dossier). En fraction elle vaudrait 2,062, au-delà du plafond de 1,5
+du chargeur, qui la **diviserait une seconde fois** et ferait entrer 2,06 % en base là où il
+laisse aujourd'hui une **case vide**. Une case vide vaut mieux qu'une valeur approchée :
+elle reste donc en pourcentage, nommée, et la case reste vide des deux côtés.
+
+**Effet mesuré, avant/après, sur la base du jour.**
+
+| | avant | après |
+|---|---|---|
+| conventions dans la colonne | 2 (68 426 % / 5 370 fraction) | **1** (73 795 fraction, 1 résidu nommé) |
+| valeurs de `rendement` fausses en base | **1 683**, facteur 100 exact sur les 1 683 | **0** |
+| valeurs perdues ou créées | — | **0** (75 551 non nulles des deux côtés) |
+| lignes du CSV modifiées | — | **68 425 / 90 660** |
+| champs de `collecte/profils.json` déplacés | — | **0** (fichier identique) |
+
+Le défaut était donc **latent** au sens où C21 l'entendait — aucune des 1 683 n'est la
+dernière séance d'un titre, et 46 titres sur 47 terminaient déjà en fraction. Il ne l'était
+pas pour les **trois backtests du dépôt**, qui lisent la série entière, ni pour aucune
+confrontation historique du type de celle qui a résolu C17.
+
+**Le cas CFAC est tranché dans le sens que C21 demandait** : ce sont bien les séances
+**courantes** qui étaient fausses et non la dernière du mois — 211 lignes CFAC corrigées, et
+la dernière séance (0,0365) était déjà juste.
+
+**Test : section 29 de `tester_donnees.py`, six contrôles.** Plafond **0** sur les lignes
+mal échelonnées — le défaut lui-même ; plafond **1** sur le résidu en pourcentage (STBC) ;
+plafond **1 756** sur les non tranchées ; aucun rendement supérieur à 1,5 en base ; et le
+contrôle que C21 réclamait nommément : **FTSC n'est pas balayé**. Son rendement de 86,5 %
+est réel (C1) ; le test exige qu'il reste entre 0,50 et 1,5, donc ni effacé par un seuil de
+niveau ni divisé une seconde fois. Plus une alerte : les **291** ruptures d'échelle
+résiduelles entre séances voisines, qui bordent les changements de dividende de référence —
+là, un facteur cent ne se distingue pas d'un dividende qui double, et les trancher
+demanderait une troisième source.
+
+### La chasse : le PER du BOC bascule entre deux branches
+
+**La famille que rien ne surveille.** Trois choses lisent le PER du BOC — l'axe de décote,
+le PEG/PEGY, le payout implicite (`rendement × PER`). Une seule le confronte à quoi que ce
+soit : la section 27 (C25), et seulement sur **une** séance, contre la page Volumes /
+Valeurs. Les 75 000 autres valeurs ne sont confrontées à rien.
+
+**L'identité, et ses deux témoins.** Le BPA implicite vaut `cours / PER` et ne change qu'à
+la publication d'un résultat. Le **cours** et le **rendement** de la même ligne sont les
+témoins : s'ils sont continus et que le PER saute d'un facteur cinq, ce n'est pas le marché
+qui a bougé, c'est la définition du PER.
+
+**Mesuré : 23 bascules sur 12 titres** (BNBC, BOAN, CABC, CIEC, FTSC, PALC, SDSC, SICC,
+SLBC, SMBC, SPHC, UNXC), toutes entre mars et juillet, et plusieurs **alternent** :
+SLBC 4,60 → 29,82 en 2018, 78,20 → 5,83 en 2021, 6,43 → 116,29 en 2023, 112,57 → 9,09 en
+2024 ; SMBC 2,71 → 371,45 en avril 2020 (×137) puis 550,40 → 3,62 en avril 2021 (×152) ;
+CABC 5,99 → 177,18 (×29,6) ; BNBC 4,23 → 196,88 (×46,5) ; SDSC 6,98 → 190,70 (×27,3). Un
+bénéfice n'alterne pas d'un facteur douze tous les ans ; deux définitions du BPA, si.
+
+**Et ce défaut-là n'est PAS latent.** Le moteur ne lit que la dernière valeur, et quatre
+titres portent aujourd'hui celle de la branche haute, qui est le `per` publié dans
+`collecte/profils.json` : **BNBC 563,92** (51 fois sa propre médiane), **BOAN 254,11** (34
+fois), **SDSC 202,15** (28 fois), **SICC 139,98** (12 fois). FTSC, cinquième au compteur
+(60,38 contre 9,62), est expliqué par C1 : son résultat 2025 est passé de 18 595 M à
+466 M. **UNLC porte 731,42 sans qu'aucune bascule ne soit détectée** — sa dérive est
+graduelle, donc d'une autre famille.
+
+**Test : section 30, trois contrôles** — plafond **23** sur les bascules, registre figé des
+12 titres, et alerte nommant les titres dont le PER du jour dépasse cinq fois leur propre
+médiane. Trancher quelle branche fait foi demande le **nombre d'actions**, que
+`societes.csv` ne porte pas : c'est un arbitrage, inscrit en **C31**.
+
+### Barrières
+
+Base reconstruite entièrement (`peupler.py` + les cinq chargeurs), golden tests **tous
+passent**, `tester_donnees.py` **252 OK, 0 ÉCHEC**, code 2 (C4 douze dates, C5 CFAC et
+NEIC, section 27 séance suivante), `avis_brvm.py --test` et `notations.py --test` passent,
+`generer_dashboard.py` 48 titres. `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant
+le commit.
+
+### Proposé, et prochain
+
+**Proposé : C31** — les 23 bascules du PER, priorité 2 : un PER faux est publié et lu,
+comme C23 l'était. **Prochain, par l'ordre déterministe** : C21 étant consommé, le premier
+rang-1 restant est **C27** (ORANGE, `validation : OK`, statut PROPOSÉ, priorité 4) ; C22
+suit à la priorité 7.
+
 ## 2026-10-03 — cycle 17 (soir) : C18, le détecteur nommait la mauvaise séance
 
 **Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun
