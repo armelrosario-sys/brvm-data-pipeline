@@ -22,8 +22,9 @@ Correspondance ticker <-> slug de fichier : derivee DYNAMIQUEMENT depuis
 SOCIETES (peupler.py) a chaque execution, jamais figee en dur -- si un
 ticker est ajoute/renomme, la correspondance se recalcule automatiquement.
 Un seul cas non deductible automatiquement (abreviation) : LNBB -> lnb_bn.
-BBGCI : aucun document trouve dans le MANIFESTE sous quelque nom que ce
-soit (meme situation que SDSC avant le 14/07/2026) -- signale, pas bloquant.
+BBGC (BBGCI jusqu'au 04/10/2026, mnemonique provisoire) : aucun document
+trouve dans le MANIFESTE sous quelque nom que ce soit (meme situation que
+SDSC avant le 14/07/2026) -- signale, pas bloquant.
 """
 import csv
 import json

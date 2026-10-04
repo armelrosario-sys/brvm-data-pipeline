@@ -1439,11 +1439,14 @@ def test_fondamentaux_agregateur():
                 bloquant=False)
         return
 
-    # L'alias existe parce que les deux chaines ne nomment pas Bridge Bank de
-    # la meme facon. Sans lui, le titre serait invisible a l'arbitrage alors
-    # que les deux chaines le connaissent.
-    verifie("BBGCI" in agr and "BBGC" not in agr,
-            "l'alias de ticker BBGC -> BBGCI est applique a la lecture")
+    # Jusqu'au 04/10/2026, un alias traduisait BBGC (chaine pipeline/) vers
+    # BBGCI (moteur), parce que la base portait un mnemonique provisoire. C27 a
+    # tranche sur l'avis BRVM de premiere cotation : le mnemonique officiel est
+    # BBGC, la base a ete renommee, l'alias est vide. Le controle est retourne —
+    # il verifie maintenant que Bridge Bank arrive sous son vrai nom et que
+    # l'ancien code provisoire a bien disparu des deux cotes.
+    verifie("BBGC" in agr and "BBGCI" not in agr,
+            "Bridge Bank est lu sous le mnemonique officiel BBGC, sans alias")
 
     for champ, plancher in (("ca", 40), ("marge_nette", 40), ("croissance_ca", 40),
                             ("capitaux_propres", 20)):
@@ -3472,10 +3475,17 @@ TOLERANCE_INDICE = 0.005
 # de confronter tant que la seance n'est pas ETABLIE.
 DIVERGENCES_SEANCE_VOISINE_MINIMUM = 15
 
-# La page publie BBGC la ou societes.csv porte BBGCI, dont la note dit elle-meme
-# que le mnemonique est provisoire et « A RECONFIRMER des qu'un avis BRVM officiel
-# sera publie ». Registre ADOSSE A LA VALEUR OBSERVEE : un ticker hors base de plus
-# est signale, jamais silencieux. Renommer un ticker en base est un arbitrage.
+# Registre ADOSSE A LA VALEUR OBSERVEE : un ticker hors base de plus est signale,
+# jamais silencieux.
+#
+# Pourquoi BBGC y reste apres le renommage du 04/10/2026 (cycle 19, C27). La
+# colonne connu_en_base du releve est une OBSERVATION DATEE : le 02/10/2026,
+# BBGC n'etait effectivement pas en base, puisqu'elle portait encore le
+# mnemonique provisoire BBGCI. Le renommage ne change pas ce qui a ete observe
+# ce jour-la, et reecrire la ligne du releve pour qu'elle dise « oui » serait
+# falsifier un releve. Le prochain releve, lui, dira « oui » de lui-meme : BBGC
+# sortira alors de l'ensemble hors-base sans que personne y touche, et ce
+# registre pourra se vider.
 TICKERS_HORS_BASE = {"BBGC"}
 
 # Libelles des indices, de chaque cote.

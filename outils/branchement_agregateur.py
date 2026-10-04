@@ -15,7 +15,11 @@ l'URL du rapport de notation dont ils sont tires.
 
 CE QU'ELLE CHANGE
   - moteur/arbitrage.py : le chargeur expose ces grandeurs, et applique un
-    alias de ticker BBGC -> BBGCI, sans lequel Bridge Bank reste invisible a
+    alias de ticker BBGC -> BBGCI (DEFAIT le 04/10/2026 par le chantier C27 :
+    la base porte desormais le mnemonique officiel BBGC et ALIAS_TICKERS est
+    vide ; ce script est un proces-verbal d'une passe deja faite, le relancer
+    echouera sur ses propres ancres — c'est l'effet voulu, pas une regression),
+    sans lequel Bridge Bank restait invisible a
     l'arbitrage alors que les deux chaines la connaissent, chacune sous son code.
   - moteur/profils.py : le ROE se replie sur les capitaux propres de
     l'agregateur quand la base n'en a pas, ou quand les siens depassent trois

@@ -76,7 +76,7 @@ if GITHUB_TOKEN:
 SOCIETES_NOMS = {
     "SNTS": "Sonatel", "STBC": "Sitab", "NSBC": "NSIA Banque CI", "SMBC": "SMB CI",
     "SAFC": "Safca (Alios Finance CI)", "ORGT": "Oragroup Togo",
-    "BOABF": "BOA Burkina Faso", "BBGCI": "Bridge Bank Group CI",
+    "BOABF": "BOA Burkina Faso", "BBGC": "Bridge Bank Group CI",
     "CBIBF": "Coris Bank International", "SICC": "Sicor",
     "NTLC": "Nestle CI", "PALC": "Palm CI", "SPHC": "Saph CI",
     "TTLC": "TotalEnergies Marketing CI", "TTLS": "TotalEnergies Marketing SN",

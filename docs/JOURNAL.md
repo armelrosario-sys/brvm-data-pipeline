@@ -9,6 +9,188 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-04 — cycle 19 (soir) : C27, Bridge Bank existait en deux moitiés qui ne se rencontraient jamais
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun
+commit**. Le cycle 18 est clos (`1abeb93` annonce → `80f3b6c` clôture, 06h55 et 07h13 UTC,
+soit près de douze heures avant ce cycle). Aucun `Annonce hors cycle :` ouvert. Annonce de
+ce cycle poussée seule : `99c9366`.
+
+**Chantier retenu, par l'ordre déterministe.** Rang 1 = le premier `ORANGE` portant
+`validation : OK` dont la passe autorisée n'est pas consommée. C16, C17, C18, C19, C20, C21,
+C23, C25 et C26 le disent consommée ; restent **C27** (priorité 4) et **C22** (priorité 7).
+Priorité la plus haute d'abord → **C27**. C'est aussi ce qu'annonçait le cycle 18. **Cycle
+du soir : pas de chasse** (étape 5, une fois par jour, au cycle du matin).
+
+### Premier axe — le mnémonique officiel
+
+**La preuve, à deux côtés, et les deux côtés sont la BRVM elle-même.**
+
+1. **L'avis de première cotation**, déjà collecté dans `collecte/avis_brvm.csv` le
+   **25/09/2026** : « Résultats de première cotation - BRIDGE BANK GROUP COTE D'IVOIRE
+   (**BBGC**) ». C'est **exactement** le document que la note de `donnees/base/societes.csv`
+   réclamait depuis le 10/07/2026 : « Ticker *BBGCI* provisoire (non confirmé par mnémonique
+   officiel BRVM, ISIN CI0000010609 connu) […] **À RECONFIRMER dès qu'un avis BRVM officiel
+   de première cotation sera publié** ». Il l'a été. La note demandait cette passe.
+2. **La page « Volumes / Valeurs »** relevée le 02/10/2026 par C25
+   (`collecte/releve_volumes.csv`) publie `BBGC` sur les 48 lignes de la cote.
+
+Deux corroborations de plus, qui ne sont pas la preuve mais la renforcent : le **bulletin
+officiel de la cote n° 186** du 01/10/2026 (`donnees/boc.json`) porte le symbole `BBGC` avec
+une clôture de **8 800 FCFA**, un volume de **60 416** et une valeur de **535 765 635** ; et
+`donnees/cote_reference.json` nomme **48 titres**, dont `BBGC`.
+
+**Ce que la mesure préalable a trouvé, et que le chantier n'avait pas prévu.** C27 demandait
+« combien de lignes de combien de tables portent `BBGCI`, et ce que le renommage déplace dans
+`profils.json` ». La réponse aux deux est petite — **13 lignes**, **0 champ déplacé** — et
+c'est la mesure *à côté* qui compte :
+
+- **Bridge Bank est la seule société réelle de la base sans aucun cours.** `societes` en
+  porte 50, `profils.json` 47 : les trois absents sont `TEST_EXCLU`, `TEST_VIGIL` (synthétiques)
+  et **`BBGCI`**. 5 exercices fondamentaux en base, **0** ligne dans `cours_mensuels`, **0**
+  dans `cours_quotidien_boc`.
+- **Et pourtant le dépôt détient déjà ses cotations, sous le nom `BBGC`** : 7 séances de
+  valeur transigée dans `collecte/historique_liquidite.json` (24/09, 25/09, 28/09, 29/09,
+  30/09, 01/10, 02/10), la ligne complète du bulletin du 01/10 dans `donnees/boc.json`, un
+  cours de référence dans `donnees/cote_reference.json`, et une ligne de relevé avec son PER
+  (16,45) dans `collecte/releve_volumes.csv`.
+
+Les deux moitiés du titre existaient et ne se rencontraient jamais, faute de porter le même
+nom. `moteur/arbitrage.py` avait posé un pansement sur ce point — `ALIAS_TICKERS = {"BBGC":
+"BBGCI"}`, 27/09/2026 — qui **tranchait dans le mauvais sens** : il faisait du mnémonique
+officiel l'alias du provisoire.
+
+**Livré : `outils/migration_ticker_bbgci_vers_bbgc.py`.** Autotest `--test` : **13 contrôles,
+0 échec**, dont le piège que la substitution naïve ne voit pas (`BBGCIX` commence par `BBGCI`
+sans être `BBGCI` — c'est la virgule de l'ancre qui l'écarte). **13 lignes renommées** sur
+quatre fichiers : `donnees/base/societes.csv` 1, `donnees/base/etats_financiers.csv` 5,
+`donnees/base/source_urls.csv` 5, `collecte/avis_brvm.csv` 2. Six gardes vérifiées à
+l'exécution, pas seulement écrites : entête (c'est elle qui a arrêté la première tentative —
+`avis_brvm.csv` est en **CRLF**), nombre de lignes, empreinte SHA-256 avant, cardinalité
+exacte de chaque ancre, nombre de colonnes inchangé ligne à ligne vu par l'analyseur CSV, et
+relecture après écriture. **Relancé deux fois : sans effet**, il constate « migration DEJA
+APPLIQUEE ».
+
+**La note de `societes.csv` n'est pas écrasée**, et c'est délibéré : la première règle du
+dépôt interdit d'effacer une note qui documente une analyse humaine. La phrase d'origine
+reste mot pour mot — elle dit l'état de la connaissance au 10/07/2026 — et la confirmation
+datée, sourcée sur les quatre publications ci-dessus, est **ajoutée derrière** (840
+caractères).
+
+**Non renommé, à dessein.** `collecte/fondamentaux_echecs.jsonl` porte une ligne
+`"ticker": "BBGCI"` dont le `nom_fichier` est
+`..._rapport_dactivites_-_3eme_trimestre_2024_-_bank_of_africa_bf.pdf` : un document de
+**BOA Burkina Faso**. C'est la famille de **C29**. La renommer porterait plus loin une
+attribution fausse.
+
+**Côté code, dans le même commit** : `ALIAS_TICKERS` passe à `{}` ; le contrôle de la section
+14 de `tester_donnees.py` est **retourné** (il vérifiait que l'alias s'appliquait, il vérifie
+maintenant que Bridge Bank arrive sous son vrai nom et que l'ancien code a disparu des deux
+côtés) ; le golden test 54 de `moteur/tester.py` gagne un contrôle (`BBGCI` absent de la base)
+et un avertissement daté ; les registres de `pipeline/collecte_volumes.py`,
+`collecte/backfill_fondamentaux.py`, `collecte/avis_brvm.py` et `collecte/notations.py` sont
+mis à jour (ce dernier accepte désormais les deux orthographes en entrée et rend `BBGC`).
+`TICKERS_HORS_BASE = {"BBGC"}` **reste** : la colonne `connu_en_base` du relevé est une
+observation datée du 02/10, et réécrire un relevé pour qu'il dise autre chose serait le
+falsifier ; le prochain relevé dira « oui » de lui-même.
+
+**Effet mesuré, avant/après, sur la base du jour.**
+
+| | avant | après |
+|---|---|---|
+| lignes portant `BBGCI` dans les données | 13 | **0** |
+| `societes` / `etats_financiers` sous `BBGC` | 0 / 0 | **1 / 5** |
+| entrées dans `ALIAS_TICKERS` | 1 | **0** |
+| titres dans `profils.json` | 47 | **47** — champs déplacés : **0** |
+| titres au tableau de bord `.xlsx` | 48 | **48** |
+| `docs_site/index.html` régénéré : `BBGCI` / `BBGC` | 10 / 0 | **0 / 10** |
+| `tester_donnees.py` | 252 OK, 0 ÉCHEC | **252 OK, 0 ÉCHEC** |
+
+Le renommage ne déplace **rien** aujourd'hui, et c'est attendu : sans cours, Bridge Bank
+n'entre dans aucun classement, aucun axe, aucun grade. Ce qu'il change est à venir.
+
+### Second axe — la seconde source des cours
+
+**Elle existe, elle est gratuite, et elle était déjà dans le dépôt.** C25 puis C27
+concluaient que les 90 660 cours n'ont aucune seconde source, parce que la page « Volumes /
+Valeurs » ne publie pas les cours de la cote. C'était vrai de *cette* source-là et **faux du
+dépôt** : le projet lit chaque bulletin **deux fois**, avec deux analyseurs écrits
+séparément —
+
+- `pipeline/collecte_boc.py` → `donnees/boc.json`
+- `collecte/extracteur_boc.py` → `collecte/cours_quotidien_boc.csv`
+
+**Confrontés sur la séance du 01/10/2026 : 45 tickers communs, 0 divergence de cours.** Ce
+n'est donc pas la copie que C30 dénonce à la section 19 — c'est bien l'accord de deux
+lectures indépendantes du même PDF.
+
+Elles ne sont pas d'accord sur *quelles lignes existent* : `boc.json` porte `BBGC` que le CSV
+n'a pas ; le CSV porte `SEMC` et `SICC` que `boc.json` n'a pas — toutes deux cotées pour la
+dernière fois le **15/09/2026** d'après `cote_reference.json`, donc des lignes du bulletin
+sans transaction, que le second analyseur retient et le premier non.
+
+**La limite, dite avant de s'en réjouir** : `donnees/boc.json` est **réécrit à chaque séance**
+par `boc_quotidien.yml` — une séance à la fois, aucun historique. Cette source ne rattrape pas
+les 90 660 cours déjà en base ; elle les surveillerait à partir d'aujourd'hui. Rien n'a été
+branché : c'est un arbitrage (que fait-on d'une divergence : signalement, ou refus de
+charger ?). Inscrit en **C33**.
+
+### La cause du trou, trouvée en cherchant pourquoi BBGC n'a pas de cours
+
+`collecte/extracteur_boc.py` filtre chaque bulletin par un ensemble écrit en dur :
+`UNIVERS_ACTIONS`, **47 tickers**, où `BBGC` ne figure pas. Bridge Bank est cotée depuis le
+**24/09/2026** (BOC n° 181) ; depuis, `cours_quotidien_boc.csv` porte **exactement 47 lignes à
+chacune des six séances** (24/09, 25/09, 28/09, 29/09, 30/09, 01/10) et **jamais `BBGC`**. La
+48e ligne du bulletin est écartée **en silence**, séance après séance, alors que l'autre
+analyseur la rend sans difficulté.
+
+La liste a pourtant une raison d'être, écrite au-dessus d'elle : des OPCVM et des obligations
+partagent le motif à 2–6 majuscules et ont déjà été pris pour des actions (FGI, SBIF).
+L'ouvrir sans la remplacer par un critère plus sûr rouvre ce défaut-là. **Rien n'a été
+écrit** : ouvrir l'entrée d'une série de cours certifiée est un arbitrage. Inscrit en **C32**,
+priorité 2, avec les trois voies possibles.
+
+### Barrières
+
+Barrières **complètes** (le commit touche `donnees/`, `collecte/`, `moteur/`, `outils/`,
+`pipeline/`). Base reconstruite à neuf : `peupler.py` (50 sociétés, 185 lignes d'états) puis
+les cinq chargeurs, tous code 0. `moteur/tester.py` : **tous les golden tests passent**.
+`moteur/profils.py` : 47 titres, A=5 B=28 C=14. `moteur/tester_donnees.py` : **252 OK, 0
+ÉCHEC**, code 2 — les trois alertes de fraîcheur habituelles (C4 : 12 dates ; C5 : CFAC et
+NEIC ; section 27 : le relevé du 02/10 porte la séance suivant le bulletin). `avis_brvm.py
+--test` et `notations.py --test` passent. `generer_dashboard.py` : 48 titres.
+`generer_dashboard_html.py` compile (bac à sable en **Python 3.13.16**).
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
+### Deux cas de plus pour C28, constatés avant toute modification
+
+Les deux ont été mesurés sur le dépôt **tel qu'il était en arrivant**, avant le renommage :
+ils ne viennent pas de ce cycle.
+
+- **`collecte/profils.json`** : régénéré depuis les fichiers commités, il diffère du fichier
+  commité sur **un titre, SEMC, deux champs** — dividende de référence **14,40** commité
+  contre **14,00** régénéré, là où `collecte/dividendes_boc.csv` porte `SEMC,14.0,2021-12-28`.
+  **Aucun champ décisionnel** ne bouge (ni profil, ni secondaire, ni grade, ni gate, ni
+  drapeaux). Le cycle 18 annonçait « `profils.json` identique » : vrai de son propre
+  périmètre, faux de la paire fichier/générateur.
+- **`docs_site/index.html`** : régénéré, il passe de **1 160 à 1 403 lignes**, **109 blocs de
+  différences**. Bénin — `pages.yml` régénère la page à chaque publication, c'est donc la
+  version fraîche qui est publiée — mais c'est exactement la question du chantier.
+
+Ni l'un ni l'autre n'a été commité régénéré : ce serait un second chantier dans le même
+commit, et pour `profils.json` cela effacerait en silence un cas que C28 doit trancher.
+C28 passe donc de **trois** à **cinq** fichiers.
+
+### Proposé
+
+- **C32** — l'univers de 47 tickers écrit en dur dans `extracteur_boc.py`, **ORANGE,
+  priorité 2** : un titre coté depuis six séances n'a aucun prix et rien ne le dit.
+- **C33** — brancher la seconde extraction du bulletin comme contrôle de la première,
+  **ORANGE, priorité 3**.
+
+**Prochain chantier, par l'ordre déterministe : C22** (ORANGE, `validation : OK`, passe non
+consommée, priorité 7) — sauf si Claudia valide C32, qui passerait devant par sa priorité.
+
 ## 2026-10-04 — cycle 18 (matin) : C21, la colonne n'avait jamais eu une seule convention
 
 **Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun

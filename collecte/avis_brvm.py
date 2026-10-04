@@ -159,7 +159,7 @@ def charger_tickers():
 ALIAS = {
     "sonoco metal packaging siem ci": "SEMC",
     "sonoco metal packaging": "SEMC",
-    "bridge bank group cote divoire": "BBGCI",
+    "bridge bank group cote divoire": "BBGC",
     "safca ci": "SAFC",
     "safca": "SAFC",
     "agl ci": "SDSC",

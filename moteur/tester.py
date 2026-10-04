@@ -471,17 +471,36 @@ verifie(r["score_composite"] is not None,
 verifie(any("SUSPENDU comme critere de decision" in a for a in r["alertes"]),
         "alerte de suspension explicite presente")
 
-print("\n=== Golden test 54 (Etape E) : Bridge Bank Group CI — pret pour IPO, aucun cours invente ===")
+print("\n=== Golden test 54 (Etape E) : Bridge Bank Group CI — cotee depuis le 24/09/2026, aucun cours invente ===")
+# Renomme BBGCI -> BBGC le 04/10/2026 (cycle 19, chantier C27) : l'avis BRVM de
+# premiere cotation du 25/09/2026 a confirme le mnemonique officiel, que la note
+# de societes.csv donnait jusque-la pour provisoire.
+#
+# Le titre est cote depuis le 24/09/2026 (BOC n(deg) 181) et le depot detient
+# deja des seances sous ce nom -- mais AUCUNE n'a encore atteint la base :
+# cours_mensuels et cours_quotidien_boc restent vides pour lui. Ce controle dit
+# exactement cela, et c'est ce qu'il doit dire : tant que la collecte n'a rien
+# verse, aucun prix n'est invente pour combler le trou.
+#
+# ATTENTION, ce zero est DATE et il devra tomber. La cause est identifiee le
+# 04/10/2026 : collecte/extracteur_boc.py filtre chaque bulletin par un univers
+# de 47 tickers ecrit en dur, ou BBGC ne figure pas — la 48e ligne est donc
+# ecartee en silence a chaque seance depuis le 24/09/2026. C'est le chantier
+# C32. Le jour ou il passe, ce controle doit etre retourne, pas conserve : un
+# golden test qui fige un trou de collecte le protege au lieu de le surveiller.
 import sqlite3
 conn_e = sqlite3.connect(DB)
-n_cours_bbgci = conn_e.execute(
-    "SELECT COUNT(*) FROM cours_mensuels WHERE ticker='BBGCI'").fetchone()[0]
-n_exercices_bbgci = conn_e.execute(
-    "SELECT COUNT(*) FROM etats_financiers WHERE ticker='BBGCI'").fetchone()[0]
+n_cours_bbgc = conn_e.execute(
+    "SELECT COUNT(*) FROM cours_mensuels WHERE ticker='BBGC'").fetchone()[0]
+n_exercices_bbgc = conn_e.execute(
+    "SELECT COUNT(*) FROM etats_financiers WHERE ticker='BBGC'").fetchone()[0]
+n_ancien = conn_e.execute(
+    "SELECT COUNT(*) FROM societes WHERE ticker='BBGCI'").fetchone()[0]
 conn_e.close()
-verifie(n_cours_bbgci == 0, "aucune entree cours_mensuels pour BBGCI (pas encore cote, aucun prix invente)")
-verifie(n_exercices_bbgci == 5, f"5 exercices fondamentaux disponibles (2021-2025), obtenu : {n_exercices_bbgci}")
-r = evaluer_titre("BBGCI")
+verifie(n_cours_bbgc == 0, "aucune entree cours_mensuels pour BBGC (rien collecte encore, aucun prix invente)")
+verifie(n_exercices_bbgc == 5, f"5 exercices fondamentaux disponibles (2021-2025), obtenu : {n_exercices_bbgc}")
+verifie(n_ancien == 0, f"le mnemonique provisoire BBGCI a disparu de la base, obtenu : {n_ancien}")
+r = evaluer_titre("BBGC")
 verifie(r["statut_gate"] == "ELIGIBLE", "statut = ELIGIBLE (fondamentaux solides)")
 verifie(r["score_valorisation"] is None,
         f"score valorisation absent (aucun PER disponible), obtenu : {r['score_valorisation']}")

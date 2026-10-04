@@ -88,9 +88,19 @@ DRAPEAUX = (
 
 
 # La chaine pipeline/ et le moteur ne nomment pas toujours le titre de la meme
-# facon. Sans cet alias, Bridge Bank serait invisible a l'arbitrage alors que
-# les deux chaines la connaissent — chacune sous son code.
-ALIAS_TICKERS = {"BBGC": "BBGCI"}
+# facon. Quand c'est le cas, cet alias traduit le code de la chaine pipeline/
+# vers celui du moteur.
+#
+# VIDE depuis le 04/10/2026 (cycle 19, chantier C27), et c'est le but. Il portait
+# {"BBGC": "BBGCI"}, un pansement pose le 27/09/2026 parce que Bridge Bank etait
+# en base sous un mnemonique PROVISOIRE que la BRVM n'avait pas encore confirme.
+# Il tranchait dans le mauvais sens : il faisait du mnemonique officiel l'alias
+# du provisoire. L'avis BRVM de premiere cotation du 25/09/2026 a tranche --
+# c'est BBGC — et outils/migration_ticker_bbgci_vers_bbgc.py a renomme le titre
+# partout. Les deux chaines le nomment desormais pareil : il n'y a plus rien a
+# traduire. Garder l'entree reviendrait a renvoyer BBGC vers un ticker qui
+# n'existe plus nulle part.
+ALIAS_TICKERS = {}
 
 
 def charger_agregateur(chemin=AGREGATEUR):

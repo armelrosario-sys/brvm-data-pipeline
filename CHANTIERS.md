@@ -2023,7 +2023,11 @@ titre par titre.
 ## C27 — La page confirme BBGC là où la base porte BBGCI, et le cours reste sans seconde source
 
 - classe : ORANGE — renomme un ticker dans une table certifiée, et choisit une seconde source
-- statut : PROPOSÉ
+- statut : **FAIT le 04/10/2026 (cycle 19)** — premier axe appliqué et figé par un test,
+  second axe tranché : la seconde source **existe et était déjà dans le dépôt**. La passe
+  autorisée est consommée ; **aucun cycle ne reprend C27.** Ce que l'application a rendu
+  visible part en **C32** (la cause, chiffrée) et **C33** (le branchement de la seconde
+  source). Voir *Fait le 04/10/2026* au bas de ce bloc.
 - validation : OK
 - autonomie : partielle — le renommage est sans réseau ; une seconde source de cours ne l'est pas
 - priorité : 4
@@ -2053,9 +2057,142 @@ autres pistes (`sikafinance.json`, déjà collecté ; la page de cotation par ti
 idempotent le porte partout avec son effet mesuré ; et la seconde source des cours est soit
 trouvée et branchée, soit écartée avec un motif daté qui dit ce qui reste non surveillé.
 
-## C28 — Trois fichiers dérivés commités que leur propre générateur ne reproduit pas
+### Fait le 04/10/2026 (cycle 19)
 
-- classe : ORANGE — l'un des trois écrase un fichier commité par un faux rapport complet, et
+**Premier axe : le mnémonique officiel est BBGC, et ce n'était pas cosmétique.** La preuve
+est à deux côtés et les deux côtés sont la BRVM : l'**avis de première cotation du
+25/09/2026**, déjà dans `collecte/avis_brvm.csv`, s'intitule « Résultats de première
+cotation — BRIDGE BANK GROUP COTE D'IVOIRE (**BBGC**) » — c'est exactement le document que
+la note de `societes.csv` attendait ; et la **page Volumes / Valeurs** relevée le 02/10/2026
+publie `BBGC` sur les 48 lignes. Corroboré deux fois de plus : le bulletin officiel n° 186
+du 01/10/2026 (`donnees/boc.json`) porte le symbole `BBGC`, clôture 8 800 ; et
+`donnees/cote_reference.json` nomme 48 titres dont `BBGC`.
+
+**Ce que la mesure préalable a trouvé, et que le chantier n'avait pas prévu.** Bridge Bank
+est **la seule société réelle de la base sans aucun cours** : 5 exercices fondamentaux,
+**0** ligne de `cours_mensuels`, **0** de `cours_quotidien_boc`, **absente de
+`collecte/profils.json`**, qui n'en compte que 47. Pendant ce temps le dépôt détenait déjà,
+**sous le nom `BBGC`**, 7 séances de valeur transigée dans
+`collecte/historique_liquidite.json` (24/09 → 02/10/2026), une ligne de bulletin complète
+dans `donnees/boc.json` et un cours de référence dans `donnees/cote_reference.json`. Les
+deux moitiés du titre existaient et ne se rencontraient jamais, faute de porter le même nom.
+`moteur/arbitrage.py` avait posé un pansement — `ALIAS_TICKERS = {"BBGC": "BBGCI"}` — qui
+tranchait **dans le mauvais sens** : il faisait du mnémonique officiel l'alias du provisoire.
+
+**Livré** `outils/migration_ticker_bbgci_vers_bbgc.py` (`--test` **13 contrôles, 0 échec**,
+idempotent — relancé deux fois, il constate « DEJA APPLIQUEE » sans rien écrire). **13 lignes
+renommées** sur quatre fichiers : `societes.csv` 1, `etats_financiers.csv` 5,
+`source_urls.csv` 5, `avis_brvm.csv` 2. Six gardes : entête, nombre de lignes, empreinte
+SHA-256 avant, cardinalité exacte de chaque ancre, nombre de colonnes inchangé ligne à ligne,
+relecture après écriture. La note de `societes.csv` **n'est pas écrasée** — la règle du dépôt
+l'interdit : la phrase d'origine reste mot pour mot et la confirmation datée est ajoutée
+derrière. `ALIAS_TICKERS` passe à `{}` ; le contrôle de la section 14 est retourné.
+
+**Non renommé, à dessein** : la ligne `"ticker": "BBGCI"` de
+`collecte/fondamentaux_echecs.jsonl` porte un `nom_fichier` de **BOA Burkina Faso**. C'est
+**C29**, et la renommer porterait plus loin une attribution fausse.
+
+**Effet mesuré, avant/après, sur la base du jour.**
+
+| | avant | après |
+|---|---|---|
+| lignes portant `BBGCI` dans les données | 13 | **0** |
+| `societes` / `etats_financiers` sous `BBGC` | 0 / 0 | **1 / 5** |
+| entrées dans `ALIAS_TICKERS` | 1 | **0** |
+| titres dans `profils.json` | 47 | **47** — champs déplacés : **0** |
+| titres au tableau de bord | 48 | **48** |
+| `docs_site/index.html` régénéré : `BBGCI` / `BBGC` | 10 / 0 | **0 / 10** |
+| `tester_donnees.py` | 252 OK, 0 ÉCHEC | **252 OK, 0 ÉCHEC** |
+
+Le renommage ne déplace **rien** aujourd'hui, et c'est attendu : sans cours, Bridge Bank
+n'entre dans aucun classement. Ce qu'il change est à venir — les deux moitiés du titre
+portent enfin le même nom.
+
+**Second axe : la seconde source de cours existe, elle est gratuite, et elle était déjà
+dans le dépôt.** `donnees/boc.json` est produit par `pipeline/collecte_boc.py`, un analyseur
+**différent** de `collecte/extracteur_boc.py` qui alimente `cours_quotidien_boc.csv` : deux
+extractions indépendantes du **même** bulletin. Confrontées sur la séance du 01/10/2026 :
+**45 tickers communs, 0 divergence de cours**. Elles ne sont pas d'accord sur *quelles
+lignes existent* — `boc.json` porte `BBGC` que le CSV n'a pas, le CSV porte `SEMC` et `SICC`
+que `boc.json` n'a pas (toutes deux cotées pour la dernière fois le 15/09 selon
+`cote_reference.json`). C'est donc une vraie seconde source, et non la copie que C30
+dénonce à la section 19. **Sa limite, dite franchement** : `donnees/boc.json` est réécrit à
+chaque séance par `boc_quotidien.yml` — une séance à la fois, aucun historique. Elle ne
+rattrape pas les 90 660 cours déjà en base ; elle les surveille à partir d'aujourd'hui.
+Rien n'a été branché : inscrit en **C33**.
+
+## C32 — Un univers de 47 tickers écrit en dur écarte la 48e ligne de chaque bulletin
+
+- classe : ORANGE — ouvre l'entrée d'une série de cours certifiée à un titre qu'elle n'acceptait pas ; le diagnostic est fait
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau** — la correction est dans le dépôt ; sa vérification demande un passage de `boc_quotidien.yml`
+- priorité : 2 — **un titre coté depuis dix séances n'a aucun prix, et rien ne le dit**
+
+**Le constat, mesuré le 04/10/2026 (cycle 19), en cherchant pourquoi BBGC n'a pas de cours.**
+`collecte/extracteur_boc.py` filtre chaque bulletin par un ensemble écrit en dur :
+
+```
+# Univers des 47 actions BRVM (hors obligations/FCTC/OPCVM ...)
+UNIVERS_ACTIONS = { "ABJC", "BICB", ... }   # 47 tickers, BBGC absent
+```
+
+Bridge Bank est cotée depuis le **24/09/2026** (BOC n° 181). Depuis, `cours_quotidien_boc.csv`
+porte **exactement 47 lignes à chaque séance** — 24/09, 25/09, 28/09, 29/09, 30/09, 01/10 —
+et **jamais `BBGC`**. La 48e ligne du bulletin est écartée **en silence**, séance après
+séance. Le même bulletin, lu par l'autre analyseur, la rend sans difficulté : `donnees/boc.json`
+porte `BBGC` avec clôture 8 800, volume 60 416, valeur 535 765 635.
+
+**Pourquoi c'est un arbitrage et pas une évidence.** La liste a une raison d'être, écrite
+au-dessus d'elle : des OPCVM et des obligations partagent le motif à 2–6 majuscules et ont
+déjà été pris pour des actions (cas réel : FGI, SBIF). L'ouvrir sans la remplacer par un
+critère plus sûr rouvre ce défaut-là. Trois voies, à peser : ajouter `BBGC` à la main (une
+ligne, mais la prochaine introduction retombera dans le trou) ; dériver l'univers de
+`donnees/base/societes.csv` à l'exécution (comme `moteur/calendrier.py` le fait déjà pour les
+slugs) ; ou garder la liste et **signaler** tout ticker du bulletin qu'elle écarte, au lieu
+de le jeter.
+
+**Ce que la boucle ne fera pas sans un mot de Claudia** : ouvrir l'entrée de la série. Le
+golden test 54 de `moteur/tester.py` **fige aujourd'hui ce zéro** (`aucune entrée
+cours_mensuels pour BBGC`) ; le commentaire posé ce cycle dit qu'il devra être retourné, pas
+conservé — un golden test qui fige un trou de collecte le protège au lieu de le surveiller.
+
+**Terminé quand** : aucun ticker présent au bulletin n'est écarté sans être nommé, Bridge
+Bank a ses cours depuis le 24/09/2026 ou le motif de leur absence est écrit, et un test
+refuse qu'un bulletin perde une ligne en silence.
+
+## C33 — Brancher la seconde extraction du bulletin comme contrôle de la première
+
+- classe : ORANGE — décide laquelle des deux extractions fait foi en cas de divergence ; la mesure est faite
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau** pour la première passe
+- priorité : 3
+
+**Ce que C27 a trouvé le 04/10/2026.** Le dépôt lit chaque bulletin **deux fois**, avec deux
+analyseurs écrits séparément : `pipeline/collecte_boc.py` → `donnees/boc.json`, et
+`collecte/extracteur_boc.py` → `collecte/cours_quotidien_boc.csv`. Personne ne les a jamais
+confrontés. Mesure de la séance du 01/10/2026 : **45 tickers communs, 0 divergence de cours**,
+et un désaccord sur trois lignes (`BBGC` d'un côté, `SEMC` et `SICC` de l'autre).
+
+**Pourquoi cela compte.** C25 puis C27 concluaient que les 90 660 cours n'ont aucune seconde
+source — la page « Volumes / Valeurs » ne publie pas les cours de la cote. C'était vrai de
+*cette* source-là, et faux du dépôt : la seconde extraction existe depuis toujours, et elle
+est gratuite. C'est aussi la réponse à **C30**, qui montre que la section 19 confronte une
+copie à sa source : celle-ci confronte deux lectures indépendantes du même PDF.
+
+**Sa limite, à dire avant de la brancher.** `donnees/boc.json` est écrasé à chaque séance :
+une séance à la fois, aucun historique. Le contrôle ne vaut que pour la séance du jour, et il
+ne dit rien des 90 660 cours déjà en base. L'arbitrage porte sur ce qu'on fait d'une
+divergence : signalement seul, ou refus de charger.
+
+**Terminé quand** : chaque séance est confrontée entre les deux extractions, une divergence
+de cours est signalée et nommée, un désaccord sur les lignes présentes l'est aussi, et le
+plafond est figé dans `tester_donnees.py`.
+
+## C28 — Cinq fichiers dérivés commités que leur propre générateur ne reproduit pas
+
+- classe : ORANGE — l'un d'eux écrase un fichier commité par un faux rapport complet, et
   choisir ce que chacun doit rendre est un arbitrage ; le diagnostic et l'effet sont mesurés
 - statut : PROPOSÉ
 - validation : —
@@ -2103,7 +2240,26 @@ plus que `verifier_releases.py` distingue les deux cas et **échoue bruyamment**
 plutôt que d'écrire un faux — c'est la seule pièce des trois qui soit du code pur, donc
 VERTE si Claudia la détache.
 
-**Terminé quand** : chacun des trois est soit régénéré et commité, soit déclaré archive avec
+**Ils sont cinq. Deux de plus, mesurés le 04/10/2026 (cycle 19) en passant les barrières de
+C27 — et constatés AVANT toute modification, donc sans rapport avec elle.**
+
+- **`collecte/profils.json`** : régénéré par `moteur/profils.py` sur la base reconstruite à
+  neuf depuis les fichiers commités, il diffère du fichier commité sur **un titre, SEMC, deux
+  champs** — le dividende de référence y vaut **14,40** quand le dépôt porte **14,00**
+  (`collecte/dividendes_boc.csv`, `SEMC,14.0,2021-12-28`). Aucun champ décisionnel : ni
+  profil, ni grade, ni gate ne bouge. Le cycle 18 annonçait « `profils.json` identique » ; sur
+  son propre périmètre c'était vrai, mais la paire fichier/générateur, elle, ne l'est pas.
+- **`docs_site/index.html`** : régénéré par `dashboard/generer_dashboard_html.py`, il passe de
+  **1 160 à 1 403 lignes**, **109 blocs de différences**. Le fichier commité est une build
+  largement périmée. Le cas est bénin — `pages.yml` régénère la page à chaque publication,
+  donc c'est bien la version fraîche qui est publiée — mais il illustre exactement la question
+  du chantier : ce fichier commité est-il une sortie, ou rien du tout ?
+
+Aucun des deux n'a été commité régénéré par le cycle 19 : ce serait un second chantier dans
+le même commit, et pour `profils.json` cela effacerait en silence un cas que ce chantier doit
+trancher.
+
+**Terminé quand** : chacun des **cinq** est soit régénéré et commité, soit déclaré archive avec
 son motif daté ; `verifier_releases.py` ne peut plus écrire « asset absent » quand il n'a pas
 pu interroger la release ; et une section de `tester_donnees.py` relance chaque générateur hors
 réseau, exige l'égalité à l'octet, et porte un registre des paires déclarées archives — de
@@ -2302,6 +2458,42 @@ les quatre PER hors branche sont tranchés avec leur preuve à deux côtés ; l'
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
+## 2026-10-04 — cycle 19 (soir)
+
+**Exécuté : C27. Le renommage ne déplace rien aujourd'hui, et la mesure préalable dit
+pourquoi : Bridge Bank est la seule société réelle de la base sans aucun cours** — 5
+exercices, **0** ligne de `cours_mensuels`, **0** de `cours_quotidien_boc`, absente de
+`profils.json`. Le dépôt détenait pourtant déjà, **sous le nom `BBGC`**, 7 séances de valeur
+transigée (24/09 → 02/10), la ligne de bulletin du 01/10 (clôture 8 800) et un cours de
+référence. Les deux moitiés du titre ne se rencontraient jamais, et
+`ALIAS_TICKERS = {"BBGC": "BBGCI"}` tranchait **dans le mauvais sens**.
+
+**Preuve à deux côtés, les deux publiées par la BRVM** : l'avis de première cotation du
+25/09/2026, déjà collecté, s'intitule « … (**BBGC**) » — le document exact que la note de
+`societes.csv` attendait ; la page Volumes / Valeurs du 02/10 publie `BBGC` sur 48 lignes.
+
+**Livré** `outils/migration_ticker_bbgci_vers_bbgc.py` (`--test` **13 contrôles, 0 échec** ;
+relancé deux fois : « DEJA APPLIQUEE », rien écrit) : **13 lignes renommées**, `BBGCI` **13 →
+0**, `ALIAS_TICKERS` **1 → 0**, `profils.json` **47 titres, 0 champ déplacé**, dashboard **48
+titres**, page régénérée **0 `BBGCI` / 10 `BBGC`**. La note de `societes.csv` n'est pas
+écrasée. Non renommée à dessein : la ligne `BBGCI` de `fondamentaux_echecs.jsonl`, dont le
+document est de **BOA Burkina Faso** (C29).
+
+**Second axe tranché : la seconde source des cours était déjà dans le dépôt.** `boc.json` et
+`cours_quotidien_boc.csv` sont deux lectures **indépendantes** du même bulletin — séance du
+01/10 : **45 tickers communs, 0 divergence**. Limite : `boc.json` est écrasé chaque séance.
+C25 et C27 disaient qu'il n'y avait pas de seconde source ; vrai de la page, faux du dépôt.
+→ **C33**. **Et la cause du trou** : `extracteur_boc.py` filtre par un `UNIVERS_ACTIONS` de
+**47 tickers écrit en dur** sans `BBGC` — 47 lignes exactement aux six séances depuis le
+24/09, la 48e jetée en silence. Rien écrit : → **C32**, priorité 2.
+
+**Barrières** : base complète, golden tests tous passent, `tester_donnees.py` **252 OK, 0
+ÉCHEC**, code 2 (C4, C5, section 27), `avis_brvm --test` et `notations --test` passent,
+dashboard 48 titres. **Pas de chasse : cycle du soir.** **Deux cas de plus pour C28**,
+constatés avant toute modification. **Prochain, par l'ordre déterministe : C22** (ORANGE,
+`validation : OK`, passe non consommée, priorité 7) — sauf si Claudia valide C32, qui
+passerait devant.
+
 ## 2026-10-04 — cycle 18 (matin)
 
 **Exécuté : C21. Son diagnostic était faux d'un facteur 40, et le défaut n'était pas où
@@ -2335,20 +2527,6 @@ quatre titres portent aujourd'hui la branche haute, publiée dans `profils.json`
 et `notations --test` passent, dashboard 48 titres. **Proposé : C31** (les 23 bascules du
 PER, priorité 2 — un PER faux est publié et lu). **Prochain, par l'ordre déterministe :
 C27** (ORANGE, validation OK, passe non consommée, priorité 4).
-
-## 2026-10-03 — cycle 17 (soir)
-
-**Exécuté : C18. Le tableau du chantier se trompait de séance sur deux cas sur cinq.** Le
-détecteur signale la séance de **chute**, jamais celle du **retour**. **SAFC 21/12/2018
-n'est pas une collision, c'est une division de nominal 1:25** — dividende BOC 576,00 →
-23,04 entre les bulletins de nov. et déc. 2018, ÷25 exact. **Trois séances corrigées** par
-`outils/correction_collisions_echelle.py` (3 lignes sur 90 660) : SLBC 12/01/2022
-154 → 154 000, SLBC 02/06/2023 67,6 → 67 600, STBC 12/07/2018 11 315 → 44 995. **Deux
-prouvées et NON écrites** parce que les corriger fait tomber la section 19 — inscrit en
-**C30**, qui montre que cette section vérifie la fidélité d'une copie, pas l'accord de
-deux extractions. **Effet** : alerte des divisions **13 → 12**, chutes de plus de 99,5 %
-**2 écartées en silence → 0**, registre `COLLISIONS_ECHELLE` **5 → 2**, `profils.json`
-identique. **Barrières** : `tester_donnees.py` **243 OK, 0 ÉCHEC**, code 2.
 
 ---
 

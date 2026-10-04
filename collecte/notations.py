@@ -89,7 +89,7 @@ NOMS_TICKERS = {
     "nsia banque ci": "NSBC", "nsia banque cote divoire": "NSBC",
     "coris bank international": "CBIBF", "coris bank international bf": "CBIBF",
     "coris bank international burkina faso": "CBIBF", "orange ci": "ORAC",
-    "cote divoire telecom": "ORAC", "bbgci": "BBGCI", "biic": "BICB", "lnb": "LNBB",
+    "cote divoire telecom": "ORAC", "bbgci": "BBGC", "bbgc": "BBGC", "biic": "BICB", "lnb": "LNBB",
     "loterie nationale du benin": "LNBB", "bollore transport & logistics": "SDSC",
     "bollore transport et logistics": "SDSC", "agl ci": "SDSC",
 }
