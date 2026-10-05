@@ -9,6 +9,252 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-05 — cycle 20 (matin) : C22, les trois refus où la BRVM s'oppose à elle-même
+
+**Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun
+commit**. Le cycle 19 est clos (`99c9366` annonce → `690a1b0` clôture, 18h55 et 19h11 UTC la
+veille). Aucun `Annonce hors cycle :` ouvert. Annonce de ce cycle poussée seule : `3c07ab0`.
+
+**Chantier retenu, par l'ordre déterministe.** Rang 1 = le premier `ORANGE` portant
+`validation : OK` dont la passe autorisée n'est pas consommée. C16, C17, C20, C21, C23, C25
+et C27 sont FAIT ; C18, C19 et C26 portent `validation : OK` mais leur `statut` dit la passe
+consommée ; C32 et C33, proposés la veille, n'ont pas de validation. Reste **C22** (priorité
+7), seul du rang 1. C'est aussi ce qu'annonçait le cycle 19. **Cycle du matin : chasse faite**
+(étape 5).
+
+### Les 8 refus, vérifiés avant tout arbitrage
+
+Base reconstruite (`peupler.py` + les cinq chargeurs), `charger_dividendes_boc.py` relancé :
+**`8 refusé(s)`**, aux 8 mêmes couples (ticker, exercice) que le bloc C22 annonçait. La
+mesure du cycle 12 tient. Mais le **diagnostic** d'origine se trompait sur la nature de trois
+d'entre eux, et c'est tout l'intérêt de ce cycle.
+
+### Ce que trois des huit sont réellement
+
+Le bloc C22 lisait chaque refus comme « deux valeurs certifiées qui s'opposent ». Pour **SAFC
+2010, SEMC 2020 et BOAC 2025**, c'est faux : les deux valeurs sont **dans le même fichier**,
+`collecte/dividendes_par_exercice.csv`, aux lignes 220/221, 247/248 et 58/59. Et ce fichier
+n'est pas une saisie : il est **généré** par `historiser_dividendes_exercice.py` depuis
+`collecte/dividendes_historique.csv`, à raison d'**une ligne par valeur observée** dans la
+colonne « Dernier dividende payé » du bulletin. Quand la BRVM **révise** cette colonne, le
+générateur émet deux lignes, et `charger_dividendes_exercice.py` garde **la première du
+fichier** — sans jamais lire `premiere_observation` ni `derniere_observation`, les deux
+colonnes qui disent laquelle est courante.
+
+Les fenêtres d'observation, relevées dans `dividendes_historique.csv` :
+
+| titre | exercice | en base | observée | courante | observée | facteur |
+|---|---|---|---|---|---|---|
+| SAFC | 2010 | 576,00 | 2018-01-02 → **2018-12-21** | **23,04** | 2018-12-24 → 2026-07-24 | **25,0 exact** |
+| SEMC | 2020 | 14,40 | 2021-12-23 → **2024-05-13** | **14,00** | 2024-05-14 → 2026-07-24 | 1,029 |
+| BOAC | 2025 | 594,53 | 2026-05-04 → **2026-05-04** | **597,53** | 2026-05-05 → 2026-07-24 | 1,005 |
+
+La base porte donc, pour ces trois, la valeur que la BRVM a **retirée** — 594,53 n'a vécu
+**qu'une séance** — et elle la porte par **ordre de lignes dans un CSV**, pas par arbitrage.
+
+**Le second côté, mesuré ce cycle sur les 8 dernières séances à rendement publié** (implicite
+= `rendement × cours` de `cours_quotidien_boc`, une extraction indépendante de la colonne
+« Dernier dividende payé » — le patron de preuve de C17) :
+
+| titre | implicite | écart à la retirée | écart à la courante |
+|---|---|---|---|
+| SEMC | 14,053 | **2,47 %** (14,40) | **0,38 %** (14,00) |
+| BOAC | 597,1 à 598,0 | **0,44 à 0,58 %** (594,53) | **0,01 à 0,08 %** (597,53) |
+
+Un rapport de 6,5 pour SEMC, de 10 pour BOAC. **SAFC ne publie aucun rendement** : son second
+côté est sa **série de cours**, qui divise par le même 25 à la même séance — 5 300 le 20/12,
+**215** le 21/12 ; médiane **6 000** en 2018 contre **335** en 2019 ; et sur toute la période
+du 21/12/2018 au 31/12/2020, **deux seules séances** dépassent 1 000, les 31/12/2018 et
+04/01/2019, déjà inscrites comme fautives dans `COLLISIONS_ECHELLE` (section 19). C'est la
+division de nominal au vingt-cinquième que le **cycle 17** avait établie, vue cette fois dans
+la colonne du dividende.
+
+**Décision inscrite : la publication courante de la BRVM fait foi sur celle qu'elle a
+retirée** — 23,04 / 14,00 / 597,53. **Non appliquée ici**, et le motif est écrit : écrire dans
+un fichier généré serait défait à la première régénération, et la règle de chargement qui le
+ferait proprement ne déplace pas 3 valeurs mais **31**. C'est **C34**, mesuré ci-dessous.
+
+### Ce qui a été appliqué, et seulement cela
+
+`outils/arbitrage_refus_pont_boc.py` — `--test` **25 contrôles, 0 échec** ; relancé **deux
+fois** après la passe : « ARBITRAGE DÉJÀ APPLIQUÉ — aucun fichier écrit ». Sept gardes
+vérifiées à l'exécution : existence, en-tête exact, nombre de lignes, empreinte SHA-256
+**avant**, assertion d'**unicité** de chaque ancre (la **ligne entière**, pas un fragment),
+garde `attendu` champ par champ lue par l'analyseur CSV, relecture après écriture. La
+première exécution a d'ailleurs **refusé d'écrire** : le compte de lignes attendu était faux
+d'une unité. C'est la garde qui a parlé, pas moi.
+
+**NSBC 2025.** La base portait un montant **vide** daté du **30/06/2026**, et sa propre note
+disait pourquoi : « AGO 30/06/2026 : 19 Mds FCFA approuvés (Ecofin) ; par action à sourcer ».
+Une date d'**AGO** à la place d'une date de paiement — et c'était le **seul** montant vide de
+la table des dividendes. Le pont refusait précisément parce que sa garde exige la date
+identique des deux côtés. Ce script corrige **la date seule** → **2026-08-04** ; le montant
+**675,98** est ensuite écrit par `charger_dividendes_boc.py`, sous sa garde, à la
+reconstruction suivante — vérifié en base : `675.98 | 2026-08-04 | ... montant complété, date
+identique des deux côtés`, et **plus aucun montant NULL** dans la table.
+
+Preuve à deux côtés : la colonne « Dernier dividende payé » (675,98 / 2026-08-04, source
+`BOC 2026-08-03`) et l'implicite, **675,0 à 676,8** sur 8 séances, soit **0,02 à 0,15 %**.
+*Réserve explicite, et elle ne ferme pas* : les 19 Md approuvés rapportés à 675,98 impliquent
+**28,1 M** d'actions, quand le BNPA de référence (1 540,38, séance 2025-12-31) rapporté au
+résultat net en implique **24,7 M** (exercice 2024) ou **26,4 M** (exercice 2025) — soit 16,7
+à 17,9 Md distribués contre 19 annoncés. L'identité ne ferme qu'en lisant les 19 Md en
+**brut** (675,98 / 0,875 × 24,7 M = 19,1 Md, à 0,6 %), ce qui reste un **signal** et non une
+preuve. Elle n'est donc pas comptée : la preuve retenue est celle des deux colonnes du BOC, et
+cette lecture-là relève de C2.
+
+**SNTS 2025.** Même montant des deux côtés — **1 740,00**, confirmé par l'implicite (1 738,2
+à 1 741,5, soit **0,07 à 0,10 %**) — et seule la **date** diffère d'un jour. Le BOC publie le
+**26/05/2026**, et il le publie du 2026-05-21 au 2026-07-24, donc **deux mois après** le
+versement ; la base portait le 25/05 d'après **Sika Finance 02/2026**, une annonce de presse
+**antérieure** à l'événement. La date publiée par la bourse elle-même, après coup, l'emporte.
+Effet second, qui n'est pas cosmétique : la clef de déduplication du pont est le triplet
+(ticker, montant, date) — elle ne protégeait **pas** d'un doublon à un jour près.
+
+Dans les deux cas la note d'origine est **conservée mot pour mot** en tête, et l'arbitrage
+ajouté derrière, daté et sourcé : elle dit l'état de la connaissance avant ce cycle.
+
+### Les refus maintenus, et le seul point qui attend un mot
+
+**SICC 1999 — refus définitif.** Le 0 est un marqueur d'obsolescence posé à la main ; le
+montant du BOC, 1 919,00, date du 25/09/2000, soit **26 ans** ; et aucun second côté n'existe
+— SICC ne publie **aucun** rendement sur ses **2 029** séances de `cours_quotidien_boc`, donc
+`rendement × cours` ne peut rien confirmer. Renvoi C16.
+
+**BOABF 2025 — refus motivé, la base fait foi.** Sa note dit « net après IRVM 12,5 % », et
+**397,25 / 0,875 = 454,00 exactement**, un brut rond, quand **397,00 / 0,875 = 453,71** ne
+l'est pas : le 397,00 du BOC est ce même net arrondi au franc. Et il faut dire l'autre moitié :
+l'implicite **ne sépare pas** les deux — 0,02 à 0,09 % contre 397,00, 0,01 à 0,15 % contre
+397,25, les deux sous l'arrondi de publication. Écart 0,25 FCFA, soit 0,06 % : aucun rang ne
+bouge. Renvoi C2.
+
+**ORGT 2019 — signalé, rien écrit, et c'est le seul point qui attend Claudia.** Le BOC divise
+**aujourd'hui** par **59,52** : l'implicite vaut 59,40 à 59,64 sur les 8 dernières séances,
+écart **0,08 à 0,20 %**. Un dividende a donc bien été versé le 17/07/2020 **pour l'exercice
+2019**. Or la note du marqueur dit « 5e année sans dividende confirmée presse 05/2026 », ce
+qui porte sur les exercices **2020 à 2024**, pas sur 2019 : le marqueur 0 est posé sur un
+exercice **qui a payé**. Effet latent mesuré : la section 24 compte ORGT comme « référence
+identifiée », mais contre le versement **2018** (56,73 le 2019-07-01, écart 4,5 % à
+l'implicite, sous la tolérance de 10 %) et non contre celui que le BOC utilise. La première
+règle du dépôt interdit d'écraser une valeur adossée à une note humaine : **rien n'a été
+écrit**. Deux issues — déplacer le marqueur sur 2020-2024 et laisser le pont écrire 59,52 sur
+2019, ou confirmer que le 0 de 2019 est voulu.
+
+### Le registre, et ce que la section 24 en fait
+
+`collecte/arbitrages_pont_boc.csv` — 8 lignes, 13 colonnes : les deux valeurs et les deux
+dates en présence, la **décision** (une de cinq catégories), la **valeur retenue**, le
+**chantier de renvoi**, `refus_subsiste`, et le **motif** écrit avec sa preuve (de 366 à
+1 144 caractères par ligne).
+
+La **section 24** le relit désormais, et dans les **deux sens** — sans faire confiance à la
+sortie du pont : elle **recalcule** l'ensemble des refus depuis `dividendes_boc.csv` et la
+base, avec la même logique (triplet exact → rien ; couple absent → insertion ; montant NULL à
+date identique → complétion ; sinon refus). Huit contrôles neufs :
+
+- chaque ligne porte une décision d'une catégorie **connue** (une catégorie inventée est un ÉCHEC) ;
+- chaque ligne porte une valeur retenue, un motif et un chantier — les lignes « muettes » sont nommées ;
+- aucun couple (ticker, exercice) en double ;
+- **tout refus que le pont émet est inscrit** — sinon ÉCHEC, avec le nom du cas et où l'inscrire. C'est le « aucun refus nouveau n'apparaît sans être inscrit » de C22 ;
+- **tout refus marqué `subsiste : oui` est réellement émis** — sinon le registre a dérivé ;
+- un `TRANCHE_APPLIQUE` dont le refus subsiste est un ÉCHEC : c'est le faux vert que la chasse du cycle 11 cherchait, un arbitrage qui se croit appliqué ;
+- aucun montant de dividende vide dans la table (alerte).
+
+Le pont émet désormais **6** refus, non 8 : NSBC passe en complétion (3 au lieu de 2) et SNTS
+en « déjà présent à l'identique » (39 au lieu de 38).
+
+**`RATTACHEMENTS_CONNUS` (section 26) est vide.** Son unique exemption était NSBC 2025 — « la
+date de la base est celle de l'AGO, pas du paiement » —, posée pour que la section ne tombe
+pas dessus à chaque passage. Le cas est tranché, donc l'exemption part, et la section passe
+**sans** elle. Un registre d'exceptions qui ne se vide jamais finit par couvrir le défaut au
+lieu de le signaler.
+
+### Ce que ce cycle ne change pas, et il faut le dire
+
+`collecte/profils.json` est **identique au champ près** avant et après : **0 champ** sur 47
+titres. NSBC était déjà « référence identifiée » par son versement 2024 (668,15, à 1,1 % de
+l'implicite) ; il l'est maintenant par le bon. Le défaut était **latent**, comme C10, C17 et
+C19 : armé, en attente.
+
+### Chasse du cycle 20 — un relevé de collecte commité cesse d'avancer en silence
+
+Le dépôt surveille la fraîcheur de ce qu'il **lit** : `cours_mensuels` contre le quotidien
+(section 2), `profils.json` contre la base (section 23). Il ne surveillait pas la fraîcheur de
+ce qu'il **écrit** — les relevés commités de `collecte/`, qui sont la mémoire longue des
+collecteurs. Balayage de tous les fichiers de `collecte/`, `donnees/` et `donnees/base/`
+portant une date ISO, confronté à la dernière séance du quotidien (**2026-10-01**, 2 029
+séances) : **deux relevés se sont arrêtés le même jour, le 2026-07-24.**
+
+| relevé | dernière date | retard | lignes |
+|---|---|---|---|
+| `collecte/dividendes_historique.csv` | 2026-07-24 | **44 séances** | 365 |
+| `collecte/liquidite_quotidienne_historique.csv` | 2026-07-24 | **44 séances** | 73 141 |
+| `collecte/dividendes_boc.csv` | 2026-09-30 | 1 séance | 64 |
+| `collecte/cours_quotidien_boc.csv` | 2026-10-01 | 0 | 90 660 |
+
+**La conséquence est chiffrée, pas supposée.** `dividendes_par_exercice.csv` est **généré**
+depuis `dividendes_historique.csv`. Or **17 des 64** lignes de `dividendes_boc.csv` — toutes
+collectées entre le **2026-07-28** et le **2026-09-28** — sont **absentes** du relevé : SLBC,
+BICB, SIBC, LNBB, **NSBC**, SOGC, STBC, CFAC, SGBC, SPHC, TTLC, NTLC, NEIC, SDCC, SMBC, SHEC,
+ABJC. Une régénération du fichier généré les perdrait **toutes les 17**, dont **NSBC 675,98
+du 04/08/2026**, la valeur même que C22 vient de faire entrer en base ce cycle. Côté
+liquidité, les 44 séances postérieures au 2026-07-24 sont exactement 44 des **195** séances
+du quotidien sans aucune ligne de liquidité — C14 avait relevé la date de fin le 28/09, sans
+la lire comme un arrêt.
+
+**Ce que la chasse a cherché et n'a pas trouvé**, et qui compte parce que C34 en dépend :
+l'intégrité du relevé lui-même. Fenêtres d'observation qui se **chevauchent** pour un même
+ticker (impossible : le BOC publie une seule valeur par séance) → **0**. Fenêtres
+**inversées** ou vides → **0**. **Doublons exacts** → **0**. Le relevé est sain ; il est
+seulement en retard. Quatre autres familles mesurées et vides : deux versements d'un même
+titre à moins de 15 jours → 0 ; dividende payé **avant** la clôture de l'exercice qu'il
+récompense → 0 ; écart exercice/année de paiement différent de 1 → 0 sur **324** lignes ;
+montants négatifs → 0.
+
+**Section 31**, 16 contrôles. Bloquant : que le registre **couvre** chaque relevé mesuré, et
+que chacun existe et porte bien sa colonne de date — ce sont des propriétés du registre.
+Alerte : le retard lui-même et le nombre d'observations non relevées, parce qu'ils viennent
+des workflows de collecte et que ce fichier ne bloque pas un commit de code pour un défaut de
+source — même séparation que la section 24. Registre adossé aux valeurs observées : plafonds
+**60 / 60 / 30 / 10** séances contre **44 / 44 / 1 / 0** observés, et **17** observations non
+relevées, plafond qui ne peut que descendre. Le cas NSBC est **nommé** dans un contrôle à
+lui : s'il sort de la liste, c'est que le relevé a été rattrapé. → **C35**, priorité 3.
+
+### Barrières
+
+Base complète : `peupler.py` (50 sociétés, 185 lignes d'états), `charger_cours.py` (4 509
+lignes, 47 tickers, 101 mois), `charger_cours_quotidien.py` (90 660 lignes, 2 029 jours,
+2018-01-02 → 2026-10-01), `charger_dividendes_exercice.py` (296 ajoutés, 63 déjà présents),
+`charger_liquidite_quotidienne.py` (73 141 lignes), `charger_dividendes_boc.py` (16 ajoutés,
+**3** complétés, 39 déjà présents, **6** refusés). `moteur/tester.py` : **tous les golden
+tests passent**. `profils.py` : 47 titres, répartition et grades inchangés.
+`moteur/tester_donnees.py` : **276 OK, 0 ÉCHEC**, code **2** — quatre alertes, les trois
+connues (C4 : 12 divisions de nominal à documenter ; C5 : CFAC et NEIC ; section 28 : le
+relevé du 02/10 porte la séance suivante celle du bulletin) et **l'alerte voulue de la
+section 31** sur NSBC. `avis_brvm.py --test` et `notations.py --test` passent.
+`generer_dashboard.py` : **48 titres**. `generer_dashboard_html.py` compile (Python 3.13.16).
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
+### Proposé
+
+**C34 — le chargeur retient la publication que la BRVM a retirée, 31 fois** (ORANGE,
+priorité 2). Diagnostic fait, portée et effet mesurés : 33 groupes sur 313 portent plusieurs
+montants et **33 sur 33** voient le chargeur retenir l'observation périmée ; **31 valeurs** en
+base, dont **8 restatements de nominal** — PRSC ×64, SEMC 2016 ×40, SAFC ×25, STBC ×20, ECOC /
+SIBC / TTLC ×5, ONTBF ×2. Règle appliquée en base puis `profils.py` relancé :
+`profils.json` diffère de **2 champs de texte**, **0 profil, 0 grade, 0 rang**. Latent, mais
+armé sur huit valeurs fausses d'un ordre de grandeur, affichées sur la fiche publiée. Deux
+options écrites dans le bloc ; c'est à Claudia.
+
+**C35 — deux relevés de collecte se sont arrêtés le même jour, il y a 44 séances** (ORANGE,
+priorité 3). Réseau nécessaire : passe par les workflows.
+
+**Prochain, par l'ordre déterministe.** C22 devient FAIT, donc le **rang 1 est vide** : plus
+aucun `ORANGE` ne porte `validation : OK` avec une passe non consommée. Rang 2 = la première
+`VERTE` non faite, priorité la plus haute d'abord → **C3** (Journal des prédictions,
+priorité 3 ; C8 est à 8, C9 à 9 et explicitement en dernier). Sauf si Claudia valide C32
+(priorité 2), C34 (priorité 2) ou C35, qui passeraient devant.
+
 ## 2026-10-04 — cycle 19 (soir) : C27, Bridge Bank existait en deux moitiés qui ne se rencontraient jamais
 
 **Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun

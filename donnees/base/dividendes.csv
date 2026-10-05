@@ -2,9 +2,9 @@ ticker,montant_net,date_paiement,exercice_couvert,note
 SDSC,82.8,,2022,92 FCFA brut confirme (resolutions AG) -> net apres IRVM 10%
 SDSC,90.0,,2021,100 FCFA brut reconstruit (voir note ci-dessus) -> net
 SDSC,90.0,,2020,"idem ticker, montant_net, date_paiement, exercice_couvert REGLE D'INTEGRITE : montant renseigne UNIQUEMENT si source dans la conversation ; sinon None (date seule, issue du BOC) — la saisie manuelle suit les memes regles que l'extraction automatique."
-SNTS,1740,2026-05-25,2025,source : Sika Finance 02/2026 (1933 brut / 1740 net)
+SNTS,1740,2026-05-26,2025,"source : Sika Finance 02/2026 (1933 brut / 1740 net) -- DATE TRANCHEE le 05/10/2026 (cycle 20, chantier C22) : le BOC publie le 26/05/2026, et il le publie du 2026-05-21 au 2026-07-24, donc deux mois apres le versement, quand la date de presse du 25/05 lui est anterieure. Le montant 1740 ne change pas et l'implicite rendement x cours du BOC le confirme : 1738,2 a 1741,5 sur les 8 dernieres seances (0,07 a 0,10 %). Registre : collecte/arbitrages_pont_boc.csv ; proces-verbal : outils/arbitrage_refus_pont_boc.py."
 STBC,,2025-08-29,2024,date BOC ; montant a re-sourcer
-NSBC,,2026-06-30,2025,AGO 30/06/2026 : 19 Mds FCFA approuves (Ecofin) ; par action a sourcer
+NSBC,,2026-08-04,2025,"AGO 30/06/2026 : 19 Mds FCFA approuves (Ecofin) ; par action a sourcer -- DATE TRANCHEE le 05/10/2026 (cycle 20, chantier C22) : la date portee ici etait celle de l'AGO, pas celle du paiement. Le BOC donne 675,98 paye le 04/08/2026 (collecte/dividendes_boc.csv, source BOC 2026-08-03) et l'implicite rendement x cours vaut 675,0 a 676,8 sur les 8 dernieres seances (0,02 a 0,15 %). Seule la DATE est corrigee ici ; le montant est ecrit par collecte/charger_dividendes_boc.py sous sa garde de date identique des deux cotes. La phrase qui precede est conservee : elle dit ce qu'on savait avant cette date. Reserve : les 19 Mds rapportes a 675,98 impliquent 28,1 M d'actions contre 24,7 a 26,4 M deduites du BNPA de reference -- l'identite ne ferme pas, elle n'est donc pas comptee comme preuve. Registre : collecte/arbitrages_pont_boc.csv."
 SMBC,,2025-09-15,2024,date BOC ; montant a re-sourcer
 BOABF,397.25,2026-04-23,2025,"source : Ecofin 03/2026 (dividende net apres IRVM 12,5%)"
 CBIBF,900,2026-06-19,2025,source : avis BRVM + presse 06/2026

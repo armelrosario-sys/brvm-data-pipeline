@@ -3040,7 +3040,148 @@ def test_reference_dividende_boc():
                else " — EN BAISSE, la reference echappe sur : "
                     + ", ".join(sorted(echappent))),
             bloquant=False)
+
+    # --- Le registre des refus du pont (chantier C22, 05/10/2026) -----------
+    # C22 exige qu'aucun refus du pont ne reste sans motif ecrit, et qu'aucun
+    # refus NOUVEAU n'apparaisse sans etre inscrit. Le controle ne fait pas
+    # confiance a la sortie du pont : il RECALCULE l'ensemble des refus depuis
+    # collecte/dividendes_boc.csv et la base, avec la meme logique que le pont,
+    # puis le compare au registre dans les DEUX sens.
+    _controle_registre_refus(cur, boc_brut=chemin_csv)
     conn.close()
+
+
+# Le registre est un fichier de donnees, pas du code : il vit dans collecte/
+# et la section le relit. Une ligne y porte sa decision, son motif, sa preuve
+# et le chantier dont elle releve.
+REGISTRE_REFUS = "collecte/arbitrages_pont_boc.csv"
+
+# Decisions admises. Une decision inconnue est un ECHEC : elle signifie qu'un
+# cycle a invente une categorie sans le dire.
+DECISIONS_REFUS = {
+    "REFUS_DEFINITIF",   # la base fait foi, definitivement (marqueur humain)
+    "REFUS_SIGNALE",     # la base n'est pas ecrasee, mais le cas part a Claudia
+    "REFUS_MOTIVE",      # la base fait foi, motif ecrit, renvoi a un chantier
+    "TRANCHE_RENVOI",    # valeur tranchee, application renvoyee a un chantier
+    "TRANCHE_APPLIQUE",  # valeur tranchee ET appliquee : le refus doit disparaitre
+}
+
+
+def _refus_recalcules(cur, boc_brut):
+    """Les refus que le pont emet, recalcules independamment de sa sortie.
+
+    Meme logique que charger_dividendes_boc.py : triplet exact deja present ->
+    rien ; couple (ticker, exercice) absent -> insertion ; montant NULL a date
+    identique -> completion ; sinon REFUS.
+    """
+    import csv as _csv
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from dates_dividendes import est_iso  # noqa: E402
+    from historiser_dividendes_exercice import deduire_exercice  # noqa: E402
+
+    refus = set()
+    if not Path(boc_brut).exists():
+        return refus
+    with Path(boc_brut).open(encoding="utf-8", newline="") as f:
+        for r in _csv.DictReader(f):
+            ticker = (r.get("ticker") or "").strip()
+            brut = (r.get("montant_net") or "").strip()
+            date_p = (r.get("date_paiement") or "").strip()
+            if not ticker or not brut or not date_p or not est_iso(date_p):
+                continue
+            try:
+                montant = float(brut)
+            except ValueError:
+                continue
+            exercice, _c, _n = deduire_exercice(int(date_p[:4]), int(date_p[5:7]))
+            if exercice is None:
+                continue
+            if cur.execute("SELECT 1 FROM dividendes WHERE ticker=? AND "
+                           "montant_net=? AND date_paiement=?",
+                           (ticker, montant, date_p)).fetchone():
+                continue
+            presentes = cur.execute(
+                "SELECT montant_net, date_paiement FROM dividendes "
+                "WHERE ticker=? AND exercice_couvert=?",
+                (ticker, exercice)).fetchall()
+            if not presentes:
+                continue
+            if any(m is None and d == date_p for m, d in presentes):
+                continue
+            refus.add((ticker, exercice))
+    return refus
+
+
+def _controle_registre_refus(cur, boc_brut):
+    """Le registre de C22 couvre exactement les refus que le pont emet."""
+    import csv as _csv
+    chemin = RACINE / REGISTRE_REFUS
+    if not verifie(chemin.exists(),
+                   f"{REGISTRE_REFUS} existe : les refus du pont ont un registre "
+                   f"motive (chantier C22)"):
+        return
+    with chemin.open(encoding="utf-8", newline="") as f:
+        lignes = list(_csv.DictReader(f))
+
+    # Forme : chaque ligne porte une decision connue, un motif, un chantier.
+    inconnues = sorted({l["decision"] for l in lignes} - DECISIONS_REFUS)
+    verifie(not inconnues,
+            "chaque ligne du registre porte une decision d'une categorie connue"
+            + ("" if not inconnues else f" — INCONNUES : {inconnues}"))
+    muettes = [f"{l['ticker']} ex.{l['exercice']}" for l in lignes
+               if not l["motif"].strip() or not l["chantier"].strip()
+               or not l["valeur_retenue"].strip()]
+    verifie(not muettes,
+            f"les {len(lignes)} lignes du registre portent toutes une valeur "
+            f"retenue, un motif et un chantier de renvoi"
+            + ("" if not muettes else " — MUETTES : " + ", ".join(muettes)))
+
+    doublons = len(lignes) - len({(l["ticker"], l["exercice"]) for l in lignes})
+    verifie(not doublons,
+            f"le registre ne porte aucun couple (ticker, exercice) en double "
+            f"({doublons} doublon(s))")
+
+    # Les deux sens. Un refus non inscrit est le defaut que C22 ferme ; une
+    # ligne 'subsiste' que le pont n'emet plus est un registre qui a derive.
+    recalcules = _refus_recalcules(cur, boc_brut)
+    inscrits = {(l["ticker"], int(l["exercice"])) for l in lignes}
+    subsistent = {(l["ticker"], int(l["exercice"])) for l in lignes
+                  if l["refus_subsiste"].strip().lower() == "oui"}
+
+    non_inscrits = sorted(f"{t} ex.{e}" for t, e in recalcules - inscrits)
+    verifie(not non_inscrits,
+            f"les {len(recalcules)} refus que le pont emet sont tous inscrits au "
+            f"registre"
+            + ("" if not non_inscrits
+               else " — REFUS NOUVEAU SANS MOTIF ECRIT : " + ", ".join(non_inscrits)
+                    + f" ; l'inscrire dans {REGISTRE_REFUS} avec sa valeur "
+                      f"retenue, son motif et son chantier"))
+
+    fantomes = sorted(f"{t} ex.{e}" for t, e in subsistent - recalcules)
+    verifie(not fantomes,
+            f"les {len(subsistent)} refus marques 'subsiste : oui' sont tous "
+            f"emis par le pont"
+            + ("" if not fantomes else " — FANTOMES, le pont ne les emet plus : "
+                                       + ", ".join(fantomes)))
+
+    # Un TRANCHE_APPLIQUE dont le refus subsiste est un arbitrage qui n'a pas
+    # pris : c'est exactement le faux vert que la chasse du cycle 11 cherchait.
+    rates = sorted(f"{l['ticker']} ex.{l['exercice']}" for l in lignes
+                   if l["decision"] == "TRANCHE_APPLIQUE"
+                   and (l["ticker"], int(l["exercice"])) in recalcules)
+    verifie(not rates,
+            "aucun arbitrage marque TRANCHE_APPLIQUE ne voit son refus subsister"
+            + ("" if not rates else " — NON APPLIQUE EN FAIT : " + ", ".join(rates)))
+
+    # Et la consequence concrete de l'arbitrage NSBC : la table n'a plus de
+    # montant vide. C'etait le seul, et il tenait a une date d'AGO.
+    vides = [f"{t} ex.{e}" for t, e in cur.execute(
+        "SELECT ticker, exercice_couvert FROM dividendes WHERE montant_net IS NULL "
+        "AND ticker NOT LIKE 'TEST_%'")]
+    verifie(not vides,
+            "aucun montant de dividende n'est vide dans la table"
+            + ("" if not vides else " — VIDES : " + ", ".join(vides)),
+            bloquant=False)
 
 
 # ----------------------------------------------------------------------
@@ -3171,11 +3312,16 @@ def test_lecture_des_bassins():
 # ----------------------------------------------------------------------
 # Chaque divergence connue entre l'avis BRVM et la base, avec le chantier dont
 # elle releve. Un cas NON inscrit ici fait tomber ou alerter la section.
-RATTACHEMENTS_CONNUS = {
-    ("NSBC", 2025): "C22 — la date de la base (2026-06-30) est celle de l'AGO, "
-                    "pas du paiement ; l'avis du 21/07/2026 et "
-                    "collecte/dividendes_boc.csv (04/08/2026) le disent tous deux",
-}
+#
+# VIDE DEPUIS LE 05/10/2026 (cycle 20, chantier C22), et c'est le resultat, pas
+# un relachement. Le seul cas inscrit etait NSBC 2025 : la base portait la date
+# de l'AGO (2026-06-30) a la place de la date de paiement, et l'exemption
+# existait pour que la section ne tombe pas dessus a chaque passage. C22 a
+# tranche le cas -- date corrigee en 2026-08-04 par
+# outils/arbitrage_refus_pont_boc.py, montant 675,98 complete par le pont --
+# donc l'exemption n'a plus d'objet et elle part. Un registre d'exceptions qui
+# ne se vide jamais finit par couvrir le defaut au lieu de le signaler.
+RATTACHEMENTS_CONNUS = {}
 # Avis de dividende que le collecteur n'a pas su rattacher a un ticker. Plafond
 # qui ne peut que DESCENDRE : 19 sur 47 mesures le 02/10/2026.
 AVIS_DIVIDENDE_SANS_TICKER_MAX = 19
@@ -3946,6 +4092,193 @@ def test_bascule_per_boc():
 
 
 
+
+# ---------------------------------------------------------------------------
+# SECTION 31 — un releve de collecte commite cesse d'avancer en silence
+#              (chasse du cycle 20, 05/10/2026)
+# ---------------------------------------------------------------------------
+# Retard mesure le 05/10/2026, en SEANCES du quotidien (derniere seance en base
+# 2026-10-01, 2 029 seances). Registre adosse aux valeurs OBSERVEES : une hausse
+# est signalee, jamais silencieuse. Un plafond ne peut que DESCENDRE.
+#
+#   fichier -> (colonne de date lue, retard observe en seances, plafond, motif)
+#
+# Les deux premiers sont les cas qui ont ouvert la chasse : ils se sont arretes
+# le MEME jour, le 2026-07-24, alors que le quotidien a continue 44 seances.
+RETARD_RELEVES_MAX = {
+    "collecte/dividendes_historique.csv": (
+        "derniere_observation", 44, 60,
+        "releve des fenetres d'observation du BOC ; dividendes_par_exercice.csv "
+        "en est GENERE, donc son retard se propage a toute regeneration"),
+    "collecte/liquidite_quotidienne_historique.csv": (
+        "date_bulletin", 44, 60,
+        "releve de la liquidite quotidienne (table de C14)"),
+    "collecte/dividendes_boc.csv": (
+        "date_paiement", 1, 30,
+        "colonne Dernier dividende paye du bulletin ; une date de PAIEMENT, donc "
+        "un retard apparent est normal entre deux saisons d'AGM"),
+    "collecte/cours_quotidien_boc.csv": (
+        "date_bulletin", 0, 10,
+        "la serie de reference : c'est elle qui donne la derniere seance"),
+}
+
+# Lignes de collecte/dividendes_boc.csv absentes de dividendes_historique.csv.
+# Consequence DIRECTE du retard du premier releve, et elle est chiffree : une
+# regeneration de dividendes_par_exercice.csv perdrait ces valeurs. 17 mesurees
+# le 05/10/2026, toutes collectees entre le 2026-07-28 et le 2026-09-28.
+# Plafond qui ne peut que DESCENDRE.
+OBSERVATIONS_NON_RELEVEES_MAX = 17
+
+
+def _derniere_date_iso(chemin, colonne):
+    """La plus grande date ISO portee par `colonne`, ou None."""
+    import csv as _csv
+    chemin_abs = RACINE / chemin
+    if not chemin_abs.exists():
+        return None
+    maxi = None
+    with chemin_abs.open(encoding="utf-8", newline="") as f:
+        lecteur = _csv.DictReader(f)
+        if colonne not in (lecteur.fieldnames or []):
+            return None
+        for r in lecteur:
+            v = (r.get(colonne) or "").strip()
+            if len(v) == 10 and v[4] == "-" and v[7] == "-" and (maxi is None or v > maxi):
+                maxi = v
+    return maxi
+
+
+def test_fraicheur_releves_collecte():
+    """Un releve commite qui cesse d'avancer doit le DIRE, pas attendre d'etre lu.
+
+    POURQUOI CETTE SECTION EXISTE (chasse du cycle 20, 05/10/2026). Le depot
+    surveille la fraicheur de ce qu'il LIT -- cours_mensuels contre le quotidien
+    (section 2), profils.json contre la base (section 23). Il ne surveillait pas
+    la fraicheur de ce qu'il ECRIT : les releves commites de collecte/, qui sont
+    la memoire longue des collecteurs.
+
+    Deux d'entre eux se sont arretes le MEME jour, le 2026-07-24, et rien ne le
+    disait. Mesure de ce cycle : le quotidien a publie 44 seances de plus
+    (jusqu'au 2026-10-01) pendant que ni collecte/dividendes_historique.csv ni
+    collecte/liquidite_quotidienne_historique.csv n'avancaient d'une ligne.
+
+    CE QUE CELA COUTE, ET C'EST MESURE, pas suppose.
+    collecte/dividendes_par_exercice.csv n'est pas un fichier saisi : il est
+    GENERE par historiser_dividendes_exercice.py depuis
+    collecte/dividendes_historique.csv. Or 17 des 64 lignes de
+    collecte/dividendes_boc.csv -- toutes collectees entre le 2026-07-28 et le
+    2026-09-28 -- sont absentes du releve. Une regeneration du fichier genere
+    les perdrait toutes les 17, dont NSBC 675,98 du 04/08/2026 : la valeur meme
+    que C22 vient de faire entrer en base ce cycle. Le defaut est LATENT tant que
+    personne ne regenere, et ARME des que quelqu'un le fait.
+    Cote liquidite, les 44 seances postericures au 2026-07-24 sont exactement 44
+    des 195 seances du quotidien sans aucune ligne de liquidite.
+
+    SEVERITES. Bloquant : que le registre COUVRE chaque fichier mesure, et que
+    chaque fichier du registre existe et porte bien sa colonne de date -- ce sont
+    des proprietes du registre et du depot. En alerte : le retard lui-meme et le
+    nombre d'observations non relevees, parce qu'ils viennent des workflows de
+    collecte et que ce fichier ne bloque pas un commit de code pour un defaut de
+    source. C'est la meme separation que la section 24.
+    """
+    print("\n=== 31. Fraicheur des releves de collecte commites "
+          "(bloquant + alertes) ===")
+    import csv as _csv
+
+    reference = _derniere_date_iso("collecte/cours_quotidien_boc.csv", "date_bulletin")
+    if not verifie(reference is not None,
+                   "collecte/cours_quotidien_boc.csv donne la derniere seance de "
+                   "reference"):
+        return
+    seances = set()
+    with (RACINE / "collecte" / "cours_quotidien_boc.csv").open(
+            encoding="utf-8", newline="") as f:
+        for r in _csv.DictReader(f):
+            v = (r.get("date_bulletin") or "").strip()
+            if len(v) == 10:
+                seances.add(v)
+    ordonnees = sorted(seances)
+    verifie(len(ordonnees) >= 2000,
+            f"la mesure porte sur une population reelle ({len(ordonnees)} seances, "
+            f"derniere {reference})")
+
+    for chemin, (colonne, observe, plafond, motif) in sorted(
+            RETARD_RELEVES_MAX.items()):
+        chemin_abs = RACINE / chemin
+        if not verifie(chemin_abs.exists(), f"{chemin} existe"):
+            continue
+        derniere = _derniere_date_iso(chemin, colonne)
+        if not verifie(derniere is not None,
+                       f"{chemin} porte bien une colonne {colonne} datee en ISO"):
+            continue
+        retard = sum(1 for s in ordonnees if s > derniere)
+        verifie(retard <= plafond,
+                f"{chemin} : derniere date {derniere}, {retard} seance(s) de "
+                f"retard sur {reference} (plafond {plafond}, observe {observe} le "
+                f"05/10/2026) — {motif}"
+                + ("" if retard <= plafond
+                   else " — EN HAUSSE : le releve a cesse d'avancer et rien "
+                        "d'autre ne le dit"),
+                bloquant=False)
+
+    # Le registre doit couvrir ce qui est reellement commite : un releve nouveau
+    # qui porterait une date de seance sans etre inscrit ici serait exactement le
+    # defaut que cette section ferme, vu une fois de plus.
+    attendus = {"collecte/dividendes_historique.csv",
+                "collecte/liquidite_quotidienne_historique.csv",
+                "collecte/dividendes_boc.csv",
+                "collecte/cours_quotidien_boc.csv"}
+    verifie(attendus <= set(RETARD_RELEVES_MAX),
+            f"le registre couvre les {len(attendus)} releves commites qui portent "
+            f"une date de seance ou d'observation"
+            + ("" if attendus <= set(RETARD_RELEVES_MAX)
+               else " — NON COUVERTS : " + ", ".join(sorted(attendus - set(RETARD_RELEVES_MAX)))))
+
+    # --- La consequence chiffree : ce qu'une regeneration perdrait -----------
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from dates_dividendes import vers_iso  # noqa: E402
+    releve = set()
+    with (RACINE / "collecte" / "dividendes_historique.csv").open(
+            encoding="utf-8", newline="") as f:
+        for r in _csv.DictReader(f):
+            brut = (r.get("montant") or "").strip()
+            try:
+                d = vers_iso((r.get("date_paiement") or "").strip())
+            except Exception:
+                d = (r.get("date_paiement") or "").strip()
+            releve.add((r.get("ticker"), brut and float(brut), d))
+    absents = []
+    with (RACINE / "collecte" / "dividendes_boc.csv").open(
+            encoding="utf-8", newline="") as f:
+        for r in _csv.DictReader(f):
+            brut = (r.get("montant_net") or "").strip()
+            cle = (r.get("ticker"), brut and float(brut),
+                   (r.get("date_paiement") or "").strip())
+            if cle not in releve:
+                absents.append(f"{cle[0]} {cle[1]} le {cle[2]}")
+    verifie(len(absents) <= OBSERVATIONS_NON_RELEVEES_MAX,
+            f"{len(absents)} observation(s) de collecte/dividendes_boc.csv absente(s) "
+            f"du releve dividendes_historique.csv (plafond "
+            f"{OBSERVATIONS_NON_RELEVEES_MAX}) — une regeneration de "
+            f"dividendes_par_exercice.csv les perdrait"
+            + ("" if len(absents) <= OBSERVATIONS_NON_RELEVEES_MAX
+               else " — EN HAUSSE : " + ", ".join(sorted(absents))),
+            bloquant=False)
+
+    # Et le cas nominatif qui donne la mesure son sens : la valeur que C22 vient
+    # de faire entrer en base est parmi les absentes. Non bloquant, mais nomme :
+    # si elle en sort, c'est que le releve a ete rattrape.
+    nsbc = [a for a in absents if a.startswith("NSBC")]
+    verifie(not nsbc,
+            "NSBC 675.98 du 2026-08-04, entre en base par C22, est aussi dans le "
+            "releve dividendes_historique.csv"
+            + ("" if not nsbc else " — ABSENTE du releve : " + ", ".join(nsbc)
+                                   + " ; une regeneration de "
+                                     "dividendes_par_exercice.csv la perdrait"),
+            bloquant=False)
+
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -3980,6 +4313,7 @@ def main():
     test_confrontation_per_page()
     test_echelle_rendement_boc()
     test_bascule_per_boc()
+    test_fraicheur_releves_collecte()
     if not sans_app:
         test_application()
 
