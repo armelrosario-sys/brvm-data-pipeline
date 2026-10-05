@@ -2211,7 +2211,7 @@ Rien n'a été branché : inscrit en **C33**.
 
 - classe : ORANGE — ouvre l'entrée d'une série de cours certifiée à un titre qu'elle n'acceptait pas ; le diagnostic est fait
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : complète, **sans réseau** — la correction est dans le dépôt ; sa vérification demande un passage de `boc_quotidien.yml`
 - priorité : 2 — **un titre coté depuis dix séances n'a aucun prix, et rien ne le dit**
 
@@ -2533,7 +2533,7 @@ les quatre PER hors branche sont tranchés avec leur preuve à deux côtés ; l'
 
 - classe : ORANGE — tranche une règle de lecture et déplace 31 valeurs certifiées ; le diagnostic est fait et l'effet est mesuré
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : 2 — **une règle de lecture fausse, huit valeurs décalées d'un facteur 2 à 64**
 
@@ -2594,7 +2594,7 @@ valeurs sont corrigées par un script idempotent à gardes `attendu` ; l'effet s
 
 - classe : ORANGE — relancer une collecte sur quarante-quatre séances écrit dans des relevés certifiés ; le diagnostic est fait
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : **réseau nécessaire** — passe par les workflows du dépôt (`boc_quotidien.yml`, `collecte.yml`)
 - priorité : 3 — latent aujourd'hui, armé dès qu'un fichier généré est régénéré
 
