@@ -7,13 +7,15 @@ name: Sentinelle
 # Il s'exécute après les deux passages de collecte du bulletin (18 h et 21 h UTC)
 # et n'écrit jamais dans le dépôt : il ouvre, met à jour ou ferme une issue.
 
+# Volontairement sans déclencheur « workflow_run » : il faudrait y inscrire le
+# nom exact d'un autre workflow, et le dépôt en compte plusieurs qui touchent au
+# bulletin. Un nom approximatif n'échoue pas — il est simplement ignoré, ce qui
+# donnerait un contrôle muet, précisément le défaut que ce fichier combat. Le
+# passage quotidien suffit : le tableau de bord n'est publié qu'une fois par jour.
 on:
   schedule:
     - cron: '47 22 * * 1-5'      # du lundi au vendredi, après les collectes
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Collecte BOC"]
-    types: [completed]
 
 permissions:
   contents: read
