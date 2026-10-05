@@ -2635,6 +2635,42 @@ relevées (plafond **17**, qui ne peut que descendre) et nomme le cas NSBC. 16 c
 17 observations manquantes y sont ; les plafonds de la section 31 sont abaissés d'autant ; et
 la relance est portée par un workflow qu'un cycle peut déclencher.
 
+## C36 — Quand la BRVM ne publie que l'édition anglaise du BOC, la séance est perdue
+
+- classe : ORANGE — charger une seconde édition, au format et à la précision différents, est un arbitrage sur une donnée certifiée
+- statut : PROPOSÉ
+- validation : —
+- priorité : 3
+
+**D'où vient ce chantier.** Signalement de Claudia le 05/10/2026 : le BOC du **02/10/2026**
+est publié (`boc_eng_20261002.pdf`) et n'a jamais été chargé. Deux défauts, dont un seul est
+réglé hors cycle le même jour :
+
+- **Réglé (commit hors cycle du 05/10)** : `collecte_boc_quotidien.py` s'arrêtait au premier
+  BOC trouvé en remontant et n'essayait que le suffixe `_2`. Il tente désormais **toutes** les
+  séances ouvrées des 10 derniers jours absentes de l'historique, sous `_2`, `_1` et `_3`, et
+  journalise pour chaque absence son motif — dont « ÉDITION ANGLAISE SEULE ».
+- **Ouvert, c'est ce chantier** : si seule l'édition anglaise existe, la séance n'est pas
+  chargée, et c'est voulu tant que Claudia n'a pas tranché.
+
+**Pourquoi l'édition anglaise n'est pas chargée d'office.** Lue le 05/10 sur le 02/10 et
+confrontée à l'édition française du 01/10 : cours et PER sont écrits en entier (SNTS 45,000
+et 10.88 ; BOAC 12.89), mais le **rendement est arrondi à deux décimales de la fraction**
+(SNTS **0.04**, BOAC 0.05, SGBC 0.06, contre 3,87 %, 5,20 %, 5,89 % en français). Nombres à
+l'anglaise (virgule des milliers, point décimal), mois en anglais (« 26 May 26 ») :
+`extracteur_boc.py` n'en lit rien aujourd'hui. Le même bulletin annonce **46** titres cotés.
+
+**Les options.**
+- **(a)** Ne rien charger : la séance reste un trou daté, signalé par le collecteur.
+- **(b)** Charger **cours et PER** depuis l'édition anglaise, **rendement laissé vide** (une
+  case vide vaut mieux qu'une valeur approchée), source étiquetée `BOC_ENG` ; la ligne est
+  remplacée si l'édition française paraît plus tard.
+- **(c)** Charger aussi le rendement arrondi. **Déconseillé** : contraire à la deuxième règle
+  de ce fichier.
+
+**Première mesure à faire** (pré-autorisée, sans écriture) : sur les 60 dernières séances,
+combien n'ont qu'une édition anglaise ? Si c'est le 02/10 seul, (a) suffit peut-être.
+
 ---
 
 # Veille datée, hors file

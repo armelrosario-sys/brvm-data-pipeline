@@ -9,6 +9,38 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-05 — hors cycle : le collecteur BOC quotidien rattrape les séances manquées
+
+**Le signalement de Claudia** (15h02 UTC). Le run de `collecte_boc_quotidien.yml` du 05/10 a
+chargé le BOC du **01/10** ; le **02/10** a répondu 404 et a été « ignoré ». Or un BOC du 02/10
+existe : `boc_eng_20261002.pdf`.
+
+**Deux défauts dans `collecte/collecte_boc_quotidien.py`.**
+1. **Il s'arrêtait au premier BOC trouvé** en remontant depuis aujourd'hui. Une séance
+   manquée n'était jamais rattrapée : il suffisait que la suivante soit publiée.
+2. **Il n'essayait que le suffixe `_2`**, alors que `pipeline/collecte_boc.py` essaie `_2`,
+   `_1`, `_3` depuis août, et il jugeait un PDF à sa taille (≥ 1 000 octets) et non à sa
+   signature `%PDF`.
+
+**Corrigé.** Chaque séance ouvrée des 10 derniers jours **absente de
+`cours_quotidien_boc.csv`** est tentée, de la plus ancienne à la plus récente, sous les trois
+suffixes français ; chaque absence est journalisée avec son motif. `cours_mensuels` ne prend
+plus une séance rattrapée si une séance plus tardive du même mois est déjà en base.
+
+**Non chargé, et volontairement : l'édition anglaise.** Lue sur le 02/10, elle arrondit le
+rendement à deux décimales de la fraction (SNTS 0.04 contre 3,87 % en français). Le
+collecteur la **détecte** et l'écrit dans son journal ; la charger est un arbitrage :
+**chantier C36**, ORANGE, trois options.
+
+**Vérifié.** Réseau simulé : le 02/10 et le 05/10 manquants sont chargés dans l'ordre, le
+mensuel finit sur le 05/10 ; rattrapage tardif du 02/10 après le 05/10 : le mensuel reste au
+05/10. **Contrôle indépendant** : la section de `tester_donnees.py` qui confronte le relevé
+de la page « Volumes / Valeurs » au bulletin signalait déjà le trou (« le relevé du
+2026-10-02 porte la séance SUIVANTE celle du bulletin »). Barrières : golden tests verts ;
+`tester_donnees.py` 276 OK, code 2 (4 alertes de fraîcheur, dont ce trou) ; `profils.json`
+inchangé. Le run réel est relancé après le commit pour savoir si une édition française du
+02/10 existe sous un autre suffixe.
+
 ## 2026-10-05 — cycle 20 (matin) : C22, les trois refus où la BRVM s'oppose à elle-même
 
 **Contrôle anti-collision.** `git log --since="3 hours ago"` sur `origin/main` : **aucun

@@ -19,8 +19,9 @@ collecte quotidienne alimente DEUX tables, jamais une seule --
     logique existante -- B1_RECORD, mediane sectorielle, etc.), desormais a
     jour quotidiennement au lieu de deux fois par semaine.
 
-Essaie plusieurs jours en arriere (jusqu'a 5) si le BOC du jour n'est pas
-encore publie (weekend, jour ferie, delai de publication).
+Rattrapage (05/10/2026) : tente TOUTES les seances ouvrees des
+MAX_JOURS_EN_ARRIERE derniers jours absentes de l'historique commite, et pas
+seulement la plus recente ; dit pour chaque absence pourquoi.
 
 Usage : python3 collecte_boc_quotidien.py [chemin_db]
 """
@@ -39,7 +40,12 @@ from extracteur_boc import extraire_boc
 DB = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).resolve().parent.parent / "moteur" / "brvm.db")
 UA = {"User-Agent": "brvm-data-pipeline/0.3 (collecte selective respectueuse; "
       "https://github.com/armelrosario-sys/brvm-data-pipeline)"}
-MAX_JOURS_EN_ARRIERE = 5
+MAX_JOURS_EN_ARRIERE = 10  # fenetre de RATTRAPAGE (05/10/2026) : voir main()
+# Suffixes observes pour l'edition FRANCAISE. _2 est l'usage ; _1 et _3 existent
+# (pipeline/collecte_boc.py les essaie depuis aout). Avant le 05/10/2026, ce
+# collecteur n'essayait que _2 : toute seance publiee sous un autre suffixe
+# etait perdue sans bruit.
+SUFFIXES_FR = ("_2", "_1", "_3")
 _session = None
 
 
@@ -62,23 +68,46 @@ def obtenir_session():
     return _session
 
 
-def telecharger_boc(jour):
-    """Tente de telecharger le BOC pour une date donnee. Retourne le chemin
-    du fichier temporaire si succes, None sinon (jour non-ouvre ou pas encore publie)."""
-    aaaammjj = jour.strftime("%Y%m%d")
-    url = f"https://www.brvm.org/sites/default/files/boc_{aaaammjj}_2.pdf"
+def _pdf(url):
+    """Contenu si l'URL sert un vrai PDF, None sinon. Le controle porte sur la
+    signature %PDF et non sur la taille : la page d'erreur de brvm.org fait
+    36 743 octets et aurait passe le seuil de 1 000 octets de l'ancien test
+    si elle avait ete servie avec un statut 200."""
     try:
         resp = obtenir_session().get(url, timeout=30)
-        if resp.status_code != 200 or len(resp.content) < 1000:
-            print(f"  {aaaammjj} : statut {resp.status_code}, {len(resp.content)} octets -- ignore")
-            return None
-        f = tempfile.NamedTemporaryFile(suffix=f"_boc_{aaaammjj}_2.pdf", delete=False)
-        f.write(resp.content)
-        f.close()
-        return f.name
     except requests.RequestException as e:
-        print(f"  {aaaammjj} : ECHEC requete ({type(e).__name__}: {e}) -- ignore")
+        print(f"    {url} : ECHEC requete ({type(e).__name__}: {e})")
         return None
+    if resp.status_code == 200 and resp.content[:4] == b"%PDF":
+        return resp.content
+    return None
+
+
+def telecharger_boc(jour):
+    """Cherche l'edition FRANCAISE du BOC d'une seance, sous chacun de ses
+    suffixes. Retourne (chemin_temporaire, url) ou (None, motif).
+
+    L'edition ANGLAISE (boc_eng_...) est seulement DETECTEE, jamais chargee :
+    mesure du 05/10/2026 sur le BOC du 02/10, elle arrondit le rendement a deux
+    decimales de la fraction (SNTS : 0.04 contre 3,87 % en francais), ecrit les
+    nombres a l'anglaise et les mois en anglais. La charger approcherait une
+    valeur certifiee -- interdit par CHANTIERS.md. Chantier C36."""
+    aaaammjj = jour.strftime("%Y%m%d")
+    base = "https://www.brvm.org/sites/default/files"
+    for suffixe in SUFFIXES_FR:
+        url = f"{base}/boc_{aaaammjj}{suffixe}.pdf"
+        contenu = _pdf(url)
+        if contenu:
+            f = tempfile.NamedTemporaryFile(suffix=f"_boc_{aaaammjj}{suffixe}.pdf", delete=False)
+            f.write(contenu)
+            f.close()
+            return f.name, url
+    for suffixe in SUFFIXES_FR:
+        url = f"{base}/boc_eng_{aaaammjj}{suffixe}.pdf"
+        if _pdf(url):
+            return None, (f"EDITION ANGLAISE SEULE ({url}) -- non chargee : rendement "
+                          "arrondi, voir chantier C36")
+    return None, "aucune edition publiee (ferie, ou pas encore en ligne)"
 
 
 def periode(date_bulletin_aaaammjj):
@@ -205,41 +234,21 @@ def exporter_dividendes_boc(cur):
     return len(rows)
 
 
-def main():
-    aujourd_hui = date.today()
-    chemin_pdf, date_bulletin = None, None
-    for delta in range(MAX_JOURS_EN_ARRIERE):
-        jour = aujourd_hui - timedelta(days=delta)
-        if jour.weekday() >= 5:  # 5=samedi, 6=dimanche -- la BRVM cote du lundi au vendredi
-            print(f"  {jour.isoformat()} : week-end, jour non ouvre -- ignore sans requete")
-            continue
-        chemin = telecharger_boc(jour)
-        if chemin:
-            db_, lignes = extraire_boc(chemin)
-            if db_ and lignes:
-                chemin_pdf, date_bulletin, boc_lignes = chemin, db_, lignes
-                print(f"BOC trouve pour {jour.isoformat()} ({len(lignes)} titres)")
-                break
-            print(f"  {jour.strftime('%Y%m%d')} : telechargement reussi mais extraction "
-                  f"vide (date_bulletin={db_!r}, {len(lignes)} ligne(s)) -- ignore")
-            Path(chemin).unlink(missing_ok=True)
+def seances_deja_en_base():
+    """Dates (ISO) deja presentes dans l'historique COMMITE du quotidien."""
+    f = Path(__file__).resolve().parent / "cours_quotidien_boc.csv"
+    if not f.exists():
+        return set()
+    with open(f, encoding="utf-8") as fh:
+        next(fh, None)
+        return {ligne.split(",")[1] for ligne in fh if ligne.count(",") >= 4}
 
-    if not chemin_pdf:
-        print(f"Aucun BOC exploitable trouve sur les {MAX_JOURS_EN_ARRIERE} derniers jours -- rien a faire.")
-        return
 
-    Path(chemin_pdf).unlink(missing_ok=True)
+def charger_une_seance(cur, date_bulletin, boc_lignes):
+    """Ecrit une seance dans cours_quotidien_boc, cours_mensuels et dividendes.
+    Rend (n_quotidien, n_mensuel, n_dividendes)."""
     p = periode(date_bulletin)
     d_iso = date_iso(date_bulletin)
-
-    conn = sqlite3.connect(DB)
-    cur = conn.cursor()
-    n_recharges = recharger_historique_committe(cur)
-    if n_recharges:
-        print(f"{n_recharges} ligne(s) d'historique deja committe rechargee(s) avant d'accumuler")
-    n_div_recharges = recharger_dividendes_committes(cur)
-    if n_div_recharges:
-        print(f"{n_div_recharges} dividende(s) BOC deja committe(s) recharge(s)")
     n_quotidien, n_mensuel = 0, 0
     for r in boc_lignes:
         cur.execute(
@@ -249,27 +258,89 @@ def main():
              r.get("rendement") / 100 if r.get("rendement") else None))
         n_quotidien += 1
 
-        # cours_mensuels : ne remplacer que si cette collecte est plus recente
-        # que ce qui y figure deja pour ce mois (coherent avec charger_cours.py :
-        # "on garde la ligne la plus tardive du mois").
-        existant = cur.execute(
-            "SELECT fin_mois FROM cours_mensuels WHERE ticker=? AND fin_mois=?",
-            (r["ticker"], p)).fetchone()
+        # cours_mensuels garde la ligne la plus TARDIVE du mois (coherent avec
+        # charger_cours.py). Garde ajoutee le 05/10/2026 avec le rattrapage : une
+        # seance ancienne rattrapee apres une plus recente du meme mois ne doit
+        # pas ecraser celle-ci.
+        plus_recente = cur.execute(
+            "SELECT 1 FROM cours_quotidien_boc WHERE ticker=? AND date_bulletin>? "
+            "AND substr(date_bulletin,1,7)=?", (r["ticker"], d_iso, p)).fetchone()
+        if plus_recente:
+            continue
         cur.execute(
             "INSERT OR REPLACE INTO cours_mensuels (ticker, fin_mois, cours, per, rendement, liquidite_ratio) "
             "VALUES (?,?,?,?,?,NULL)",
             (r["ticker"], p, r.get("cours"), r.get("per"),
              r.get("rendement") / 100 if r.get("rendement") else None))
         n_mensuel += 1
-
     n_dividendes = charger_dividendes_boc(cur, boc_lignes, d_iso)
-    n_div_exportes = exporter_dividendes_boc(cur)
+    return n_quotidien, n_mensuel, n_dividendes
 
+
+def main():
+    """RATTRAPAGE (05/10/2026). Avant cette date, le collecteur s'arretait au
+    PREMIER BOC trouve en remontant depuis aujourd'hui, et ne chargeait que
+    celui-la. Une seance manquee un jour -- suffixe inhabituel, edition anglaise
+    seule, publication tardive -- n'etait jamais rattrapee : le BOC du 02/10/2026
+    manquait encore le 05/10, et le journal du workflow disait seulement
+    "statut 404 -- ignore". Desormais : chaque jour ouvre de la fenetre ABSENT
+    de l'historique commite est tente, du plus ancien au plus recent, et chaque
+    absence dit pourquoi."""
+    aujourd_hui = date.today()
+    deja = seances_deja_en_base()
+    a_tenter = []
+    for delta in range(MAX_JOURS_EN_ARRIERE - 1, -1, -1):
+        jour = aujourd_hui - timedelta(days=delta)
+        if jour.weekday() >= 5:  # la BRVM cote du lundi au vendredi
+            continue
+        if jour.isoformat() in deja:
+            continue
+        a_tenter.append(jour)
+    if not a_tenter:
+        print(f"Toutes les seances ouvrees des {MAX_JOURS_EN_ARRIERE} derniers jours sont "
+              "deja en base -- rien a faire.")
+        return
+    print("Seances absentes de l'historique, a tenter : "
+          + ", ".join(j.isoformat() for j in a_tenter))
+
+    trouvees, manquantes = [], []
+    for jour in a_tenter:
+        chemin, source = telecharger_boc(jour)
+        if not chemin:
+            manquantes.append((jour, source))
+            continue
+        db_, lignes = extraire_boc(chemin)
+        Path(chemin).unlink(missing_ok=True)
+        if not (db_ and lignes):
+            manquantes.append((jour, f"telecharge ({source}) mais extraction vide"))
+            continue
+        if date_iso(db_) != jour.isoformat():
+            # Le document dit lui-meme sa date : on la croit, et on le dit.
+            print(f"  {jour.isoformat()} : le document lu ({source}) porte la date "
+                  f"{date_iso(db_)} -- retenu sous sa propre date")
+        trouvees.append((db_, lignes, source))
+
+    for jour, motif in manquantes:
+        print(f"  {jour.isoformat()} : NON CHARGE -- {motif}")
+    if not trouvees:
+        print("Aucun BOC exploitable a charger.")
+        return
+
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    n_recharges = recharger_historique_committe(cur)
+    if n_recharges:
+        print(f"{n_recharges} ligne(s) d'historique deja committe rechargee(s) avant d'accumuler")
+    n_div_recharges = recharger_dividendes_committes(cur)
+    if n_div_recharges:
+        print(f"{n_div_recharges} dividende(s) BOC deja committe(s) recharge(s)")
+    for db_, lignes, source in sorted(trouvees, key=lambda x: x[0]):
+        nq, nm, nd = charger_une_seance(cur, db_, lignes)
+        print(f"BOC du {date_iso(db_)} charge ({len(lignes)} titres, {source}) : "
+              f"{nq} ligne(s) quotidiennes, {nm} mensuelle(s), {nd} nouveau(x) dividende(s)")
+    n_div_exportes = exporter_dividendes_boc(cur)
     conn.commit()
     conn.close()
-    print(f"{n_quotidien} ligne(s) ajoutee(s)/mise(s) a jour dans cours_quotidien_boc ({d_iso})")
-    print(f"{n_mensuel} ligne(s) rafraichie(s) dans cours_mensuels ({p})")
-    print(f"{n_dividendes} nouveau(x) dividende(s) ajoute(s) depuis le BOC (source officielle directe)")
     print(f"{n_div_exportes} dividende(s) BOC au total exportes vers dividendes_boc.csv")
 
 
