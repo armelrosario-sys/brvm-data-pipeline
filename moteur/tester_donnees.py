@@ -4279,6 +4279,36 @@ def test_fraicheur_releves_collecte():
 
 
 
+# ----------------------------------------------------------------------
+# 32. L'HISTORIQUE DU QUOTIDIEN NE PEUT QUE CROITRE (bloquant)
+# ----------------------------------------------------------------------
+def test_historique_quotidien_protege():
+    """Le 05/10/2026 a 15h11, le run de collecte_boc_quotidien.yml a commite
+    cours_quotidien_boc.csv VIDE (90 660 lignes supprimees, restaurees par le
+    revert 8fbdc5f). Cause : le collecteur, corrige le meme jour pour rattraper
+    les seances manquees, sortait AVANT de recharger l'historique commite quand
+    aucun BOC n'etait chargeable ; l'export du workflow a ecrit la table vide.
+
+    Deux protections, chacune suffisante, et toutes deux figees ici :
+      (1) main() recharge l'historique commite AVANT toute sortie ;
+      (2) l'export du workflow refuse d'ecrire moins de lignes qu'il n'y en a."""
+    print("\n=== 32. L'historique du quotidien ne peut que croitre (bloquant) ===")
+    src = (RACINE / "collecte" / "collecte_boc_quotidien.py").read_text(encoding="utf-8")
+    corps = src[src.index("def main():"):]
+    i_recharge = corps.find("recharger_historique_committe(cur)")
+    i_return = corps.find("return")
+    verifie(i_recharge != -1 and (i_return == -1 or i_recharge < i_return),
+            "collecte_boc_quotidien.main() recharge l'historique commite avant toute sortie")
+    wf = (RACINE / ".github" / "workflows" / "collecte_boc_quotidien.yml").read_text(encoding="utf-8")
+    verifie("REFUS" in wf and "len(rows) < avant" in wf,
+            "l'export de collecte_boc_quotidien.yml refuse de reduire l'historique commite")
+    f = RACINE / "collecte" / "cours_quotidien_boc.csv"
+    n = max(sum(1 for _ in open(f, encoding="utf-8")) - 1, 0) if f.exists() else 0
+    verifie(n >= 90660,
+            f"cours_quotidien_boc.csv porte {n} lignes (plancher 90 660, releve du "
+            "05/10/2026 ; il ne peut que monter)")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -4314,6 +4344,7 @@ def main():
     test_echelle_rendement_boc()
     test_bascule_per_boc()
     test_fraicheur_releves_collecte()
+    test_historique_quotidien_protege()
     if not sans_app:
         test_application()
 

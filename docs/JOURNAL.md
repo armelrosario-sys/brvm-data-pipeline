@@ -9,6 +9,33 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-05 — hors cycle : incident, l'historique du quotidien vidé puis restauré
+
+**Ce qui s'est passé.** Le run de vérification de `collecte_boc_quotidien.yml`, lancé à
+15h09 UTC juste après le correctif `a97df44`, n'a trouvé aucun BOC chargeable : le 02/10 n'a
+qu'une édition anglaise, le 05/10 n'était pas encore en ligne. Le collecteur corrigé sortait
+alors **avant** de recharger l'historique commité dans la base reconstruite par le workflow ;
+l'étape d'export a écrit la table vide, et le commit automatique `1eed05e` (15h11) a vidé
+`cours_quotidien_boc.csv` de ses **90 660 lignes**. **L'erreur est la mienne** : le test
+simulé chargeait toujours une séance, il n'a jamais emprunté la sortie anticipée.
+
+**Restauré** par `git revert` (`8fbdc5f`) : 90 660 lignes, à l'identique. Aucun autre commit
+ne s'était intercalé ; `dividendes_boc.csv` n'avait pas été touché.
+
+**Corrigé deux fois, chacune suffisante.** (1) `main()` recharge l'historique et les
+dividendes commités **avant toute sortie** ; (2) l'export du workflow **refuse d'écrire moins
+de lignes que le fichier n'en contient** (`REFUS : …`, code 1, rien de commité). Rejoué en
+local sur le scénario exact : 90 660 lignes exportées ; base vidée à la main : refus.
+
+**Test** : section 32 de `tester_donnees.py`, 3 contrôles (rechargement avant tout `return`,
+garde de l'export, plancher de 90 660 lignes qui ne peut que monter). Barrières : golden tests
+verts ; `tester_donnees.py` **279 OK**, code 2 (4 alertes de fraîcheur connues) ;
+`profils.json` inchangé ; `avis_brvm.py --test`, `notations.py --test` verts ;
+`generer_dashboard.py` 48 titres.
+
+**Ce que le run a quand même appris** : sous les suffixes `_2`, `_1` et `_3`, **aucune édition
+française du 02/10 n'existe**. Le 02/10 relève donc bien de C36.
+
 ## 2026-10-05 — hors cycle : le collecteur BOC quotidien rattrape les séances manquées
 
 **Le signalement de Claudia** (15h02 UTC). Le run de `collecte_boc_quotidien.yml` du 05/10 a

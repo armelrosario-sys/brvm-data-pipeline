@@ -285,7 +285,21 @@ def main():
     manquait encore le 05/10, et le journal du workflow disait seulement
     "statut 404 -- ignore". Desormais : chaque jour ouvre de la fenetre ABSENT
     de l'historique commite est tente, du plus ancien au plus recent, et chaque
-    absence dit pourquoi."""
+    absence dit pourquoi.
+
+    L'HISTORIQUE COMMITE EST RECHARGE EN BASE AVANT TOUTE SORTIE ANTICIPEE.
+    Defaut du 05/10/2026, 15h11 : la premiere version de ce rattrapage sortait
+    sans recharger quand aucun BOC n'etait chargeable ; l'etape d'export du
+    workflow a alors ecrit la table vide, et le commit automatique a vide
+    cours_quotidien_boc.csv de ses 90 660 lignes (restaure par revert, 8fbdc5f).
+    La base que le workflow exporte doit TOUJOURS contenir l'historique."""
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+    n_recharges = recharger_historique_committe(cur)
+    n_div_recharges = recharger_dividendes_committes(cur)
+    conn.commit()
+    print(f"{n_recharges} ligne(s) d'historique et {n_div_recharges} dividende(s) "
+          "commites recharges en base avant tout")
     aujourd_hui = date.today()
     deja = seances_deja_en_base()
     a_tenter = []
@@ -299,6 +313,7 @@ def main():
     if not a_tenter:
         print(f"Toutes les seances ouvrees des {MAX_JOURS_EN_ARRIERE} derniers jours sont "
               "deja en base -- rien a faire.")
+        conn.close()
         return
     print("Seances absentes de l'historique, a tenter : "
           + ", ".join(j.isoformat() for j in a_tenter))
@@ -324,16 +339,9 @@ def main():
         print(f"  {jour.isoformat()} : NON CHARGE -- {motif}")
     if not trouvees:
         print("Aucun BOC exploitable a charger.")
+        conn.close()
         return
 
-    conn = sqlite3.connect(DB)
-    cur = conn.cursor()
-    n_recharges = recharger_historique_committe(cur)
-    if n_recharges:
-        print(f"{n_recharges} ligne(s) d'historique deja committe rechargee(s) avant d'accumuler")
-    n_div_recharges = recharger_dividendes_committes(cur)
-    if n_div_recharges:
-        print(f"{n_div_recharges} dividende(s) BOC deja committe(s) recharge(s)")
     for db_, lignes, source in sorted(trouvees, key=lambda x: x[0]):
         nq, nm, nd = charger_une_seance(cur, db_, lignes)
         print(f"BOC du {date_iso(db_)} charge ({len(lignes)} titres, {source}) : "

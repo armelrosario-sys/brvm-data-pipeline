@@ -49,6 +49,16 @@ jobs:
           import sqlite3, csv
           c = sqlite3.connect('moteur/brvm.db').cursor()
           rows = c.execute('SELECT ticker, date_bulletin, cours, per, rendement FROM cours_quotidien_boc ORDER BY date_bulletin, ticker').fetchall()
+          # GARDE (05/10/2026) : l'historique ne peut que croitre. Le 05/10 a 15h11,
+          # une base sans historique a ete exportee et a vide le fichier commite
+          # (90 660 lignes). On refuse d'ecrire moins de lignes qu'il n'en contient.
+          import os, sys
+          avant = 0
+          if os.path.exists('collecte/cours_quotidien_boc.csv'):
+              with open('collecte/cours_quotidien_boc.csv', encoding='utf-8') as f:
+                  avant = max(sum(1 for _ in f) - 1, 0)
+          if len(rows) < avant:
+              sys.exit(f'REFUS : la base exporterait {len(rows)} lignes contre {avant} commitees -- rien ecrit')
           with open('collecte/cours_quotidien_boc.csv', 'w', newline='', encoding='utf-8') as f:
               w = csv.writer(f)
               w.writerow(['ticker', 'date_bulletin', 'cours', 'per', 'rendement'])
