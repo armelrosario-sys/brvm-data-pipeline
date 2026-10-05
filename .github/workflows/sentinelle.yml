@@ -1,0 +1,92 @@
+name: Sentinelle
+
+# Les collectes signalent leurs propres échecs, mais seulement quand elles
+# tournent. Ce contrôle-ci part du résultat publié : il dit si le tableau de bord
+# affiche encore des chiffres dignes de foi, y compris quand plus rien ne tourne.
+#
+# Il s'exécute après les deux passages de collecte du bulletin (18 h et 21 h UTC)
+# et n'écrit jamais dans le dépôt : il ouvre, met à jour ou ferme une issue.
+
+on:
+  schedule:
+    - cron: '47 22 * * 1-5'      # du lundi au vendredi, après les collectes
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Collecte BOC"]
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: sentinelle
+  cancel-in-progress: false
+
+jobs:
+  controler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Contrôler le jeu publié
+        id: controle
+        run: |
+          set +e
+          python pipeline/sentinelle.py
+          echo "etat=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Conserver le rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-sentinelle
+          path: donnees/sentinelle.md
+          if-no-files-found: warn
+
+      - name: Ouvrir ou mettre à jour l'alerte
+        if: steps.controle.outputs.etat != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          numero=$(gh issue list --label sentinelle --state open \
+                     --json number --jq '.[0].number // empty')
+          titre="Sentinelle — le tableau de bord demande une intervention"
+          if [ -z "$numero" ]; then
+            gh label create sentinelle --color D8A93A \
+              --description "Alerte automatique sur la fraîcheur des données" 2>/dev/null || true
+            gh issue create --title "$titre" --label sentinelle \
+                            --body-file donnees/sentinelle.md
+            echo "Alerte ouverte."
+          else
+            # On remplace le corps plutôt que d'empiler des commentaires : une
+            # alerte qui dure ne doit pas produire une notification par jour.
+            gh issue edit "$numero" --body-file donnees/sentinelle.md
+            echo "Alerte #$numero mise à jour."
+          fi
+
+      - name: Refermer l'alerte résolue
+        if: steps.controle.outputs.etat == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          numero=$(gh issue list --label sentinelle --state open \
+                     --json number --jq '.[0].number // empty')
+          if [ -n "$numero" ]; then
+            gh issue comment "$numero" --body \
+              "Contrôle repassé au vert le $(date -u +%d/%m/%Y) à $(date -u +%H:%M) UTC. Refermée automatiquement."
+            gh issue close "$numero"
+            echo "Alerte #$numero refermée."
+          else
+            echo "Rien à signaler."
+          fi
+
+      - name: Marquer l'exécution en échec si une alerte subsiste
+        if: steps.controle.outputs.etat != '0'
+        run: exit 1
