@@ -3677,12 +3677,6 @@
    {
     "date": "2026-08-03",
     "type": "AGO",
-    "titre": "avis de convocation assemblee generale mixte africa global logistics ci",
-    "url": "https://www.brvm.org/sites/default/files/20260803_-_avis_de_convocation_-_assemblee_generale_mixte_-_africa_global_logistics_ci.pdf"
-   },
-   {
-    "date": "2026-08-03",
-    "type": "AGO",
     "titre": "pouvoir assemblee generale mixte africa global logistics ci",
     "url": "https://www.brvm.org/sites/default/files/20260803_-_pouvoir_-_assemblee_generale_mixte_-_africa_global_logistics_ci.pdf"
    },
@@ -3691,6 +3685,12 @@
     "type": "AGO",
     "titre": "formulaire de vote par correspondance assemblee generale mixte africa global logistics ci",
     "url": "https://www.brvm.org/sites/default/files/20260803_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_mixte_-_africa_global_logistics_ci.pdf"
+   },
+   {
+    "date": "2026-08-03",
+    "type": "AGO",
+    "titre": "avis de convocation assemblee generale mixte africa global logistics ci",
+    "url": "https://www.brvm.org/sites/default/files/20260803_-_avis_de_convocation_-_assemblee_generale_mixte_-_africa_global_logistics_ci.pdf"
    }
   ]
  },
@@ -4554,6 +4554,12 @@
    {
     "date": "2026-05-19",
     "type": "AGO",
+    "titre": "avis de convocation assemblee generale ordinaire solibra ci",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "type": "AGO",
     "titre": "pouvoir assemblee generale ordinaire solibra ci",
     "url": "https://www.brvm.org/sites/default/files/20260519_-_pouvoir_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
    },
@@ -4562,12 +4568,6 @@
     "type": "AGO",
     "titre": "formulaire de vote par correspondance assemblee generale ordinaire solibra ci",
     "url": "https://www.brvm.org/sites/default/files/20260519_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
-   },
-   {
-    "date": "2026-05-19",
-    "type": "AGO",
-    "titre": "avis de convocation assemblee generale ordinaire solibra ci",
-    "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
    }
   ]
  },
