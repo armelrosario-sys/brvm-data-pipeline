@@ -476,28 +476,61 @@ print("\n=== Golden test 54 (Etape E) : Bridge Bank Group CI — cotee depuis le
 # premiere cotation du 25/09/2026 a confirme le mnemonique officiel, que la note
 # de societes.csv donnait jusque-la pour provisoire.
 #
-# Le titre est cote depuis le 24/09/2026 (BOC n(deg) 181) et le depot detient
-# deja des seances sous ce nom -- mais AUCUNE n'a encore atteint la base :
-# cours_mensuels et cours_quotidien_boc restent vides pour lui. Ce controle dit
-# exactement cela, et c'est ce qu'il doit dire : tant que la collecte n'a rien
-# verse, aucun prix n'est invente pour combler le trou.
+# Le titre est cote depuis le 24/09/2026 (BOC n(deg) 181).
 #
-# ATTENTION, ce zero est DATE et il devra tomber. La cause est identifiee le
-# 04/10/2026 : collecte/extracteur_boc.py filtre chaque bulletin par un univers
-# de 47 tickers ecrit en dur, ou BBGC ne figure pas — la 48e ligne est donc
-# ecartee en silence a chaque seance depuis le 24/09/2026. C'est le chantier
-# C32. Le jour ou il passe, ce controle doit etre retourne, pas conserve : un
-# golden test qui fige un trou de collecte le protege au lieu de le surveiller.
+# CE CONTROLE A ETE RETOURNE LE 07/10/2026 (cycle 21, chantier C32), et voici
+# pourquoi. Il exigeait `n_cours_bbgc == 0` en disant « rien collecte encore,
+# aucun prix invente ». Mais la cause du zero n'etait pas la prudence : c'etait
+# un univers de 47 tickers ecrit en dur dans collecte/extracteur_boc.py, qui
+# ecartait la 48e ligne de chaque bulletin en silence. Ce test figeait donc un
+# TROU DE COLLECTE en le prenant pour une abstention -- il le protegeait au lieu
+# de le surveiller, et c'est exactement ce que son propre commentaire du
+# 04/10/2026 annoncait qu'il faudrait corriger.
+#
+# Ce qui est figé ici desormais est la propriete qui vaut a 0 cours comme a 400 :
+# aucun prix de BBGC n'est invente. Deux controles, tous deux vrais dans les
+# deux etats, et aucun des deux ne retient la collecte :
+#   - aucun cours ne precede la premiere cotation du 24/09/2026 ;
+#   - aucun cours n'est egal au prix d'offre de l'IPO (6 750 FCFA), que la note
+#     de societes.csv interdit explicitement d'utiliser comme un cours.
+# Le compte des seances qui manquent encore BBGC, lui, est suivi comme une
+# alerte de fraicheur par la section 33 de tester_donnees.py : c'est sa place,
+# pas celle d'un golden test.
 import sqlite3
+PREMIERE_COTATION_BBGC = "2026-09-24"
+# cours_mensuels.fin_mois est au mois (format "2026-09"), cours_quotidien_boc
+# .date_bulletin au jour ("2026-09-24") : chacun est compare a sa granularite,
+# sinon "2026-09" < "2026-09-24" ferait crier le test sur le mois meme de la
+# premiere cotation.
+PREMIER_MOIS_BBGC = PREMIERE_COTATION_BBGC[:7]
+PRIX_OFFRE_IPO_BBGC = 6750
 conn_e = sqlite3.connect(DB)
 n_cours_bbgc = conn_e.execute(
     "SELECT COUNT(*) FROM cours_mensuels WHERE ticker='BBGC'").fetchone()[0]
+n_quotidien_bbgc = conn_e.execute(
+    "SELECT COUNT(*) FROM cours_quotidien_boc WHERE ticker='BBGC'").fetchone()[0]
+avant_cotation = conn_e.execute(
+    "SELECT COUNT(*) FROM cours_mensuels WHERE ticker='BBGC' AND fin_mois < ?",
+    (PREMIER_MOIS_BBGC,)).fetchone()[0] + conn_e.execute(
+    "SELECT COUNT(*) FROM cours_quotidien_boc WHERE ticker='BBGC' AND date_bulletin < ?",
+    (PREMIERE_COTATION_BBGC,)).fetchone()[0]
+au_prix_offre = conn_e.execute(
+    "SELECT COUNT(*) FROM cours_mensuels WHERE ticker='BBGC' AND cours = ?",
+    (PRIX_OFFRE_IPO_BBGC,)).fetchone()[0] + conn_e.execute(
+    "SELECT COUNT(*) FROM cours_quotidien_boc WHERE ticker='BBGC' AND cours = ?",
+    (PRIX_OFFRE_IPO_BBGC,)).fetchone()[0]
 n_exercices_bbgc = conn_e.execute(
     "SELECT COUNT(*) FROM etats_financiers WHERE ticker='BBGC'").fetchone()[0]
 n_ancien = conn_e.execute(
     "SELECT COUNT(*) FROM societes WHERE ticker='BBGCI'").fetchone()[0]
 conn_e.close()
-verifie(n_cours_bbgc == 0, "aucune entree cours_mensuels pour BBGC (rien collecte encore, aucun prix invente)")
+verifie(avant_cotation == 0,
+        f"aucun cours BBGC anterieur a sa premiere cotation du {PREMIERE_COTATION_BBGC}, "
+        f"dans AUCUNE des deux series, obtenu : {avant_cotation} "
+        f"({n_cours_bbgc} mensuel(s), {n_quotidien_bbgc} quotidien(s) en base)")
+verifie(au_prix_offre == 0,
+        f"aucun cours BBGC egal au prix d'offre de l'IPO ({PRIX_OFFRE_IPO_BBGC} FCFA, "
+        f"qui n'est pas un cours de marche), obtenu : {au_prix_offre}")
 verifie(n_exercices_bbgc == 5, f"5 exercices fondamentaux disponibles (2021-2025), obtenu : {n_exercices_bbgc}")
 verifie(n_ancien == 0, f"le mnemonique provisoire BBGCI a disparu de la base, obtenu : {n_ancien}")
 r = evaluer_titre("BBGC")

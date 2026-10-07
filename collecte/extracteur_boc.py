@@ -6,25 +6,37 @@ de chaque ligne de cotation, quel que soit le nombre total de colonnes (15 sans
 code secteur avant ~2022, 16 avec depuis) -> indexation par la fin, robuste aux
 deux formats sans les distinguer explicitement.
 """
-import csv, re, sys
+import csv, os, re, sys
 from pathlib import Path
 import pdfplumber
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from univers_actions import univers_actions
 
 NON_TICKERS = {"TOTAL", "SECTEUR", "COMPARTIMENT", "",
                "CB", "CD", "FIN", "ENE", "TEL", "IND", "SPU"}  # codes sectoriels BOC
 RE_TICKER = re.compile(r"^[A-Z]{2,6}\d{0,2}$")
 
-# Univers des 47 actions BRVM (hors obligations/FCTC/OPCVM, qui partagent parfois
-# des symboles a 2-4 lettres majuscules coincidant avec le motif ci-dessus —
-# cas reel rencontre : FGI/SBIF sont des OPCVM, pas des actions).
-UNIVERS_ACTIONS = {
-    "ABJC", "BICB", "BICC", "BNBC", "BOAB", "BOABF", "BOAC", "BOAM", "BOAN",
-    "BOAS", "CABC", "CBIBF", "CFAC", "CIEC", "ECOC", "ETIT", "FTSC", "LNBB",
-    "NEIC", "NSBC", "NTLC", "ONTBF", "ORAC", "ORGT", "PALC", "PRSC", "SAFC",
-    "SCRC", "SDCC", "SDSC", "SEMC", "SGBC", "SHEC", "SIBC", "SICC", "SIVC",
-    "SLBC", "SMBC", "SNTS", "SOGC", "SPHC", "STAC", "STBC", "TTLC", "TTLS",
-    "UNLC", "UNXC",
-}
+# CHANTIER C32 (07/10/2026, cycle 21) — l'univers n'est plus ecrit ici.
+#
+# Il etait en dur : 47 tickers, BBGC absent. Bridge Bank Group CI est cotee
+# depuis le 24/09/2026 et chaque bulletin porte depuis 48 lignes de cotation ;
+# cours_quotidien_boc.csv en a enregistre 47, toutes les seances du 24/09 au
+# 06/10 incluses, et la 48e etait jetee SANS AUCUNE TRACE. Une liste blanche
+# ecrite a la main ne se trompe pas une fois, elle se trompe a chaque
+# introduction en bourse -- et le silence est le vrai defaut, plus encore que la
+# liste.
+#
+# Deux corrections, et pas une :
+#   1. l'univers est derive de donnees/base/societes.csv a l'execution
+#      (collecte/univers_actions.py, qui porte la regle et son autotest) : la
+#      liste blanche reste -- des OPCVM et des obligations partagent le motif de
+#      ticker, FGI et SBIF l'ont deja prouve -- mais sa source est le
+#      referentiel que le depot tient a jour, plus une copie figee ici ;
+#   2. tout candidat qui ressemble a un ticker de cotation et que l'univers
+#      ECARTE est desormais NOMME (`lignes_ecartees`, et une ligne sur stderr).
+#      La correction 1 reparera les introductions connues ; la correction 2 est
+#      ce qui fera du bruit la prochaine fois qu'elle se trompe quand meme.
 RE_NOMBRE = re.compile(r"^-?[\d\s]+(?:,\d+)?\s?%?$")
 
 
@@ -38,18 +50,35 @@ def to_float(s):
         return None
 
 
-def parser_ligne(row):
-    """Retourne dict ou None si la ligne n'est pas une ligne de cotation valide."""
+def parser_ligne(row, ecartes=None, univers=None):
+    """Retourne dict ou None si la ligne n'est pas une ligne de cotation valide.
+
+    `ecartes` (set, optionnel) recueille les mnemoniques qui ressemblent a un
+    ticker de cotation, portent des valeurs exploitables, et que l'univers
+    ECARTE : c'est la seule chose qui distingue « cette ligne n'est pas une
+    cotation » de « cette ligne est une cotation que je ne sais pas nommer ».
+    Avant C32, les deux cas rendaient None et se taisaient pareillement.
+    """
     row = [c.strip() if c else "" for c in row]
     if len(row) < 12:
         return None
-    ticker = None
+    if univers is None:
+        univers = univers_actions()
+    ticker, candidat_inconnu = None, None
     for idx in (0, 1):
         cand = row[idx].split("\n")[0].strip()
-        if cand in UNIVERS_ACTIONS:
+        if cand in univers:
             ticker = cand
             break
+        if (candidat_inconnu is None and cand not in NON_TICKERS
+                and RE_TICKER.match(cand)):
+            candidat_inconnu = cand
     if ticker is None:
+        if ecartes is not None and candidat_inconnu is not None:
+            # On ne le signale que si la ligne porte vraiment des valeurs de
+            # cotation : sinon on nommerait des entetes et des totaux.
+            if to_float(row[-6]) is not None or to_float(row[-1]) is not None:
+                ecartes.add(candidat_inconnu)
         return None
 
     per = to_float(row[-1])
@@ -78,24 +107,40 @@ def parser_ligne(row):
     }
 
 
-def extraire_boc(chemin_pdf):
-    """Retourne (date_bulletin, [lignes]) ou (None, []) si echec de lecture."""
+def extraire_boc(chemin_pdf, ecartes=None):
+    """Retourne (date_bulletin, [lignes]) ou (None, []) si echec de lecture.
+
+    `ecartes` (set, optionnel) est rempli des mnemoniques de cotation que
+    l'univers a ecartes. Qu'il soit fourni ou non, chacun est NOMME sur stderr :
+    c'est ce que C32 reproche a la version precedente, qui les jetait sans un
+    mot. La signature reste compatible avec les quatre appelants du depot.
+    """
     nom = Path(chemin_pdf).name
     m = re.search(r"(\d{8})", nom)
     date_bulletin = m.group(1) if m else None
     lignes, vus = [], set()
+    ecartes_locaux = set()
+    univers = univers_actions()
     try:
         with pdfplumber.open(chemin_pdf) as pdf:
             for page in pdf.pages:
                 for table in page.extract_tables():
                     for row in table:
-                        r = parser_ligne(row)
+                        r = parser_ligne(row, ecartes=ecartes_locaux, univers=univers)
                         if r and r["ticker"] not in vus:
                             lignes.append(r)
                             vus.add(r["ticker"])
     except Exception as e:
         print(f"[extraction] {nom} : ECHEC ({type(e).__name__}: {e})", file=sys.stderr)
         return None, []
+    if ecartes is not None:
+        ecartes.update(ecartes_locaux)
+    if ecartes_locaux:
+        print(f"[extraction] {nom} : {len(ecartes_locaux)} mnemonique(s) de cotation "
+              f"ECARTE(S) par l'univers, hors referentiel donnees/base/societes.csv : "
+              + ", ".join(sorted(ecartes_locaux))
+              + " -- si l'un d'eux est une action, il manque a societes.csv (chantier C32)",
+              file=sys.stderr)
     return date_bulletin, lignes
 
 

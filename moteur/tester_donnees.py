@@ -3868,7 +3868,43 @@ def test_confrontation_per_page():
 # outils/normalisation_rendement_boc.py. Ils ne peuvent que BAISSER.
 POURCENTAGE_RESIDUEL_MAX = 1        # STBC 2018-08-01, 206,2 % : hors plafond du chargeur
 MAL_ECHELONNEES_MAX = 0             # le defaut lui-meme : zero, et il y reste
-NON_TRANCHEES_MAX = 1756            # lignes qu'aucun des deux cotes ne tranche
+
+# NON TRANCHEES : plafond change d'UNITE le 07/10/2026 (cycle 21), et ce n'est
+# pas un relevement.
+#
+# Il valait 1756, « lignes qu'aucun des deux cotes ne tranche », pose le
+# 04/10/2026 et annonce comme « ne pouvant que baisser ». Il a rougi le
+# 07/10/2026 a 1786, SANS LA MOINDRE REGRESSION. La mesure du cycle 21 le dit a
+# la ligne pres : 1756 jusqu'au 2026-10-01 inclus — le plafond exact de l'epoque
+# — plus 15 pour le 2026-10-05 et 15 pour le 2026-10-06. Le taux par seance est
+# de 15 depuis le 24/09, invariant.
+#
+# Le defaut n'est donc pas dans la donnee, il est dans l'UNITE du plafond : un
+# compte ABSOLU pose sur une serie qui s'allonge de 47 lignes a chaque seance
+# etait arithmetiquement condamne a tourner au rouge tout seul, et il l'a fait
+# apres deux seances. Un tel plafond ne surveille rien : il ne sait pas
+# distinguer la croissance normale d'une regression, et il crie pour la
+# premiere.
+#
+# Le remplacant est un TAUX PAR SEANCE, en deux plafonds, et il ne derive pas.
+#
+# PREMIERE MESURE, CORRIGEE PAR LE TEST LUI-MEME. J'ai d'abord pose 15, releve
+# sur les seules huit seances depuis le 24/09/2026 — et la section 34, ecrite le
+# meme cycle, l'a fait tomber aussitot : sur les 2 031 seances de la serie, le
+# maximum par seance est 34 (le 2025-01-02), puis 31 (2022-01-12) et 30
+# (2023-06-02). La fenetre de huit seances n'etait pas representative. Les deux
+# plafonds ci-dessous sont mesures sur la serie ENTIERE le 07/10/2026 :
+#
+#   - 34 par seance sur toute la serie, c'est le residu historique, borne ;
+#   - 15 par seance sur les 91 seances de 2026, c'est le regime COURANT, et
+#     c'est ce plafond-la qui garde la collecte d'aujourd'hui. Il est deux fois
+#     plus severe que le precedent, et une seule seance qui deraille le fait
+#     tomber — la ou le compte absolu avait besoin de 1 757 lignes cumulees.
+#
+# Le compte absolu reste publie en observation, pour que la grandeur reste
+# lisible. Les deux taux, eux, ne peuvent que BAISSER.
+NON_TRANCHEES_PAR_SEANCE_MAX = 34        # serie entiere, 2 031 seances
+NON_TRANCHEES_PAR_SEANCE_2026_MAX = 15   # regime courant, 91 seances de 2026
 RUPTURES_VOISINES_MAX = 291         # frontieres de changement de dividende, alerte seule
 FTSC_RENDEMENT_REEL_MIN = 0.50      # C1 : la distribution 2025 de FTSC est exacte
 
@@ -3908,6 +3944,8 @@ def test_echelle_rendement_boc():
     verdict = nrb.classer(lignes, nrb.dividendes_mensuels())
 
     pourcentage, fraction, non_tranchees, mal = 0, 0, 0, []
+    import collections as _col
+    nt_par_seance = _col.Counter()
     for i, r in enumerate(lignes):
         v = nrb._flot(r["rendement"])
         if v is None:
@@ -3921,6 +3959,7 @@ def test_echelle_rendement_boc():
             fraction += 1
         else:
             non_tranchees += 1
+            nt_par_seance[(r.get("date_bulletin") or "").strip()] += 1
 
     # --- A : le fichier ne porte plus qu'un residu nomme en pourcentage
     verifie(pourcentage <= POURCENTAGE_RESIDUEL_MAX,
@@ -3936,10 +3975,29 @@ def test_echelle_rendement_boc():
             f"{MAL_ECHELONNEES_MAX})"
             + ("" if not mal else f" : {mal[:8]}"))
 
-    # --- C : le residu non tranche ne grossit pas
-    verifie(non_tranchees <= NON_TRANCHEES_MAX,
-            f"{non_tranchees} ligne(s) qu'aucun des deux cotes ne tranche, plafond "
-            f"{NON_TRANCHEES_MAX} — un plafond qui ne peut que baisser")
+    # --- C : le residu non tranche ne grossit pas, SEANCE PAR SEANCE
+    # (unite corrigee le 07/10/2026, cycle 21 : voir le commentaire de
+    # NON_TRANCHEES_PAR_SEANCE_MAX. Un compte absolu sur une serie qui croit de
+    # 47 lignes par seance tournait au rouge sans regression.)
+    pires = sorted(nt_par_seance.items(), key=lambda kv: -kv[1])[:5]
+    pire = pires[0][1] if pires else 0
+    verifie(pire <= NON_TRANCHEES_PAR_SEANCE_MAX,
+            f"au plus {pire} ligne(s) non tranchee(s) sur une MEME seance, plafond "
+            f"{NON_TRANCHEES_PAR_SEANCE_MAX} par seance — un plafond qui ne peut que baisser"
+            + ("" if pire <= NON_TRANCHEES_PAR_SEANCE_MAX
+               else f" — seances en cause : {pires}"))
+    pires_2026 = sorted(((d, n) for d, n in nt_par_seance.items() if d >= "2026-01-01"),
+                        key=lambda kv: -kv[1])[:5]
+    pire_2026 = pires_2026[0][1] if pires_2026 else 0
+    verifie(pire_2026 <= NON_TRANCHEES_PAR_SEANCE_2026_MAX,
+            f"au plus {pire_2026} ligne(s) non tranchee(s) sur une meme seance de 2026, "
+            f"plafond {NON_TRANCHEES_PAR_SEANCE_2026_MAX} — c'est le regime courant, "
+            f"celui qui garde la collecte d'aujourd'hui"
+            + ("" if pire_2026 <= NON_TRANCHEES_PAR_SEANCE_2026_MAX
+               else f" — seances en cause : {pires_2026}"))
+    print(f"  [obs]  {non_tranchees} ligne(s) non tranchees au total sur "
+          f"{len(nt_par_seance)} seance(s) concernee(s) — grandeur publiee pour "
+          f"rester lisible ; le controle bloquant est le taux par seance ci-dessus")
 
     # --- D : la base ne porte aucune valeur hors echelle
     conn = sqlite3.connect(DB)
@@ -3987,9 +4045,26 @@ def test_echelle_rendement_boc():
 # SECTION 30 — le PER du BOC bascule entre deux branches (chasse du cycle 18)
 # ---------------------------------------------------------------------------
 
-BASCULES_PER_MAX = 23               # mesure du 04/10/2026 ; ne peut que baisser
-TICKERS_A_BASCULE_PER = {"BNBC", "BOAN", "CABC", "CIEC", "FTSC", "PALC",
-                         "SDSC", "SICC", "SLBC", "SMBC", "SPHC", "UNXC"}
+# UNITE CORRIGEE LE 07/10/2026 (cycle 21, chasse de la section 34).
+#
+# Ce plafond valait `BASCULES_PER_MAX = 23`, un compte ABSOLU et BLOQUANT sur
+# une serie que la collecte allonge, pose le 04/10/2026 — et il etait deja a
+# MARGE NULLE : 23 observees sur 23 autorisees. La seance suivante portant une
+# bascule cassait la barriere. C'est exactement ce qui est arrive a
+# NON_TRANCHEES_MAX, dont la panne a ouvert la chasse de ce cycle, et la
+# section 34 interdit desormais cette forme.
+#
+# Le remplacant est un REGISTRE PAR TICKER, mesure le 07/10/2026 sur les
+# 90 754 lignes : 23 bascules, reparties sur exactement les 12 titres deja
+# nommes, 4 au plus pour un meme titre. Il est AUSSI severe que le compte total
+# — une bascule de plus, sur n'importe quel titre, le fait tomber — et il ne
+# derive pas, parce qu'il est indexe par titre et non par le temps. Chaque
+# nombre ne peut que BAISSER, et la liste des titres ne peut que se reduire.
+BASCULES_PAR_TICKER = {
+    "SLBC": 4, "BNBC": 3, "FTSC": 3, "SICC": 3, "CABC": 2, "SMBC": 2,
+    "BOAN": 1, "CIEC": 1, "PALC": 1, "SDSC": 1, "SPHC": 1, "UNXC": 1,
+}
+TICKERS_A_BASCULE_PER = set(BASCULES_PAR_TICKER)
 # Titres dont le PER DU JOUR est plus de cinq fois leur propre mediane. FTSC est
 # explique (C1 : resultat 2025 de 466 M contre 18 595 M en 2024) ; les quatre
 # autres ne le sont pas, et c'est l'objet du chantier propose.
@@ -4069,9 +4144,20 @@ def test_bascule_per_boc():
             derniers[t] = (pers[-1], _st.median(pers))
 
     total = sum(bascules.values())
-    verifie(total <= BASCULES_PER_MAX,
+    # Registre par titre (unite corrigee le 07/10/2026) : chaque titre est
+    # compare a SON nombre mesure, pas la serie entiere a un cumul.
+    en_hausse = sorted(
+        (t, n, BASCULES_PAR_TICKER.get(t, 0))
+        for t, n in bascules.items() if n > BASCULES_PAR_TICKER.get(t, 0))
+    verifie(not en_hausse,
             f"{total} bascule(s) d'echelle du PER a cours ET rendement continus, "
-            f"plafond {BASCULES_PER_MAX} — un plafond qui ne peut que baisser")
+            f"chaque titre a ou sous son nombre mesure le 07/10/2026 — chaque nombre "
+            f"ne peut que baisser"
+            + ("" if not en_hausse else " — EN HAUSSE : " + ", ".join(
+                f"{t} {n} contre {ref} au registre" for t, n, ref in en_hausse)))
+    print(f"  [obs]  {total} bascule(s) au total sur {len(bascules)} titre(s) — "
+          f"grandeur publiee pour rester lisible ; le controle bloquant est le "
+          f"registre par titre ci-dessus")
 
     nouveaux = sorted(set(bascules) - TICKERS_A_BASCULE_PER)
     verifie(not nouveaux,
@@ -4309,6 +4395,256 @@ def test_historique_quotidien_protege():
             "05/10/2026 ; il ne peut que monter)")
 
 
+# ----------------------------------------------------------------------
+# 33. AUCUNE LIGNE DE BULLETIN N'EST ECARTEE EN SILENCE (chantier C32)
+# ----------------------------------------------------------------------
+# Nombre de seances du quotidien, depuis la premiere cotation de BBGC le
+# 2026-09-24 (BOC n(deg) 181), qui ne portent PAS BBGC. Mesure du 07/10/2026
+# (cycle 21) : 8 seances sur 8 -- 24/09, 25/09, 28/09, 29/09, 30/09, 01/10,
+# 05/10, 06/10, toutes a exactement 47 lignes. Ces huit-la sont deja ecrites et
+# le collecteur ne les retentera pas (il saute toute seance deja en base) : leur
+# rattrapage demande une reextraction ciblee, et c'est un chantier a part.
+#
+# ET ELLES SONT NOMMEES, PAS COMPTEES. Un plafond « au plus 8 seances sans
+# BBGC » serait exactement le defaut que la chasse de ce cycle a trouve dans la
+# section 29 : un compte absolu sur une serie que la collecte allonge, donc un
+# plafond qui rougit tout seul a la seance suivante. La liste ci-dessous fige
+# les huit seances CONNUES ; le controle exige ZERO seance manquante en dehors
+# d'elles. Une neuvieme seance sans BBGC tombe donc immediatement, et chacune de
+# ces huit qui sera rattrapee pourra sortir de la liste.
+SEANCES_SANS_BBGC_CONNUES = {
+    "2026-09-24", "2026-09-25", "2026-09-28", "2026-09-29",
+    "2026-09-30", "2026-10-01", "2026-10-05", "2026-10-06",
+}
+PREMIERE_COTATION_BBGC = "2026-09-24"
+
+
+def test_univers_bulletin_sans_silence():
+    """POURQUOI CETTE SECTION EXISTE (chantier C32, 07/10/2026, cycle 21).
+    collecte/extracteur_boc.py filtrait chaque bulletin par un ensemble de 47
+    tickers ECRIT EN DUR. Bridge Bank Group CI est cotee depuis le 24/09/2026 ;
+    de cette seance au 06/10 incluse, cours_quotidien_boc.csv a porte
+    exactement 47 lignes a chaque fois, et jamais BBGC. La 48e ligne du
+    bulletin etait jetee SANS AUCUNE TRACE -- ni alerte, ni journal, ni
+    compteur : c'est le silence, plus que la liste, qui a laisse passer dix
+    seances.
+
+    Ce que cette section fige, et pourquoi chaque controle plutot qu'un autre :
+      - l'univers est DERIVE de donnees/base/societes.csv, donc une prochaine
+        introduction suit le referentiel au lieu d'attendre qu'on se souvienne
+        d'un script de collecte ;
+      - il COUVRE la cote observee (donnees/cote_reference.json, 48 titres lus
+        du bulletin lui-meme) : c'est le controle qui tombera le jour ou une
+        49e societe sera cotee sans etre inscrite, et il la nommera ;
+      - un mnemonique de cotation que l'univers ecarte quand meme est NOMME,
+        pas jete -- parce qu'aucune liste blanche, derivee ou non, n'est a
+        l'abri d'avoir tort ;
+      - et un entete ou un total ne declenche pas de fausse alerte, sans quoi
+        le signalement serait aussitot ignore.
+    La liste blanche est conservee a dessein : des OPCVM et des obligations du
+    meme document partagent le motif de ticker (FGI, SBIF, cas reels)."""
+    print("\n=== 33. Aucune ligne de bulletin n'est ecartee en silence (C32) ===")
+    import csv as _csv
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from univers_actions import univers_actions, UniversIndisponible  # noqa: E402
+    import extracteur_boc as eb  # noqa: E402
+
+    src = (RACINE / "collecte" / "extracteur_boc.py").read_text(encoding="utf-8")
+    verifie("UNIVERS_ACTIONS = {" not in src,
+            "extracteur_boc.py ne porte plus d'univers ecrit en dur")
+    verifie("from univers_actions import univers_actions" in src,
+            "extracteur_boc.py derive son univers de univers_actions.py")
+
+    univers = univers_actions(forcer=True)
+    cote = json.loads((RACINE / "donnees" / "cote_reference.json").read_text(
+        encoding="utf-8"))
+    absents = sorted(t for t in cote if t not in univers)
+    verifie(not absents,
+            f"les {len(cote)} titres de la cote observee (donnees/cote_reference.json) "
+            f"sont tous dans l'univers"
+            + ("" if not absents else " — ECARTES DU BULLETIN, donc PERDUS a chaque "
+                                      "seance : " + ", ".join(absents)))
+    verifie("BBGC" in univers,
+            "BBGC est dans l'univers (la 48e ligne du bulletin est acceptee)")
+
+    # Le signalement, eprouve sur des lignes fabriquees : un mnemonique de
+    # cotation inconnu est nomme, un entete ne l'est pas.
+    inconnu = ["ZZZC", "UN TITRE INCONNU", "CD"] + [""] * 4 + [
+        "10", "1000", "5000", "0,0", "5100", "", "0,0", "9,9"]
+    vus = set()
+    verifie(eb.parser_ligne(inconnu, ecartes=vus) is None and vus == {"ZZZC"},
+            f"un mnemonique de cotation hors univers est NOMME, pas jete "
+            f"(obtenu : {sorted(vus)})")
+    entete = ["SECTEUR", "TOTAL"] + [""] * 12
+    vus2 = set()
+    eb.parser_ligne(entete, ecartes=vus2)
+    texte = ["XXXX", "une ligne de texte"] + [""] * 12
+    eb.parser_ligne(texte, ecartes=vus2)
+    verifie(not vus2,
+            f"un entete, un total ou une ligne sans valeur ne declenche aucune "
+            f"fausse alerte (obtenu : {sorted(vus2)})")
+
+    # Le refus plutot que la devinette : un referentiel tronque doit arreter la
+    # collecte, pas la laisser tourner sur un univers de deux tickers.
+    import tempfile as _tmp
+    with _tmp.TemporaryDirectory() as d:
+        tronque = Path(d) / "societes.csv"
+        tronque.write_text("ticker,nom\nABJC,Servair\n", encoding="utf-8")
+        refuse = False
+        try:
+            univers_actions(tronque)
+        except UniversIndisponible:
+            refuse = True
+        verifie(refuse,
+                "un referentiel des societes tronque fait REFUSER l'univers, "
+                "il ne rend jamais un ensemble degrade")
+
+    # Et le compte de ce que la correction du code ne repare pas : les seances
+    # deja ecrites a 47 lignes. Alerte de fraicheur, pas blocage -- le defaut
+    # est dans le passe, et son rattrapage est un chantier a part.
+    f = RACINE / "collecte" / "cours_quotidien_boc.csv"
+    seances, avec_bbgc = set(), set()
+    with f.open(encoding="utf-8", newline="") as fh:
+        for r in _csv.DictReader(fh):
+            d = (r.get("date_bulletin") or "").strip()
+            if d >= PREMIERE_COTATION_BBGC:
+                seances.add(d)
+                if r.get("ticker") == "BBGC":
+                    avec_bbgc.add(d)
+    manquantes = sorted(seances - avec_bbgc)
+    nouvelles = sorted(set(manquantes) - SEANCES_SANS_BBGC_CONNUES)
+    verifie(not nouvelles,
+            f"aucune seance NOUVELLE sans BBGC : {len(manquantes)} manquante(s) sur "
+            f"{len(seances)} depuis le {PREMIERE_COTATION_BBGC}, toutes dans les "
+            f"{len(SEANCES_SANS_BBGC_CONNUES)} seances connues et nommees"
+            + ("" if not nouvelles
+               else " — SEANCE(S) NOUVELLE(S), la correction de C32 n'a pas pris : "
+                    + ", ".join(nouvelles)),
+            bloquant=False)
+    rattrapees = sorted(SEANCES_SANS_BBGC_CONNUES - set(manquantes))
+    if rattrapees:
+        print(f"  [obs]  {len(rattrapees)} seance(s) connue(s) desormais RATTRAPEE(S) : "
+              + ", ".join(rattrapees) + " — a retirer de SEANCES_SANS_BBGC_CONNUES")
+
+
+# ----------------------------------------------------------------------
+# 34. UN PLAFOND BLOQUANT NE PEUT PAS ETRE UN CUMUL (chasse du cycle 21)
+# ----------------------------------------------------------------------
+# D'OU VIENT CETTE SECTION. Le 07/10/2026, la barriere etait DEJA ROUGE sur
+# `main` avant tout travail du cycle, et aucune regression ne l'expliquait :
+# NON_TRANCHEES_MAX valait 1756, pose le 04/10/2026, et la mesure du cycle 21
+# l'a retrouve A LA LIGNE PRES — 1756 jusqu'au 2026-10-01 inclus, plus 15 pour
+# le 05/10 et 15 pour le 06/10. Le plafond etait un COMPTE ABSOLU sur une serie
+# que la collecte allonge de 47 lignes par seance : il etait condamne a rougir
+# tout seul, et il l'a fait apres deux seances.
+#
+# LA FAMILLE, MESUREE LE 07/10/2026. Treize plafonds de ce fichier portent un
+# compte ; quatre etaient DEJA A MARGE NULLE, c'est-a-dire qu'une seule seance
+# de plus les faisait tomber : RUPTURES_VOISINES_MAX (291 observees sur 291),
+# BASCULES_PER_MAX (23 sur 23), OBSERVATIONS_NON_RELEVEES_MAX (17 sur 17) et le
+# plafond de seances sans BBGC pose par C32 le meme jour (8 sur 8, corrige en
+# liste nommee dans la section 33 des que la chasse l'a vu). Les quatre sont des
+# ALERTES, pas des blocages : ils auraient crie sans arreter personne. Le
+# cinquieme, NON_TRANCHEES_MAX, etait le seul BLOQUANT de la famille, et c'est
+# le seul qui a casse la barriere.
+#
+# LE CONTRE-EXEMPLE EST DANS LE MEME FICHIER, et c'est lui qui donne la regle.
+# Les plafonds de la section 31 (fraicheur des releves) sont exprimes en
+# SEANCES DE RETARD : 46 contre 60, 3 contre 30, 0 contre 10. Ils ne derivent
+# pas, parce qu'un retard ne cumule pas — il monte quand la collecte s'arrete et
+# redescend quand elle reprend. C'est la bonne unite.
+#
+# LA REGLE QUE CETTE SECTION FIGE : un plafond BLOQUANT doit etre un taux, un
+# retard, ou un compte de cas nommes — jamais un cumul sur une serie qui croit.
+# Un plafond non bloquant peut rester un cumul : il informe, il n'arrete rien.
+# Et tout plafond nouveau doit etre CLASSE ici, sans quoi cette section tombe :
+# c'est la seule facon qu'un plafond ne naisse plus sans que son unite ait ete
+# pensee.
+#
+#   cumul    — compte absolu sur une serie que la collecte allonge : DERIVE
+#   taux     — par seance, par titre, par ligne : ne derive pas
+#   retard   — en seances d'ecart a la derniere seance connue : ne derive pas
+#   ponctuel — un ensemble ferme de cas nommes, ou un zero : ne derive pas
+UNITE_PLAFONDS = {
+    "PAIRES_CONFRONTABLES_MINIMUM": "ponctuel",   # plancher, pas un plafond
+    "FIGEMENTS_PER_MAX": "cumul",
+    "FIGEMENTS_RENDEMENT_MAX": "cumul",
+    "DATES_ISO_MIN": "ponctuel",
+    "TITRES_PER_GLISSANT_MIN": "ponctuel",
+    "REFERENCES_IDENTIFIEES_MIN": "ponctuel",
+    "AVIS_DIVIDENDE_SANS_TICKER_MAX": "cumul",
+    "TITRES_RELEVES_MINIMUM": "ponctuel",
+    "PER_RELEVES_MINIMUM": "ponctuel",
+    "DIVERGENCES_SEANCE_VOISINE_MINIMUM": "ponctuel",
+    "POURCENTAGE_RESIDUEL_MAX": "ponctuel",       # un cas nomme : STBC 2018-08-01
+    "MAL_ECHELONNEES_MAX": "ponctuel",            # zero, et il y reste
+    "NON_TRANCHEES_PAR_SEANCE_MAX": "taux",       # corrige le 07/10/2026
+    "NON_TRANCHEES_PAR_SEANCE_2026_MAX": "taux",  # regime courant
+    "RUPTURES_VOISINES_MAX": "cumul",             # alerte seule
+    "FTSC_RENDEMENT_REEL_MIN": "ponctuel",
+    "OBSERVATIONS_NON_RELEVEES_MAX": "cumul",     # alerte seule
+}
+# Les registres en forme de dictionnaire ou d'ensemble nomme ne figurent pas
+# ci-dessus et n'ont pas a y figurer : etre indexe par titre, par fichier ou par
+# seance nommee est precisement ce qui les empeche de deriver. Ce sont
+# BASCULES_PAR_TICKER (section 30), RETARD_RELEVES_MAX (section 31) et
+# SEANCES_SANS_BBGC_CONNUES (section 33), tous trois issus de la conversion d'un
+# cumul ou ecrits d'emblee sous cette forme.
+
+
+def test_unite_des_plafonds():
+    """Deux controles, et le premier est celui qui aurait sauve la barriere.
+
+    A — aucun plafond BLOQUANT n'est un cumul. C'est la regle que la panne du
+        07/10/2026 a ecrite : un cumul qui bloque arrete le depot sans qu'aucune
+        regression ne se soit produite.
+    B — tout plafond du fichier est classe dans UNITE_PLAFONDS. Sans ce
+        controle, la regle A ne couvrirait que les plafonds d'aujourd'hui, et le
+        prochain plafond ecrit a la main echapperait a la question.
+
+    Le caractere bloquant est lu dans le code lui-meme : l'appel verifie() qui
+    nomme la constante porte `bloquant=False` ou ne le porte pas. On ne demande
+    pas aux sections de se declarer, on regarde ce qu'elles font."""
+    print("\n=== 34. Un plafond bloquant ne peut pas etre un cumul (chasse C21/C32) ===")
+    import re as _re
+    src = (RACINE / "moteur" / "tester_donnees.py").read_text(encoding="utf-8")
+
+    # B — l'inventaire : toute constante de seuil declaree au niveau module.
+    declares = set(_re.findall(
+        r"^([A-Z][A-Z0-9_]*(?:_MAX|_MIN|_MINIMUM))\s*=\s*-?[0-9]", src, _re.M))
+    non_classes = sorted(declares - set(UNITE_PLAFONDS))
+    verifie(not non_classes,
+            f"les {len(declares)} plafonds du fichier sont tous classes dans "
+            f"UNITE_PLAFONDS"
+            + ("" if not non_classes
+               else " — NON CLASSE(S), leur unite n'a pas ete pensee : "
+                    + ", ".join(non_classes)))
+    disparus = sorted(set(UNITE_PLAFONDS) - declares)
+    verifie(not disparus,
+            "UNITE_PLAFONDS ne classe aucun plafond disparu du fichier"
+            + ("" if not disparus else " — A RETIRER : " + ", ".join(disparus)))
+
+    # A — la regle. Pour chaque constante, l'appel verifie() qui la nomme.
+    fautifs = []
+    for nom, unite in sorted(UNITE_PLAFONDS.items()):
+        if unite != "cumul":
+            continue
+        for m in _re.finditer(r"verifie\(", src):
+            debut = m.start()
+            # Fin de l'appel : la ligne vide qui suit, ou 1200 caracteres.
+            fin = src.find("\n\n", debut)
+            appel = src[debut:fin if 0 < fin - debut < 1600 else debut + 1600]
+            if nom in appel and "bloquant=False" not in appel:
+                fautifs.append(nom)
+                break
+    verifie(not fautifs,
+            f"aucun des {sum(1 for u in UNITE_PLAFONDS.values() if u == 'cumul')} "
+            f"plafonds de type `cumul` n'est bloquant"
+            + ("" if not fautifs
+               else " — BLOQUANT ET CUMULATIF, donc condamne a rougir sans "
+                    "regression : " + ", ".join(sorted(set(fautifs)))))
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -4345,6 +4681,8 @@ def main():
     test_bascule_per_boc()
     test_fraicheur_releves_collecte()
     test_historique_quotidien_protege()
+    test_univers_bulletin_sans_silence()
+    test_unite_des_plafonds()
     if not sans_app:
         test_application()
 

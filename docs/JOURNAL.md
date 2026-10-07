@@ -9,6 +9,220 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-07 — cycle 21 (matin) : C32, un univers écrit en dur, et un plafond qui rougissait tout seul
+
+### Ce que le cycle a trouvé avant de commencer : la barrière était déjà rouge
+
+Contrôle anti-collision : aucune annonce ouverte, seuls les commits automatiques du pipeline
+dans les trois heures. État : `tester_donnees.py` sortait en **code 1**, une incohérence
+bloquante — **avant tout travail de ce cycle**.
+
+L'échec : `au plus 1786 ligne(s) qu'aucun des deux côtés ne tranche, plafond 1756`,
+section 29 (chantier C21). Aucune régression ne l'expliquait, et la mesure le dit à la ligne
+près :
+
+| séances | non tranchées |
+|---|---|
+| jusqu'au 2026-10-01 inclus | **1 756** — le plafond exact posé le 04/10/2026 |
+| 2026-10-05 | +15 |
+| 2026-10-06 | +15 |
+| **total** | **1 786** |
+
+Le taux par séance est de **15** depuis le 24/09, invariant. Vérifié sur l'arbre intact
+(`git stash -u`) : **même échec, 1786** — le défaut ne venait donc d'aucune modification de
+ce cycle. Le plafond était un **compte absolu** sur `collecte/cours_quotidien_boc.csv`, série
+que la collecte allonge de 47 lignes par séance : il était arithmétiquement condamné à
+tourner au rouge sans qu'aucune régression ne se produise, et il l'a fait après **deux
+séances**.
+
+**Réparé en changeant d'unité, pas de valeur** — relever 1756 à 1786 n'aurait fait que
+reporter la même panne de deux séances. Deux plafonds de **taux**, mesurés sur la série
+entière :
+
+- `NON_TRANCHEES_PAR_SEANCE_MAX = 34` — maximum sur les 2 031 séances (le 2025-01-02),
+  puis 31 (2022-01-12) et 30 (2023-06-02) ;
+- `NON_TRANCHEES_PAR_SEANCE_2026_MAX = 15` — régime courant, maximum sur les 91 séances de
+  2026. C'est ce plafond-là qui garde la collecte d'aujourd'hui, et il est **deux fois plus
+  sévère** que le précédent : une seule séance qui déraille le fait tomber, là où le compte
+  absolu avait besoin de 1 757 lignes cumulées pour réagir.
+
+Le compte absolu reste **publié en observation**, non bloquant, pour que la grandeur reste
+lisible.
+
+**Erreur à signaler : mon premier chiffre était faux.** J'avais posé 15 comme plafond unique,
+mesuré sur les seules huit séances depuis le 24/09/2026. La section 34, écrite le même cycle,
+l'a fait tomber aussitôt : sur la série entière le maximum par séance est **34**. La fenêtre
+de huit séances n'était pas représentative, et c'est le test qui l'a dit, pas moi.
+
+### Chantier exécuté : C32 — l'univers de 47 tickers écrit en dur
+
+Rang 1 de l'ordre déterministe : ORANGE, `validation : OK`, passe non consommée, priorité 2 ;
+à priorité égale avec C34, le plus petit numéro passe.
+
+**Le constat, revérifié ce cycle.** `collecte/cours_quotidien_boc.csv` porte **exactement 47
+lignes** à chacune des 8 séances depuis la première cotation de Bridge Bank Group CI le
+24/09/2026 (BOC n° 181) — 24, 25, 28, 29, 30/09, 01, 05, 06/10 — et **`BBGC` n'y figure pas
+une seule fois** (0 ligne sur 90 754). Le même bulletin, lu par l'autre analyseur, le rend
+sans difficulté : `donnees/cote_reference.json` porte 48 titres dont `BBGC`, clôture **9 650**
+pour la séance du 06/10. La page « Volumes / Valeurs » le publie aussi, 48 lignes aux relevés
+du 02/10, 06/10 et 07/10.
+
+**Trois voies étaient à peser ; deux ont été prises, et la troisième écartée en le disant.**
+Ajouter `BBGC` à la main aurait laissé la prochaine introduction retomber dans le trou. Ont
+été faites : **(b)** dériver l'univers du référentiel, **et (c)** signaler tout ticker écarté
+— car le critère de terminaison en demande les deux, et parce qu'aucune liste blanche,
+dérivée ou non, n'est à l'abri d'avoir tort.
+
+**`collecte/univers_actions.py`** — seule définition de l'univers dans le dépôt, dérivée de
+`donnees/base/societes.csv` à l'exécution. Autotest `--test` : **9 contrôles, 0 échec**.
+
+- **La liste blanche est conservée**, et c'est délibéré : des OPCVM et des obligations du
+  même document partagent le motif `^[A-Z]{2,6}\d{0,2}$` — FGI et SBIF l'ont déjà prouvé, et
+  l'ancien commentaire le consignait. Ce qui change est sa **source**.
+- **Deux exclusions, toutes deux lisibles dans la donnée** : le motif du BOC, et le préfixe
+  `[SYNTHETIQUE]` de la colonne `nom`, qui écarte `TEST_EXCLU` et `TEST_VIGIL`, deux titres
+  fabriqués pour les golden tests. Le motif les écartait déjà (l'underscore ne passe pas) ;
+  la seconde règle est explicite au lieu d'être un effet de bord d'une expression régulière.
+- **Un refus plutôt qu'une devinette** : référentiel absent, illisible, sans colonne
+  `ticker`, ou rendant moins de **40** tickers → exception. Un univers dégradé ferait
+  exactement ce que ce chantier corrige, écarter des lignes en silence.
+- **Résultat : 48 tickers**, et les **47** de l'ancienne liste en dur sont **tous** retenus —
+  la dérivation élargit, elle ne retire rien.
+
+**`collecte/extracteur_boc.py`** ne porte plus d'univers. `parser_ligne()` et
+`extraire_boc()` prennent un paramètre `ecartes` optionnel ; tout candidat qui passe le motif,
+n'est pas un code sectoriel, **porte des valeurs de cotation exploitables** et que l'univers
+écarte est nommé — dans l'ensemble et sur stderr. La condition « porte des valeurs
+exploitables » évite de nommer les en-têtes et les totaux, sans quoi le signalement serait
+aussitôt ignoré. La signature reste compatible avec les **quatre** appelants
+(`collecte_boc_quotidien.py`, `backfill_boc_quotidien.py`, `backfill_liquidite.py`,
+`backfill_dividendes.py`).
+
+**Test : section 33 de `tester_donnees.py`, 8 contrôles.** Le plus utile n'est pas « BBGC est
+dans l'univers » : c'est **« les 48 titres de `donnees/cote_reference.json` sont tous dans
+l'univers »**. C'est lui qui tombera, en la nommant, le jour où une 49e société sera cotée
+sans être inscrite au référentiel. Les autres : plus d'univers en dur dans l'extracteur ; un
+mnémonique inconnu est nommé ; un en-tête ne déclenche aucune fausse alerte ; un référentiel
+tronqué fait refuser l'univers.
+
+**Golden test 54 de `moteur/tester.py` retourné, pas conservé.** Il exigeait
+`n_cours_bbgc == 0` en disant « rien collecté encore, aucun prix inventé ». Mais la cause du
+zéro n'était pas la prudence, c'était le trou de collecte : le test **protégeait** le trou au
+lieu de le surveiller — ce que son propre commentaire du 04/10/2026 annonçait qu'il faudrait
+corriger. Ce qui est figé désormais vaut à 0 cours comme à 400 : aucun cours `BBGC` antérieur
+au 24/09/2026 **dans aucune des deux séries** (`cours_mensuels.fin_mois` au mois,
+`cours_quotidien_boc.date_bulletin` au jour — chacun comparé à sa granularité, sinon
+`"2026-09" < "2026-09-24"` ferait crier le test sur le mois même de la première cotation), et
+aucun égal au prix d'offre de l'IPO, **6 750 FCFA**, que la note de `societes.csv` interdit
+d'utiliser comme un cours.
+
+**Effet sur la base, mesuré : aucun, et c'était attendu.** `collecte/profils.json` est
+**identique au champ près — 0 champ sur 47** ; dashboard **48 titres**. L'univers s'ouvre,
+mais aucune ligne `BBGC` n'existe encore dans le fichier : la correction porte sur les séances
+à venir.
+
+**Ce que la correction du code ne répare pas, dit franchement.** Les 8 séances sont déjà
+écrites à 47 lignes, et **les deux collecteurs les sautent par construction** :
+`collecte_boc_quotidien.py` par `seances_deja_en_base()`, `backfill_boc_quotidien.py` par
+`iso in deja_en_base`. Aucun ne les retentera. Le dépôt n'archive **aucun PDF** : les
+bulletins doivent être retéléchargés, donc par un workflow. C'est **C37**. Et les 8 dates sont
+**nommées** dans `SEANCES_SANS_BBGC_CONNUES`, pas comptées — un plafond « au plus 8 séances »
+aurait été exactement le défaut que la chasse du même cycle venait de trouver : le contrôle
+exige **zéro séance nouvelle** hors de la liste, et une 9e tombe immédiatement.
+
+### Chasse du matin : un plafond bloquant ne peut pas être un cumul
+
+La chasse n'a pas été choisie, elle a été imposée par la panne d'ouverture — et c'est la
+meilleure sorte. La question : combien de plafonds de `tester_donnees.py` partagent le défaut
+de `NON_TRANCHEES_MAX`, un compte absolu sur une série que la collecte allonge ?
+
+**Inventaire des 17 plafonds scalaires du fichier, mesuré le 07/10/2026.** Six étaient des
+cumuls, et **quatre à marge nulle** — une seule séance de plus les faisait tomber :
+
+| plafond | observé | plafond | marge | bloquant |
+|---|---|---|---|---|
+| `NON_TRANCHEES_MAX` | 1 786 | 1 756 | **−30** | **oui** → la panne |
+| `BASCULES_PER_MAX` | 23 | 23 | **0** | **oui** |
+| `RUPTURES_VOISINES_MAX` | 291 | 291 | **0** | non |
+| `OBSERVATIONS_NON_RELEVEES_MAX` | 17 | 17 | **0** | non |
+| `AVIS_DIVIDENDE_SANS_TICKER_MAX` | 18 | 19 | 1 | non |
+| `FIGEMENTS_PER_MAX` | 106 | 108 | 2 | non |
+| `FIGEMENTS_RENDEMENT_MAX` | 43 | 327 | 284 | non |
+
+**Le contre-exemple est dans le même fichier, et c'est lui qui donne la règle.** Les plafonds
+de la section 31 sont exprimés en **séances de retard** : 46 contre 60, 3 contre 30, 0 contre
+10. Ils ne dérivent pas, parce qu'un retard ne cumule pas — il monte quand la collecte
+s'arrête et redescend quand elle reprend.
+
+**La règle figée : section 34 de `tester_donnees.py`, 3 contrôles.** Un plafond **bloquant**
+doit être un taux, un retard, ou un compte de cas nommés — jamais un cumul. Un plafond non
+bloquant peut rester un cumul : il informe, il n'arrête rien. Le caractère bloquant est lu
+dans le code lui-même, en cherchant l'appel `verifie()` qui nomme la constante et en regardant
+s'il porte `bloquant=False` : on ne demande pas aux sections de se déclarer, on regarde ce
+qu'elles font. Et **tout plafond nouveau doit être classé** dans `UNITE_PLAFONDS`, sans quoi
+la section tombe — c'est la seule façon qu'un plafond ne naisse plus sans que son unité ait
+été pensée.
+
+**La section a immédiatement trouvé un second cas, bloquant, à marge nulle.**
+`BASCULES_PER_MAX = 23` (section 30, posé le 04/10/2026) : **23 bascules observées sur 23
+autorisées**. La séance suivante portant une bascule cassait la barrière — la panne du jour,
+une seconde fois. Remplacé par un **registre par titre**, mesuré sur les 90 754 lignes :
+
+```
+SLBC 4 | BNBC 3 | FTSC 3 | SICC 3 | CABC 2 | SMBC 2 |
+BOAN 1 | CIEC 1 | PALC 1 | SDSC 1 | SPHC 1 | UNXC 1     = 23 sur 12 titres
+```
+
+Il est **aussi sévère** que le compte total — une bascule de plus, sur n'importe quel titre,
+le fait tomber — et il ne dérive pas, parce qu'il est indexé par **titre** et non par le
+temps. `TICKERS_A_BASCULE_PER` est désormais dérivé de ce registre, une seule source.
+
+**Il reste 5 cumuls**, tous non bloquants, trois à marge nulle : ils crieront sans rien
+arrêter. Une alerte qui se déclenche sans motif est une alerte qu'on apprend à ignorer, et
+c'est ainsi qu'on rate la vraie. Inscrits en **C38**, classe VERTE : la méthode est écrite et
+éprouvée deux fois dans ce cycle.
+
+### Barrières
+
+Complètes, le commit touchant `collecte/` et `moteur/`.
+
+- `moteur/fusionner_fondamentaux.py`, `peupler.py` : **50 sociétés, 185 lignes** d'états
+  financiers.
+- Les cinq chargeurs : `cours_mensuels` 4 509 lignes / 47 tickers / 101 mois ;
+  `cours_quotidien_boc` 90 754 / 47 / 2 031 séances ; dividendes exercice 296 ajoutés ;
+  dividendes BOC 16 ajoutés, 3 montants nuls complétés, **6 refusés** (dont BOAC 2025, le
+  refus voulu de C22) ; liquidité 73 141 lignes.
+- `moteur/tester.py` : **tous les golden tests passent**, golden test 54 inclus sous sa
+  nouvelle forme.
+- `profils.py` : 47 titres, répartition inchangée ; `profils.json` **0 champ déplacé**.
+- `moteur/tester_donnees.py` : **290 OK, 0 ÉCHEC**, **code 2** — alertes de fraîcheur
+  seules : les 12 dates de C4, les 2 exercices de C5, l'ancrage de la séance du relevé
+  (section 27, C33) et le relevé NSBC (section 31, C35).
+- `collecte/avis_brvm.py --test` et `collecte/notations.py --test` passent (PDF GCR 10/10).
+- `dashboard/generer_dashboard.py` **48 titres** ; `generer_dashboard_html.py` **48 titres**,
+  44/48 avec `source_url`.
+- `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant commit.
+
+**Un cas de plus pour C28, constaté sans rien modifier.** `generer_dashboard_html.py`
+réécrit `docs_site/index.html` avec une page **substantiellement différente** de celle qui est
+commitée (750 insertions, 507 suppressions). La raison est dans `pages.yml` : le fichier
+publié est **recopié depuis `docs/index.html`**, produit par un autre générateur. Le fichier
+commité n'est donc pas la sortie du script qui porte son nom. Régénération **annulée**
+(`git checkout --`), rien commité.
+
+### Proposés
+
+- **C37** — les 8 séances de BBGC déjà écrites à 47 lignes, et personne ne les retentera.
+  ORANGE, priorité 3. Diagnostic fait, témoin identifié (clôture 9 650 au 06/10 dans
+  `cote_reference.json`). L'arbitrage : ajouter la 48e ligne sans toucher les 47 existantes,
+  et nommer toute divergence entre les deux extractions plutôt que de l'écraser.
+- **C38** — les 5 cumuls restants de la barrière, 3 à marge nulle. VERTE, priorité 3 ;
+  méthode éprouvée deux fois ce cycle.
+
+**Prochain chantier, par l'ordre déterministe : C34** — ORANGE, `validation : OK`, passe non
+consommée, priorité 2. C32 l'avait précédé à priorité égale par son numéro plus petit.
+
+
 ## 2026-10-05 — hors cycle : incident, l'historique du quotidien vidé puis restauré
 
 **Ce qui s'est passé.** Le run de vérification de `collecte_boc_quotidien.yml`, lancé à
