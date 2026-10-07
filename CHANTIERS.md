@@ -2846,7 +2846,13 @@ ne prouve rien sur un import : vérifier **sans** la dépendance.
 **Barrières** : base complète, golden tests **tous passent**, `tester_donnees.py` **0 ÉCHEC**,
 code 2 (C4, C5, section 27, relevé NSBC), `avis_brvm` et `notations --test` passent, dashboard
 **48 titres**. `docs_site/index.html` régénéré **non commité** : `pages.yml` le recopie depuis
-`docs/index.html` — cas de plus pour **C28**. **Prochain, par l'ordre déterministe : C34**.
+`docs/index.html` — cas de plus pour **C28**. **Vérification de bout en bout : repoussée au cycle du soir, et c'est normal.** `tests.yml`
+et `boc_quotidien.yml` déclenchés (204 tous deux) ; P4 **vert** sur `ee79c1b`, P11 **vert mais
+sans rien committer** — le BOC du 07/10 n'est pas publié à 06h45 UTC. La preuve que `BBGC`
+entre bien dans la série sera la **première séance chargée après ce cycle** : elle doit porter
+**48 lignes**, et la section 33 crie si une séance nouvelle en manque.
+
+**Prochain, par l'ordre déterministe : C34**.
 
 ## 2026-10-05 — cycle 20 (matin)
 
