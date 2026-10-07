@@ -137,6 +137,29 @@ séances, dont 8 séances de janvier 2018 entièrement. Le rendement vide est un
 de l'option (b), jamais une signature. C'est le registre qui identifie, et la section 35 part
 donc du registre et non de la colonne.
 
+### Troisième fois la même erreur, et une méthode de vérification fausse
+
+Le commit de clôture a fait **échouer P4**. Même cause qu'au matin, pour la troisième fois du
+jour : la section 35 faisait `from extracteur_boc import to_float`, et ce module porte
+`import pdfplumber` **en tête**. J'avais pris soin de placer l'import de pdfplumber *dans* la
+fonction de `extracteur_boc_eng.py` — et je suis allé le chercher dans le module français
+juste à côté.
+
+**Le plus instructif n'est pas l'erreur, c'est que ma vérification l'avait déclarée saine.**
+Je rejouais la barrière en substituant `builtins.__import__` pour faire échouer
+`import pdfplumber` ; ce montage a rendu **0 échec** sur un code qui casse en CI. Il ne
+reproduit donc pas l'absence d'une dépendance, et les trois « rejoué dans les conditions de
+la CI » de la journée ne valaient rien.
+
+**Remplacé par la vraie méthode** : un environnement virtuel où l'on installe exactement ce
+que `tests.yml` installe — `pyyaml==6.0.2 openpyxl==3.1.5 pandas` puis `requirements.txt` —
+et où `import pdfplumber` échoue pour de bon. Dans cet environnement : golden tests tous
+passent, `tester_donnees.py` **298 OK, 0 ÉCHEC, code 2**. C'est cette méthode qu'il faut
+employer désormais, pas un leurre d'import.
+
+**Corrigé** en suivant la convention du dépôt : `to_float` est **extraite par AST** via
+`_extraire_fonction`, comme `parser_ligne` l'est depuis le matin.
+
 ### Proposés
 
 - **C39** — les cinq jours ouvrés dont la cause n'est pas établie. ORANGE, priorité 3. Avec

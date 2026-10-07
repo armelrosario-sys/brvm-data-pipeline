@@ -169,6 +169,32 @@ l'environnement, jamais le fichier. Ne pas « réparer » ce fichier ; et ne pas
 non plus si un bac à sable futur retombe en 3.11 — vérifier la version avant de
 conclure à une régression.
 
+## Vérifier une barrière sans la dépendance : la seule méthode qui vaut
+
+Ajouté le 07/10/2026 après **trois** pannes de P4 dans la même journée, toutes identiques :
+un test de données qui importe un module dont l'en-tête porte `import pdfplumber`, absent de
+`requirements.txt`. Le bac à sable le porte préinstallé, la CI non.
+
+**Ce qui ne marche pas, et qui a menti trois fois** : rejouer la barrière en substituant
+`builtins.__import__` pour faire échouer `import pdfplumber`. Ce montage a rendu « 0 échec »
+sur du code qui cassait en CI. Il ne reproduit pas l'absence d'une dépendance.
+
+**Ce qui marche** : un environnement virtuel aux dépendances exactes de `tests.yml`.
+
+```
+python3 -m venv /tmp/venv_ci
+/tmp/venv_ci/bin/pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas
+/tmp/venv_ci/bin/pip install -r requirements.txt
+/tmp/venv_ci/bin/python -c "import pdfplumber"      # doit ECHOUER
+```
+
+Puis reconstruire la base et passer les barrières **avec ce python-là**. Une barrière verte
+dans le bac à sable ne prouve rien sur un import.
+
+**Et la convention du dépôt pour s'en passer** : `_extraire_fonction(fichier, nom, besoins=…)`
+de `tester_donnees.py` compile UNE fonction sans importer son module. `besoins` accepte les
+affectations de tête **et, depuis le 07/10/2026, les fonctions d'appui**.
+
 ## Moyens disponibles
 
 - **Poussée directe sur `main`** : opérationnelle depuis le 27/09/2026.

@@ -4713,8 +4713,13 @@ def test_edition_anglaise_boc():
     sys.path.insert(0, str(RACINE / "collecte"))
     from extracteur_boc_eng import (to_float_eng, parser_ligne_eng,  # noqa: E402
                                     date_dividende_eng_vers_iso)
-    from extracteur_boc import to_float as to_float_fr  # noqa: E402
     from univers_actions import univers_actions  # noqa: E402
+    # `to_float` du francais est EXTRAITE PAR AST, pas importee : son module
+    # porte `import pdfplumber` EN TETE, absent de requirements.txt. Troisieme
+    # occurrence de cette panne le 07/10/2026 (sections 23, 33, puis celle-ci) :
+    # un test de donnees ne depend que de ce que requirements.txt installe.
+    to_float_fr = _extraire_fonction(
+        RACINE / "collecte" / "extracteur_boc.py", "to_float")
 
     # --- A : le facteur 1 000 ------------------------------------------------
     verifie(to_float_eng("45,000") == 45000.0 and to_float_fr("45,000") == 45.0,
