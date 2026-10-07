@@ -2721,7 +2721,7 @@ combien n'ont qu'une édition anglaise ? Si c'est le 02/10 seul, (a) suffit peut
 
 - classe : ORANGE — écrit dans une série de cours certifiée, et demande un passage réseau
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : partielle — la réextraction demande brvm.org, donc un workflow
 - priorité : 3 — le titre est coté depuis 8 séances et n'a toujours aucun prix en base
 
@@ -2761,7 +2761,7 @@ modifiée ; toute divergence entre les deux extractions est nommée ; et
 
 - classe : VERTE — ne touche que des seuils de test et leur unité ; aucune donnée, aucune valeur certifiée
 - statut : PROPOSÉ
-- validation : —
+- validation : OK
 - autonomie : complète, **sans réseau**
 - priorité : 3
 
