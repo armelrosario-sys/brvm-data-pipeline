@@ -2510,6 +2510,13 @@ def _extraire_fonction(chemin, nom, besoins=()):
     for noeud in arbre.body:
         if isinstance(noeud, _ast.FunctionDef) and noeud.name == nom:
             retenus.append(noeud)
+        # Ajout 07/10/2026 : `besoins` accepte aussi des FONCTIONS d'appui.
+        # parser_ligne() de extracteur_boc appelle to_float(), qui vit dans le
+        # meme fichier ; sans cette branche il aurait fallu importer le module,
+        # donc pdfplumber. Les appelants anterieurs ne nomment que des
+        # affectations : leur comportement est inchange.
+        elif isinstance(noeud, _ast.FunctionDef) and noeud.name in besoins:
+            retenus.append(noeud)
         elif isinstance(noeud, _ast.Assign) and any(
                 isinstance(c, _ast.Name) and c.id in besoins for c in noeud.targets):
             retenus.append(noeud)
@@ -4447,7 +4454,20 @@ def test_univers_bulletin_sans_silence():
     import csv as _csv
     sys.path.insert(0, str(RACINE / "collecte"))
     from univers_actions import univers_actions, UniversIndisponible  # noqa: E402
-    import extracteur_boc as eb  # noqa: E402
+
+    # parser_ligne() est EXTRAITE PAR AST, pas importee — et c'est exactement
+    # l'erreur que la section 23 avait deja documentee le 30/09/2026 : un
+    # `import extracteur_boc` tire `pdfplumber`, qui n'est PAS dans
+    # requirements.txt. La premiere version de cette section-ci l'a importe et a
+    # fait tomber P4 le 07/10/2026 (ModuleNotFoundError), alors qu'elle passait
+    # dans le bac a sable ou pdfplumber est preinstalle — une barriere verte par
+    # accident d'environnement, la meme erreur a huit jours d'intervalle. Les
+    # tests de donnees ne dependent que de ce que requirements.txt installe.
+    # `univers` est toujours passe explicitement, pour que la fonction extraite
+    # n'ait pas a resoudre univers_actions() dans son espace de noms.
+    parser_ligne = _extraire_fonction(
+        RACINE / "collecte" / "extracteur_boc.py", "parser_ligne",
+        besoins=("NON_TICKERS", "RE_TICKER", "to_float"))
 
     src = (RACINE / "collecte" / "extracteur_boc.py").read_text(encoding="utf-8")
     verifie("UNIVERS_ACTIONS = {" not in src,
@@ -4472,14 +4492,21 @@ def test_univers_bulletin_sans_silence():
     inconnu = ["ZZZC", "UN TITRE INCONNU", "CD"] + [""] * 4 + [
         "10", "1000", "5000", "0,0", "5100", "", "0,0", "9,9"]
     vus = set()
-    verifie(eb.parser_ligne(inconnu, ecartes=vus) is None and vus == {"ZZZC"},
+    verifie(parser_ligne(inconnu, ecartes=vus, univers=univers) is None
+            and vus == {"ZZZC"},
             f"un mnemonique de cotation hors univers est NOMME, pas jete "
             f"(obtenu : {sorted(vus)})")
+    connu = ["BBGC", "BRIDGE BANK", "CD"] + [""] * 4 + [
+        "60416", "535765635", "8800", "0,0", "9650", "", "0,0", "12,5"]
+    lu = parser_ligne(connu, univers=univers)
+    verifie(lu is not None and lu["ticker"] == "BBGC",
+            f"une ligne de cotation BBGC est bien LUE, pas seulement acceptee "
+            f"(obtenu : {None if lu is None else lu['ticker']})")
     entete = ["SECTEUR", "TOTAL"] + [""] * 12
     vus2 = set()
-    eb.parser_ligne(entete, ecartes=vus2)
+    parser_ligne(entete, ecartes=vus2, univers=univers)
     texte = ["XXXX", "une ligne de texte"] + [""] * 12
-    eb.parser_ligne(texte, ecartes=vus2)
+    parser_ligne(texte, ecartes=vus2, univers=univers)
     verifie(not vus2,
             f"un entete, un total ou une ligne sans valeur ne declenche aucune "
             f"fausse alerte (obtenu : {sorted(vus2)})")

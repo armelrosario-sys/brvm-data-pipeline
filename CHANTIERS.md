@@ -2836,11 +2836,17 @@ plafonds du fichier. Elle a aussitôt pris `BASCULES_PER_MAX` (23 sur 23, **marg
 bloquant) → registre par titre. **5 cumuls restent**, 3 à marge nulle, tous **non bloquants**
 → **C38** (VERTE). Contre-exemple : la section 31 compte en **séances de retard**.
 
-**Barrières** : base complète, golden tests **tous passent**, `tester_donnees.py` **290 OK,
-0 ÉCHEC**, code 2 (C4, C5, section 27, relevé NSBC), `avis_brvm` et `notations --test`
-passent, dashboard **48 titres**. `docs_site/index.html` régénéré **non commité** :
-`pages.yml` le recopie depuis `docs/index.html` — cas de plus pour **C28**. **Prochain, par
-l'ordre déterministe : C34** (ORANGE, `validation : OK`, passe non consommée, priorité 2).
+**Mon erreur, et elle a cassé P4.** La section 33 faisait `import extracteur_boc`, donc
+`import pdfplumber`, **absent de `requirements.txt`** — et la section 23 porte ce
+commentaire depuis le 30/09/2026, panne identique. Corrigé : `parser_ligne` **extraite par
+AST** (`_extraire_fonction`, qui accepte désormais des fonctions dans `besoins`). Rejoué
+`pdfplumber` rendu introuvable : **code 2, 0 ÉCHEC**. Une barrière verte dans le bac à sable
+ne prouve rien sur un import : vérifier **sans** la dépendance.
+
+**Barrières** : base complète, golden tests **tous passent**, `tester_donnees.py` **0 ÉCHEC**,
+code 2 (C4, C5, section 27, relevé NSBC), `avis_brvm` et `notations --test` passent, dashboard
+**48 titres**. `docs_site/index.html` régénéré **non commité** : `pages.yml` le recopie depuis
+`docs/index.html` — cas de plus pour **C28**. **Prochain, par l'ordre déterministe : C34**.
 
 ## 2026-10-05 — cycle 20 (matin)
 

@@ -210,6 +210,37 @@ publié est **recopié depuis `docs/index.html`**, produit par un autre généra
 commité n'est donc pas la sortie du script qui porte son nom. Régénération **annulée**
 (`git checkout --`), rien commité.
 
+### Erreur du cycle, et correction : P4 est tombée sur un import
+
+Le commit `14ad77f` a fait **échouer P4**, et la faute est entièrement mienne : la section 33
+faisait `import extracteur_boc`, qui exécute `import pdfplumber` — **absent de
+`requirements.txt`**. Le bac à sable le porte préinstallé, la CI non : barrière verte par
+accident d'environnement.
+
+**Le dépôt l'avait déjà écrit.** La section 23 porte, depuis le **30/09/2026**, le
+commentaire exact de cette panne : « un `from collecte_boc_quotidien import …` tire
+extracteur_boc, donc `import pdfplumber`, qui n'est PAS dans requirements.txt. La première
+version de cette section l'importait et a fait tomber P4 le 30/09/2026 ». J'ai refait la même
+erreur à huit jours d'intervalle, dans le même fichier, sans lire le commentaire qui la
+décrivait.
+
+**Corrigé** (`db05e1a`) en suivant la convention que le dépôt avait déjà établie :
+`parser_ligne` est **extraite par AST** via `_extraire_fonction`, pas importée. Le helper
+accepte désormais des **fonctions** d'appui dans `besoins` (une branche de quatre lignes) —
+`parser_ligne` appelle `to_float`, qui vit dans le même fichier ; les appelants antérieurs ne
+nomment que des affectations et sont inchangés. `univers` est toujours passé explicitement,
+pour que la fonction extraite n'ait rien à résoudre. Un contrôle de plus au passage : une
+ligne de cotation `BBGC` est bien **lue**, pas seulement acceptée.
+
+**Rejoué dans les conditions de la CI**, `pdfplumber` rendu introuvable par substitution de
+`builtins.__import__` : `tester_donnees.py` **code 2, 0 ÉCHEC**, sections 23, 33 et 34
+passent ; golden tests tous passent.
+
+**Leçon pour les cycles suivants** : un test de données ne dépend que de ce que
+`requirements.txt` installe, et la vérification locale doit se faire **sans** la dépendance,
+pas avec. Le bac à sable est plus riche que la CI, donc une barrière verte en local ne prouve
+rien sur un import.
+
 ### Proposés
 
 - **C37** — les 8 séances de BBGC déjà écrites à 47 lignes, et personne ne les retentera.
