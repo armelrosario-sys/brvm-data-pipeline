@@ -9,6 +9,142 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-07 — hors cycle : C36, l'édition anglaise du BOC, et un témoin qu'il a fallu corriger
+
+**Demandé par Claudia** à 08h00 UTC, après qu'elle a demandé si le BOC du 02/10/2026 avait
+été récupéré. Réponse mesurée : non — `collecte/cours_quotidien_boc.csv` portait **0 ligne**
+à cette date, la série passant du 10-01 au 10-05. Contrôle anti-collision fait (cycle 21
+annoncé puis clos, aucune annonce ouverte), fenêtre interdite 06h40-07h45 passée. Annonce
+`4537d1f`, clôture par ce commit.
+
+### La mesure demandée par le chantier, et ce qu'elle a rendu de plus
+
+C36 pré-autorisait « sur les 60 dernières séances, combien n'ont qu'une édition anglaise ? ».
+Sur la fenêtre **07/07 → 06/10**, 60 séances présentes, **6 jours ouvrés manquants** :
+2026-07-31, 08-04, 08-07, 08-25, 08-26 et 10-02. Seul le 10-02 est confirmé « édition
+anglaise seule » ; les cinq autres précèdent le correctif du 05/10 et leur cause n'est pas
+établie. Ils sont inscrits en **C39** — aucun des deux collecteurs ne reviendra sur eux.
+
+### Les deux pièges de format, et pourquoi ils ne se devinent pas
+
+L'édition anglaise écrit **« 45,000 » pour quarante-cinq mille**. Le `to_float()` de
+`extracteur_boc.py` fait `.replace(",", ".")` : il aurait rendu **45.0** pour le cours de
+SNTS, un **facteur 1 000** dans une série certifiée. C'est le défaut le plus grave que ce
+chantier pouvait introduire, et il est figé par un test qui met les deux convertisseurs côte
+à côte. `collecte/extracteur_boc_eng.py` refuse donc toute virgule qui n'est pas suivie
+d'exactement trois chiffres : « 45,00 » et « 3,87 » sont ambigus entre les deux conventions,
+donc illisibles, donc `None`. Second piège : les mois sont en anglais (« 26 May 26 »), et un
+mois français y est refusé — aucun mélange de langues dans une date.
+
+`--test` : **42 contrôles, 0 échec**. L'`import pdfplumber` est placé **dans** la fonction
+d'extraction et non en tête de module — leçon directe de la panne P4 du matin même.
+
+### Le témoin d'alignement, corrigé par la mesure
+
+L'extracteur anglais ancre ses colonnes **depuis la droite**, comme le français. C'est
+vraisemblable — même bulletin traduit — mais ce n'est pas une preuve, et se tromper de colonne
+verserait des valeurs fausses sous une date vraie. `outils/versement_boc_eng.py` a donc fait
+de la preuve à deux côtés une **condition d'écriture**.
+
+**Le premier jet confrontait le PER, et il a refusé** : 26 concordants sur 44, **59,1 %**,
+plancher 90 %. Le refus était correct sur ce témoin et faux sur sa conclusion. La mesure :
+
+| témoin | résultat au 02/10 | nature |
+|---|---|---|
+| **volume + valeur échangée** | **46 / 46 identiques à l'unité** | entiers bruts, non dérivés |
+| PER | 26 / 44, écarts de 0,3 à 2 % | **dérivé** : cours / BPA |
+| cours contre la séance voisine (01/10) | écart médian **0,53 %**, 0 au-delà de 15 % sur 47 | continuité |
+
+Un décalage de colonne donnerait des écarts **en facteurs**, pas de 1 % : PALC 8,32 contre
+8,27, ECOC 14,83 contre 14,56, ORAC 18,5 contre 18,18. Les deux sources ne dérivent pas le
+PER de la même façon, ce qui est exactement le sujet de **C31** et **C33**. Les lignes brutes
+confirment l'ancrage à l'œil :
+
+```
+NTLC : ['CB','NTLC','NESTLE CI','','14,900','15,995','14,910','0.07 %','938',
+        '14,310,880','14,910','40.00 %','369.60','07 Sep 26','0.02','17.86']
+         row[-8] volume 938 | row[-7] valeur 14,310,880 | row[-6] cours 14,910 | row[-1] PER 17.86
+```
+
+**Corrigé** : l'alignement est prouvé par les volumes (plancher 95 %), la continuité des cours
+est une seconde condition (plafond individuel 25 % — il n'arbitre pas un mouvement de marché,
+il attrape une colonne décalée ou une collision d'échelle, qui se comptent en facteurs), et le
+PER reste **confronté et publié, non bloquant**.
+
+**Réserve du commit d'annonce, levée** : le bulletin annonce **46 titres cotés** dans sa
+synthèse, mais porte **48 lignes de cotation**, 0 écartée. La réserve portait sur un chiffre
+de synthèse, pas sur les lignes.
+
+### Les sept gardes, et ce qu'elles ont vu
+
+Entête conforme (90 754 lignes en place), SHA-256 avant, seance vierge, garde `attendu`
+relisant les 90 754 lignes préexistantes après écriture, preuve à deux côtés, plancher de
+40 titres, SHA-256 après et relecture. **48 lignes ajoutées, 0 modifiée**, série à **90 802**
+lignes et **2 032** séances, **48 rendements vides sur 48**. Registre
+`collecte/seances_boc_eng.csv` : 48 titres, volumes 46/46, PER 26/44, voisine 2026-10-01,
+écart médian 0,005328.
+
+### L'effet, mesuré champ par champ, et il n'est pas nul
+
+`BBGC` obtient son **premier cours en base** — 8 995, PER 16,54 — ce que C32 n'avait pas pu
+faire le matin pour les séances déjà écrites. Il entre donc dans les bassins de percentile,
+qui passent de **36 à 37** titres au marché. Sur les 47 titres communs :
+
+| champ déplacé | titres |
+|---|---|
+| `reference_axes` | 36 |
+| `comparaisons` | 36 |
+| `croissance_pctl` | 25 |
+| `decote_pctl` | 19 |
+| `n_secteur` | 16 |
+| `motif` | 11 |
+| **`secondaire`** | **1 — ETIT** |
+
+**Un seul champ décisionnel bouge : ETIT perd son profil secondaire GROWTH.** Son percentile
+de croissance recule de **69 à 64**, BBGC s'étant classé devant lui à 71. Les valeurs propres
+d'ETIT ne changent pas — 14,7 %/an, PEGY 0,21, profil GARP, grade B inchangés. C'est l'**effet
+de bassin** de C20, option (a), tranchée par Claudia le 02/10/2026 : un titre qui entre dans
+un axe déplace le rang des autres, et c'est assumé.
+
+Et le 48e titre apparaît profilé pour la première fois : **BBGC — profil GARP, secondaire
+GROWTH, grade A**, gate ELIGIBLE, **0 drapeau**, croissance 15,8 %/an, PEGY 1,04,
+décote_pctl 20.
+
+### Barrières
+
+Base complète (50 sociétés, 185 lignes), cinq chargeurs — `cours_quotidien_boc` désormais
+**48 tickers, 2 032 séances** —, **golden tests tous passent** (le golden test 54, retourné le
+matin même, a absorbé l'arrivée d'un cours BBGC sans une seule retouche : c'était son but),
+`avis_brvm --test` et `notations --test` passent, dashboard 48 titres.
+
+`tester_donnees.py` a d'abord rendu **code 1** : « mêmes titres dans le fichier commité et le
+regénéré (48) — DIFFERENCE : BBGC ». Ce n'est pas un défaut, c'est le contrôle qui fait son
+travail : le workflow de versement avait commité la série mais pas `collecte/profils.json`,
+resté à 47 titres. Le fichier régénéré est commité avec ce commit, et la barrière repasse à
+**code 2**, alertes de fraîcheur seules.
+
+### Test
+
+**Section 35** de `tester_donnees.py`, 7 contrôles. Elle fige les deux propriétés : le
+facteur 1 000 (les deux convertisseurs côte à côte), et le fait que le rendement n'entre
+jamais — vérifié sur l'extracteur, sur le code du versement (ajout seul, jamais de
+réécriture), et sur **toutes les lignes des séances inscrites au registre**.
+
+**Une affirmation corrigée avant commit.** J'avais écrit, dans les deux fichiers, qu'« une
+ligne BOC_ENG se reconnaît à son rendement vide ». **Faux**, et la mesure l'a dit :
+`cours_quotidien_boc.csv` en portait déjà **15 116 sur 90 754**, réparties sur les 2 031
+séances, dont 8 séances de janvier 2018 entièrement. Le rendement vide est une **conséquence**
+de l'option (b), jamais une signature. C'est le registre qui identifie, et la section 35 part
+donc du registre et non de la colonne.
+
+### Proposés
+
+- **C39** — les cinq jours ouvrés dont la cause n'est pas établie. ORANGE, priorité 3. Avec
+  une difficulté nommée : la garde d'alignement de C36 exige un relevé « Volumes / Valeurs »
+  du même jour, et `releve_volumes.csv` ne commence qu'au 02/10/2026. Pour juillet et août,
+  **le témoin n'existe pas** — il faudra trancher si la continuité des cours seule suffit.
+
+
 ## 2026-10-07 — cycle 21 (matin) : C32, un univers écrit en dur, et un plafond qui rougissait tout seul
 
 ### Ce que le cycle a trouvé avant de commencer : la barrière était déjà rouge

@@ -16,8 +16,8 @@
     "titre": 26.73,
     "mediane_secteur": 17.89,
     "n_secteur": 5,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 6.18,
@@ -30,22 +30,22 @@
     "titre": 1.52,
     "mediane_secteur": 2.1,
     "n_secteur": 5,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 1.65,
     "mediane_secteur": 0.88,
     "n_secteur": 5,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 26.28,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -87,8 +87,8 @@
    "detail": "glissement -12.15 % en base contre -11.08 % chez l'agregateur (ecart 1.1 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 48,
-  "croissance_pctl": 34,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 33,
+  "reference_axes": "marche (n=37)",
   "g": 1.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -143,6 +143,119 @@
    }
   ]
  },
+ "BBGC": {
+  "dominant": "GARP",
+  "mixte": true,
+  "VALUE": null,
+  "GROWTH": null,
+  "GARP": null,
+  "alerte_peg": false,
+  "peg": 1.04,
+  "dy": null,
+  "confiance": "HAUTE",
+  "profil": "GARP",
+  "motif": "croissance de 15.8 %/an dans la fenetre soutenable (8-30 %), payee PEGY 1.04 — la croissance n'est pas encore dans le prix",
+  "comparaisons": {
+   "per": {
+    "titre": 16.54,
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
+   },
+   "dy": {
+    "titre": null,
+    "mediane_secteur": 4.42,
+    "n_secteur": 14,
+    "mediane_marche": 4.51,
+    "n_marche": 36
+   },
+   "g": {
+    "titre": 15.84,
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
+   },
+   "payout": {
+    "titre": 0.65,
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
+   },
+   "roe": {
+    "titre": 25.9,
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
+   }
+  },
+  "payout_source": "ETATS_FINANCIERS",
+  "date_cours": "2026-10-02",
+  "tendance_intermediaire": null,
+  "periode_intermediaire": null,
+  "per_ttm": null,
+  "ttm_detail": null,
+  "ttm_motif": "aucune publication intermediaire en base",
+  "roe_exercice": 2025,
+  "taux_reference": 0.0707,
+  "prime_rendement": null,
+  "dy_recurrent": null,
+  "distribution_non_recurrente": null,
+  "table_cours": "cours_quotidien_boc",
+  "part_operationnelle": null,
+  "secondaire": "GROWTH",
+  "grade": "A",
+  "notes": [],
+  "reserves": [
+   "croissance du resultat net TOTAL, non ajustee des operations sur capital"
+  ],
+  "chiffre_affaires": null,
+  "marge_nette": null,
+  "croissance_ca": null,
+  "reference_31_decembre": null,
+  "roe_source": "ETATS_FINANCIERS",
+  "source_capitaux_propres": null,
+  "arbitrage": null,
+  "decote_pctl": 20,
+  "croissance_pctl": 71,
+  "reference_axes": "secteur (n=15)",
+  "g": 15.8,
+  "source_croissance": "RN_VERIFIE(4ex)",
+  "drapeaux": [],
+  "per": 16.54,
+  "per_analyse": 16.54,
+  "per_source": "BOC",
+  "payout": 0.65,
+  "roe": 25.9,
+  "pegy": 1.04,
+  "gate": "ELIGIBLE",
+  "secteur": "SERVICES_FINANCIERS",
+  "n_secteur": 15,
+  "source_fait": null,
+  "notation": null,
+  "contradiction_notation": false,
+  "statut_cotation": "NEGOCIABLE",
+  "evenements_cotation": [],
+  "date_statut_cotation": null,
+  "historique_cotation": [],
+  "avis_recents": [
+   {
+    "date": "2026-09-25",
+    "type": "PREMIERE_COTATION",
+    "titre": "Résultats de première cotation - BRIDGE BANK GROUP COTE D'IVOIRE (BBGC)",
+    "url": "https://www.brvm.org/sites/default/files/20260924_-_avis_ndeg285_brvmdg_-_resultats_de_premiere_cotation_-_bridge_bank_group_cote_divoire_bbgc.pdf"
+   },
+   {
+    "date": "2026-09-08",
+    "type": "PREMIERE_COTATION",
+    "titre": "BRIDGE BANK GROUP COTE D’IVOIRE : Première cotation",
+    "url": "https://www.brvm.org/sites/default/files/20260908_-_avis_ndeg263_brvmdg_-_premiere_cotation_-bridge_bank_group_cote_divoire.pdf"
+   }
+  ]
+ },
  "BICB": {
   "dominant": "AUCUN_PROFIL",
   "mixte": false,
@@ -158,10 +271,10 @@
   "comparaisons": {
    "per": {
     "titre": 13.71,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 2.96,
@@ -172,24 +285,24 @@
    },
    "g": {
     "titre": null,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.41,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 26.82,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -226,9 +339,9 @@
    "drapeau": "ECART_AGREGATEUR",
    "detail": "glissement +24.71 % en base (ligne certifiee) contre -20.30 % chez l'agregateur : ecart de 45.0 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
-  "decote_pctl": 40,
+  "decote_pctl": 42,
   "croissance_pctl": null,
-  "reference_axes": "secteur (n=14)",
+  "reference_axes": "secteur (n=15)",
   "g": null,
   "source_croissance": "AUCUNE",
   "drapeaux": [
@@ -242,7 +355,7 @@
   "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": null,
   "contradiction_notation": false,
@@ -263,14 +376,14 @@
   "dy": 3.66,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P44)",
+  "motif": "croissance de 43.4 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P46)",
   "comparaisons": {
    "per": {
     "titre": 14.42,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.66,
@@ -281,24 +394,24 @@
    },
    "g": {
     "titre": 43.38,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.53,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 30.29,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -337,9 +450,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +39.25 % en base contre +39.25 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 44,
-  "croissance_pctl": 92,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 46,
+  "croissance_pctl": 93,
+  "reference_axes": "secteur (n=15)",
   "g": 43.4,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -355,7 +468,7 @@
   "pegy": 0.31,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": null,
   "contradiction_notation": false,
@@ -485,10 +598,10 @@
   "comparaisons": {
    "per": {
     "titre": 18.84,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 6.26,
@@ -499,24 +612,24 @@
    },
    "g": {
     "titre": 3.35,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 1.18,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 17.11,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -559,8 +672,8 @@
    "detail": "glissement -2.29 % en base contre +2.34 % chez l'agregateur (ecart 4.6 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 54,
-  "croissance_pctl": 38,
-  "reference_axes": "secteur (n=14)",
+  "croissance_pctl": 36,
+  "reference_axes": "secteur (n=15)",
   "g": 3.3,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -577,7 +690,7 @@
   "pegy": 1.96,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -612,10 +725,10 @@
   "comparaisons": {
    "per": {
     "titre": 18.06,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.03,
@@ -626,24 +739,24 @@
    },
    "g": {
     "titre": -8.92,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 1.04,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 34.29,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -684,9 +797,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -14.13 % en base contre -14.13 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 42,
-  "croissance_pctl": 15,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 41,
+  "croissance_pctl": 14,
+  "reference_axes": "secteur (n=15)",
   "g": -8.9,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -702,7 +815,7 @@
   "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -737,10 +850,10 @@
   "comparaisons": {
    "per": {
     "titre": 12.67,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.29,
@@ -751,24 +864,24 @@
    },
    "g": {
     "titre": 20.98,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.76,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 27.92,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -807,8 +920,8 @@
    "detail": "glissement +10.91 % en base contre +10.91 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 78,
-  "croissance_pctl": 85,
-  "reference_axes": "secteur (n=14)",
+  "croissance_pctl": 86,
+  "reference_axes": "secteur (n=15)",
   "g": 21.0,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -823,7 +936,7 @@
   "pegy": 0.48,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -867,14 +980,14 @@
   "dy": 5.0,
   "confiance": "FAIBLE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 44.3 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P49)",
+  "motif": "croissance de 44.3 %/an issue d'un rattrapage depuis un creux : non extrapolable, et decote insuffisante par ailleurs (rang P51)",
   "comparaisons": {
    "per": {
     "titre": 15.1,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.0,
@@ -885,24 +998,24 @@
    },
    "g": {
     "titre": 44.26,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.76,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 22.24,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -942,9 +1055,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +21.46 % en base contre +21.46 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 49,
+  "decote_pctl": 51,
   "croissance_pctl": 100,
-  "reference_axes": "secteur (n=14)",
+  "reference_axes": "secteur (n=15)",
   "g": 44.3,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -960,7 +1073,7 @@
   "pegy": 0.31,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -1049,7 +1162,7 @@
   "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": "Bulletins officiels de la cote 2025-2026 ; contexte souverain Niger",
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -1080,14 +1193,14 @@
   "dy": 5.52,
   "confiance": "FAIBLE",
   "profil": "VALUE",
-  "motif": "decote marquee (rang P74 sur l'axe decote) sur des benefices etablis, croissance de -2.1 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P76 sur l'axe decote) sur des benefices etablis, croissance de -2.1 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 13.39,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.52,
@@ -1098,24 +1211,24 @@
    },
    "g": {
     "titre": -2.14,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.74,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 24.72,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1153,9 +1266,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +9.62 % en base contre +9.61 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 74,
-  "croissance_pctl": 23,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 76,
+  "croissance_pctl": 21,
+  "reference_axes": "secteur (n=15)",
   "g": -2.1,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -1171,7 +1284,7 @@
   "pegy": 3.96,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -1208,8 +1321,8 @@
     "titre": 13.57,
     "mediane_secteur": 25.39,
     "n_secteur": 2,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.61,
@@ -1222,22 +1335,22 @@
     "titre": 21.86,
     "mediane_secteur": -1.49,
     "n_secteur": 2,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.53,
     "mediane_secteur": 0.44,
     "n_secteur": 2,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 15.4,
     "mediane_secteur": 7.87,
     "n_secteur": 2,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1275,9 +1388,9 @@
    "drapeau": "ECART_AGREGATEUR",
    "detail": "glissement +4.68 % en base (ligne certifiee) contre +39.16 % chez l'agregateur : ecart de 34.5 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
-  "decote_pctl": 58,
+  "decote_pctl": 59,
   "croissance_pctl": 86,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": 21.9,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -1329,14 +1442,14 @@
   "dy": 2.86,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P22) ni rendement distinctifs",
+  "motif": "croissance de 5.1 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P24) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 15.36,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 2.86,
@@ -1347,24 +1460,24 @@
    },
    "g": {
     "titre": 5.06,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.44,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 19.81,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1405,9 +1518,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +36.44 % en base contre +36.63 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 22,
-  "croissance_pctl": 46,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 24,
+  "croissance_pctl": 43,
+  "reference_axes": "secteur (n=15)",
   "g": 5.1,
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [
@@ -1424,7 +1537,7 @@
   "pegy": 1.94,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -1474,8 +1587,8 @@
     "titre": 33.08,
     "mediane_secteur": 17.89,
     "n_secteur": 5,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.61,
@@ -1488,22 +1601,22 @@
     "titre": -5.34,
     "mediane_secteur": 2.1,
     "n_secteur": 5,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 1.19,
     "mediane_secteur": 0.88,
     "n_secteur": 5,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 24.13,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1548,8 +1661,8 @@
    "detail": "exercice 2025 disponible chez l'agregateur (resultat net 8 416) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv"
   },
   "decote_pctl": 16,
-  "croissance_pctl": 23,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 22,
+  "reference_axes": "marche (n=37)",
   "g": -5.3,
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [
@@ -1603,8 +1716,8 @@
     "titre": 26.45,
     "mediane_secteur": 23.12,
     "n_secteur": 2,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.32,
@@ -1617,22 +1730,22 @@
     "titre": 10.09,
     "mediane_secteur": 3.74,
     "n_secteur": 2,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 1.0,
     "mediane_secteur": 0.85,
     "n_secteur": 2,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 26.36,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -1668,8 +1781,8 @@
    "detail": "glissement +29.70 % en base contre +29.96 % chez l'agregateur (ecart 0.3 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 16,
-  "croissance_pctl": 57,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 56,
+  "reference_axes": "marche (n=37)",
   "g": 10.1,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -1731,10 +1844,10 @@
   "comparaisons": {
    "per": {
     "titre": 14.53,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.67,
@@ -1745,24 +1858,24 @@
    },
    "g": {
     "titre": 12.49,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.68,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 31.84,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1801,9 +1914,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.45 % en base contre +10.45 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 48,
-  "croissance_pctl": 62,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 50,
+  "croissance_pctl": 57,
+  "reference_axes": "secteur (n=15)",
   "g": 12.5,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -1819,7 +1932,7 @@
   "pegy": 0.85,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -1854,7 +1967,7 @@
  },
  "ETIT": {
   "dominant": "GARP",
-  "mixte": true,
+  "mixte": false,
   "VALUE": null,
   "GROWTH": null,
   "GARP": null,
@@ -1867,10 +1980,10 @@
   "comparaisons": {
    "per": {
     "titre": 3.4,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 1.41,
@@ -1881,24 +1994,24 @@
    },
    "g": {
     "titre": 14.71,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.05,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 21.62,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -1915,7 +2028,7 @@
   "distribution_non_recurrente": null,
   "table_cours": "cours_quotidien_boc",
   "part_operationnelle": null,
-  "secondaire": "GROWTH",
+  "secondaire": null,
   "grade": "B",
   "notes": [
    "PEGY < 0.25 : protocole de revue obligatoire (donnee erronee ? risque non capture ?)"
@@ -1937,8 +2050,8 @@
    "detail": "glissement +15.29 % en base contre +15.29 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 54,
-  "croissance_pctl": 69,
-  "reference_axes": "secteur (n=14)",
+  "croissance_pctl": 64,
+  "reference_axes": "secteur (n=15)",
   "g": 14.7,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -1952,7 +2065,7 @@
   "pegy": 0.21,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": null,
   "contradiction_notation": false,
@@ -2083,8 +2196,8 @@
     "titre": 17.0,
     "mediane_secteur": 17.89,
     "n_secteur": 5,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.18,
@@ -2097,22 +2210,22 @@
     "titre": 60.0,
     "mediane_secteur": 2.1,
     "n_secteur": 5,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.71,
     "mediane_secteur": 0.88,
     "n_secteur": 5,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 19.57,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2162,7 +2275,7 @@
   },
   "decote_pctl": 40,
   "croissance_pctl": 100,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": 60.0,
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [
@@ -2229,8 +2342,8 @@
     "titre": 13.95,
     "mediane_secteur": 17.89,
     "n_secteur": 5,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 6.31,
@@ -2243,22 +2356,22 @@
     "titre": 18.84,
     "mediane_secteur": 2.1,
     "n_secteur": 5,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.88,
     "mediane_secteur": 0.88,
     "n_secteur": 5,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 54.79,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2296,9 +2409,9 @@
    "drapeau": "FONDAMENTAL_EN_RETARD",
    "detail": "exercice 2025 disponible chez l'agregateur (resultat net 2 037) alors que la base s'arrete a 2024 : le profil porte sur des comptes perimes, saisir l'exercice manquant dans donnees/base/etats_financiers.csv"
   },
-  "decote_pctl": 75,
-  "croissance_pctl": 77,
-  "reference_axes": "marche (n=36)",
+  "decote_pctl": 76,
+  "croissance_pctl": 78,
+  "reference_axes": "marche (n=37)",
   "g": 18.8,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -2344,14 +2457,14 @@
   "dy": 3.2199999999999998,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 7.9 %/an sous la fenetre GARP (8 %) — a 0.1 point de la fenetre, a revoir a la prochaine publication, sans decote (rang de decote P51) ni rendement distinctifs",
+  "motif": "croissance de 7.9 %/an sous la fenetre GARP (8 %) — a 0.1 point de la fenetre, a revoir a la prochaine publication, sans decote (rang de decote P52) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 12.76,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.22,
@@ -2362,24 +2475,24 @@
    },
    "g": {
     "titre": 7.93,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.41,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 17.45,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2414,9 +2527,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +6.82 % en base contre +6.82 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 51,
-  "croissance_pctl": 54,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 52,
+  "croissance_pctl": 50,
+  "reference_axes": "secteur (n=15)",
   "g": 7.9,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -2430,7 +2543,7 @@
   "pegy": 1.14,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "GCR",
@@ -2474,14 +2587,14 @@
   "dy": 2.39,
   "confiance": "HAUTE",
   "profil": "AUCUN_PROFIL",
-  "motif": "croissance de 3.5 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P17) ni rendement distinctifs",
+  "motif": "croissance de 3.5 %/an sous la fenetre GARP (8 %), sans decote (rang de decote P16) ni rendement distinctifs",
   "comparaisons": {
    "per": {
     "titre": 18.55,
     "mediane_secteur": 12.09,
     "n_secteur": 6,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 2.39,
@@ -2494,22 +2607,22 @@
     "titre": 3.49,
     "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.5,
     "mediane_secteur": 0.63,
     "n_secteur": 6,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 62.98,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -2545,9 +2658,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +1.53 % en base contre +1.53 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 17,
-  "croissance_pctl": 46,
-  "reference_axes": "marche (n=36)",
+  "decote_pctl": 16,
+  "croissance_pctl": 44,
+  "reference_axes": "marche (n=37)",
   "g": 3.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -2612,8 +2725,8 @@
     "titre": 13.79,
     "mediane_secteur": 13.79,
     "n_secteur": 3,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.93,
@@ -2626,22 +2739,22 @@
     "titre": -13.42,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.68,
     "mediane_secteur": 0.63,
     "n_secteur": 3,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 27.61,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2679,7 +2792,7 @@
   },
   "decote_pctl": 60,
   "croissance_pctl": 6,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": -13.4,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -2743,8 +2856,8 @@
     "titre": 19.2,
     "mediane_secteur": 13.79,
     "n_secteur": 3,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.29,
@@ -2757,22 +2870,22 @@
     "titre": 4.08,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.63,
     "mediane_secteur": 0.63,
     "n_secteur": 3,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 27.23,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -2809,8 +2922,8 @@
    "detail": "glissement +6.07 % en base contre +6.07 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 20,
-  "croissance_pctl": 49,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 47,
+  "reference_axes": "marche (n=37)",
   "g": 4.1,
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [
@@ -2873,10 +2986,10 @@
   "comparaisons": {
    "per": {
     "titre": 9.46,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 2.02,
@@ -2887,24 +3000,24 @@
    },
    "g": {
     "titre": 3.02,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.0,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 19.15,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -2937,8 +3050,8 @@
   "source_capitaux_propres": null,
   "arbitrage": null,
   "decote_pctl": 93,
-  "croissance_pctl": 31,
-  "reference_axes": "secteur (n=14)",
+  "croissance_pctl": 29,
+  "reference_axes": "secteur (n=15)",
   "g": 3.0,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -2952,7 +3065,7 @@
   "pegy": 1.88,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -2989,8 +3102,8 @@
     "titre": 8.28,
     "mediane_secteur": 12.09,
     "n_secteur": 6,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.31,
@@ -3003,22 +3116,22 @@
     "titre": -10.48,
     "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.44,
     "mediane_secteur": 0.63,
     "n_secteur": 6,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 11.74,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3053,9 +3166,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -2.23 % en base contre -2.23 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 85,
+  "decote_pctl": 86,
   "croissance_pctl": 11,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": -10.5,
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [
@@ -3125,8 +3238,8 @@
     "titre": 17.89,
     "mediane_secteur": 17.89,
     "n_secteur": 5,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.41,
@@ -3139,22 +3252,22 @@
     "titre": 2.1,
     "mediane_secteur": 2.1,
     "n_secteur": 5,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.79,
     "mediane_secteur": 0.88,
     "n_secteur": 5,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 20.8,
     "mediane_secteur": 24.13,
     "n_secteur": 5,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3193,8 +3306,8 @@
    "detail": "glissement +0.99 % en base contre +0.86 % chez l'agregateur (ecart 0.1 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 40,
-  "croissance_pctl": 37,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 36,
+  "reference_axes": "marche (n=37)",
   "g": 2.1,
   "source_croissance": "RN_VERIFIE(8ex)",
   "drapeaux": [
@@ -3290,7 +3403,7 @@
   "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -3462,14 +3575,14 @@
   "dy": 3.5699999999999994,
   "confiance": "MOYENNE",
   "profil": "AUCUN_PROFIL",
-  "motif": "ni decote (rang P22), ni croissance dans le tercile superieur (P26), ni rendement superieur : coeur de cote correctement paye",
+  "motif": "ni decote (rang P22), ni croissance dans le tercile superieur (P25), ni rendement superieur : coeur de cote correctement paye",
   "comparaisons": {
    "per": {
     "titre": 19.79,
     "mediane_secteur": 23.12,
     "n_secteur": 2,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.57,
@@ -3482,22 +3595,22 @@
     "titre": -2.61,
     "mediane_secteur": 3.74,
     "n_secteur": 2,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.71,
     "mediane_secteur": 0.85,
     "n_secteur": 2,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 15.35,
     "mediane_secteur": 20.85,
     "n_secteur": 2,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3539,8 +3652,8 @@
    "detail": "glissement +17.78 % en base (ligne certifiee) contre +30.96 % chez l'agregateur : ecart de 13.2 pt non explique, la ligne certifiee est conservee mais le perimetre (consolide, part du groupe) reste a verifier"
   },
   "decote_pctl": 22,
-  "croissance_pctl": 26,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 25,
+  "reference_axes": "marche (n=37)",
   "g": -2.6,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -3712,8 +3825,8 @@
     "titre": 37.21,
     "mediane_secteur": 25.39,
     "n_secteur": 2,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 0.94,
@@ -3726,22 +3839,22 @@
     "titre": -24.83,
     "mediane_secteur": -1.49,
     "n_secteur": 2,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.35,
     "mediane_secteur": 0.44,
     "n_secteur": 2,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 0.34,
     "mediane_secteur": 7.87,
     "n_secteur": 2,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -3779,7 +3892,7 @@
   "arbitrage": null,
   "decote_pctl": 3,
   "croissance_pctl": 3,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": -24.8,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -3847,14 +3960,14 @@
   "dy": 5.89,
   "confiance": "MOYENNE",
   "profil": "VALUE",
-  "motif": "decote marquee (rang P89 sur l'axe decote) sur des benefices etablis, croissance de 15.9 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P90 sur l'axe decote) sur des benefices etablis, croissance de 15.9 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 11.97,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.89,
@@ -3865,24 +3978,24 @@
    },
    "g": {
     "titre": 15.89,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.51,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 22.44,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -3923,9 +4036,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -0.12 % en base contre +0.12 % chez l'agregateur (ecart 0.2 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 89,
-  "croissance_pctl": 77,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 90,
+  "croissance_pctl": 79,
+  "reference_axes": "secteur (n=15)",
   "g": 15.9,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -3942,7 +4055,7 @@
   "pegy": 0.55,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -3986,14 +4099,14 @@
   "dy": 3.7599999999999993,
   "confiance": "HAUTE",
   "profil": "GROWTH",
-  "motif": "croissance de 19.3 %/an dans le tercile superieur (P80), reguliere",
+  "motif": "croissance de 19.3 %/an dans le tercile superieur (P81), reguliere",
   "comparaisons": {
    "per": {
     "titre": 23.62,
     "mediane_secteur": 19.18,
     "n_secteur": 4,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.76,
@@ -4006,22 +4119,22 @@
     "titre": 19.32,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 1.01,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 22.2,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -4058,8 +4171,8 @@
    "detail": "glissement +12.59 % en base contre +12.59 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 23,
-  "croissance_pctl": 80,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 81,
+  "reference_axes": "marche (n=37)",
   "g": 19.3,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -4127,10 +4240,10 @@
   "comparaisons": {
    "per": {
     "titre": 16.19,
-    "mediane_secteur": 14.07,
-    "n_secteur": 14,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_secteur": 14.42,
+    "n_secteur": 15,
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.16,
@@ -4141,24 +4254,24 @@
    },
    "g": {
     "titre": -11.5,
-    "mediane_secteur": 7.93,
-    "n_secteur": 13,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_secteur": 10.21,
+    "n_secteur": 14,
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.67,
-    "mediane_secteur": 0.6,
-    "n_secteur": 14,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_secteur": 0.65,
+    "n_secteur": 15,
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 27.16,
-    "mediane_secteur": 23.58,
-    "n_secteur": 14,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_secteur": 24.72,
+    "n_secteur": 15,
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4197,9 +4310,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +10.73 % en base contre +10.73 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 34,
-  "croissance_pctl": 8,
-  "reference_axes": "secteur (n=14)",
+  "decote_pctl": 36,
+  "croissance_pctl": 7,
+  "reference_axes": "secteur (n=15)",
   "g": -11.5,
   "source_croissance": "BPA_IMPLICITE",
   "drapeaux": [
@@ -4214,7 +4327,7 @@
   "pegy": null,
   "gate": "ELIGIBLE",
   "secteur": "SERVICES_FINANCIERS",
-  "n_secteur": 14,
+  "n_secteur": 15,
   "source_fait": null,
   "notation": {
    "agence": "Bloomfield Investment Corporation",
@@ -4442,14 +4555,14 @@
   "dy": 5.0,
   "confiance": "HAUTE",
   "profil": "VALUE",
-  "motif": "decote marquee (rang P68 sur l'axe decote) sur des benefices etablis, croissance de 60.0 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P69 sur l'axe decote) sur des benefices etablis, croissance de 60.0 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 13.45,
     "mediane_secteur": 12.09,
     "n_secteur": 6,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.0,
@@ -4462,22 +4575,22 @@
     "titre": 60.0,
     "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.76,
     "mediane_secteur": 0.63,
     "n_secteur": 6,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 23.46,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -4518,9 +4631,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +113.21 % en base contre +113.21 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 68,
+  "decote_pctl": 69,
   "croissance_pctl": 100,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": 60.0,
   "source_croissance": "RN_PROBABLE(3ex)",
   "drapeaux": [
@@ -4589,8 +4702,8 @@
     "titre": 9.54,
     "mediane_secteur": 19.18,
     "n_secteur": 4,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.4,
@@ -4603,22 +4716,22 @@
     "titre": 11.54,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.42,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 30.47,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4656,8 +4769,8 @@
    "detail": "glissement +50.32 % en base contre +50.32 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 66,
-  "croissance_pctl": 60,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 58,
+  "reference_axes": "marche (n=37)",
   "g": 11.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -4733,8 +4846,8 @@
     "titre": 10.88,
     "mediane_secteur": 13.79,
     "n_secteur": 3,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 3.87,
@@ -4747,22 +4860,22 @@
     "titre": 14.03,
     "mediane_secteur": 4.08,
     "n_secteur": 3,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.42,
     "mediane_secteur": 0.63,
     "n_secteur": 3,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 29.56,
     "mediane_secteur": 27.61,
     "n_secteur": 3,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4797,9 +4910,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement +5.06 % en base contre +5.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 59,
-  "croissance_pctl": 66,
-  "reference_axes": "marche (n=36)",
+  "decote_pctl": 60,
+  "croissance_pctl": 64,
+  "reference_axes": "marche (n=37)",
   "g": 14.0,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -4863,14 +4976,14 @@
   "dy": 6.35,
   "confiance": "HAUTE",
   "profil": "VALUE",
-  "motif": "decote marquee (rang P80 sur l'axe decote) sur des benefices etablis, croissance de -7.2 %/an — l'histoire est la revalorisation, pas l'expansion",
+  "motif": "decote marquee (rang P81 sur l'axe decote) sur des benefices etablis, croissance de -7.2 %/an — l'histoire est la revalorisation, pas l'expansion",
   "comparaisons": {
    "per": {
     "titre": 13.65,
     "mediane_secteur": 12.09,
     "n_secteur": 6,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 6.35,
@@ -4883,22 +4996,22 @@
     "titre": -7.24,
     "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.87,
     "mediane_secteur": 0.63,
     "n_secteur": 6,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 18.26,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -4933,9 +5046,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -4.71 % en base contre -4.71 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 80,
-  "croissance_pctl": 20,
-  "reference_axes": "marche (n=36)",
+  "decote_pctl": 81,
+  "croissance_pctl": 19,
+  "reference_axes": "marche (n=37)",
   "g": -7.2,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [
@@ -4989,8 +5102,8 @@
     "titre": 8.19,
     "mediane_secteur": 12.09,
     "n_secteur": 6,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 5.38,
@@ -5003,22 +5116,22 @@
     "titre": 14.35,
     "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.44,
     "mediane_secteur": 0.63,
     "n_secteur": 6,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 18.1,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -5056,8 +5169,8 @@
    "detail": "glissement +32.90 % en base contre +32.90 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
   "decote_pctl": 88,
-  "croissance_pctl": 69,
-  "reference_axes": "marche (n=36)",
+  "croissance_pctl": 67,
+  "reference_axes": "marche (n=37)",
   "g": 14.4,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -5204,8 +5317,8 @@
     "titre": 10.73,
     "mediane_secteur": 12.09,
     "n_secteur": 6,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 7.83,
@@ -5218,22 +5331,22 @@
     "titre": 46.9,
     "mediane_secteur": 8.92,
     "n_secteur": 6,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.8,
     "mediane_secteur": 0.63,
     "n_secteur": 6,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 79.89,
     "mediane_secteur": 20.86,
     "n_secteur": 6,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -5278,7 +5391,7 @@
   },
   "decote_pctl": 93,
   "croissance_pctl": 94,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": 46.9,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -5358,8 +5471,8 @@
     "titre": 20.96,
     "mediane_secteur": 19.18,
     "n_secteur": 4,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.62,
@@ -5372,22 +5485,22 @@
     "titre": -9.55,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 1.1,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": 25.1,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "ETATS_FINANCIERS",
@@ -5425,9 +5538,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -3.06 % en base contre -3.06 % chez l'agregateur (ecart 0.0 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 35,
+  "decote_pctl": 34,
   "croissance_pctl": 14,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": -9.5,
   "source_croissance": "RN_VERIFIE(4ex)",
   "drapeaux": [
@@ -5491,8 +5604,8 @@
     "titre": 17.4,
     "mediane_secteur": 19.18,
     "n_secteur": 4,
-    "mediane_marche": 14.47,
-    "n_marche": 36
+    "mediane_marche": 14.53,
+    "n_marche": 37
    },
    "dy": {
     "titre": 4.88,
@@ -5505,22 +5618,22 @@
     "titre": 1.11,
     "mediane_secteur": 6.33,
     "n_secteur": 4,
-    "mediane_marche": 5.06,
-    "n_marche": 35
+    "mediane_marche": 6.49,
+    "n_marche": 36
    },
    "payout": {
     "titre": 0.85,
     "mediane_secteur": 0.93,
     "n_secteur": 4,
-    "mediane_marche": 0.69,
-    "n_marche": 36
+    "mediane_marche": 0.68,
+    "n_marche": 37
    },
    "roe": {
     "titre": null,
     "mediane_secteur": 25.1,
     "n_secteur": 3,
-    "mediane_marche": 24.13,
-    "n_marche": 35
+    "mediane_marche": 24.42,
+    "n_marche": 36
    }
   },
   "payout_source": "IMPLICITE(rendement x PER)",
@@ -5555,9 +5668,9 @@
    "drapeau": "CROISSANCE_CORROBOREE",
    "detail": "glissement -5.06 % en base contre -13.31 % chez l'agregateur (ecart 8.3 pt) : transcription corroboree par une source independante"
   },
-  "decote_pctl": 48,
+  "decote_pctl": 47,
   "croissance_pctl": 31,
-  "reference_axes": "marche (n=36)",
+  "reference_axes": "marche (n=37)",
   "g": 1.1,
   "source_croissance": "RN_PROBABLE(4ex)",
   "drapeaux": [

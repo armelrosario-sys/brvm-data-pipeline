@@ -2682,7 +2682,9 @@ la relance est portée par un workflow qu'un cycle peut déclencher.
 ## C36 — Quand la BRVM ne publie que l'édition anglaise du BOC, la séance est perdue
 
 - classe : ORANGE — charger une seconde édition, au format et à la précision différents, est un arbitrage sur une donnée certifiée
-- statut : PROPOSÉ
+- statut : **FAIT le 07/10/2026, hors cycle, à la demande de Claudia** — option (b)
+  appliquée, le 02/10/2026 est versé (48 lignes, rendements vides) et figé par un test.
+  Voir *Ce qu'a fait le travail hors cycle du 07/10/2026*, au bas du bloc.
 - validation : OK option (b)
 - priorité : 2
 
@@ -2715,6 +2717,63 @@ l'anglaise (virgule des milliers, point décimal), mois en anglais (« 26 May 26
 **Première mesure à faire** (pré-autorisée, sans écriture) : sur les 60 dernières séances,
 combien n'ont qu'une édition anglaise ? Si c'est le 02/10 seul, (a) suffit peut-être.
 
+### Ce qu'a fait le travail hors cycle du 07/10/2026
+
+**La mesure demandée, pour ce qu'elle vaut sans réseau** : sur la fenêtre des 60 dernières
+séances (07/07 → 06/10), **6 jours ouvrés** manquaient au quotidien — 31/07, 04/08, 07/08,
+25/08, 26/08 et 02/10. Les cinq premiers précèdent le correctif hors cycle du 05/10 et leur
+cause n'est pas établie ; seul le 02/10 est confirmé « édition anglaise seule ».
+
+**Livré.** `collecte/extracteur_boc_eng.py` (`--test` **42 contrôles, 0 échec**) et
+`outils/versement_boc_eng.py`, déclenchés par `.github/workflows/boc_eng.yml` — mode
+**rapport par défaut**, le bac à sable n'atteignant pas brvm.org.
+
+**Les deux pièges de format, et ils ne se devinent pas.** L'édition anglaise écrit
+« 45,000 » pour quarante-cinq mille : le `to_float()` français fait `.replace(",", ".")` et
+aurait rendu **45.0** pour le cours de SNTS, soit un **facteur 1 000** dans une série
+certifiée. Le convertisseur anglais refuse donc toute virgule qui n'est pas suivie
+d'exactement trois chiffres — « 45,00 » est ambigu entre les deux conventions, donc
+illisible. Et les mois sont en anglais (« 26 May 26 »), refusés s'ils sont français.
+
+**Le témoin d'alignement a dû être corrigé par la mesure, et c'est le cœur de ce chantier.**
+Le premier jet confrontait le **PER** au relevé de la page « Volumes / Valeurs » et a
+**refusé** le versement : 26 concordants sur 44, 59,1 %. Le refus était juste sur ce
+témoin-là, et faux sur sa conclusion.
+
+| témoin | concordance au 02/10 | nature |
+|---|---|---|
+| **volume + valeur échangée** | **46 / 46 à l'unité** | entiers bruts, non dérivés |
+| PER | 26 / 44, écarts de 0,3 à 2 % | **dérivé** (cours / BPA) |
+| cours contre la séance voisine | écart médian **0,53 %**, 0 au-delà de 15 % | continuité |
+
+Un décalage de colonne donnerait des écarts en **facteurs**, pas de 1 %. Les deux sources ne
+dérivent pas le PER de la même façon — c'est le sujet de **C31** et **C33**. Le PER reste
+confronté et publié ; il ne bloque plus. L'alignement est prouvé par les volumes, et les
+lignes brutes le confirment à l'œil : `NTLC ['CB','NTLC','NESTLE CI','','14,900','15,995',
+'14,910','0.07 %','938','14,310,880','14,910','40.00 %','369.60','07 Sep 26','0.02','17.86']`.
+
+**Réserve du commit d'annonce, levée par la mesure** : le bulletin annonce 46 titres cotés
+dans sa **synthèse**, mais porte **48 lignes de cotation**, 0 écartée.
+
+**Versé** : 48 lignes au 2026-10-02, **48 rendements vides sur 48**, 0 ligne préexistante
+modifiée sur les 90 754, série à **90 802** lignes et **2 032** séances. Registre
+`collecte/seances_boc_eng.csv` inscrit.
+
+**L'effet, mesuré champ par champ, et il n'est pas nul.** `BBGC` obtient son **premier cours
+en base** — 8 995, PER 16,54 — et entre donc dans les bassins de percentile, qui passent de
+36 à 37 titres au marché. Sur les 47 titres communs : `reference_axes` 36, `comparaisons` 36,
+`croissance_pctl` 25, `decote_pctl` 19, `n_secteur` 16, `motif` 11, et **un seul champ
+décisionnel** — **ETIT perd son profil secondaire GROWTH** parce que son percentile de
+croissance recule de **69 à 64**, BBGC (71) s'étant classé devant lui. Les valeurs propres
+d'ETIT ne changent pas (14,7 %/an, PEGY 0,21) : c'est l'**effet de bassin** de C20, option (a),
+déjà tranchée. Et le 48e titre apparaît profilé : **BBGC, GARP, secondaire GROWTH, grade A**,
+ELIGIBLE, 0 drapeau, croissance 15,8 %/an, PEGY 1,04.
+
+**Terminé quand** — rempli : la séance du 02/10 est en base avec sa source, le rendement n'y
+est jamais approché, et la **section 35** de `tester_donnees.py` (7 contrôles) fige les deux
+propriétés. Ce qui reste ouvert est le sort des **cinq autres** jours ouvrés manquants, dont
+la cause n'est pas établie : → **C39**.
+
 ---
 
 ## C37 — Les 8 séances de BBGC déjà écrites à 47 lignes, et personne ne les retentera
@@ -2731,6 +2790,13 @@ collectées restent à 47 lignes, et **les deux collecteurs les sautent par cons
 `collecte_boc_quotidien.py` par `seances_deja_en_base()`, `backfill_boc_quotidien.py` par
 `iso in deja_en_base`. La correction de C32 ne vaut donc que pour les séances à venir ; ces
 huit-là resteront vides indéfiniment si rien ne les reprend nommément.
+
+**Mise à jour du 07/10/2026 (hors cycle, C36)** : BBGC n'est plus sans aucun prix. Le
+versement de la séance du **02/10** lui a donné son premier cours en base — 8 995, PER 16,54 —
+et il est désormais profilé (GARP, grade A). Les **8 séances** de ce chantier restent
+pourtant à rattraper telles quelles : le 02/10 n'en faisait pas partie, il manquait
+entièrement à la série. La ligne `priorité` est inchangée, mais l'urgence a baissé : le titre
+a un prix, il lui manque son historique.
 
 **Ce qui est mesuré, et ce qui ne l'est pas.** Les 8 dates sont nommées :
 2026-09-24, 09-25, 09-28, 09-29, 09-30, 10-01, 10-05, 10-06 — chacune à exactement 47 lignes
@@ -2798,6 +2864,56 @@ nouveau soit classé dans `UNITE_PLAFONDS`.
 **Terminé quand** : aucun des 5 ne reste un cumul — chacun est un taux, un retard ou un
 registre de cas nommés —, chaque conversion est justifiée par sa mesure, et `UNITE_PLAFONDS`
 ne porte plus la valeur `cumul`.
+
+## C39 — Cinq jours ouvrés manquent au quotidien, et leur cause n'est pas établie
+
+- classe : ORANGE — toute reprise écrit dans une série de cours certifiée ; seule la mesure est pré-autorisée
+- statut : PROPOSÉ
+- validation : —
+- autonomie : partielle — établir la cause demande brvm.org, donc un workflow
+- priorité : 3
+
+**D'où vient ce chantier.** La mesure demandée par C36 — « sur les 60 dernières séances,
+combien n'ont qu'une édition anglaise ? » — a été faite le 07/10/2026 et elle a rendu plus
+que la question. Sur la fenêtre du **07/07 au 06/10** (60 séances présentes), **6 jours
+ouvrés** manquaient à `collecte/cours_quotidien_boc.csv` :
+
+| jour ouvré absent | cause |
+|---|---|
+| 2026-10-02 | **édition anglaise seule** — versé par C36 le 07/10/2026 |
+| 2026-07-31 | non établie |
+| 2026-08-04 | non établie |
+| 2026-08-07 | non établie |
+| 2026-08-25 | non établie |
+| 2026-08-26 | non établie |
+
+**Pourquoi la cause n'est pas établie, et pourquoi ça compte.** Les cinq précèdent le
+correctif hors cycle du 05/10/2026, qui a donné au collecteur sa fenêtre de rattrapage de
+10 jours et les suffixes `_1` et `_3`. Avant lui, le collecteur s'arrêtait au premier BOC
+trouvé et n'essayait que `_2` : un suffixe inhabituel, une publication tardive, un férié ou
+une édition anglaise seule produisaient le même trou, indistinguable. Et aucun des deux
+collecteurs ne reviendra : `collecte_boc_quotidien.py` ne regarde que 10 jours en arrière,
+`backfill_boc_quotidien.py` mémorise chaque jour déjà tenté. Ces cinq-là sont donc
+définitivement perdus si rien ne les reprend nommément.
+
+**Ce qui est pré-autorisé sans écriture** : sonder, pour chacun des cinq, l'existence de
+`boc_AAAAMMJJ{_2,_1,_3}.pdf` et de `boc_eng_AAAAMMJJ{_2,_1,_3}.pdf` — `boc_eng.yml` le fait
+déjà et dit lequel existe — puis dire, date par date, laquelle des quatre causes s'applique :
+férié, édition française retrouvable, édition anglaise seule, ou rien de publié. C'est une
+sonde en lecture seule, douze requêtes au plus par date.
+
+**L'arbitrage, et il n'est pas le même selon la cause.** Une édition française retrouvable se
+charge sans question par le collecteur normal. Une édition anglaise seule relève de C36, dont
+l'outillage existe désormais — mais sa garde d'alignement exige un relevé « Volumes /
+Valeurs » du même jour, et `collecte/releve_volumes.csv` ne commence qu'au **02/10/2026** :
+pour juillet et août, **le témoin n'existe pas**. Verser sans lui demanderait un autre témoin
+— la continuité des cours contre les deux séances voisines, déjà implémentée en garde 5c —
+et c'est précisément ce qu'il faut trancher : la continuité seule suffit-elle à prouver
+l'alignement d'une ligne ?
+
+**Terminé quand** : chacun des cinq jours porte sa cause, datée et sourcée ; ceux qui sont
+récupérables le sont ou leur refus est motivé ; et le compte des jours ouvrés absents de la
+fenêtre est figé dans `tester_donnees.py`.
 
 # Veille datée, hors file
 
