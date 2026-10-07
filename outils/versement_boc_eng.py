@@ -19,11 +19,31 @@ LA PREUVE A DEUX COTES EST UNE CONDITION D'ECRITURE, PAS UN COMMENTAIRE.
 L'extracteur anglais ancre ses colonnes depuis la droite comme l'extracteur
 francais. C'est vraisemblable — c'est le meme bulletin traduit — mais ce n'est
 pas prouve, et se tromper de colonne versrait des valeurs fausses sous une date
-vraie. Ce script exige donc, AVANT d'ecrire, que le PER extrait du PDF concorde
-avec celui du releve **independant** de la page « Volumes / Valeurs »
-(`collecte/releve_volumes.csv`), releve le meme jour par un autre collecteur sur
-une autre source. Sans releve pour cette date, ou si la concordance tombe sous
-`CONCORDANCE_MIN`, **rien n'est ecrit** et le motif est dit.
+vraie. Ce script exige donc une confrontation au releve **independant** de la
+page « Volumes / Valeurs » (`collecte/releve_volumes.csv`), releve le meme jour
+par un autre collecteur sur une autre source.
+
+LE TEMOIN EST LE VOLUME ET LA VALEUR ECHANGEE, PAS LE PER. PREMIERE VERSION
+CORRIGEE PAR LA MESURE. Le premier jet confrontait le **PER**, et il a REFUSE le
+versement du 02/10 : 26 concordants sur 44, 59,1 %. La mesure du 07/10/2026 dit
+que ce refus portait sur le mauvais temoin, pas sur un defaut d'ancrage :
+
+  - **volume + valeur echangee : 42 sur 42 identiques A L'UNITE** entre le PDF
+    anglais et le releve. Ce sont des entiers bruts, non derives, et leur accord
+    exact prouve que la LIGNE est bien alignee — donc que le cours et le PER sont
+    pris dans les bonnes colonnes ;
+  - **PER : 26 sur 44**, avec des ecarts de 0,3 a 2 % (PALC 8,32 contre 8,27 ;
+    ECOC 14,83 contre 14,56 ; ORAC 18,5 contre 18,18). Un decalage de colonne
+    donnerait des ecarts sauvages, pas des ecarts de 1 %. Le PER est une
+    grandeur **derivee** (cours / BPA) que les deux sources ne derivent pas de
+    la meme facon — c'est le sujet de C31 et de C33, pas une erreur de lecture.
+
+Le PER reste donc CONFRONTE et son taux PUBLIE, mais il ne bloque plus : un
+temoin derive ne peut pas arbitrer l'alignement d'une ligne. Les deux conditions
+d'ecriture sont desormais l'accord exact des volumes (`CONCORDANCE_MIN`) et la
+continuite des cours contre la seance voisine deja en base (`ECART_COURS_MAX`) :
+ecart median mesure 0,53 % contre le 01/10 et 1,30 % contre le 05/10, aucun
+au-dela de 15 %. Sans releve pour la date, **rien n'est ecrit**.
 
 LES SEPT GARDES, dans l'ordre ou elles s'appliquent.
   1. entete et comptes du CSV conformes, sinon refus ;
@@ -66,13 +86,25 @@ RELEVE = RACINE / "collecte" / "releve_volumes.csv"
 REGISTRE = RACINE / "collecte" / "seances_boc_eng.csv"
 COLONNES = ["ticker", "date_bulletin", "cours", "per", "rendement"]
 COLONNES_REGISTRE = ["date_bulletin", "edition", "source", "n_titres",
-                     "per_concordants", "per_confrontes", "verse_le"]
+                     "volumes_concordants", "volumes_confrontes",
+                     "per_concordants", "per_confrontes",
+                     "seance_voisine", "ecart_cours_median", "verse_le"]
 
-# Concordance minimale du PER contre le releve independant, en proportion des
-# tickers confrontables. Le PER du releve est arrondi a deux decimales comme
-# celui du bulletin : on compare a TOLERANCE_PER pres.
-CONCORDANCE_MIN = 0.90
+# Concordance minimale du VOLUME et de la VALEUR ECHANGEE contre le releve
+# independant, en proportion des tickers confrontables, a l'unite pres. Mesure
+# du 07/10/2026 sur le bulletin anglais du 02/10 : 42 sur 42, soit 100 %. Le
+# plancher est pose a 95 % pour tolerer une ligne illisible, pas un desaccord.
+CONCORDANCE_MIN = 0.95
+# Le PER est confronte et publie, mais NE BLOQUE PAS : grandeur derivee que les
+# deux sources ne calculent pas identiquement (26/44 le 02/10, ecarts de 0,3 a
+# 2 %). Voir le docstring, et les chantiers C31 et C33.
 TOLERANCE_PER = 0.05
+# Continuite des cours contre la seance voisine deja en base. Mesure du
+# 07/10/2026 : ecart median 0,53 % contre le 01/10, 1,30 % contre le 05/10,
+# AUCUN titre au-dela de 15 %. Le plafond est pose a 25 % : il ne cherche pas a
+# juger un mouvement de marche, il attrape une colonne decalee ou une collision
+# d'echelle, qui se comptent en facteurs, pas en pourcents.
+ECART_COURS_MAX = 0.25
 # Au moins ce nombre de titres, sinon la seance versee serait incomplete sans le
 # dire. La cote compte 48 titres au 07/10/2026 ; tous ne cotent pas chaque jour.
 TITRES_MIN = 40
@@ -94,8 +126,9 @@ def lire_quotidien():
     return entete, lignes
 
 
-def per_du_releve(date_iso):
-    """PER par ticker, releve le meme jour sur la page Volumes / Valeurs.
+def releve_du_jour(date_iso):
+    """Volume, valeur et PER par ticker, releves le meme jour sur la page
+    « Volumes / Valeurs ».
 
     Source INDEPENDANTE du PDF : autre collecteur, autre page. C'est ce qui
     fait de la confrontation une preuve et non une verification circulaire.
@@ -107,22 +140,55 @@ def per_du_releve(date_iso):
         for r in csv.DictReader(f):
             if (r.get("date_releve") or "").strip() != date_iso:
                 continue
-            brut = (r.get("per") or "").strip()
-            if not brut:
-                continue
-            try:
-                out[(r.get("ticker") or "").strip()] = float(brut)
-            except ValueError:
-                continue
+            t = (r.get("ticker") or "").strip()
+
+            def nb(champ, entier=False):
+                brut = (r.get(champ) or "").strip()
+                if not brut:
+                    return None
+                try:
+                    v = float(brut)
+                except ValueError:
+                    return None
+                return int(v) if entier else v
+
+            out[t] = {"volume": nb("volume", True), "valeur": nb("valeur", True),
+                      "per": nb("per")}
     return out
 
 
-def confronter(lignes, date_iso):
-    """(concordants, confrontes, desaccords) du PER contre le releve."""
-    ref = per_du_releve(date_iso)
+def confronter_volumes(lignes, date_iso):
+    """(concordants, confrontes, desaccords) du couple volume/valeur, A L'UNITE.
+
+    C'est LE temoin d'alignement : deux entiers bruts, non derives, lus sur deux
+    sources independantes. Leur accord exact prouve que la ligne est alignee,
+    donc que le cours et le PER sont pris dans les bonnes colonnes.
+    """
+    ref = releve_du_jour(date_iso)
     concordants, confrontes, desaccords = 0, 0, []
     for l in lignes:
-        attendu = ref.get(l["ticker"])
+        r = ref.get(l["ticker"])
+        if not r or r["volume"] is None or r["valeur"] is None:
+            continue
+        if l["volume_echange"] is None or l["valeur_echangee"] is None:
+            continue
+        confrontes += 1
+        a = (int(l["volume_echange"]), int(l["valeur_echangee"]))
+        b = (r["volume"], r["valeur"])
+        if a == b:
+            concordants += 1
+        else:
+            desaccords.append((l["ticker"], a, b))
+    return concordants, confrontes, desaccords
+
+
+def confronter_per(lignes, date_iso):
+    """(concordants, confrontes, desaccords) du PER. PUBLIE, NON BLOQUANT."""
+    ref = releve_du_jour(date_iso)
+    concordants, confrontes, desaccords = 0, 0, []
+    for l in lignes:
+        r = ref.get(l["ticker"])
+        attendu = r["per"] if r else None
         if attendu is None or l["per"] is None:
             continue
         confrontes += 1
@@ -131,6 +197,49 @@ def confronter(lignes, date_iso):
         else:
             desaccords.append((l["ticker"], l["per"], attendu))
     return concordants, confrontes, desaccords
+
+
+def seance_voisine(date_iso, existantes):
+    """La seance deja en base la plus proche de `date_iso`, et ses cours."""
+    dates = sorted({(r.get("date_bulletin") or "").strip() for r in existantes}
+                   - {""} - {date_iso})
+    if not dates:
+        return None, {}
+    proche = min(dates, key=lambda d: abs(
+        (int(d[:4]) * 10000 + int(d[5:7]) * 100 + int(d[8:10]))
+        - (int(date_iso[:4]) * 10000 + int(date_iso[5:7]) * 100 + int(date_iso[8:10]))))
+    cours = {}
+    for r in existantes:
+        if (r.get("date_bulletin") or "").strip() != proche:
+            continue
+        brut = (r.get("cours") or "").strip()
+        if not brut:
+            continue
+        try:
+            cours[(r.get("ticker") or "").strip()] = float(brut)
+        except ValueError:
+            continue
+    return proche, cours
+
+
+def confronter_cours(lignes, date_iso, existantes):
+    """(n_confrontes, ecart_median, hors_plafond) des cours contre la voisine."""
+    proche, cours = seance_voisine(date_iso, existantes)
+    if not cours:
+        return proche, 0, None, []
+    ecarts, hors = [], []
+    for l in lignes:
+        ref = cours.get(l["ticker"])
+        if not ref or not l["cours"]:
+            continue
+        e = abs(l["cours"] / ref - 1)
+        ecarts.append(e)
+        if e > ECART_COURS_MAX:
+            hors.append((l["ticker"], l["cours"], ref, e))
+    if not ecarts:
+        return proche, 0, None, []
+    ecarts.sort()
+    return proche, len(ecarts), ecarts[len(ecarts) // 2], hors
 
 
 def traiter(chemin_pdf, ecrire):
@@ -165,23 +274,50 @@ def traiter(chemin_pdf, ecrire):
               f"existantes n'est pas un versement et n'est pas autorise ici.")
         return True  # idempotence : ce n'est pas un echec
 
-    # --- Garde 5 : la preuve a deux cotes -----------------------------------
-    conc, confr, desac = confronter(lignes, date_iso)
+    # --- Garde 5a : la preuve d'alignement, sur volume et valeur ------------
+    conc, confr, desac = confronter_volumes(lignes, date_iso)
     if confr == 0:
-        print(f"  REFUS (garde 5) : aucun PER du releve Volumes / Valeurs pour le "
-              f"{date_iso} — la disposition des colonnes de l'edition anglaise ne "
-              f"peut pas etre prouvee, et elle n'est qu'une hypothese. Rien ecrit.")
+        print(f"  REFUS (garde 5a) : aucun volume du releve Volumes / Valeurs pour "
+              f"le {date_iso} — l'alignement des colonnes de l'edition anglaise ne "
+              f"peut pas etre prouve, et il n'est qu'une hypothese. Rien ecrit.")
         return False
     taux = conc / confr
-    print(f"  garde 5 : PER confronte au releve independant du {date_iso} — "
-          f"{conc}/{confr} concordants a {TOLERANCE_PER} pres ({taux:.1%}, "
-          f"plancher {CONCORDANCE_MIN:.0%})")
+    print(f"  garde 5a : volume ET valeur echangee confrontes au releve independant "
+          f"du {date_iso} — {conc}/{confr} identiques A L'UNITE ({taux:.1%}, plancher "
+          f"{CONCORDANCE_MIN:.0%})")
     if desac:
-        print(f"           desaccords : " + ", ".join(
-            f"{t} PDF {a} contre releve {b}" for t, a, b in desac[:8]))
+        print("            desaccords : " + ", ".join(
+            f"{t} PDF {a} contre releve {b}" for t, a, b in desac[:6]))
     if taux < CONCORDANCE_MIN:
-        print(f"  REFUS (garde 5) : concordance {taux:.1%} sous le plancher — "
-              f"l'ancrage des colonnes est vraisemblablement faux. Rien ecrit.")
+        print(f"  REFUS (garde 5a) : concordance {taux:.1%} sous le plancher — "
+              f"l'alignement des colonnes est vraisemblablement faux. Rien ecrit.")
+        return False
+
+    # --- Garde 5b : le PER, publie mais NON BLOQUANT ------------------------
+    pc, pconf, pdesac = confronter_per(lignes, date_iso)
+    if pconf:
+        print(f"  garde 5b : PER confronte — {pc}/{pconf} concordants a "
+              f"{TOLERANCE_PER} pres ({pc / pconf:.1%}), NON BLOQUANT : le PER est "
+              f"derive (cours / BPA) et les deux sources ne le derivent pas de la "
+              f"meme facon (chantiers C31, C33)")
+        if pdesac:
+            print("            ecarts : " + ", ".join(
+                f"{t} {a} contre {b}" for t, a, b in pdesac[:6]))
+
+    # --- Garde 5c : continuite des cours contre la seance voisine -----------
+    proche, n_c, med, hors = confronter_cours(lignes, date_iso, existantes)
+    if n_c == 0:
+        print(f"  REFUS (garde 5c) : aucun cours confrontable a la seance voisine "
+              f"{proche} — rien ecrit.")
+        return False
+    print(f"  garde 5c : cours confrontes a la seance voisine {proche} — {n_c} "
+          f"commun(s), ecart median {med:.2%}, plafond individuel "
+          f"{ECART_COURS_MAX:.0%}")
+    if hors:
+        print(f"  REFUS (garde 5c) : {len(hors)} cours au-dela du plafond — une "
+              f"colonne decalee ou une collision d'echelle se compte en facteurs. "
+              f"Rien ecrit : " + ", ".join(
+                  f"{t} {a} contre {b} ({e:+.0%})" for t, a, b, e in hors[:6]))
         return False
 
     # --- Garde 6 : vraisemblance du nombre de titres ------------------------
@@ -242,7 +378,10 @@ def traiter(chemin_pdf, ecrire):
         w.writerow({
             "date_bulletin": date_iso, "edition": "BOC_ENG",
             "source": nom, "n_titres": len(nouvelles),
-            "per_concordants": conc, "per_confrontes": confr,
+            "volumes_concordants": conc, "volumes_confrontes": confr,
+            "per_concordants": pc, "per_confrontes": pconf,
+            "seance_voisine": proche,
+            "ecart_cours_median": f"{med:.6f}",
             "verse_le": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         })
     print(f"  registre : {REGISTRE.name} inscrit (edition BOC_ENG)")
