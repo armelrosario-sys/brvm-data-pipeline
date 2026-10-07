@@ -4789,6 +4789,147 @@ def test_edition_anglaise_boc():
             + ("" if not fautives else " — FAUTIVES : " + " ; ".join(fautives)))
 
 
+# ----------------------------------------------------------------------
+# 36. UNE OBSERVATION RETIREE PAR LA BRVM N'ENTRE PAS EN BASE
+#     (chantier C34, 07/10/2026)
+# ----------------------------------------------------------------------
+# Les huit restatements de nominal sont NOMMES, pas comptes : un plafond
+# chiffre deriverait a la premiere revision suivante, et la lecon de la
+# section 34 (07/10/2026) est qu'un controle bloquant ne peut pas etre un
+# cumul. L'invariant A, lui, est a zero tolerance et vrai a tout moment.
+RESTATEMENTS_NOMINAL = {
+    ("PRSC", 2018): (9623.00, 150.36, 64),
+    ("SEMC", 2016): (677.00, 16.92, 40),
+    ("SAFC", 2010): (576.00, 23.04, 25),
+    ("STBC", 2016): (4124.00, 206.20, 20),
+    ("ECOC", 2017): (1844.00, 368.80, 5),
+    ("SIBC", 2017): (945.00, 189.00, 5),
+    ("TTLC", 2016): (485.00, 97.00, 5),
+    ("ONTBF", 2017): (727.91, 363.96, 2),
+}
+# Deux couples que la regle ne doit JAMAIS toucher : leurs montants portent des
+# DATES DE PAIEMENT differentes, donc ne se revisent pas l'un l'autre. ECOC 2021
+# est le plus instructif : 549,00 est le versement du 30/05/2023, publie une
+# seule fois sous la date fautive « 30-mai-22 ». Une regle large ecrirait cette
+# faute de frappe du BOC dans la base.
+HORS_REVISION = {("ABJC", 2018): 123.72, ("ECOC", 2021): 420.30}
+# La regle est une regle de CHARGEMENT du fichier genere. Trois valeurs de la
+# table viennent d'une SAISIE A LA MAIN et divergent du dernier chiffre publie
+# par le BOC : C22 les a examinees une par une et MAINTENUES, motif ecrit dans
+# collecte/arbitrages_pont_boc.csv. La regle 1 du depot interdit de les ecraser.
+# Elles sont nommees ici, avec leur valeur, pour qu'une QUATRIEME crie.
+SAISIES_MAINTENUES = {
+    ("SICC", 1999): 0.0,    # marqueur d'obsolescence pose a la main
+    ("ORGT", 2019): 0.0,    # signale a Claudia le 05/10/2026, rien ecrit
+    ("BOABF", 2025): 397.25,  # net apres IRVM : 397,25 / 0,875 = 454,00 exact
+}
+SOURCE_GENEREE = "dividendes_par_exercice.csv"
+
+
+def test_observations_perimees_boc():
+    """POURQUOI CETTE SECTION EXISTE (chantier C34, 07/10/2026).
+    `collecte/dividendes_par_exercice.csv` est GENERE a raison d'une ligne par
+    valeur OBSERVEE dans la colonne « Dernier dividende paye » du BOC. Quand la
+    BRVM revise cette colonne, le fichier porte l'ancienne valeur ET la
+    courante, l'ancienne d'abord — et `charger_dividendes_exercice.py` gardait
+    « la premiere ligne ». Mesure du 07/10/2026 : 31 valeurs de la table
+    `dividendes` etaient des observations RETIREES, dont huit decalees d'un
+    facteur 2 a 64, et la fiche publiee les affichait.
+
+    Trois proprietes, et la troisieme est celle qui protege de MOI :
+
+      A. aucune ligne datee VENUE DU FICHIER GENERE ne porte un montant retire
+         pour sa propre date de paiement — zero tolerance. Le premier jet de
+         cette section ne portait pas cette restriction et a declare fautives
+         trois valeurs SAISIES A LA MAIN que C22 avait examinees et maintenues
+         (SICC 1999, ORGT 2019, BOABF 2025) : la regle est une regle de
+         chargement, pas un droit de correction sur une saisie humaine. Les
+         trois sont nommees au controle A'' pour qu'une quatrieme crie ;
+      B. les huit restatements de nominal portent leur valeur COURANTE, nommes
+         un par un avec leur facteur ;
+      C. les deux couples a deux dates de paiement restent INTOUCHES. C'est la
+         garde contre l'elargissement de la regle : « garder la fenetre la plus
+         recente parmi tous les candidats du couple » semble plus simple et
+         ecrirait une faute de frappe du BOC (ECOC 2021).
+
+    Cette section n'importe que `observations_boc`, qui ne depend que de
+    `dates_dividendes` — ni pdfplumber, ni rien hors requirements.txt."""
+    print("\n=== 36. Observations retirees par la BRVM : hors de la base (C34) ===")
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from observations_boc import charger_fenetres, est_perimee  # noqa: E402
+
+    fenetres = charger_fenetres()
+    verifie(len(fenetres) > 300,
+            f"le releve des fenetres de publication est lisible : {len(fenetres)} "
+            f"triplets (ticker, date, montant)")
+
+    cur = sqlite3.connect(DB).cursor()
+    lignes = cur.execute(
+        "SELECT ticker, exercice_couvert, montant_net, date_paiement, source "
+        "FROM dividendes WHERE exercice_couvert IS NOT NULL").fetchall()
+    du_genere = [(t, e, m, d) for t, e, m, d, s in lignes
+                 if SOURCE_GENEREE in (s or "")]
+
+    # --- A : l'invariant, a zero tolerance ---------------------------------
+    fautives = [f"{t} ex.{e} porte {m} le {d} (retire)"
+                for t, e, m, d in du_genere
+                if d and m is not None and est_perimee(t, d, m, fenetres)]
+    verifie(not fautives,
+            f"aucune des {len(du_genere)} lignes chargees depuis "
+            f"{SOURCE_GENEREE} ne porte un montant que la BRVM a retire pour ce "
+            f"versement"
+            + ("" if not fautives
+               else f" — {len(fautives)} FAUTIVE(S) : " + " ; ".join(fautives[:8])))
+    verifie(len(du_genere) > 250,
+            f"le fichier genere alimente bien la table : {len(du_genere)} lignes "
+            f"sur {len(lignes)} (si ce chiffre s'effondre, le controle A ne "
+            f"regarde plus rien)")
+
+    # --- A' : la regle vit bien dans le chargeur, pas seulement ici --------
+    src = (RACINE / "collecte" / "charger_dividendes_exercice.py").read_text(
+        encoding="utf-8")
+    verifie("est_perimee(" in src and "from observations_boc import" in src,
+            "charger_dividendes_exercice.py appelle est_perimee() : la regle vit "
+            "dans le chargeur, et ce test ne se contente pas de la reverifier sur "
+            "sa propre lecture")
+
+    # --- A'' : les trois saisies maintenues, nommees ----------------------
+    # Elles divergent du dernier chiffre du BOC, et c'est VOULU. Les nommer ici
+    # fait crier une quatrieme divergence sans jamais autoriser a corriger
+    # celles-ci : la regle 1 du depot les protege.
+    en_base = {(t, e): m for t, e, m, _, _ in lignes}
+    divergentes = {(t, e) for t, e, m, d, s in lignes
+                   if SOURCE_GENEREE not in (s or "") and d and m is not None
+                   and est_perimee(t, d, m, fenetres)}
+    nouvelles = sorted(f"{t} ex.{e}" for t, e in divergentes - set(SAISIES_MAINTENUES))
+    verifie(not nouvelles,
+            f"les {len(divergentes)} valeurs saisies a la main qui divergent du "
+            f"dernier chiffre du BOC sont exactement les 3 que C22 a maintenues"
+            + ("" if not nouvelles
+               else " — DIVERGENCE NOUVELLE, non arbitree : " + ", ".join(nouvelles)
+                    + " ; l'inscrire dans collecte/arbitrages_pont_boc.csv"))
+    for cle, attendu in sorted(SAISIES_MAINTENUES.items()):
+        m = en_base.get(cle)
+        verifie(m is not None and abs(m - attendu) < 1e-6,
+                f"{cle[0]} {cle[1]} vaut toujours {attendu:g}, la valeur saisie a "
+                f"la main que C22 a maintenue — obtenu {m}")
+
+    # --- B : les huit restatements, nommes --------------------------------
+    for cle, (retiree, courante, facteur) in sorted(RESTATEMENTS_NOMINAL.items()):
+        m = en_base.get(cle)
+        verifie(m is not None and abs(m - courante) < 1e-6,
+                f"{cle[0]} {cle[1]} porte {courante:g} et non {retiree:g} "
+                f"(restatement de nominal, facteur {facteur}) — obtenu {m}")
+
+    # --- C : les deux couples hors revision, intouches --------------------
+    for cle, attendu in sorted(HORS_REVISION.items()):
+        m = en_base.get(cle)
+        verifie(m is not None and abs(m - attendu) < 1e-6,
+                f"{cle[0]} {cle[1]} vaut toujours {attendu:g} : ses deux montants "
+                f"portent des dates de paiement DIFFERENTES, la regle ne les "
+                f"departage pas — obtenu {m}")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -4828,6 +4969,7 @@ def main():
     test_univers_bulletin_sans_silence()
     test_unite_des_plafonds()
     test_edition_anglaise_boc()
+    test_observations_perimees_boc()
     if not sans_app:
         test_application()
 

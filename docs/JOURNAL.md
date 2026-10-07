@@ -9,6 +9,170 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-07 — cycle 22 (soir) : C34, le chargeur retenait 31 observations que la BRVM avait retirées
+
+Contrôle anti-collision fait d'abord : `git log --since="3 hours ago"` sur `main` rend
+**0 commit**, et les deux annonces du jour (cycle 21 `e98d11c`, hors cycle `4537d1f`) ont
+chacune leur clôture. Annonce de ce cycle : `e67d926`. CI à l'arrivée : P4 **verte** sur
+`ea5ca5b`, le dernier commit avant ce cycle. Pas de chasse aux défauts : c'est le cycle du
+soir.
+
+Barrières passées dans un venv aux dépendances **exactes** de `tests.yml`, où
+`import pdfplumber` échoue pour de bon — la méthode inscrite dans `CHANTIERS.md` le matin
+même après trois pannes de P4 dans la journée.
+
+### Pourquoi l'option (a), alors que la ligne de validation ne nomme pas d'option
+
+La ligne `validation : OK` de C34 a été posée le 05/10/2026 dans un lot de trois (`bc561f8`),
+sans nommer d'option — là où Claudia écrit « OK option (b) » quand elle en choisit une (C16,
+C20, C23, C36). Les deux options de C34 ont donc été relues, et **(a)** retenue sur trois
+motifs, à charge pour Claudia de dire le contraire :
+
+1. le critère de terminaison du chantier nomme **le chargeur** (« le chargeur ne retient plus
+   jamais une observation retirée »), pas le générateur ;
+2. l'option (b) change la **forme** d'un fichier généré commité, `dividendes_par_exercice.csv`
+   — or **C19** a un arbitrage ouvert sur ce même fichier (FTSC 2016) et **C28** le surveille.
+   Un cycle ne tranche pas à la place d'un autre chantier ;
+3. (a) ne touche aucune donnée commitée : elle est révocable d'un `git revert` sur du code.
+
+### Ce que l'option (a) est devenue, et ce qui l'a façonnée
+
+`collecte/dividendes_historique.csv` est le relevé **brut** des valeurs lues dans la colonne
+« Dernier dividende payé » du BOC, avec leur **fenêtre de publication**. Le fichier qui en est
+dérivé, `dividendes_par_exercice.csv`, recopie ces lignes **sans la fenêtre**, l'ancienne
+valeur avant la courante, et `charger_dividendes_exercice.py` gardait « la première ligne ».
+
+Première formulation essayée, et **écartée par la mesure** : « parmi tous les candidats d'un
+(ticker, exercice), garder la fenêtre la plus récente ». Elle déplace **33** couples au lieu de
+31, et les **deux** de trop le sont à tort :
+
+- **ABJC 2018** : 123,72 payé le 27/05/2019 serait remplacé par 164,96 payé le 30/09/2019 —
+  un **autre versement** de la même année, pas une révision du même ;
+- **ECOC 2021** : 420,30 payé le 29/04/2022 serait remplacé par 549,00 « payé le 30/05/2022 »,
+  alors que 549,00 est le versement du **30/05/2023**, publié **une seule fois** sous la date
+  fautive `30-mai-22` entre le 30/05/2023 et le 02/01/2024. La règle large écrirait donc la
+  **faute de frappe du BOC** dans la base.
+
+La règle retenue est donc **étroite** : une révision se lit **à ticker ET date de paiement
+égaux**. `collecte/observations_boc.py` (`--test` **10 contrôles, 0 échec**) lit les fenêtres ;
+le chargeur **écarte** toute ligne dont le montant a été retiré pour sa propre date, et
+**nomme** chacune sur stderr. Un couple absent du relevé n'est jamais écarté : on ne devine
+pas.
+
+### L'effet, mesuré des deux côtés de la table
+
+| | avant | après |
+|---|---|---|
+| lignes de la table `dividendes` | 327 | **327** |
+| couples (ticker, exercice) dont le montant change | — | **31** |
+| couples dont la **date de paiement** change | — | **0** |
+| lignes écartées par le chargeur (31 couples, SEMC 2016 en porte 2) | 0 | **32** |
+| refus émis par `charger_dividendes_boc.py` | **6** | **3** |
+| champs de `collecte/profils.json` déplacés | — | **2 sur 4 562** |
+| profils, secondaires, grades, gates, drapeaux déplacés | — | **0, 0, 0, 0, 0** |
+
+Les **8** restatements de nominal annoncés par le chantier sont confirmés **à la valeur près** :
+PRSC 2018 9 623,00 → 150,36 (×64), SEMC 2016 677,00 → 16,92 (×40), SAFC 2010 576,00 → 23,04
+(×25), STBC 2016 4 124,00 → 206,20 (×20), ECOC 2017 1 844,00 → 368,80 (×5), SIBC 2017 945,00 →
+189,00 (×5), TTLC 2016 485,00 → 97,00 (×5), ONTBF 2017 727,91 → 363,96 (×2).
+
+**Une affirmation du chantier est fausse, et je la corrige.** C34 écrivait « les 23 autres sont
+des écarts **sous 6 %** ». Ils sont bien **23** (31 − 8), mais **deux** ne sont pas sous 6 % :
+**ETIT 2016** (1,00 → 1,21, soit **−17,4 %**) et **ONTBF 2023** (226,45 → 266,45, soit
+**−15,0 %**). La répartition exacte, mesurée ce cycle : **8** restatements de nominal (facteur 2
+à 64), **2** écarts entre 15 % et 25 %, **21** sous 6 % — le plus fort de ceux-là étant
+CIEC 2020 (176,14 → 167,14, +5,4 %).
+
+**La preuve à deux côtés est venue d'elle-même, et c'est le résultat le plus solide du cycle.**
+`charger_dividendes_boc.py` est un **second chemin, indépendant** : il lit
+`collecte/dividendes_boc.csv` et refuse d'écrire quand la base porte déjà autre chose. Il
+refusait **6 fois** ; il refuse **3 fois**. Les trois refus qui tombent sont **SAFC 2010, SEMC
+2020 et BOAC 2025** — exactement les trois que **C22** avait tranchés le 05/10/2026 en
+renvoyant leur application à C34, avec leur valeur retenue (23,04 / 14,00 / 597,53). La règle
+posée ici, qui ne sait rien de C22, retrouve les trois mêmes valeurs. Les trois refus restants
+(SICC 1999, ORGT 2019, BOABF 2025) sont ceux que C22 a explicitement **maintenus**.
+
+Second côté sur SEMC 2020 : la réserve publiée disait « un dividende de 14.40 » quand
+l'implicite du BOC vaut **14,05** ; elle dit maintenant **14,00**. L'écart passe de 0,35 à
+**0,05**.
+
+### Mon erreur de ce cycle, et c'est mon propre test qui l'a dite
+
+Le premier jet de la section 36 testait l'invariant sur **toutes** les lignes datées de la
+table. Il a rendu **ÉCHEC** sur trois : BOABF 2025 (397,25), SICC 1999 (0,0) et ORGT 2019
+(0,0). Les trois sont des valeurs **saisies à la main**, que C22 a examinées une par une et
+**maintenues**, motif écrit dans `collecte/arbitrages_pont_boc.csv` : un marqueur
+d'obsolescence, un cas signalé à Claudia et rien écrit, et un net après IRVM dont
+397,25 / 0,875 = **454,00 exact**. Mon invariant les déclarait fautives, c'est-à-dire qu'il
+réclamait d'écraser trois analyses humaines — la **règle 1** du dépôt, mot pour mot.
+
+Corrigé : l'invariant A porte sur les lignes **venues du fichier généré** (296 sur 327), et un
+contrôle A'' **nomme** les trois saisies maintenues avec leur valeur, pour qu'une **quatrième**
+divergence crie au lieu de passer. La règle posée ici est une règle de **chargement**, pas un
+droit de correction sur une saisie.
+
+### Le procès-verbal, et la seule chose qu'il écrit
+
+`outils/arbitrage_observations_perimees_boc.py` fige les **31** déplacements (ticker, exercice,
+date, montant retiré, montant courant), les recalcule sur l'état du dépôt et **refuse** si un
+seul champ diffère ; il vérifie aussi que les 31 couples portent la valeur courante dans
+`moteur/brvm.db`, et que **ABJC 2018 et ECOC 2021 restent intouchés**. Il n'écrit **rien** de
+la correction elle-même : il n'y a rien à migrer, la valeur fautive ne vivait que dans une base
+reconstruite à chaque passage.
+
+Sa seule écriture est **due à C22** : les trois lignes `TRANCHE_RENVOI` / `refus_subsiste=oui`
+dont le motif dit « NON APPLIQUÉ ICI : fichier généré, voir C34 » passent en
+`TRANCHE_APPLIQUE` / `non`. Sans cela la section 24 reste rouge, et elle l'a dit d'elle-même :
+« FANTÔMES, le pont ne les émet plus ». Six gardes : nombre de lignes, en-tête, empreinte
+SHA-256 avant, garde `attendu` sur les trois champs de chacune des trois, **réserialisation
+exigée à l'octet près** sur les lignes non visées avant toute écriture, relecture après. Les
+trois maintenus sont vérifiés `oui` **avant et après**. Relancé : « ARBITRAGE DÉJÀ APPLIQUÉ,
+aucun fichier écrit ».
+
+### Test : section 36 de `tester_donnees.py`, 18 contrôles
+
+Trois propriétés, et la troisième protège de moi : (A) aucune ligne venue du fichier généré ne
+porte un montant retiré, **zéro tolérance** ; (B) les huit restatements sont **nommés** un par
+un avec leur facteur, jamais comptés — la leçon de la section 34 du matin, un plafond bloquant
+ne peut pas être un cumul ; (C) ABJC 2018 vaut toujours 123,72 et ECOC 2021 toujours 420,30,
+ce qui interdit à un cycle futur d'« élargir » la règle. Un contrôle de plus vérifie que
+`est_perimee()` est bien appelée **dans le chargeur** : sans lui, le test se contenterait de
+revérifier sa propre lecture.
+
+La section n'importe que `observations_boc`, qui ne dépend que de `dates_dividendes` — ni
+`pdfplumber`, ni rien hors `requirements.txt`.
+
+### Barrières
+
+Venv aux dépendances exactes de `tests.yml` (`import pdfplumber` → `ModuleNotFoundError`).
+Base complète par la chaîne des cinq chargeurs, golden tests **tous passent**,
+`tester_donnees.py` **316 OK, 0 ÉCHEC, code 2** — les 5 alertes sont toutes antérieures (C4 :
+12 divisions de nominal ; C5 : CFAC et NEIC ; relevé du 07/10 non ancrable, 0 indice lu ;
+C35 : NSBC 675,98 absente du relevé). `avis_brvm --test` et `notations --test` passent (PDF GCR
+10/10), dashboard **48 titres**. `observations_boc --test` 10/0,
+`arbitrage_observations_perimees_boc` conforme et idempotent. `dashboard_brvm.xlsx` et
+`moteur/brvm.db` supprimés avant commit.
+
+### Proposé : C40 — le BOC republie parfois une date de paiement qui recule
+
+Trouvé en bornant la règle de C34, pas par une chasse (le soir n'en fait pas). Critère : à
+ticker et montant égaux, une date de paiement qui **recule** alors que la publication avance.
+**2 cas sur 365 observations**, et les deux sont nommés :
+
+- **ECOC 549,00** : publié au 30/05/2023, puis au **30/05/2022** du 30/05/2023 au 02/01/2024,
+  puis de nouveau au 30/05/2023. La date reculée crée un **exercice 2021 fantôme** ;
+- **SLBC 2 322,00** : 15/06/2018 puis **14/06/2018** — même exercice, donc inoffensif sur
+  l'attribution, mais c'est l'un des 10 groupes de doublons de C19.
+
+**Effet mesuré : latent, et protégé par accident.** ECOC 2021 porte aujourd'hui 420,30, la
+bonne valeur — parce que la ligne 420,30 **précède** la ligne 549,00 dans le fichier généré et
+que le chargeur garde la première. Rien ne l'énonce : c'est un **ordre de tri** qui protège une
+valeur certifiée. Un changement de tri du générateur suffirait à écrire la faute de frappe.
+C'est exactement le piège dans lequel la formulation large de la règle de C34 tombait.
+
+**Prochain, par l'ordre déterministe : C35** (ORANGE, `validation : OK`, priorité 3, statut
+PROPOSÉ) — à égalité de priorité avec C37 et C38, et plus petit numéro.
+
 ## 2026-10-07 — hors cycle : C36, l'édition anglaise du BOC, et un témoin qu'il a fallu corriger
 
 **Demandé par Claudia** à 08h00 UTC, après qu'elle a demandé si le BOC du 02/10/2026 avait

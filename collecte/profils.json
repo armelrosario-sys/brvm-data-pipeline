@@ -3868,7 +3868,7 @@
   "taux_reference": 0.0707,
   "prime_rendement": null,
   "dy_recurrent": null,
-  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 14.40 FCFA verse le 2021-12-28, soit 4.8 ans avant le cours (dividende implicite du BOC : 14.05) : il ne decrit plus une distribution en cours",
+  "distribution_non_recurrente": "le rendement du BOC repose sur un dividende de 14.00 FCFA verse le 2021-12-28, soit 4.8 ans avant le cours (dividende implicite du BOC : 14.05) : il ne decrit plus une distribution en cours",
   "table_cours": "cours_quotidien_boc",
   "part_operationnelle": null,
   "secondaire": null,
@@ -3880,7 +3880,7 @@
    "croissance issue du BPA implicite (source BOC circulaire, validation croisee faite sur NSBC uniquement)",
    "AUCUN_RN_EN_BASE : aucun resultat net transcrit : la croissance repose integralement sur le BPA implicite, invérifiable en l'etat",
    "ROE_SOURCE_EXTERIEURE : les capitaux propres ne sont pas en base : le ROE est calcule sur ceux d'un rapport de notation, dont l'URL figure dans la fiche",
-   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 14.40 FCFA verse le 2021-12-28, soit 4.8 ans avant le cours (dividende implicite du BOC : 14.05) : il ne decrit plus une distribution en cours",
+   "DISTRIBUTION_NON_RECURRENTE : le rendement du BOC repose sur un dividende de 14.00 FCFA verse le 2021-12-28, soit 4.8 ans avant le cours (dividende implicite du BOC : 14.05) : il ne decrit plus une distribution en cours",
    "croissance du resultat net TOTAL, non ajustee des operations sur capital"
   ],
   "chiffre_affaires": 23200.0,
