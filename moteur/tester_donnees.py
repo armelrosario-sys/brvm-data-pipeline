@@ -4672,6 +4672,118 @@ def test_unite_des_plafonds():
                     "regression : " + ", ".join(sorted(set(fautifs)))))
 
 
+# ----------------------------------------------------------------------
+# 35. L'EDITION ANGLAISE DU BOC : CE QU'ELLE VERSE, ET CE QU'ELLE NE VERSE PAS
+#     (chantier C36, option (b), hors cycle du 07/10/2026)
+# ----------------------------------------------------------------------
+REGISTRE_BOC_ENG = "collecte/seances_boc_eng.csv"
+
+
+def test_edition_anglaise_boc():
+    """POURQUOI CETTE SECTION EXISTE (chantier C36, 07/10/2026, hors cycle).
+    Quand la BRVM ne publie que l'edition anglaise du bulletin, la seance
+    etait perdue : le 02/10/2026 manquait a `cours_quotidien_boc.csv`, 0 ligne,
+    la serie passant du 10-01 au 10-05. Claudia a tranche l'option (b) :
+    charger cours et PER, laisser le rendement VIDE.
+
+    Deux proprietes a figer, et elles sont de nature differente.
+
+    A — LE PIEGE DU FACTEUR 1 000. L'edition anglaise ecrit « 45,000 » pour
+        quarante-cinq mille. Le `to_float()` francais fait
+        `.replace(",", ".")` et aurait rendu **45.0** pour le cours de SNTS.
+        C'est le defaut le plus grave que ce chantier pouvait introduire : une
+        valeur fausse d'un facteur mille, sous une date vraie, dans une serie
+        certifiee. Fige ici, avec son contre-exemple francais cote a cote.
+
+    B — LE RENDEMENT N'ENTRE JAMAIS. L'anglais l'arrondit a deux decimales de
+        la fraction (SNTS 0.04 contre 3,87 % en francais). L'extracteur ne le
+        lit pas, et toute seance inscrite au registre doit porter un rendement
+        vide sur TOUTES ses lignes.
+
+    Et une precision que la mesure a imposee : le rendement vide n'identifie
+    PAS une ligne anglaise. La serie en porte 15 116 sur 90 754, heritees de
+    janvier 2018 notamment. C'est le registre qui identifie, et c'est pourquoi
+    le controle B part du registre et non de la colonne.
+
+    Cette section n'a besoin ni de pdfplumber ni de la base : l'import de
+    pdfplumber vit DANS `extraire_boc_eng()`, pas en tete de module — leçon
+    de la panne P4 du 07/10/2026 au matin."""
+    print("\n=== 35. Edition anglaise du BOC : cours et PER, jamais le rendement (C36) ===")
+    import csv as _csv
+    sys.path.insert(0, str(RACINE / "collecte"))
+    from extracteur_boc_eng import (to_float_eng, parser_ligne_eng,  # noqa: E402
+                                    date_dividende_eng_vers_iso)
+    from extracteur_boc import to_float as to_float_fr  # noqa: E402
+    from univers_actions import univers_actions  # noqa: E402
+
+    # --- A : le facteur 1 000 ------------------------------------------------
+    verifie(to_float_eng("45,000") == 45000.0 and to_float_fr("45,000") == 45.0,
+            f"« 45,000 » vaut 45000 en anglais et 45 en francais — le convertisseur "
+            f"anglais rend {to_float_eng('45,000')}, le francais {to_float_fr('45,000')} ; "
+            f"confondre les deux versrait le cours de SNTS mille fois trop petit")
+    ambigus = {a: to_float_eng(a) for a in ("45,00", "3,87", "1,2")}
+    verifie(all(v is None for v in ambigus.values()),
+            f"une virgule qui n'est pas un separateur de milliers est AMBIGUE entre "
+            f"les deux conventions, donc refusee : {ambigus}")
+    verifie(date_dividende_eng_vers_iso("26 May 26") == "2026-05-26"
+            and date_dividende_eng_vers_iso("26 Mai 26") is None,
+            "les mois anglais sont lus, les mois francais refuses — aucun melange "
+            "de langues dans une date")
+
+    # --- B : le rendement ne sort jamais de l'extracteur --------------------
+    univers = univers_actions()
+    ligne = ["SNTS", "SONATEL SN", "TEL", "", "", "", "",
+             "2,500", "112,500,000", "45,000", "12.50", "1,200.00", "26 May 26",
+             "0.04", "10.88"]
+    lu = parser_ligne_eng(ligne, univers=univers)
+    verifie(lu is not None and lu["rendement"] is None and lu["per"] == 10.88
+            and lu["cours"] == 45000.0,
+            f"l'extracteur anglais rend cours et PER mais JAMAIS le rendement "
+            f"(obtenu cours={None if not lu else lu['cours']}, "
+            f"per={None if not lu else lu['per']}, "
+            f"rendement={None if not lu else lu['rendement']})")
+
+    # --- B' : le versement n'ecrit jamais dans la colonne rendement ---------
+    src = (RACINE / "outils" / "versement_boc_eng.py").read_text(encoding="utf-8")
+    verifie('"rendement": "",' in src,
+            "outils/versement_boc_eng.py ecrit la colonne rendement VIDE, en clair "
+            "dans son code")
+    verifie('CSV_QUOTIDIEN.open("a"' in src and 'CSV_QUOTIDIEN.open("w"' not in src,
+            "le versement AJOUTE et ne reecrit jamais la serie entiere — une "
+            "reecriture remplacerait des valeurs certifiees par une extraction")
+
+    # --- B'' : l'invariant sur les seances reellement versees ---------------
+    # Vrai a zero seance versee comme a vingt : c'est ce qui en fait un
+    # invariant et non un compteur qui derive.
+    registre = RACINE / REGISTRE_BOC_ENG
+    dates_eng = set()
+    if registre.exists():
+        with registre.open(newline="", encoding="utf-8") as f:
+            dates_eng = {(r.get("date_bulletin") or "").strip()
+                         for r in _csv.DictReader(f)}
+        dates_eng.discard("")
+    fautives = []
+    if dates_eng:
+        par_date = {}
+        with (RACINE / "collecte" / "cours_quotidien_boc.csv").open(
+                newline="", encoding="utf-8") as f:
+            for r in _csv.DictReader(f):
+                d = (r.get("date_bulletin") or "").strip()
+                if d in dates_eng:
+                    par_date.setdefault(d, []).append(r)
+        for d in sorted(dates_eng):
+            lignes_d = par_date.get(d, [])
+            avec = [r["ticker"] for r in lignes_d if (r.get("rendement") or "").strip()]
+            if not lignes_d:
+                fautives.append(f"{d} au registre mais absente de la serie")
+            elif avec:
+                fautives.append(f"{d} porte {len(avec)} rendement(s) non vide(s)")
+    verifie(not fautives,
+            f"les {len(dates_eng)} seance(s) du registre {REGISTRE_BOC_ENG} portent "
+            f"toutes un rendement VIDE sur chacune de leurs lignes"
+            + ("" if not fautives else " — FAUTIVES : " + " ; ".join(fautives)))
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -4710,6 +4822,7 @@ def main():
     test_historique_quotidien_protege()
     test_univers_bulletin_sans_silence()
     test_unite_des_plafonds()
+    test_edition_anglaise_boc()
     if not sans_app:
         test_application()
 

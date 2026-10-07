@@ -1,0 +1,144 @@
+name: C36 - Edition anglaise du BOC (rapport, puis versement)
+
+# Cree le 07/10/2026, hors cycle, a la demande de Claudia. Chantier C36,
+# option (b) : quand la BRVM ne publie que l'edition anglaise du bulletin, la
+# seance etait perdue. Le 02/10/2026 en est le cas reel.
+#
+# POURQUOI UN WORKFLOW ET PAS UN SCRIPT LOCAL. Le bac a sable de la boucle
+# n'atteint pas brvm.org (CONNECT 403). Seuls les workflows du depot y vont.
+#
+# DEUX MODES, ET LE RAPPORT EST LE DEFAUT. L'extracteur anglais ancre ses
+# colonnes depuis la droite comme l'extracteur francais : c'est vraisemblable,
+# le bulletin est le meme traduit, mais ce n'est pas prouve. Le mode `rapport`
+# telecharge, extrait et MONTRE -- lignes brutes incluses -- sans rien ecrire.
+# Le mode `verser` n'ecrit que si outils/versement_boc_eng.py voit ses sept
+# gardes passer, dont la preuve a deux cotes du PER contre le releve
+# independant de la page Volumes / Valeurs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: "Seances a traiter, AAAA-MM-JJ separees par des espaces"
+        required: true
+        default: "2026-10-02"
+      mode:
+        description: "rapport (defaut, aucune ecriture) ou verser"
+        required: true
+        default: "rapport"
+        type: choice
+        options: [rapport, verser]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: boc_eng
+  cancel-in-progress: false
+
+jobs:
+  boc-eng:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pdfplumber requests pyyaml
+
+      - name: Autotest de l'extracteur anglais, avant tout telechargement
+        run: python3 collecte/extracteur_boc_eng.py --test
+
+      - name: Telecharger les editions anglaises demandees
+        run: |
+          mkdir -p /tmp/boc_eng
+          python3 - <<'PY'
+          import os, sys
+          sys.path.insert(0, "collecte")
+          from collecte_boc_quotidien import _pdf, SUFFIXES_FR
+          dates = os.environ["DATES"].split()
+          trouves, manquants = [], []
+          for d in dates:
+              aaaammjj = d.replace("-", "")
+              ok = False
+              for suffixe in SUFFIXES_FR:
+                  url = f"https://www.brvm.org/sites/default/files/boc_eng_{aaaammjj}{suffixe}.pdf"
+                  contenu = _pdf(url)
+                  if contenu:
+                      chemin = f"/tmp/boc_eng/boc_eng_{aaaammjj}{suffixe}.pdf"
+                      with open(chemin, "wb") as f:
+                          f.write(contenu)
+                      print(f"{d} : TROUVE {url} ({len(contenu)} octets)")
+                      trouves.append(chemin)
+                      ok = True
+                      break
+              if not ok:
+                  # On dit aussi si l'edition FRANCAISE existe : dans ce cas la
+                  # seance n'a rien a faire ici, le collecteur normal la prend.
+                  fr = [f"https://www.brvm.org/sites/default/files/boc_{aaaammjj}{s}.pdf"
+                        for s in SUFFIXES_FR]
+                  dispo_fr = next((u for u in fr if _pdf(u)), None)
+                  motif = (f"edition FRANCAISE disponible ({dispo_fr}) -- relancer le "
+                           f"collecteur normal, pas celui-ci" if dispo_fr
+                           else "aucune edition anglaise publiee")
+                  print(f"{d} : ABSENT -- {motif}")
+                  manquants.append(d)
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write("PDFS=" + " ".join(trouves) + "\n")
+          print(f"\n{len(trouves)} trouve(s), {len(manquants)} absent(s)")
+          PY
+        env:
+          DATES: ${{ inputs.dates }}
+
+      - name: Rapport d'extraction, lignes brutes incluses
+        if: env.PDFS != ''
+        run: |
+          for p in $PDFS; do
+            echo "::group::rapport $p"
+            python3 collecte/extracteur_boc_eng.py "$p" || true
+            echo "::endgroup::"
+          done
+
+      - name: Gardes du versement (mode rapport)
+        if: env.PDFS != ''
+        run: python3 outils/versement_boc_eng.py --rapport $PDFS
+
+      - name: Verser
+        if: env.PDFS != '' && inputs.mode == 'verser'
+        run: python3 outils/versement_boc_eng.py --verser $PDFS
+
+      - name: Relancer les barrieres apres ecriture
+        if: env.PDFS != '' && inputs.mode == 'verser'
+        run: |
+          pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas
+          pip install -r requirements.txt
+          python3 moteur/fusionner_fondamentaux.py
+          cd moteur
+          python3 peupler.py
+          python3 ../collecte/charger_cours.py brvm.db
+          python3 ../collecte/charger_cours_quotidien.py brvm.db
+          python3 ../collecte/charger_dividendes_exercice.py brvm.db
+          python3 ../collecte/charger_dividendes_boc.py brvm.db
+          python3 ../collecte/charger_liquidite_quotidienne.py brvm.db
+          python3 tester.py
+          cd ..
+          code=0
+          python3 moteur/tester_donnees.py --sans-app || code=$?
+          if [ $code -eq 1 ]; then
+            echo "::error::Barriere BLOQUANTE apres versement -- rien ne sera commite"
+            exit 1
+          fi
+
+      - name: Committer si changement
+        if: env.PDFS != '' && inputs.mode == 'verser'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          rm -f moteur/brvm.db dashboard_brvm.xlsx
+          git add collecte/cours_quotidien_boc.csv collecte/seances_boc_eng.csv
+          git commit -m "C36 : seance(s) ${{ inputs.dates }} versee(s) depuis l'edition anglaise du BOC" \
+            -m "Cours et PER seuls ; rendement laisse VIDE (l'anglais l'arrondit a deux decimales de la fraction). Preuve a deux cotes du PER contre collecte/releve_volumes.csv exigee par outils/versement_boc_eng.py." \
+            || echo "rien a committer"
+          git pull --rebase --autostash origin main
+          git push
