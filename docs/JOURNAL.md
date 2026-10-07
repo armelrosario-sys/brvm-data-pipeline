@@ -170,6 +170,22 @@ que le chargeur garde la première. Rien ne l'énonce : c'est un **ordre de tri*
 valeur certifiée. Un changement de tri du générateur suffirait à écrire la faute de frappe.
 C'est exactement le piège dans lequel la formulation large de la règle de C34 tombait.
 
+### Vérification de bout en bout, celle que le cycle 21 avait repoussée au soir
+
+P4 **verte** sur `1012786`, P5b verte. `boc_quotidien.yml` déclenché (204) : il relit le
+bulletin n° 189 du 06/10 et écrit `docs/data_brvm.json` à **48 valeurs** — la fiche publiée
+porte bien 48 titres. `collecte_boc_quotidien.yml` déclenché (204) : le BOC du **07/10 n'est pas
+publié** à 19h20 UTC, donc **aucune séance nouvelle**. La preuve que C32 attendait — une séance
+neuve à 48 lignes par le collecteur quotidien — reste donc **à venir** ; la seule séance à 48
+lignes est le 02/10, versée hors cycle par `versement_boc_eng.py`, pas par ce collecteur.
+
+Ce déclenchement a tout de même rendu quelque chose : le commit `9d6bc5a` porte **48 insertions
+et 48 suppressions** sur `cours_quotidien_boc.csv`, toutes sur la séance du 02/10, pour **0
+valeur changée** (48 clés des deux côtés, 48 identiques, 0 écart). Le collecteur **retrie** un
+bloc déjà commité à chaque passage. Rien n'est perdu, mais aucun ordre de lignes n'est tenu par
+personne dans ce dépôt — et c'est de cet ordre que dépend aujourd'hui la bonne valeur d'ECOC
+2021. Noté dans le bloc **C40**.
+
 **Prochain, par l'ordre déterministe : C35** (ORANGE, `validation : OK`, priorité 3, statut
 PROPOSÉ) — à égalité de priorité avec C37 et C38, et plus petit numéro.
 

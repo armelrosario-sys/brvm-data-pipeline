@@ -3046,6 +3046,15 @@ motif. **(b)** on n'écarte rien et l'on se contente d'un drapeau `DATE_REPUBLIE
 la fiche, puisque l'effet est latent — une case vide vaut mieux qu'une valeur approchée, et ici
 c'est l'abstention qui a ce rôle.
 
+**Une preuve que l'ordre des lignes n'est pas stable, relevée le 07/10/2026 au soir.** La
+vérification de bout en bout de ce cycle a déclenché `collecte_boc_quotidien.yml`, qui a
+commité `9d6bc5a` : **48 insertions et 48 suppressions** sur `cours_quotidien_boc.csv`, toutes
+sur la séance du 02/10/2026, pour **0 valeur changée** (confronté clé par clé : 48 clés des deux
+côtés, 48 identiques, 0 écart). Le collecteur **retrie** donc un bloc déjà commité à chaque
+passage. Aucune donnée perdue — le versement de C36 est intact — mais cela montre qu'un ordre
+de lignes n'est tenu par personne dans ce dépôt, et c'est exactement ce dont dépend aujourd'hui
+la bonne valeur d'`ECOC 2021`.
+
 **Terminé quand** : les 2 cas sont soit écartés avec leur motif, soit drapeautés ; `ECOC 2021`
 ne dépend plus de l'ordre des lignes d'un CSV mais d'une règle écrite ; et un test de la
 section 36 refuse toute nouvelle date de paiement qui recule à montant égal.
