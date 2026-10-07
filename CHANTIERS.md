@@ -2684,7 +2684,7 @@ la relance est portée par un workflow qu'un cycle peut déclencher.
 - classe : ORANGE — charger une seconde édition, au format et à la précision différents, est un arbitrage sur une donnée certifiée
 - statut : PROPOSÉ
 - validation : OK option (b)
-- priorité : 3
+- priorité : 2
 
 **D'où vient ce chantier.** Signalement de Claudia le 05/10/2026 : le BOC du **02/10/2026**
 est publié (`boc_eng_20261002.pdf`) et n'a jamais été chargé. Deux défauts, dont un seul est
