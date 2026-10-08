@@ -9,6 +9,218 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-08 — cycle 23 (matin) : C35, les relevés n'étaient pas en retard, ils étaient aveugles
+
+Contrôle anti-collision fait d'abord : `git log --since="3 hours ago"` sur `main` rend **0
+commit** ; le dernier commit datait de 01h12 UTC (`2bbf6b0`, relevé Volumes / Valeurs) et le
+cycle 22 porte bien sa clôture (`1012786`) après son annonce (`e67d926`). Annonce de ce
+cycle : `46e7042`, poussée seule avant tout travail.
+
+**Ordre déterministe, recalculé depuis la file et non repris du bloc précédent.** Rang 1
+(`ORANGE` + `validation : OK` dont la passe n'est pas consommée) : **C35** et **C37**, tous deux
+priorité 3 — tous les autres `ORANGE` validés portent un `statut` qui dit la passe consommée
+(C16, C17, C18, C19, C20, C21, C22, C25, C26, C27, C32, C34, C36). À égalité de priorité, le
+plus petit numéro : **C35**. La prédiction du cycle 22 est confirmée par un calcul indépendant.
+
+### Le chantier se trompait de cible, et c'est la mesure qui l'a montré
+
+C35 était écrit comme une question d'ordonnancement : « il faut décider **qui** rattrape : un
+backfill dédié, ou le passage quotidien rendu idempotent ». Les deux réponses étaient fausses,
+parce que le blocage n'était pas là.
+
+Les deux relevés sont produits par `collecte/backfill_dividendes.py` et
+`collecte/backfill_liquidite.py`. Ni l'un ni l'autre n'interroge brvm.org : ils parcourent les
+lignes `type=boc` de **`MANIFESTE.csv`** et téléchargent le PDF correspondant depuis les
+Releases du dépôt. Mesure de ce cycle : la Release `boc-2026` portait **20 bulletins datés du
+2026-08-05 au 2026-10-01** (téléversés entre le 2026-08-06 et le 2026-10-05, par
+`github-actions[bot]`) que `MANIFESTE.csv` **ne déclarait pas** — son dernier bulletin était
+`boc_20260724_2.pdf` et son dernier `date_collecte_utc` le 2026-07-29. Les backfills n'étaient
+donc pas en retard : ils étaient **aveugles**. Aucune relance, aucune planification, aucun
+workflow n'aurait fait avancer les relevés d'une seule ligne.
+
+Fausse piste écartée en chemin : `backfill_intensif.yml`, qui alimente le manifeste en
+bulletins quotidiens par `backfill_boc_quotidien.py`, est sur `workflow_dispatch` seul et son
+dernier passage date du **2026-07-29** — le jour même. La coïncidence invitait à conclure
+« workflow jamais planifié », et c'était faux : `collecte.yml`, lui, est bien planifié (lundi et
+jeudi 03h00 UTC), tourne, **réussit**, et téléverse. Il perdait juste tout le reste.
+
+### La cause, et le journal du run la dit mot pour mot
+
+Run 26 de `collecte.yml`, 2026-10-05, conclusion `success`, étape « Commit du manifeste et de
+l'etat » :
+
+```
+Run terminé : 3 nouveau(x) fichier(s), 7 requêtes.
+...
+fatal: pathspec 'echecs_upload.txt' did not match any files
+Changes not staged for commit:
+        modified:   MANIFESTE.csv
+        modified:   a_uploader.txt
+        modified:   collecte/etat_rapports.json
+no changes added to commit
+rien a committer
+Everything up-to-date
+```
+
+L'étape faisait `git add MANIFESTE.csv collecte/etat_rapports.json collecte/a_reteleverser.json
+a_uploader.txt echecs_upload.txt || true`. **`echecs_upload.txt` n'est créé que lorsqu'un upload
+échoue** : dans le cas sain il n'existe pas. Et `git add` est **atomique sur ses chemins** — un
+seul absent et il n'indexe **rien** et sort en **128**, code que le `|| true` avalait pour que
+l'étape ne tombe pas. Le `git commit` qui suit ne trouve rien, dit « rien a committer », et le
+run se termine **vert**. Les 3 PDF collectés ce jour-là sont bien dans la Release ; leurs lignes
+de manifeste ont été jetées.
+
+Autrement dit : **plus la collecte se portait bien, plus sûrement elle perdait sa trace.** Un
+échec d'upload aurait créé `echecs_upload.txt` et sauvé le manifeste.
+
+**Preuve des deux côtés.** (1) Le journal du run en production, ci-dessus. (2) Le mécanisme
+reproduit à part, hors du dépôt, en trois commandes : `git add A.txt B.txt ABSENT.txt` rend
+`fatal: pathspec ... did not match any files`, sort en **128**, laisse l'index **vide**, et le
+commit suivant dit « rien a committer ». Aucune des deux ne dépend de l'autre.
+
+Correctif dans `collecte.yml` : un `git add` par chemin, conditionné à son existence
+(`[ -e "$f" ] && git add "$f"` dans une boucle) — la convention déjà en place dans
+`collecte_quotidienne.yml` depuis le 16/07/2026, pour une raison voisine. Vérifié que
+`bash -e`, le shell des steps, tolère bien ce `[ … ] && …` : une liste `&&` dont le membre
+gauche échoue n'interrompt pas l'étape.
+
+### Le rattrapage : un procès-verbal, puis les deux backfills
+
+`outils/resynchroniser_manifeste_boc.py` remet dans `MANIFESTE.csv` les lignes des bulletins que
+les Releases portent déjà. La source est la liste d'assets des Releases — un côté **indépendant**
+du dépôt. Gardes, toutes présentes avant la moindre écriture :
+
+- l'**ancre** : l'en-tête de `MANIFESTE.csv` doit être exactement les 8 colonnes attendues, et
+  le fichier doit se terminer par un saut de ligne (sinon l'ajout collerait deux lignes) ;
+- le **motif** du nom (`boc_AAAAMMJJ[_N].pdf`), qui exclut les éditions anglaises `boc_eng_*` ;
+- `taille_octets` : la taille déclarée par l'API doit **égaler** le nombre d'octets reçus ;
+- le contenu doit commencer par `%PDF-` ;
+- `sha256` **calculé** sur les octets reçus, jamais repris d'ailleurs, et **refusé** s'il figure
+  déjà au manifeste sous une autre url ;
+- l'url ne doit pas déjà être au manifeste ;
+- `ATTENDU_A_AJOUTER = 20`, la mesure du jour : le script n'accepte que **20** (jamais appliqué)
+  ou **0** (déjà appliqué), et s'arrête sans écrire sur toute autre valeur ;
+- relecture du fichier **après** écriture : 8 colonnes, et exactement 20 lignes de plus.
+
+Il écrit **en ajout pur**, jamais en réécriture, en une seule opération. Résultat :
+**2 908 → 2 928 lignes**. Second passage : « Rien a faire … Deuxième passage sans effet », comme
+attendu. Un drapeau `--relance` lève la seule garde de comptage (pas une garde de contenu) pour
+l'usage récurrent par le workflow ; sans ce drapeau, le script reste le procès-verbal du jour.
+
+Puis les deux backfills, lancés avec `checkpoint.sauvegarder` neutralisé (il commite et pousse
+toutes les dix minutes ; le cycle veut un commit par chantier, après les barrières) :
+
+| relevé | avant | après | retard avant | retard après |
+|---|---|---|---|---|
+| `collecte/dividendes_historique.csv` | 365 lignes, 2026-07-24 | **382 lignes, 2026-10-01** | 44 séances | **4** |
+| `collecte/liquidite_quotidienne_historique.csv` | 73 141 lignes, 2026-07-24 | **74 069 lignes, 2026-10-01** | 44 séances | **4** |
+
+Les **17** lignes de `dividendes_boc.csv` absentes du relevé sont **0**, NSBC 675,98 du
+04/08/2026 comprise — la valeur même qu'une régénération de `dividendes_par_exercice.csv`
+aurait perdue. Séances du quotidien sans ligne de liquidité : **199 → 180**.
+
+**Le point qui demandait une preuve, et il l'a eue.** `backfill_dividendes.py` ne complète pas
+son fichier : il le **réécrit entièrement** à chaque passage, redérivé depuis
+`collecte/_dividendes_observations.json`. Le diff porte donc **41 lignes retirées** pour 58
+ajoutées, sur un relevé certifié. Avant de lancer quoi que ce soit, vérifié que le générateur
+reproduit **au byte près** le fichier commité depuis les seules observations déjà présentes
+(366 lignes identiques, 0 ligne de différence) — ce qui distingue ce fichier de la famille de
+C28. Après : sur les clés (ticker, montant, date de paiement, première observation),
+**0 clé perdue**, **0 `derniere_observation` qui recule**, et exactement **17 clés neuves**,
+qui sont exactement les 17 absentes mesurées avant. Aucun montant, aucune date de paiement
+modifiés. `collecte/profils.json`, recalculé par `profils.py`, est **identique** : 0 champ,
+0 profil, 0 grade, 0 rang.
+
+**La limite, dite plutôt que comblée.** Les Releases ne portent que **20 des 48** séances
+publiées après le 2026-07-24. Les **29** autres n'ont jamais été archivées : on ne devine pas un
+bulletin absent. C'est la moitié de **C41**.
+
+**Et la relance est portée par un workflow qu'un cycle peut déclencher** :
+`.github/workflows/rattrapage_releves.yml` — resynchronisation du manifeste, puis les deux
+backfills, puis une garde qui **refuse** tout relevé qui rétrécirait (même protection que la
+section 32, pour la même raison : le 05/10/2026, une base vide a failli écraser 90 660 lignes),
+puis le commit. Samedi 05h00 UTC et `workflow_dispatch`, groupe de concurrence `collecte` —
+le même que `collecte.yml`, puisque les deux écrivent `MANIFESTE.csv`. Léger par construction :
+il ne lit que les Releases, jamais brvm.org, et les trois étapes sont idempotentes.
+`backfill_intensif.yml` n'était pas candidat : quatre jobs enchaînés à 340 minutes avec OCR et
+Camelot pour un besoin qui tient en deux minutes.
+
+Section 31 mise à jour en conséquence : plafonds de retard **60 → 10** pour les deux relevés
+(dix séances, c'est deux semaines de cotation : un passage manqué du samedi ne crie pas, deux
+crient), et `OBSERVATIONS_NON_RELEVEES_MAX` **17 → 0** — une fois le retard soldé, c'est la
+seule valeur qui rende la mesure utile. Les deux ne peuvent que descendre.
+
+### La chasse du matin : un `git add` qui jette son propre travail (section 37)
+
+La famille est celle que C35 vient de révéler, et elle est invisible par construction : le
+workflow est **vert**, la donnée est produite, et seul le dépôt reste muet. Rien ne la
+surveillait.
+
+Mesure sur les **27** workflows d'alors : **26 étapes `git add`**, dont **15** citent des chemins
+nommés (les 11 autres sont des `git add -A`, hors de portée du défaut, qui n'échoue pas sur un
+chemin absent). Sur ces 15, **une seule** citait un chemin absent du dépôt : `collecte.yml`
+ligne 65, `echecs_upload.txt`. Tous les autres chemins cités sont suivis par git. Après
+correction, sur 28 workflows : **27 étapes, 0 fautive**.
+
+La règle que fige la section 37 : tout chemin cité par un `git add` de workflow doit exister
+dans le dépôt, **ou** l'ajout doit être gardé chemin par chemin. Bloquant — la propriété est
+entièrement locale (des chemins du dépôt, lus dans des fichiers du dépôt), aucune source de
+données n'intervient, et en production le défaut ne se signale jamais. Le test nomme en plus le
+cas `echecs_upload.txt` de `collecte.yml`, pour qu'un retour crie ici avant de coûter 44 séances
+de relevé une seconde fois.
+
+Noté au passage, sans y toucher : `|| true` **n'y change rien** et c'est le piège — il avale le
+128 et laisse croire que l'étape a fonctionné. Quatre workflows le portent encore
+(`avis_brvm`, `notations`, `reparation`, `reprise_notations`) ; leurs chemins existent tous, donc
+ils sont sains aujourd'hui, et c'est ce test qui le maintiendra.
+
+Le test n'importe que `re` et `pathlib` : aucune dépendance nouvelle, donc rien de la famille
+des trois pannes de P4 du 07/10.
+
+### Barrières
+
+Environnement virtuel aux dépendances exactes de `tests.yml` (`pyyaml==6.0.2`,
+`openpyxl==3.1.5`, `pandas`, puis `requirements.txt`), Python **3.13.16**, et
+`import pdfplumber` **échoue** bien — la seule méthode qui vaut.
+
+- `fusionner_fondamentaux.py` : rien à fusionner.
+- Base reconstruite : 50 sociétés, 185 lignes d'états financiers ; `cours_mensuels` 4 509 ;
+  `cours_quotidien_boc` **90 850** lignes, 48 tickers, **2 033** jours jusqu'au 2026-10-07 ;
+  dividendes par exercice 296 ajoutés, **32 écartés** (observations retirées, C34) ;
+  `charger_dividendes_boc` **3 refus** — SICC 1999, ORGT 2019, BOABF 2025, exactement les trois
+  que C22 a maintenus, inchangé depuis le cycle 22 ; `liquidite_quotidienne` **74 069** lignes,
+  **1 854** jours (1 834 avant).
+- `tester.py` : **tous les golden tests passent**.
+- `profils.py` : 48 titres, et `profils.json` **identique au fichier commité**.
+- `tester_donnees.py` : **322 OK, 0 ÉCHEC, 4 ALERTES**, code 2. Les 4 sont toutes antérieures et
+  connues : C4 (12 divisions de nominal à documenter), C5 (CFAC, NEIC), et deux sur le relevé du
+  2026-10-08 non ancrable (indices illisibles). La cinquième du cycle 22, C35/NSBC, **est
+  tombée** : c'est ce cycle qui l'a soldée.
+- `collecte/observations_boc.py --test` : **10 contrôles, 0 échec**.
+- `avis_brvm.py --test` : 11 avis, 10 rattachés, classification 8/8.
+- `notations.py --test` : index 15/15, PDF GCR 10/10, Bloomfield 6/6, pièges 3/3.
+- `generer_dashboard.py` : **48 titres**.
+- YAML des deux workflows relu par `yaml.safe_load`, et les deux fichiers Python compilés.
+- `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
+### Proposé : C41 (ORANGE, priorité 3)
+
+L'archive a deux trous, mesurés tous les deux ce cycle. **148** lignes du manifeste désignent un
+asset que les Releases ne portent pas (2019-09-02 → 2025-03-26) : chaque passage des deux
+backfills compte exactement **148 échecs de téléchargement**, ne les inscrit jamais comme
+traités, et repaie donc le coût à chaque run. `collecte/verifier_releases.py` le **voit déjà** et
+le dit à chaque run de `collecte.yml` (`##[warning] 148 fichier(s) manquant(s) … voir
+collecte/a_reteleverser.json`) : il n'est pas invisible, il est **non traité** — le workflow qui
+le traiterait, `reparation.yml` (P2c), n'a pas tourné depuis le **15/07/2026**. Et **29** séances
+publiées après le 2026-07-24 n'ont aucun bulletin archivé.
+
+ORANGE, et l'arbitrage est précis : le manifeste décrit chaque bulletin par son `sha256`, et un
+PDF retéléchargé en octobre 2026 n'est pas garanti identique à celui collecté en 2019. Trois
+options sont écrites dans son bloc ; le cycle ne tranche pas cela seul.
+
+**Prochain, par l'ordre déterministe : C37** — rang 1, priorité 3, et désormais le seul `ORANGE`
+portant `validation : OK` dont la ligne `statut` ne dit pas la passe consommée.
+
 ## 2026-10-07 — cycle 22 (soir) : C34, le chargeur retenait 31 observations que la BRVM avait retirées
 
 Contrôle anti-collision fait d'abord : `git log --since="3 hours ago"` sur `main` rend

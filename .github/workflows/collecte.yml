@@ -62,8 +62,27 @@ jobs:
           # Le travail de collecte etait perdu alors qu'il avait abouti.
           # Double protection : on ajoute les fichiers produits, ET le pull
           # utilise --autostash (voir ci-dessous) pour tout residu imprevu.
-          git add MANIFESTE.csv collecte/etat_rapports.json \
-                  collecte/a_reteleverser.json a_uploader.txt echecs_upload.txt || true
+          # Correctif 08/10/2026 (cycle 23, chantier C35) : ce "git add" a plusieurs
+          # chemins perdait TOUT le manifeste a chaque run sain. echecs_upload.txt
+          # n'est cree que lorsqu'un upload ECHOUE -- il n'existe donc pas dans le
+          # cas normal. Or git add est ATOMIQUE sur ses chemins : un seul absent et
+          # il n'indexe RIEN et sort en 128, que le "|| true" avalait. Journal du
+          # run 26 du 05/10/2026, verbatim :
+          #   fatal: pathspec 'echecs_upload.txt' did not match any files
+          #   Changes not staged for commit:  modified: MANIFESTE.csv ...
+          #   rien a committer / Everything up-to-date
+          # Les 3 PDF collectes ce jour-la sont bien arrives dans la Release ; leurs
+          # lignes de manifeste ont ete jetees. C'est la cause unique de l'arret des
+          # deux releves de collecte au 2026-07-24 (C35) : les backfills parcourent
+          # MANIFESTE.csv, donc ils etaient AVEUGLES a 20 bulletins deja archives.
+          # Plus la collecte se portait bien, plus surement elle perdait sa trace.
+          # Un "git add" par chemin, conditionne a son existence : la convention
+          # deja en place dans collecte_quotidienne.yml. La section 37 de
+          # moteur/tester_donnees.py ferme la famille pour tous les workflows.
+          for f in MANIFESTE.csv collecte/etat_rapports.json \
+                   collecte/a_reteleverser.json a_uploader.txt echecs_upload.txt; do
+            [ -e "$f" ] && git add "$f"
+          done
           git commit -m "Collecte $(date -u +%F)" || echo "rien a committer"
           git pull --rebase --autostash origin main
           git push

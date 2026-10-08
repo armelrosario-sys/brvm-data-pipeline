@@ -1,0 +1,106 @@
+name: Rattrapage des releves de collecte (C35)
+
+# POURQUOI CE WORKFLOW EXISTE (cycle 23, 08/10/2026, chantier C35)
+#
+# collecte/dividendes_historique.csv et
+# collecte/liquidite_quotidienne_historique.csv sont la memoire longue de deux
+# backfills. Ils s'etaient arretes tous les deux le 2026-07-24, soit 44 seances,
+# et rien ne le disait avant la section 31 de moteur/tester_donnees.py.
+#
+# La cause n'etait PAS une absence de relance : c'etait que MANIFESTE.csv, que
+# les deux backfills parcourent, ne declarait plus les bulletins. collecte.yml
+# les collectait, les publiait dans la Release, puis jetait ses lignes de
+# manifeste sur un "git add" a plusieurs chemins dont un seul manquait (corrige
+# le 08/10/2026 dans collecte.yml, famille fermee par la section 37).
+#
+# Il restait a repondre a la question ouverte de C35 : QUI rattrape. Reponse :
+# ni backfill_intensif.yml (une chaine de quatre jobs a 340 minutes avec OCR et
+# Camelot, bien trop lourde, et sur workflow_dispatch seul -- son dernier
+# passage date du 2026-07-29, le jour meme ou les releves se sont arretes), ni
+# le passage quotidien (qui ne touche ni le manifeste ni les Releases). Un
+# workflow leger, dedie, qu'un cycle declenche par l'API, et qui ne lit QUE ce
+# que les Releases portent deja : aucune requete vers brvm.org.
+#
+# Hebdomadaire, le samedi : la semaine de cotation est close, collecte.yml est
+# passe lundi et jeudi, et les trois etapes sont idempotentes -- un passage sans
+# bulletin neuf ne commite rien.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 6"   # samedi 05h00 UTC
+
+permissions:
+  contents: write
+
+# Meme groupe que collecte.yml : les deux ecrivent MANIFESTE.csv. cancel-in-progress
+# false fait ATTENDRE la seconde plutot que de la tuer.
+concurrency:
+  group: collecte
+  cancel-in-progress: false
+
+jobs:
+  rattrapage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pdfplumber requests
+
+      # 1. Le manifeste doit declarer ce que les Releases portent deja, sinon les
+      #    deux backfills restent aveugles. --relance leve la seule garde de
+      #    comptage du proces-verbal ; toutes les gardes de contenu restent.
+      - name: Resynchroniser MANIFESTE.csv sur les Releases
+        run: python3 outils/resynchroniser_manifeste_boc.py --relance
+
+      # 2. Les deux backfills. Resumables par leur propre registre de sha traites :
+      #    un bulletin deja lu n'est pas retelecharge.
+      - name: Backfill liquidite quotidienne
+        run: python3 collecte/backfill_liquidite.py
+
+      - name: Backfill dividendes (releve des fenetres d'observation)
+        run: python3 collecte/backfill_dividendes.py
+
+      # 3. Garde de non-regression : ces deux releves ne peuvent que CROITRE.
+      #    Meme protection que l'export du quotidien (section 32), pour la meme
+      #    raison : le 05/10/2026, une base vide a failli ecraser 90 660 lignes.
+      - name: Refuser un releve qui retrecit
+        run: |
+          python3 - <<'PY'
+          import csv, subprocess, sys
+          for chemin in ("collecte/dividendes_historique.csv",
+                         "collecte/liquidite_quotidienne_historique.csv"):
+              avant = subprocess.run(["git", "show", f"HEAD:{chemin}"],
+                                     capture_output=True, text=True)
+              n_avant = max(len(avant.stdout.splitlines()) - 1, 0) if avant.returncode == 0 else 0
+              with open(chemin, encoding="utf-8", newline="") as f:
+                  n_apres = sum(1 for _ in csv.DictReader(f))
+              print(f"{chemin} : {n_avant} -> {n_apres} ligne(s)")
+              if n_apres < n_avant:
+                  sys.exit(f"REFUS : {chemin} perdrait {n_avant - n_apres} ligne(s)")
+          PY
+
+      - name: Committer si changement
+        run: |
+          git config user.name "robot-rattrapage"
+          git config user.email "robot@users.noreply.github.com"
+          # Un "git add" par chemin, conditionne a son existence : la lecon de
+          # C35 elle-meme (voir collecte.yml et la section 37).
+          for f in MANIFESTE.csv \
+                   collecte/dividendes_historique.csv \
+                   collecte/dividendes_traites.json \
+                   collecte/_dividendes_observations.json \
+                   collecte/liquidite_quotidienne_historique.csv \
+                   collecte/liquidite_traites.json; do
+            [ -e "$f" ] && git add "$f"
+          done
+          git commit -m "Rattrapage des releves de collecte $(date -u +%F)" \
+            || echo "rien a committer"
+          git pull --rebase --autostash origin main
+          git push

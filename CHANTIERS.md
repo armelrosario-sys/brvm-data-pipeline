@@ -2728,7 +2728,9 @@ section n'importe que `observations_boc`, qui ne dépend que de `dates_dividende
 ## C35 — Deux relevés de collecte se sont arrêtés le même jour, il y a 44 séances
 
 - classe : ORANGE — relancer une collecte sur quarante-quatre séances écrit dans des relevés certifiés ; le diagnostic est fait
-- statut : PROPOSÉ
+- statut : **FAIT le 08/10/2026 (cycle 23)** — cause trouvée, corrigée, rattrapage appliqué et
+  mesuré. La passe autorisée est consommée ; **aucun cycle ne reprend C35.** Le trou résiduel
+  de l'archive part en **C41**. Voir *Ce qu'a fait le cycle 23*, au bas du bloc.
 - validation : OK
 - autonomie : **réseau nécessaire** — passe par les workflows du dépôt (`boc_quotidien.yml`, `collecte.yml`)
 - priorité : 3 — latent aujourd'hui, armé dès qu'un fichier généré est régénéré
@@ -2769,6 +2771,49 @@ relevées (plafond **17**, qui ne peut que descendre) et nomme le cas NSBC. 16 c
 **Terminé quand** : les deux relevés suivent la dernière séance à moins de cinq séances ; les
 17 observations manquantes y sont ; les plafonds de la section 31 sont abaissés d'autant ; et
 la relance est portée par un workflow qu'un cycle peut déclencher.
+
+### Ce qu'a fait le cycle 23 (08/10/2026), et ce que le chantier se trompait de cible
+
+**La cause n'était ni le réseau, ni une relance oubliée.** Les deux relevés sont produits par
+`backfill_dividendes.py` et `backfill_liquidite.py`, qui parcourent les lignes `type=boc` de
+`MANIFESTE.csv`. Or les PDF **étaient** dans la Release : `boc-2026` portait **20 bulletins du
+2026-08-05 au 2026-10-01** que `MANIFESTE.csv` ne déclarait pas. Les deux backfills n'étaient
+pas en retard, ils étaient **aveugles**. Aucun workflow, aucune planification ne les aurait
+fait avancer d'une ligne. Le chantier posait la question « qui rattrape » ; la réponse était
+« personne ne peut, tant que le manifeste est muet ».
+
+**Et le manifeste était muet par un défaut de `git add`, prouvé des deux côtés.** Journal du
+run 26 de `collecte.yml` (05/10/2026), verbatim : `fatal: pathspec 'echecs_upload.txt' did not
+match any files` / `no changes added to commit` / `rien a committer` / `Everything
+up-to-date`. `echecs_upload.txt` n'est créé **que si un upload échoue** : il n'existe pas dans
+le cas sain. `git add` est **atomique** sur ses chemins — un seul absent et il n'indexe rien et
+sort en 128, que le `|| true` avalait. Mécanisme **reproduit à part** en trois commandes.
+Autrement dit : plus la collecte se portait bien, plus sûrement elle perdait sa trace. Les 3
+PDF du 05/10 sont bien dans la Release ; leurs lignes de manifeste ont été jetées. Corrigé
+dans `collecte.yml` (un `git add` par chemin, gardé) ; famille fermée par la **section 37**.
+
+**Le rattrapage, mesuré.** `outils/resynchroniser_manifeste_boc.py` (procès-verbal : source =
+la liste d'assets de la Release, un côté indépendant ; taille déclarée contre octets reçus,
+`%PDF-`, sha256 calculé et refusé s'il existe déjà, ancre de l'en-tête, relecture après
+écriture, garde `ATTENDU_A_AJOUTER = 20`, second passage sans effet) a remis **20 lignes**
+(2 908 → 2 928). Puis les deux backfills : `dividendes_historique.csv` **365 → 382 lignes**,
+dernière observation **2026-07-24 → 2026-10-01**, retard **44 → 4 séances** ;
+`liquidite_quotidienne_historique.csv` **+928 lignes** (73 141 → 74 069), même retard **4**.
+Les **17** observations de `dividendes_boc.csv` absentes du relevé sont **0**, NSBC 675,98 du
+04/08/2026 comprise. Contrôle de non-perte sur les 41 lignes réécrites : **0 clé perdue**
+(ticker, montant, date de paiement, première observation), **0 fenêtre d'observation qui
+recule**, exactement **17 lignes neuves**. `profils.json` ne bouge d'**aucun champ**.
+
+**Ce qui reste, dit plutôt que comblé.** La Release ne porte que 20 des 48 séances publiées
+après le 2026-07-24 : **29 séances** du quotidien restent sans ligne de liquidité (180 au
+total, contre 199 avant). Leurs bulletins n'ont jamais été archivés, et on ne devine pas un
+bulletin absent. Avec les **148** lignes du manifeste qui désignent un asset que les Releases
+ne portent pas, cela fait **C41**.
+
+**La relance est portée par un workflow.** `.github/workflows/rattrapage_releves.yml` —
+resynchronisation puis les deux backfills, samedi 05h00 UTC et sur `workflow_dispatch`, groupe
+de concurrence `collecte`, avec une garde qui refuse tout relevé qui rétrécit. Léger par
+construction : il ne lit que les Releases, jamais brvm.org.
 
 ## C36 — Quand la BRVM ne publie que l'édition anglaise du BOC, la séance est perdue
 
@@ -3059,6 +3104,41 @@ la bonne valeur d'`ECOC 2021`.
 ne dépend plus de l'ordre des lignes d'un CSV mais d'une règle écrite ; et un test de la
 section 36 refuse toute nouvelle date de paiement qui recule à montant égal.
 
+## C41 — L'archive a deux trous : 148 assets promis et absents, 29 séances jamais archivées
+
+- classe : ORANGE — retélécharger un bulletin depuis brvm.org aujourd'hui et le reverser dans les Releases écrit dans l'archive certifiée, et peut y mettre un PDF différent de celui que le manifeste décrit par son sha256
+- statut : PROPOSÉ
+- validation : —
+- autonomie : **réseau nécessaire** — `reparation.yml` (P2c) pour les 148, `collecte.yml` pour les 29
+- priorité : 3 — latent : rien ne casse aujourd'hui, mais chaque passage des deux backfills paie 148 requêtes pour rien, et 29 séances de liquidité sont définitivement absentes tant que l'archive l'est
+
+**Le constat, mesuré le 08/10/2026 (cycle 23), en soldant C35.** Deux trous distincts, de
+causes différentes, dans la même archive :
+
+| trou | mesure de ce cycle | effet |
+|---|---|---|
+| lignes du manifeste dont l'asset manque à la Release | **148** (2019-09-02 → 2025-03-26) | chaque passage des deux backfills compte exactement **148 échecs de téléchargement**, et ne les inscrit jamais comme traités : le coût se repaie à chaque run |
+| séances publiées après le 2026-07-24 sans bulletin archivé | **29** sur 48 | autant de séances du quotidien sans aucune ligne de liquidité (**180** au total sur 2 033) |
+
+`collecte/verifier_releases.py` **voit déjà** le premier trou et le dit à chaque run de
+`collecte.yml` (`##[warning] 148 fichier(s) manquant(s) ... voir collecte/a_reteleverser.json`).
+Il n'est donc pas invisible : il est **non traité**. Le workflow qui le traiterait,
+`reparation.yml` (P2c, `collecte/reparer_releases.py`, sur `workflow_dispatch` seul), n'a pas
+tourné depuis le **15/07/2026**.
+
+**L'arbitrage, et c'est pour cela que ce chantier est ORANGE.** Le manifeste décrit chaque
+bulletin par son `sha256`. Un PDF retéléchargé depuis brvm.org en octobre 2026 n'est pas
+garanti identique à celui collecté en 2019 : la BRVM republie. Il faut donc décider, avant
+d'écrire : (a) ne verser que les PDF dont le sha256 retrouve celui du manifeste, et **laisser
+vide** le reste — une case vide vaut mieux qu'une valeur approchée ; (b) verser et **mettre à
+jour** le sha256 du manifeste, en inscrivant le remplacement dans un registre ; (c) laisser
+l'archive telle quelle et retirer du manifeste les 148 lignes mortes, ce qui supprime les 148
+requêtes inutiles sans rien reconstituer. Le cycle ne tranche pas cela seul.
+
+**Terminé quand** : les 148 sont soit versées sous preuve de sha256, soit retirées du manifeste
+avec leur motif ; les 29 séances sont archivées ou déclarées hors de portée ; et la section 31
+porte un plafond sur le nombre de lignes de manifeste sans asset, qui ne peut que descendre.
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
@@ -3072,37 +3152,38 @@ section 36 refuse toute nouvelle date de paiement qui recule à montant égal.
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`. Le bloc avait dérivé à
 trois entrées et 75 lignes ; il est ramené à une, comme le protocole le demande.
 
-## 2026-10-07 — cycle 22 (soir)
+## 2026-10-08 — cycle 23 (matin)
 
-**Exécuté : C34, option (a)** — la ligne `validation : OK` ne nommait pas d'option ; (a) retenue
-sur trois motifs écrits dans son bloc, dont celui-ci : (b) change la forme d'un fichier généré
-sur lequel C19 et C28 ont une question ouverte. `collecte/observations_boc.py` (`--test` **10/0**)
-lit les fenêtres de publication du relevé brut ; le chargeur écarte **32 lignes** (31 couples,
-SEMC 2016 en porte 2) et **nomme** chacune. **31 montants changent, 0 date, 327 lignes avant
-comme après ; `profils.json` bouge de 2 champs sur 4 562** — texte SEMC seul, **0 profil,
-0 grade, 0 rang**. Les 8 restatements du chantier sont confirmés à la valeur près ; sa phrase
-« les 23 autres sous 6 % » est **fausse** pour deux (ETIT 2016 −17,4 %, ONTBF 2023 −15,0 %).
+**Exécuté : C35** (rang 1, priorité 3, plus petit numéro ; C37 à égalité). **Il se trompait de
+cible** : il cherchait qui devait relancer une collecte, personne ne pouvait. Les deux relevés
+se construisent depuis les lignes `type=boc` de `MANIFESTE.csv`, et la Release `boc-2026`
+portait **20 bulletins du 2026-08-05 au 2026-10-01** que le manifeste ne déclarait pas — les
+backfills n'étaient pas en retard, ils étaient **aveugles**.
 
-**La règle est ÉTROITE, et c'est la mesure qui l'a bornée** : une révision se lit à ticker ET
-**date égales**. La formulation large déplaçait 33 couples, dont **ECOC 2021** où elle aurait
-écrit une **faute de frappe du BOC** (549,00 publié une fois sous `30-mai-22`) → **C40**.
+**La cause, dite mot pour mot par le journal du run.** `collecte.yml` réussissait deux fois par
+semaine en jetant son manifeste : `fatal: pathspec 'echecs_upload.txt' did not match any files`
+→ `rien a committer`. Ce fichier n'existe **que si un upload échoue**, et `git add` est
+**atomique** : un chemin absent, il n'indexe rien et sort en 128, que le `|| true` avalait.
+**Plus la collecte se portait bien, plus sûrement elle perdait sa trace.** Corrigé.
 
-**Preuve à deux côtés venue d'elle-même** : `charger_dividendes_boc.py`, chemin indépendant,
-refusait **6 fois**, refuse **3 fois** — SAFC 2010, SEMC 2020, BOAC 2025, exactement ceux que
-C22 avait renvoyés ici, aux mêmes valeurs. Registre `arbitrages_pont_boc.csv` soldé en
-`TRANCHE_APPLIQUE` : seule écriture du procès-verbal, sous six gardes, idempotente.
+**Rattrapage mesuré.** `outils/resynchroniser_manifeste_boc.py` (20 lignes, six gardes,
+idempotent) puis les deux backfills : retard **44 → 4 séances** des deux côtés,
+`dividendes_historique.csv` **365 → 382**, liquidité **+928 lignes**, observations non relevées
+**17 → 0** (NSBC 675,98 comprise), **0 clé perdue, 0 fenêtre qui recule**, `profils.json`
+**0 champ**. Section 31 : plafonds 60 → **10**, 17 → **0**. Relance portée par
+`rattrapage_releves.yml` (samedi 05h00 UTC). Reste 29 séances sans bulletin archivé → **C41**.
 
-**Mon erreur, dite par mon propre test.** La section 36 testait d'abord **toutes** les lignes
-datées : ÉCHEC sur BOABF 2025, SICC 1999, ORGT 2019 — trois **saisies à la main** maintenues par
-C22. Mon invariant réclamait d'écraser trois analyses humaines, la **règle 1**. Corrigé : il
-porte sur les **296** lignes du fichier généré et **nomme** les trois pour qu'une quatrième crie.
+**Chasse (matin) → section 37** : un `git add` de workflow qui jette tout son travail parce
+qu'un seul de ses chemins n'existe pas — vert en production, muet dans le dépôt. Sur 27
+workflows : **26 étapes, 15 avec chemins nommés, 1 fautive** (celle de C35) ; après correction
+**0 sur 27**. `|| true` n'y change rien, et quatre workflows le portent encore.
 
 **Barrières** (venv aux dépendances exactes de `tests.yml`, `import pdfplumber` échoue) : base
-complète, golden tests **tous passent**, **section 36, 18 contrôles**, `tester_donnees.py`
-**316 OK, 0 ÉCHEC**, code 2 — les 5 alertes **toutes antérieures** (C4, C5, relevé du 07/10 non
-ancrable, C35/NSBC). `avis_brvm` et `notations --test` passent, dashboard **48 titres**. Pas de
-chasse : cycle du soir. **Proposé : C40** (ORANGE, priorité 3). **Prochain, par l'ordre
-déterministe : C35** — rang 1, à égalité de priorité 3 avec C37, plus petit numéro.
+complète, golden tests **tous passent**, `tester_donnees.py` **322 OK, 0 ÉCHEC**, code 2, les
+**4** alertes toutes antérieures (C4, C5, relevé du 08/10 non ancrable ×2) — la 5ᵉ, C35/NSBC, est
+tombée ; `observations_boc --test` 10/0, `avis_brvm` et `notations --test` passent, dashboard
+**48 titres**. **Proposé : C41** (ORANGE, 3). **Prochain : C37**, seul `ORANGE` à
+`validation : OK` dont la passe n'est pas consommée.
 
 ---
 

@@ -4190,24 +4190,28 @@ def test_bascule_per_boc():
 # SECTION 31 — un releve de collecte commite cesse d'avancer en silence
 #              (chasse du cycle 20, 05/10/2026)
 # ---------------------------------------------------------------------------
-# Retard mesure le 05/10/2026, en SEANCES du quotidien (derniere seance en base
-# 2026-10-01, 2 029 seances). Registre adosse aux valeurs OBSERVEES : une hausse
-# est signalee, jamais silencieuse. Un plafond ne peut que DESCENDRE.
+# Retard REMESURE le 08/10/2026 (cycle 23), en SEANCES du quotidien (derniere
+# seance en base 2026-10-07, 2 033 seances), APRES le rattrapage de C35.
+# Registre adosse aux valeurs OBSERVEES : une hausse est signalee, jamais
+# silencieuse. Un plafond ne peut que DESCENDRE.
 #
 #   fichier -> (colonne de date lue, retard observe en seances, plafond, motif)
 #
-# Les deux premiers sont les cas qui ont ouvert la chasse : ils se sont arretes
-# le MEME jour, le 2026-07-24, alors que le quotidien a continue 44 seances.
+# Les deux premiers sont les cas qui ont ouvert la chasse : ils s'etaient arretes
+# le MEME jour, le 2026-07-24, alors que le quotidien avait continue 44 seances.
+# Leurs plafonds passent de 60 a 10 : le rattrapage les a ramenes a 4 seances, et
+# rattrapage_releves.yml passe desormais chaque samedi. Dix seances, c'est deux
+# semaines de cotation : un passage manque ne crie pas, deux crient.
 RETARD_RELEVES_MAX = {
     "collecte/dividendes_historique.csv": (
-        "derniere_observation", 44, 60,
+        "derniere_observation", 4, 10,
         "releve des fenetres d'observation du BOC ; dividendes_par_exercice.csv "
         "en est GENERE, donc son retard se propage a toute regeneration"),
     "collecte/liquidite_quotidienne_historique.csv": (
-        "date_bulletin", 44, 60,
+        "date_bulletin", 4, 10,
         "releve de la liquidite quotidienne (table de C14)"),
     "collecte/dividendes_boc.csv": (
-        "date_paiement", 1, 30,
+        "date_paiement", 5, 30,
         "colonne Dernier dividende paye du bulletin ; une date de PAIEMENT, donc "
         "un retard apparent est normal entre deux saisons d'AGM"),
     "collecte/cours_quotidien_boc.csv": (
@@ -4216,11 +4220,13 @@ RETARD_RELEVES_MAX = {
 }
 
 # Lignes de collecte/dividendes_boc.csv absentes de dividendes_historique.csv.
-# Consequence DIRECTE du retard du premier releve, et elle est chiffree : une
-# regeneration de dividendes_par_exercice.csv perdrait ces valeurs. 17 mesurees
-# le 05/10/2026, toutes collectees entre le 2026-07-28 et le 2026-09-28.
-# Plafond qui ne peut que DESCENDRE.
-OBSERVATIONS_NON_RELEVEES_MAX = 17
+# Consequence DIRECTE du retard du premier releve, et elle etait chiffree : une
+# regeneration de dividendes_par_exercice.csv aurait perdu ces valeurs. 17
+# mesurees le 05/10/2026 ; le rattrapage de C35, le 08/10/2026, les a toutes
+# fait entrer au releve et la mesure est tombee a ZERO. Le plafond descend donc
+# a 0 : toute nouvelle observation non relevee est desormais un signal immediat,
+# et c'est la seule valeur qui rende cette section utile une fois le retard solde.
+OBSERVATIONS_NON_RELEVEES_MAX = 0
 
 
 def _derniere_date_iso(chemin, colonne):
@@ -4251,21 +4257,33 @@ def test_fraicheur_releves_collecte():
     la memoire longue des collecteurs.
 
     Deux d'entre eux se sont arretes le MEME jour, le 2026-07-24, et rien ne le
-    disait. Mesure de ce cycle : le quotidien a publie 44 seances de plus
-    (jusqu'au 2026-10-01) pendant que ni collecte/dividendes_historique.csv ni
+    disait : le quotidien avait publie 44 seances de plus pendant que ni
+    collecte/dividendes_historique.csv ni
     collecte/liquidite_quotidienne_historique.csv n'avancaient d'une ligne.
 
-    CE QUE CELA COUTE, ET C'EST MESURE, pas suppose.
+    CE QUE CELA COUTAIT, ET C'ETAIT MESURE, pas suppose.
     collecte/dividendes_par_exercice.csv n'est pas un fichier saisi : il est
     GENERE par historiser_dividendes_exercice.py depuis
-    collecte/dividendes_historique.csv. Or 17 des 64 lignes de
+    collecte/dividendes_historique.csv. Or 17 des 63 lignes de
     collecte/dividendes_boc.csv -- toutes collectees entre le 2026-07-28 et le
-    2026-09-28 -- sont absentes du releve. Une regeneration du fichier genere
-    les perdrait toutes les 17, dont NSBC 675,98 du 04/08/2026 : la valeur meme
-    que C22 vient de faire entrer en base ce cycle. Le defaut est LATENT tant que
-    personne ne regenere, et ARME des que quelqu'un le fait.
-    Cote liquidite, les 44 seances postericures au 2026-07-24 sont exactement 44
-    des 195 seances du quotidien sans aucune ligne de liquidite.
+    2026-09-28 -- etaient absentes du releve. Une regeneration du fichier genere
+    les aurait perdues toutes les 17, dont NSBC 675,98 du 04/08/2026 : la valeur
+    meme que C22 avait fait entrer en base. Le defaut etait LATENT tant que
+    personne ne regenerait, et ARME des que quelqu'un le faisait.
+
+    CE QUE LE RATTRAPAGE DE C35 A CHANGE (cycle 23, 08/10/2026). La cause
+    n'etait pas une absence de relance mais MANIFESTE.csv lui-meme, arrete au
+    2026-07-24 parce que collecte.yml jetait ses lignes de manifeste a chaque run
+    sain (un "git add" a plusieurs chemins dont un seul manquait -- famille
+    fermee par la section 37). Vingt bulletins deja archives en Release n'etaient
+    pas declares ; les deux backfills n'etaient pas en retard, ils etaient
+    AVEUGLES. Apres resynchronisation du manifeste et relance des deux
+    backfills : retard 44 -> 4 seances pour les deux, +928 lignes de liquidite,
+    +17 evenements de dividende, observations non relevees 17 -> 0, aucune valeur
+    de montant ni de date de paiement modifiee et aucune fenetre d'observation
+    qui recule. Les plafonds descendent en consequence (60 -> 10, et 17 -> 0).
+    Il reste 29 seances posterieures au 2026-07-24 sans ligne de liquidite : leurs
+    bulletins n'ont jamais ete archives, et on ne devine pas un bulletin absent.
 
     SEVERITES. Bloquant : que le registre COUVRE chaque fichier mesure, et que
     chaque fichier du registre existe et porte bien sa colonne de date -- ce sont
@@ -4308,7 +4326,7 @@ def test_fraicheur_releves_collecte():
         verifie(retard <= plafond,
                 f"{chemin} : derniere date {derniere}, {retard} seance(s) de "
                 f"retard sur {reference} (plafond {plafond}, observe {observe} le "
-                f"05/10/2026) — {motif}"
+                f"08/10/2026) — {motif}"
                 + ("" if retard <= plafond
                    else " — EN HAUSSE : le releve a cesse d'avancer et rien "
                         "d'autre ne le dit"),
@@ -4364,7 +4382,8 @@ def test_fraicheur_releves_collecte():
     nsbc = [a for a in absents if a.startswith("NSBC")]
     verifie(not nsbc,
             "NSBC 675.98 du 2026-08-04, entre en base par C22, est aussi dans le "
-            "releve dividendes_historique.csv"
+            "releve dividendes_historique.csv (entre au releve le 08/10/2026 par "
+            "le rattrapage de C35)"
             + ("" if not nsbc else " — ABSENTE du releve : " + ", ".join(nsbc)
                                    + " ; une regeneration de "
                                      "dividendes_par_exercice.csv la perdrait"),
@@ -4930,6 +4949,135 @@ def test_observations_perimees_boc():
                 f"departage pas — obtenu {m}")
 
 
+# ---------------------------------------------------------------------------
+# SECTION 37 — un « git add » de workflow qui jette tout son travail parce
+#              qu'UN SEUL de ses chemins n'existe pas
+#              (chasse du cycle 23, 08/10/2026)
+# ---------------------------------------------------------------------------
+# LA FAMILLE, ET COMMENT ELLE A ETE TROUVEE. C35 cherchait pourquoi deux releves
+# de collecte s'etaient arretes le 2026-07-24. La cause n'etait ni le reseau, ni
+# un workflow manquant, ni une relance oubliee : c'etait l'etape de commit de
+# collecte.yml. Journal du run 26 du 05/10/2026, verbatim :
+#
+#     fatal: pathspec 'echecs_upload.txt' did not match any files
+#     Changes not staged for commit:  modified: MANIFESTE.csv
+#     no changes added to commit
+#     rien a committer
+#     Everything up-to-date
+#
+# echecs_upload.txt n'est cree que lorsqu'un upload ECHOUE : il n'existe donc pas
+# dans le cas sain. Or « git add » est ATOMIQUE sur ses chemins -- un seul absent
+# et il n'indexe RIEN et sort en 128. Mecanisme reproduit a part, en trois
+# commandes : « git add A.txt B.txt ABSENT.txt » sort en 128 et laisse l'index
+# vide ; le commit qui suit dit « rien a committer » et le run se termine en
+# SUCCES. Plus la collecte se portait bien, plus surement elle perdait sa trace.
+#
+# Un defaut de cette famille est invisible par construction : le workflow est
+# vert, la donnee est produite, et seul le depot reste muet. Rien ne le
+# surveillait. Mesure du 08/10/2026 sur les 27 workflows d'alors : 26 etapes
+# « git add », dont 15 citent des chemins nommes, dont UNE SEULE citait un chemin
+# absent du depot -- celle de collecte.yml, ligne 65, corrigee le meme jour.
+# Apres correction, sur 28 workflows : 27 etapes, 0 fautive. Le test fige la
+# propriete, pas le cas : la prochaine sortira a l'ecriture du workflow.
+#
+# LA REGLE. Tout chemin cite par un « git add » d'un workflow doit exister dans
+# le depot, OU l'ajout doit etre garde chemin par chemin (« [ -e x ] && git add x »,
+# la convention deja en place dans collecte_quotidienne.yml). « git add -A » est
+# hors de portee du defaut : il n'echoue pas sur un chemin absent.
+#
+# Noter que « || true » n'y change RIEN et c'est le piege : il avale le code 128
+# et laisse croire que l'etape a fonctionne. Quatre workflows le portent encore
+# (avis_brvm, notations, reparation, reprise_notations) ; leurs chemins existent
+# tous, donc ils sont sains aujourd'hui -- ce test est ce qui le maintiendra.
+WORKFLOWS = "/.github/workflows"
+
+# Drapeaux de « git add » qui ne sont pas des chemins.
+_DRAPEAUX_ADD = {"-A", "--all", "-u", "--update", "-f", "--force", "-v",
+                 "--verbose", "-n", "--dry-run", "-p", "--patch", "--", "."}
+
+
+def _ajouts_git_des_workflows(dossier):
+    """Les « git add » des workflows, un tuple par occurrence.
+
+    Rend (fichier, numero_de_ligne, chemins, garde) ou `garde` dit que la ligne
+    conditionne l'ajout a l'existence du chemin ([ -e ... ] / [ -f ... ] / if ).
+    Les continuations de ligne en antislash sont recollees.
+    """
+    import re as _re
+    occurrences = []
+    for chemin in sorted(dossier.glob("*.yml")):
+        lignes = chemin.read_text(encoding="utf-8").splitlines()
+        i = 0
+        while i < len(lignes):
+            depart = i
+            logique = lignes[i]
+            while logique.rstrip().endswith("\\") and i + 1 < len(lignes):
+                i += 1
+                logique = logique.rstrip()[:-1] + " " + lignes[i]
+            nu = logique.strip()
+            if _re.search(r"(^|[;&|]\s*)git add\b", nu):
+                morceaux = _re.split(r"(?:^|[;&|]\s*)git add\b", nu)[-1]
+                # on s'arrete au premier separateur de commande qui suit
+                morceaux = _re.split(r"[;&|]|\|\|", morceaux)[0]
+                chemins = [m for m in morceaux.split()
+                           if m not in _DRAPEAUX_ADD
+                           and not m.startswith(":")      # exclusions pathspec
+                           and "$" not in m               # variable de shell
+                           and not m.startswith("-")]
+                garde = bool(_re.search(r"\[\s*-[ef]\s", nu)) or nu.startswith("if ")
+                occurrences.append((chemin.name, depart + 1, chemins, garde))
+            i += 1
+    return occurrences
+
+
+def test_git_add_des_workflows():
+    """Un « git add » de workflow ne doit jamais pouvoir jeter son propre travail.
+
+    SEVERITE : bloquant. La propriete est entierement locale -- des chemins du
+    depot, lus dans des fichiers du depot. Aucune source de donnees n'intervient,
+    donc rien ici ne depend d'une collecte qui prend du retard. C'est exactement
+    le genre de defaut qu'il faut arreter au commit, puisqu'en production il est
+    silencieux : le workflow reste VERT.
+    """
+    print("\n=== 37. Les « git add » des workflows ne jettent pas leur travail "
+          "(bloquant) ===")
+    dossier = RACINE / ".github" / "workflows"
+    if not verifie(dossier.is_dir(), f"{WORKFLOWS} existe"):
+        return
+    occurrences = _ajouts_git_des_workflows(dossier)
+    verifie(len(occurrences) >= 20,
+            f"la mesure porte sur une population reelle : {len(occurrences)} "
+            f"etape(s) « git add » dans {len(list(dossier.glob('*.yml')))} workflow(s)")
+
+    fautifs = []
+    for fichier, ligne, chemins, garde in occurrences:
+        if garde:
+            continue
+        for p in chemins:
+            if not (RACINE / p).exists():
+                fautifs.append(f"{fichier}:{ligne} -> {p}")
+    verifie(not fautifs,
+            f"aucun « git add » non garde ne cite un chemin absent du depot "
+            f"({len(occurrences)} etape(s) examinee(s))"
+            + ("" if not fautifs else
+               " — CHEMINS ABSENTS, et « git add » est atomique : l'etape "
+               "n'indexera RIEN et le run restera VERT : " + ", ".join(fautifs)
+               + ". Garder chaque chemin : [ -e x ] && git add x"))
+
+    # Le cas nominatif qui a ouvert la chasse. S'il revient, il doit crier ici
+    # avant de couter 44 seances de releve une seconde fois.
+    collecte = [(l, c, g) for f, l, c, g in occurrences if f == "collecte.yml"]
+    verifie(bool(collecte), "collecte.yml porte bien une etape « git add »")
+    echecs_nu = [l for l, c, g in collecte if "echecs_upload.txt" in c and not g]
+    verifie(not echecs_nu,
+            "collecte.yml n'ajoute plus echecs_upload.txt sans garder son "
+            "existence (cause unique de l'arret des deux releves de C35)"
+            + ("" if not echecs_nu
+               else f" — REVENU ligne(s) {echecs_nu} : ce fichier n'existe que "
+                    f"lorsqu'un upload echoue, donc le cas SAIN perd tout le "
+                    f"manifeste"))
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -4970,6 +5118,7 @@ def main():
     test_unite_des_plafonds()
     test_edition_anglaise_boc()
     test_observations_perimees_boc()
+    test_git_add_des_workflows()
     if not sans_app:
         test_application()
 
