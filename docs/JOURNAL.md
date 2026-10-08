@@ -145,6 +145,11 @@ il ne lit que les Releases, jamais brvm.org, et les trois étapes sont idempoten
 `backfill_intensif.yml` n'était pas candidat : quatre jobs enchaînés à 340 minutes avec OCR et
 Camelot pour un besoin qui tient en deux minutes.
 
+**Vérifié en vrai, après le commit de clôture** (run 1, `37743370000`, 07h25 UTC) : les neuf
+étapes passent, et le workflow **ne commite rien** — il n'a plus rien à ajouter. L'idempotence
+n'est donc pas seulement affirmée par le script, elle est constatée de bout en bout sur un
+runner. P4 est verte sur `8247b7d` (run 253).
+
 Section 31 mise à jour en conséquence : plafonds de retard **60 → 10** pour les deux relevés
 (dix séances, c'est deux semaines de cotation : un passage manqué du samedi ne crie pas, deux
 crient), et `OBSERVATIONS_NON_RELEVEES_MAX` **17 → 0** — une fois le retard soldé, c'est la
