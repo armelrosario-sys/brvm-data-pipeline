@@ -2915,9 +2915,14 @@ la cause n'est pas établie : → **C39**.
 ## C37 — Les 8 séances de BBGC déjà écrites à 47 lignes, et personne ne les retentera
 
 - classe : ORANGE — écrit dans une série de cours certifiée, et demande un passage réseau
-- statut : PROPOSÉ
+- statut : **FAIT le 08/10/2026 (cycle 24) pour 3 des 8 séances** — 2026-09-25, 2026-09-30
+  et 2026-10-01, les trois dont le bulletin est archivé. **La passe autorisée est consommée ;
+  aucun cycle ne reprend C37.** Les 5 restantes n'ont aucun bulletin archivé : elles
+  attendent **C41**, et le script les reprendra sans modification. Voir *Ce qu'a fait le
+  cycle 24*, au bas du bloc.
 - validation : OK
-- autonomie : partielle — la réextraction demande brvm.org, donc un workflow
+- autonomie : **complète et sans brvm.org** pour toute séance archivée — corrigé le
+  08/10/2026, voir plus bas ; partielle seulement pour les séances absentes de l'archive
 - priorité : 3 — le titre est coté depuis 8 séances et n'a toujours aucun prix en base
 
 **D'où vient ce chantier.** C32 a rouvert l'entrée de la série le 07/10/2026 : l'univers est
@@ -2958,6 +2963,58 @@ par un workflow pour mesurer ce que les 8 bulletins rendent réellement.
 relire un bulletin est constatée et datée ; aucune des 47 valeurs préexistantes n'est
 modifiée ; toute divergence entre les deux extractions est nommée ; et
 `SEANCES_SANS_BBGC_CONNUES` (section 33 de `tester_donnees.py`) se vide d'autant.
+
+### Ce qu'a fait le cycle 24 (08/10/2026)
+
+**La prémisse du chantier était fausse, et c'est la seule chose qui comptait.** C37 posait
+que les bulletins devaient être retéléchargés depuis brvm.org, donc par un workflow, parce
+que `find . -name "*.pdf"` ne rend rien. C'est vrai du **dépôt** et faux de l'**archive** :
+la Release `boc-2026` porte 152 assets, `MANIFESTE.csv` déclare chacun avec son `sha256`, et
+le bac à sable atteint les deux. **Trois des huit séances se rattrapent donc sans aucun accès
+à brvm.org** — leur bulletin était déjà là.
+
+**La preuve à deux côtés, mesurée ce cycle.** Pour chacune des trois séances :
+
+| | 2026-09-25 | 2026-09-30 | 2026-10-01 |
+|---|---|---|---|
+| `sha256` du PDF vs `MANIFESTE.csv` | identique | identique | identique |
+| lignes extraites | 48 | 48 | 48 |
+| lignes préexistantes reproduites | **47 / 47** | **47 / 47** | **47 / 47** |
+| divergences sur ces 47 | **0** | **0** | **0** |
+| ligne ajoutée | `BBGC,7795.0,14.33` | `BBGC,9000.0,16.55` | `BBGC,8800.0,16.18` |
+
+Côté 1 : le document lu est le document archivé, à l'octet près. Côté 2 : l'extracteur
+reproduit les 47 lignes déjà en base **à zéro divergence**, donc la 48e qu'il en tire n'est
+pas plus douteuse que les 47 autres. Troisième concordance, non exigée mais vérifiée : la
+série 8 800 (01/10) → 8 995 (02/10, versé hors cycle par C36, d'une **autre** source) est
+continue.
+
+**Attention, piège mesuré** : comparée **sans** normaliser, la réextraction rend **43 fausses
+divergences par séance** — le BOC donne le rendement en pourcentage (`5.25`), la série le
+porte en fraction (`0.0525`) depuis le 2026-07-17. Le script divise par cent comme le
+collecteur. Sans cela, il aurait refusé les trois séances en croyant protéger la base.
+
+**Le procès-verbal** : `outils/reextraction_bbgc_depuis_archive.py`, idempotent, sept gardes
+(entête et comptes, bloc de séance contigu et trié asserté, `sha256` du PDF contre le
+manifeste, `attendu` sur chacune des 47 lignes, unicité de la ligne insérée, **égalité des
+octets préexistants**, relecture après écriture). **Aucune date n'y est écrite en dur** : les
+cibles sont déduites du fichier et du manifeste, donc le script rattrapera les 5 séances
+restantes **sans être modifié** le jour où C41 les archivera. Relancé : « migration DEJA
+APPLIQUEE ».
+
+**Un refus vérifié, pas supposé.** Une valeur préexistante a été falsifiée exprès (BICB
+2026-09-30, 8 910 → 8 911) : le script a **refusé cette séance seule**, nommé la divergence,
+et écrit les deux autres. Le refus par séance, et non tout ou rien, est le comportement
+voulu.
+
+**Et une erreur de ce cycle, annulée.** La première version réserialisait le CSV en `\n` : le
+fichier est en **CRLF** (`csv.DictWriter` l'écrit ainsi depuis l'origine), et le diff portait
+**90 851 lignes réécrites**. Annulé par `git checkout`, corrigé par une garde **à l'octet** —
+comparer des listes de lignes ne voit pas ce défaut. Diff final : **3 insertions, 0
+suppression.**
+
+`SEANCES_SANS_BBGC_CONNUES` passe de **8 à 5**. Section 33 : « 5 manquantes sur 10 depuis le
+2026-09-24, toutes dans les 5 séances connues et nommées ».
 
 ## C38 — Cinq plafonds de la barrière sont encore des cumuls, dont trois à marge nulle
 
@@ -3139,6 +3196,61 @@ requêtes inutiles sans rien reconstituer. Le cycle ne tranche pas cela seul.
 avec leur motif ; les 29 séances sont archivées ou déclarées hors de portée ; et la section 31
 porte un plafond sur le nombre de lignes de manifeste sans asset, qui ne peut que descendre.
 
+## C42 — Deux séances que le backfill a enregistrées comme « trouvées » sans rien en extraire
+
+- classe : ORANGE — écrit dans une série de cours certifiée ; le diagnostic est fait et la méthode est éprouvée
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau** — les trois bulletins sont dans l'archive du dépôt
+- priorité : 3 — latent sur deux séances anciennes, mais le mécanisme est un mensonge d'état qui ne s'éteindra jamais seul
+
+**D'où vient ce chantier.** De la généralisation de C37, mesurée ce cycle. Sur les **2 004**
+bulletins que `MANIFESTE.csv` déclare, **3 dates sont archivées et pourtant absentes** de
+`collecte/cours_quotidien_boc.csv` : **2018-06-19**, **2020-07-07**, **2026-08-26**. Les trois
+sont des séances réelles — la veille et le lendemain sont présents dans la série pour les deux
+premières, et le 27/08 pour la troisième.
+
+**La cause des deux premières est écrite dans le code, et pire que l'absence.**
+`collecte/backfill_boc_quotidien.py` ligne 129 porte une « LIMITE CONNUE (25/07/2026, non
+corrigée) » : un PDF déjà au manifeste fait `trouve = True` et `break` **sans extraction**.
+Conséquence mesurée : `collecte/etat_backfill_quotidien.json` range **2018-06-19 et
+2020-07-07 dans `jours_trouves`** (1 984 entrées), alors que la série n'en porte aucune ligne.
+L'état ne dit pas « à refaire », il dit **« fait »** — donc aucun run futur ne les retentera,
+jamais. C'est la même famille que C35 et que la chasse du cycle 23 : un collecteur qui
+réussit en perdant son travail, et qui le note comme un succès.
+
+**La troisième est d'une autre cause**, et elle est neuve : **2026-08-26** n'est dans
+**aucune** des trois listes de `etat_backfill_quotidien.json` (2 235 jours tentés). Son
+bulletin est entré au manifeste le 08/10/2026, par la resynchronisation de C35 ; le backfill
+ne l'a pas encore atteint. À vérifier avant de conclure : il peut tomber de lui-même au
+prochain passage.
+
+**Ce que la mesure dit aussi, et qui borne le chantier.** 254 jours ouvrés manquent à la
+série entre 2018-01-02 et 2026-10-07 (2 287 ouvrés, 2 033 présents). **251 n'ont aucun
+bulletin archivé** — jours fériés BRVM pour l'essentiel, et les 29 séances de C41 pour le
+reste. Ce chantier ne porte donc que sur **3** dates, pas sur 254 : c'est tout ce que
+l'archive permet de rattraper sans réseau, et c'est exactement le périmètre où la preuve à
+deux côtés de C37 est disponible.
+
+**La méthode est déjà écrite et éprouvée.** `outils/reextraction_bbgc_depuis_archive.py` fait
+exactement cela pour un ticker : `sha256` contre le manifeste, `attendu` sur les lignes
+préexistantes, refus plutôt qu'écrasement, garde à l'octet. Ici il n'y a **aucune** ligne
+préexistante sur ces trois dates, donc le côté 2 de la preuve manque et doit venir d'ailleurs
+— le plus simple est de confronter la séance extraite à la veille et au lendemain, déjà en
+base, et de refuser toute valeur qui s'en écarte d'un facteur d'échelle (la famille de C18 et
+C21).
+
+**Pourquoi c'est un arbitrage, et pas une VERTE.** Écrire trois séances entières, soit
+~141 lignes, dans une série certifiée, sans aucune ligne préexistante pour les confronter,
+demande de décider ce qui tient lieu de seconde source. Et la correction de la « LIMITE
+CONNUE » elle-même change le comportement d'un collecteur en production.
+
+**Terminé quand** : les trois dates portent leurs lignes avec leur source, ou leur absence est
+constatée et datée ; la « LIMITE CONNUE » de `backfill_boc_quotidien.py` est corrigée ou son
+maintien est motivé ; `etat_backfill_quotidien.json` ne range plus en `jours_trouves` une date
+dont la série ne porte rien ; et un contrôle de `tester_donnees.py` fige cette dernière
+propriété — un état qui dit « fait » là où le fichier dit « vide » doit crier.
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
@@ -3152,38 +3264,35 @@ porte un plafond sur le nombre de lignes de manifeste sans asset, qui ne peut qu
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`. Le bloc avait dérivé à
 trois entrées et 75 lignes ; il est ramené à une, comme le protocole le demande.
 
-## 2026-10-08 — cycle 23 (matin)
+## 2026-10-08 — cycle 24 (soir)
 
-**Exécuté : C35** (rang 1, priorité 3, plus petit numéro ; C37 à égalité). **Il se trompait de
-cible** : il cherchait qui devait relancer une collecte, personne ne pouvait. Les deux relevés
-se construisent depuis les lignes `type=boc` de `MANIFESTE.csv`, et la Release `boc-2026`
-portait **20 bulletins du 2026-08-05 au 2026-10-01** que le manifeste ne déclarait pas — les
-backfills n'étaient pas en retard, ils étaient **aveugles**.
+**Exécuté : C37** (rang 1 : seul `ORANGE` à `validation : OK` dont la passe n'était pas
+consommée). Anti-collision : **0 commit** depuis 3 h, cycle 23 clos.
 
-**La cause, dite mot pour mot par le journal du run.** `collecte.yml` réussissait deux fois par
-semaine en jetant son manifeste : `fatal: pathspec 'echecs_upload.txt' did not match any files`
-→ `rien a committer`. Ce fichier n'existe **que si un upload échoue**, et `git add` est
-**atomique** : un chemin absent, il n'indexe rien et sort en 128, que le `|| true` avalait.
-**Plus la collecte se portait bien, plus sûrement elle perdait sa trace.** Corrigé.
+**Sa prémisse était fausse, et c'était tout l'enjeu.** C37 posait un retéléchargement depuis
+brvm.org, le dépôt n'archivant aucun PDF. Vrai du dépôt, **faux de l'archive** : la Release
+`boc-2026` porte 152 assets, `MANIFESTE.csv` leur `sha256`. **3 des 8 séances se rattrapent
+sans brvm.org** — 2026-09-25, 09-30, 10-01. **Preuve à deux côtés, les deux mesurées** :
+`sha256` du PDF **identique** au manifeste sur les trois, réextraction reproduisant les lignes
+préexistantes à **47/47, 0 divergence**. Ajouté `BBGC` 7 795 / PER 14,33 ; 9 000 / 16,55 ;
+8 800 / 16,18 — continu avec le 8 995 du 02/10, venu d'une autre source. **Piège** : sans
+diviser le rendement par cent (BOC en %, série en fraction depuis le 2026-07-17), la
+confrontation rend **43 fausses divergences par séance**.
 
-**Rattrapage mesuré.** `outils/resynchroniser_manifeste_boc.py` (20 lignes, six gardes,
-idempotent) puis les deux backfills : retard **44 → 4 séances** des deux côtés,
-`dividendes_historique.csv` **365 → 382**, liquidité **+928 lignes**, observations non relevées
-**17 → 0** (NSBC 675,98 comprise), **0 clé perdue, 0 fenêtre qui recule**, `profils.json`
-**0 champ**. Section 31 : plafonds 60 → **10**, 17 → **0**. Relance portée par
-`rattrapage_releves.yml` (samedi 05h00 UTC). Reste 29 séances sans bulletin archivé → **C41**.
+**Procès-verbal** : `outils/reextraction_bbgc_depuis_archive.py`, idempotent, sept gardes,
+**aucune date en dur** — il reprendra les 5 séances restantes tel quel quand C41 les aura
+archivées. Refus **vérifié** : une valeur falsifiée exprès (BICB 8 910 → 8 911) fait refuser
+cette séance seule. `SEANCES_SANS_BBGC_CONNUES` **8 → 5**. Diff **3 insertions, 0 suppression**.
+**Deux fautes du cycle** : une réserialisation en `\n` d'un fichier **CRLF** (90 851 lignes
+réécrites, annulée par `git checkout`, corrigée par une garde **à l'octet**), et une annonce de
+cycle partie **après** le travail. Pas de chasse (soir).
 
-**Chasse (matin) → section 37** : un `git add` de workflow qui jette tout son travail parce
-qu'un seul de ses chemins n'existe pas — vert en production, muet dans le dépôt. Sur 27
-workflows : **26 étapes, 15 avec chemins nommés, 1 fautive** (celle de C35) ; après correction
-**0 sur 27**. `|| true` n'y change rien, et quatre workflows le portent encore.
-
-**Barrières** (venv aux dépendances exactes de `tests.yml`, `import pdfplumber` échoue) : base
-complète, golden tests **tous passent**, `tester_donnees.py` **322 OK, 0 ÉCHEC**, code 2, les
-**4** alertes toutes antérieures (C4, C5, relevé du 08/10 non ancrable ×2) — la 5ᵉ, C35/NSBC, est
-tombée ; `observations_boc --test` 10/0, `avis_brvm` et `notations --test` passent, dashboard
-**48 titres**. **Proposé : C41** (ORANGE, 3). **Prochain : C37**, seul `ORANGE` à
-`validation : OK` dont la passe n'est pas consommée.
+**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue) : base complète
+**48 tickers / 90 853 lignes**, golden tests tous passent, `tester_donnees.py` **322 OK, 0
+ÉCHEC**, code 2, **4** alertes toutes antérieures (C4, C5, relevé du 08/10 ×2), `profils.json`
+**0 champ**, `observations_boc` 10/0, `avis_brvm` et `notations --test` passent, dashboard **48
+titres**. **Proposé : C42** (ORANGE, 3). **Prochain** : plus aucun `ORANGE` à `validation : OK`
+non consommé → rang 2, **C38** (VERTE, 3).
 
 ---
 

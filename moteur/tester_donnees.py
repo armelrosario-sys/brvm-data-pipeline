@@ -4438,9 +4438,15 @@ def test_historique_quotidien_protege():
 # les huit seances CONNUES ; le controle exige ZERO seance manquante en dehors
 # d'elles. Une neuvieme seance sans BBGC tombe donc immediatement, et chacune de
 # ces huit qui sera rattrapee pourra sortir de la liste.
+# C37 (08/10/2026, cycle 24) : 3 des 8 seances sont RATTRAPEES -- 2026-09-25,
+# 2026-09-30 et 2026-10-01, les trois dont le bulletin est archive dans la
+# Release boc-2026 et declare par MANIFESTE.csv. Elles sortent donc de cet
+# ensemble : les y laisser ferait de ce registre un alibi, pas un controle.
+# Les 5 qui restent n'ont AUCUN bulletin archive (C41) : aucun script ne peut
+# les rattraper tant que l'archive a son trou.
 SEANCES_SANS_BBGC_CONNUES = {
-    "2026-09-24", "2026-09-25", "2026-09-28", "2026-09-29",
-    "2026-09-30", "2026-10-01", "2026-10-05", "2026-10-06",
+    "2026-09-24", "2026-09-28", "2026-09-29",
+    "2026-10-05", "2026-10-06",
 }
 PREMIERE_COTATION_BBGC = "2026-09-24"
 

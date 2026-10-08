@@ -9,6 +9,182 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-08 — cycle 24 (soir) : C37, la 48e ligne était dans l'archive, pas sur brvm.org
+
+Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit**.
+Cycle 23 est annoncé (06h58) **et** clos (07h24, puis un commit de vérification à 07h30) : aucune
+session concurrente. État : `main` à `6852fb2`, rien de local, le bloc *Dernier cycle* désignait
+**C37** comme prochain chantier.
+
+**Chantier exécuté : C37**, par l'ordre déterminé de l'étape 4 — seul `ORANGE` portant
+`validation : OK` dont la ligne `statut` ne déclare pas la passe consommée. Les autres `ORANGE` à
+`OK` sont tous `FAIT` ou explicitement consommés (C18, C19, C26, C32). Rang 2 (`VERTE`) n'est donc
+pas atteint.
+
+### La prémisse du chantier était fausse, et c'est tout ce qui comptait
+
+C37, écrit le 07/10/2026, posait : « Le dépôt n'archive **aucun PDF** (`find . -name "*.pdf"` → 0)
+: les bulletins doivent être retéléchargés », donc par un workflow, donc avec un passage sur
+brvm.org que le bac à sable n'atteint pas. La phrase est vraie du **dépôt**. Elle est fausse de
+l'**archive**, et c'est l'archive qui compte : la Release `boc-2026` porte **152 assets**,
+`MANIFESTE.csv` déclare chacun avec son `sha256`, et le bac à sable atteint `api.github.com`.
+
+Croisement des 8 dates de C37 avec le manifeste : **3 ont leur bulletin archivé** —
+`boc_20260925_2.pdf`, `boc_20260930_2.pdf`, `boc_20261001_2.pdf` — et **5 n'en ont aucun**
+(2026-09-24, 09-28, 09-29, 10-05, 10-06). Ces cinq-là sont exactement le trou d'archive de **C41**.
+Le chantier n'avait donc pas besoin d'un workflow pour sa plus grande part : il avait besoin de
+regarder dans l'archive du dépôt.
+
+### La preuve à deux côtés, les deux côtés mesurés
+
+La règle 3 du dépôt exige, avant d'écrire dans une donnée certifiée, une identité qui se ferme ou
+deux sources indépendantes. Voici ce qui a été mesuré, séance par séance :
+
+| | 2026-09-25 | 2026-09-30 | 2026-10-01 |
+|---|---|---|---|
+| `sha256` du PDF téléchargé | `289677b9…` | `18392446…` | `93f96c3a…` |
+| `sha256` déclaré par `MANIFESTE.csv` | `289677b9…` | `18392446…` | `93f96c3a…` |
+| lignes de cotation extraites | 48 | 48 | 48 |
+| lignes préexistantes en base | 47 | 47 | 47 |
+| préexistantes reproduites à l'identique | **47 / 47** | **47 / 47** | **47 / 47** |
+| **divergences** | **0** | **0** | **0** |
+| ligne ajoutée (cours / PER) | 7 795 / 14,33 | 9 000 / 16,55 | 8 800 / 16,18 |
+
+**Côté 1** : le `sha256` du PDF téléchargé égale celui du manifeste — le document lu est le
+document archivé, à l'octet près. **Côté 2** : la réextraction reproduit les **141 lignes**
+préexistantes (47 × 3) à **zéro divergence** — l'extracteur lit ces bulletins-là correctement,
+donc la 48e ligne qu'il en tire n'est pas plus douteuse que les 47 autres. Les deux côtés sont
+indépendants : le premier porte sur l'identité du fichier, le second sur la lecture de son
+contenu.
+
+**Troisième concordance, non exigée mais vérifiée** : la série devient 8 800 (01/10) → 8 995
+(02/10). Le 02/10 a été versé **hors cycle le 07/10** par C36, depuis l'édition anglaise du
+bulletin — une source distincte de celle-ci. Les deux se suivent sans rupture.
+
+### Le piège, mesuré : 43 fausses divergences par séance
+
+La première confrontation a rendu **43 divergences sur 47 lignes**, sur chacune des trois séances.
+Elles n'en sont pas. Le BOC publie le rendement en **pourcentage** (`5.25`) ; la série quotidienne
+le porte en **fraction** (`0.0525`) depuis le 2026-07-17, où `collecte/collecte_boc_quotidien.py`
+a commencé à écrire `r.get("rendement") / 100`, et C21 a normalisé tout l'historique le 04/10. Les
+4 lignes « non divergentes » étaient simplement celles dont le rendement est vide.
+
+C'est un piège exactement du genre que la section « Vérifier une barrière sans la dépendance »
+décrit : un montage qui **mentait** en rendant un résultat plausible. Ici il aurait menti dans le
+sens prudent — refuser les trois séances en croyant protéger la base — ce qui est moins grave que
+l'inverse, mais aurait clos le chantier sur une fausse impossibilité. La division par cent est
+désormais écrite dans le docstring de `extraire()`, avec la mesure qui l'impose.
+
+### Le procès-verbal exécutable
+
+`outils/reextraction_bbgc_depuis_archive.py`, idempotent, **sept gardes** :
+
+1. entête exacte et nombre de champs asserté sur chaque ligne ;
+2. bloc de la séance **contigu** et **trié par ticker**, asserté — refus d'insérer au hasard ;
+3. `sha256` du PDF contre `MANIFESTE.csv` — refus si l'un diffère (côté 1) ;
+4. garde `attendu` sur chacune des 47 lignes préexistantes — refus par séance si l'une diffère,
+   la divergence étant **nommée** et jamais écrasée (côté 2, et règle 1 du dépôt) ;
+5. unicité de la ligne insérée dans le fichier d'arrivée ;
+6. **égalité des octets** : le fichier d'après moins les lignes ajoutées doit être **identique
+   octet pour octet** au fichier d'avant ;
+7. relecture après écriture, et vérification que chaque séance traitée porte bien 48 lignes.
+
+**Aucune date n'est écrite en dur.** Les cibles sont déduites du fichier (séance ≥ 2026-09-24,
+sans ligne `BBGC`) et du manifeste (bulletin archivé). Conséquence voulue : le jour où C41 aura
+archivé les 5 séances restantes, **ce script les rattrapera sans être modifié**. Relancé après
+application, il déclare « migration DEJA APPLIQUEE pour tout ce que l'archive permet ».
+
+**Le refus a été vérifié, pas supposé.** Une valeur préexistante a été falsifiée exprès —
+BICB 2026-09-30, 8 910 → 8 911 — puis le script relancé en écriture. Il a **refusé cette séance
+seule**, nommé la divergence (`('BICB', (8911.0, 14.2, 0.0286), (8910.0, 14.2, 0.0286))`), et
+écrit les deux autres. Le refus **par séance**, et non tout ou rien, est le comportement voulu :
+une séance douteuse ne doit pas bloquer une séance prouvée.
+
+### Une faute de ce cycle, annulée et corrigée
+
+La **première version** du script réserialisait le CSV avec `"\n".join(...)`. Or
+`collecte/cours_quotidien_boc.csv` est en **CRLF** — `csv.DictWriter` écrit `\r\n` par défaut, et
+c'est lui qui écrit ce fichier depuis l'origine. Résultat du premier `git diff` :
+**90 854 insertions, 90 851 suppressions**. Les 3 lignes voulues étaient là, noyées dans une
+réécriture de tout le fichier.
+
+Ce qui rend la faute instructive : **le script avait une garde censée l'interdire**, et elle n'a
+rien vu. Elle comparait des **listes de lignes** (`corps == [l for l in nouveau if …]`), et une
+liste de lignes est aveugle au terminateur. Tout a été annulé par `git checkout -- `, et la garde
+remplacée par une comparaison **à l'octet** (garde 6 ci-dessus), plus un relevé du terminateur au
+lieu d'une supposition. Diff final : **3 insertions, 0 suppression**.
+
+**Seconde faute, de protocole** : l'annonce de cycle (`Annonce cycle 24 : …`) a été poussée
+**après** le travail, pas avant. Le contrôle anti-collision de l'étape 2 en dépend ; une session
+concurrente démarrée vers 19h00 n'aurait rien vu. Aucune ne l'a fait, mais la protection n'a pas
+joué. À ne pas reproduire.
+
+### Section 33 mise à jour
+
+`SEANCES_SANS_BBGC_CONNUES` passe de **8 à 5** dates. Le contrôle rend désormais : « aucune séance
+NOUVELLE sans BBGC : **5 manquante(s) sur 10** depuis le 2026-09-24, toutes dans les 5 séances
+connues et nommées ». Le registre devait maigrir de trois, il a maigri de trois — l'y laisser
+plein aurait fait de lui un alibi plutôt qu'un contrôle.
+
+### Chantier proposé : C42
+
+Généralisation mesurée de C37 : sur les **2 004** bulletins déclarés par `MANIFESTE.csv`,
+**3 dates sont archivées et pourtant absentes** de `cours_quotidien_boc.csv` — **2018-06-19**,
+**2020-07-07**, **2026-08-26**. Les trois sont des séances réelles (veille et lendemain présents
+dans la série pour les deux premières, le 27/08 pour la troisième).
+
+La cause des deux premières est **écrite dans le code** : la « LIMITE CONNUE (25/07/2026, non
+corrigée) » de `collecte/backfill_boc_quotidien.py` ligne 129 — un PDF déjà au manifeste fait
+`trouve = True` puis `break`, **sans extraction**. Et ce qui est pire que l'absence :
+`collecte/etat_backfill_quotidien.json` range **2018-06-19 et 2020-07-07 dans `jours_trouves`**
+(1 984 entrées), alors que la série n'en porte aucune ligne. L'état ne dit pas « à refaire », il
+dit **« fait »** — donc aucun run futur ne les retentera. Même famille que C35 et que la chasse du
+cycle 23 : un collecteur qui réussit en perdant son travail et le note comme un succès.
+
+La troisième est d'une autre cause : **2026-08-26** n'est dans **aucune** des trois listes de
+l'état (2 235 jours tentés). Son bulletin est entré au manifeste le 08/10 par la
+resynchronisation de C35 ; le backfill ne l'a pas encore atteint, et il tombera peut-être seul.
+
+Ce qui **borne** le chantier : 254 jours ouvrés manquent à la série entre 2018-01-02 et 2026-10-07
+(2 287 ouvrés, 2 033 présents), mais **251 n'ont aucun bulletin archivé** — jours fériés BRVM pour
+l'essentiel, et les 29 séances de C41 pour le reste. C42 ne porte donc que sur **3** dates : tout
+ce que l'archive permet sans réseau. Classe **ORANGE**, priorité 3 — écrire trois séances
+entières (~141 lignes) sans aucune ligne préexistante pour les confronter demande de décider ce
+qui tient lieu de second côté, et corriger la « LIMITE CONNUE » change un collecteur en production.
+
+### Barrières
+
+Méthode de la section « Vérifier une barrière sans la dépendance » : venv aux dépendances exactes
+de `tests.yml` (`pyyaml==6.0.2 openpyxl==3.1.5 pandas`, puis `requirements.txt`), `import
+pdfplumber` **échoue** bien, Python 3.13.16.
+
+- `fusionner_fondamentaux.py` : rien à fusionner. `peupler.py` : 50 sociétés, 185 lignes d'états.
+- `charger_cours.py` : 4 509 lignes, 47 tickers, 101 mois. `charger_cours_quotidien.py` :
+  **90 853 lignes, 48 tickers**, 2 033 jours, 2018-01-02 → 2026-10-07.
+- `charger_dividendes_exercice.py` : 296 ajoutés, 31 déjà présents, 32 écartés (C34).
+  `charger_dividendes_boc.py` : 16 ajoutés, 3 complétés, 3 refusés. `charger_liquidite` :
+  74 069 lignes, 48 tickers.
+- `tester.py` : **TOUS LES GOLDEN TESTS PASSENT**. `profils.py` : relancé, `collecte/profils.json`
+  **0 champ déplacé** (fichier identique).
+- `tester_donnees.py` : **322 OK, 0 ÉCHEC**, code de retour **2**, **4 alertes de fraîcheur**
+  toutes **antérieures à ce cycle** — C4 (12 chutes non documentées), C5 (CFAC, NEIC), et le
+  relevé du 2026-10-08 non ancrable (×2, indices illisibles).
+- `observations_boc.py --test` : 10 contrôles OK, 0 échec. `avis_brvm.py --test` : passe.
+  `notations.py --test` : index 15/15, PDF GCR 10/10, Bloomfield 6/6, pièges 3/3.
+- `generer_dashboard.py` (fumée) : **48 titres**. `generer_dashboard_html.py` : compile.
+- `dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant commit.
+
+### Ce qui change dans le dépôt
+
+- `collecte/cours_quotidien_boc.csv` : **+3 lignes**, 0 suppression.
+- `moteur/tester_donnees.py` : `SEANCES_SANS_BBGC_CONNUES` 8 → 5, avec son motif.
+- `outils/reextraction_bbgc_depuis_archive.py` : nouveau, 7 gardes, idempotent, sans date en dur.
+- `CHANTIERS.md` : C37 clos pour 3 des 8 séances et sa passe déclarée consommée ; C42 proposé ;
+  bloc *Dernier cycle* réécrit.
+
+**Prochain chantier** : plus aucun `ORANGE` à `validation : OK` dont la passe ne soit consommée.
+Le rang 2 s'applique donc : **C38** (VERTE, priorité 3), les cinq plafonds encore cumulatifs.
+
 ## 2026-10-08 — cycle 23 (matin) : C35, les relevés n'étaient pas en retard, ils étaient aveugles
 
 Contrôle anti-collision fait d'abord : `git log --since="3 hours ago"` sur `main` rend **0
