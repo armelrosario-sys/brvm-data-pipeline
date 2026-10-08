@@ -5,13 +5,13 @@ jobs:
   collecte:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
       - run: pip install requests beautifulsoup4
       - run: python collecte_fondamentaux.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: fondamentaux-brvm
           path: fondamentaux_brvm.csv
