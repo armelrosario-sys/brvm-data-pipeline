@@ -9,6 +9,242 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-09 — cycle 25 (matin) : C3, le journal des prédictions, et la dépendance que cinq workflows n'installaient pas
+
+Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit**.
+Le cycle 24 est annoncé (`e938abd`, 19h05) **et** clos (`0d3ba23`, 19h11) : aucune session
+concurrente. État : `main` à `b0bb62d`, les trois derniers commits sont les collectes de la nuit
+(Relevé Volumes, Sikafinance, BOC du 08/10), `tests.yml` verte sur `0d3ba23`, aucun travail hors
+cycle ouvert.
+
+### Pourquoi C3, et pourquoi le cycle 24 s'était trompé de cible
+
+Le bloc *Dernier cycle* annonçait « prochain : **C38** (VERTE, 3) ». Il avait raison sur le rang,
+faux sur le chantier. L'étape 4 dit : rang 1, un `ORANGE` à `validation : OK` dont la ligne
+`statut` ne déclare pas la passe consommée ; sinon rang 2, **la première `VERTE`** ; et dans chaque
+rang, *priorité la plus haute d'abord, à priorité égale le plus petit numéro de chantier*.
+
+Vérification faite ligne par ligne sur les 42 chantiers : les quinze `ORANGE` portant
+`validation : OK` sont tous `FAIT` ou déclarent explicitement « la passe autorisée est consommée »
+(C16, C17, C18, C19, C20, C21, C22, C25, C26, C27, C32, C34, C35, C36, C37). **Le rang 1 est vide
+pour la première fois depuis la mise en place du protocole** — c'est le premier cycle qui atteint
+réellement le rang 2.
+
+Au rang 2, les `VERTE` non faites sont **C3** (priorité 3), **C38** (priorité 3), **C8** (8) et
+**C9** (9, « en dernier »). Priorité la plus haute = 3, à égalité entre C3 et C38 ; plus petit
+numéro = **3**. Donc **C3**. Noté ici parce que la clause « plus petit numéro » existe précisément
+pour qu'aucun cycle n'arbitre, et que le premier cycle à s'en servir est aussi le premier à
+constater qu'elle avait été oubliée.
+
+Annonce poussée seule avant tout travail (`1df39be`), conformément à la règle — et à la seconde
+faute du cycle 24, qui avait poussé son annonce **après**.
+
+### C3 : ce qui est écrit, et pourquoi chaque colonne y est
+
+`collecte/journal_profils.csv` n'existait pas. Il porte désormais huit colonnes :
+`date, ticker, profil, grade, cours, date_cours, per, per_analyse`. **48 lignes au premier passage,
+une par titre profilé, aucune case vide.**
+
+Deux dates, et elles ne disent pas la même chose. `date` est le jour du **passage** de `profils.py`
+; `date_cours` est la **séance du prix** que le moteur a lue. Un verdict rendu le lundi sur le cours
+du vendredi n'est pas un verdict rendu le vendredi, et un journal qui n'inscrirait qu'une des deux
+rendrait toute confrontation future contestable.
+
+Deux PER, pour la même raison : `per` est celui que le **BOC publie** (la valeur affichée en
+premier, lue par les consommateurs existants) et `per_analyse` celui que le **moteur a réellement
+lu** pour les axes depuis la décision du 02/10/2026. Les deux sont déjà distincts dans
+`profils.json` ; les confondre dans le journal aurait effacé la distinction au moment même où elle
+devient vérifiable.
+
+### Le cours manquait, et il a fallu le chercher au bon endroit
+
+`profils.json` ne porte **aucun** cours : `ingredients()` le lisait, s'en servait, et le jetait. La
+première version du journal a donc repris ce `cours_row` — et rendu **une case vide sur 48**.
+
+Cause mesurée : ce `cours_row` exige `rendement IS NOT NULL`, parce qu'il sert au diagnostic de
+distribution non récurrente (C1), qui a besoin du couple cours/rendement. **BBGC**, la 48ᵉ ligne
+entrée par C32 le 07/10, n'a aucun rendement dans le BOC — donc aucun cours sous cette condition,
+alors que son PER est renseigné (18,75). Un profil `GARP` de grade `A` sans son prix : exactement
+l'inverse de ce que C3 demande.
+
+Correction : le cours est lu **sur la même ligne que le PER**, donc à la séance `date_cours` que
+`profils.json` publie déjà. Mesure avant/après : **1 case vide sur 48 → 0**. La clé reste
+**interne** au moteur : `profils.json` n'en porte pas, sa forme étant figée par la section 20 des
+tests de données, et l'ajouter aurait obligé à régénérer et committer le fichier dans le même
+commit. Vérifié : **0 titre à forme différente** entre le `profils.json` commité et le régénéré,
+et le fichier régénéré est **identique à l'octet** à celui du dépôt.
+
+### Ajout seul, idempotence : mesuré, pas supposé
+
+`profils.py` tourne plusieurs fois par jour — P13 (chaque jour ouvré, 18h40), P12 (mensuel), P5b
+(publication), P4 (tests), et le branchement de l'agrégateur. Un journal qui réécrirait son fichier
+à chaque passage effacerait les verdicts qu'il est censé archiver.
+
+`ecrire_journal()` ouvre en `"a"`, n'écrit l'en-tête que si le fichier est vide ou absent, et saute
+toute paire `(date, ticker)` déjà présente. Les trois mesures :
+
+- premier passage du 2026-10-09 : **48 ajoutées, 0 déjà présentes** ;
+- second passage, le même jour : **0 ajoutée, 48 reconnues**, et le fichier est **identique à
+  l'octet** ;
+- jour neuf (rejeu de test sur trois titres) : **+3 sur 3**, et le journal de la veille reste un
+  **préfixe exact** du nouveau — y compris quand le verdict d'un titre a changé entre les deux
+  jours, cas dans lequel **les deux lignes restent lisibles**.
+
+Terminaisons **LF** explicites (`lineterminator="\n"`), et le test le vérifie à l'octet. C'est la
+leçon directe de la faute du cycle 24, qui avait réécrit 90 851 lignes d'un fichier **CRLF** en
+`\n`.
+
+### Et il est planifié — sans quoi il n'existerait pas
+
+C'est le point que la leçon de C35 oblige à traiter : un fichier écrit dans un runner et jamais
+indexé est un fichier qui n'existe pas. `pages.yml`, qui lance `profils.py` plusieurs fois par
+jour, a `permissions: contents: read` : il ne peut rien committer. Le journal y serait écrit puis
+jeté à chaque passage.
+
+Deux workflows l'indexent désormais : **`avis_brvm.yml` (P13)**, le seul passage **quotidien** qui
+lance `profils.py` et committe, et **`notations.yml` (P12)**. Dans les deux, l'ajout est placé
+**dans la branche `PROFILS = success` seulement** — une ligne de journal sans le `profils.json`
+qu'elle atteste n'atteste rien —, et la branche d'échec restaure le fichier par
+`git checkout --`. L'existence est gardée : `[ -f collecte/journal_profils.csv ] && git add …`,
+parce que le fichier n'existe pas au tout premier passage et que `git add` est atomique
+(section 37). Comportement de la garde vérifié sous `bash -e` : quand le test échoue, la liste `&&`
+rend 1 sans interrompre l'étape, et la suite du script s'exécute.
+
+`branchement_agregateur.yml` fait `git add -A` et le prend donc automatiquement.
+
+### Procès-verbal : section 38, 19 contrôles
+
+La section rejoue `ecrire_journal()` **sans importer `profils.py`**, par
+`_extraire_fonction(…, besoins=("JOURNAL_COLONNES",))` : la constante nommée en `besoins` fournit
+le défaut de la signature, donc le rejeu porte sur **les colonnes réelles** du moteur et non sur une
+copie locale qui pourrait dériver sans bruit.
+
+Quatre familles de propriétés : la fonction (ajout seul, idempotence par jour, allongement, préfixe
+identique à l'octet, case vide jamais remplacée par un zéro, LF) ; le **branchement** (`calculer()`
+appelle bien la fonction — un journal correct que plus personne n'alimente cesse de s'allonger en
+silence) ; la **planification** (au moins un des 8 workflows qui lancent `profils.py` l'indexe) ;
+et le **fichier commité** (en-tête exact, 8 colonnes partout, aucune paire `(date, ticker)` en
+double, dates ISO, dates jamais décroissantes dans l'ordre du fichier — la signature d'un ajout en
+fin —, LF pur).
+
+### Chasse du matin : ce qu'un workflow installe contre ce que son code importe
+
+**La famille vient de pannes, pas d'une idée.** Le 07/10/2026, **trois fois dans la même journée**,
+P4 est tombée sur le même défaut : un test de données important un module dont la tête porte
+`import pdfplumber`, absent de `requirements.txt`. Les trois correctifs ont été **nominatifs** —
+« ne pas importer *ce* module-là ». Trois gardes, trois noms, et la famille entière restait libre.
+
+**La mesure, le 09/10/2026.** Chaque workflow écrit sa propre ligne `pip install`, et rien ne
+vérifiait qu'elle couvre ce que les scripts du même workflow importent. Sur les 28 workflows, 24
+installent des paquets et lancent du Python. **Cinq** exécutaient du code dont la **tête de module**
+importe `requests` sans jamais le nommer :
+
+| workflow | par où |
+|---|---|
+| `tests.yml` | `moteur/tester_donnees.py` → `collecte/avis_brvm.py` |
+| `branchement_agregateur.yml` | `collecte/avis_brvm.py`, `collecte/notations.py` |
+| `lot2_referentiels_et_interimaires.yml` | idem |
+| `migration_csv.yml` | idem |
+| `releve_capitaux_propres.yml` | idem |
+
+Ils marchaient **par accident** : `streamlit` exige `requests<3,>=2.27`, donc
+`pip install -r requirements.txt` l'amenait sans que personne ne l'ait demandé.
+
+**Et c'est pire que `pdfplumber`, précisément parce que c'est silencieux.** `pdfplumber` tombait en
+**rouge**. La section 10 fait
+`try: import avis_brvm / except ImportError: verifie(True, "collecteur d'avis absent — test ignoré", bloquant=False); return`.
+Sans `requests`, la barrière **ne rougit pas** : la section 10 *disparaît*, et la CI reste verte
+avec un contrôle en moins. Un test qui s'efface sans bruit est le pire état d'une barrière.
+
+**Le correctif, et sa preuve de neutralité.** `requests>=2.27,<3` déclaré dans
+`requirements.txt` — la borne reprend celle de `streamlit`, donc rien n'est contraint de plus.
+Vérifié en reconstruisant un second venv aux dépendances exactes de `tests.yml` :
+**`pip freeze` identique avant/après, 39 paquets, 0 ligne de différence**, et `import pdfplumber`
+échoue toujours (le venv reste fidèle à la CI).
+
+### La règle que la section 39 fige, et ses deux sévérités
+
+**Bloquant — ce qui s'exécute à coup sûr.** Pour chaque workflow : les scripts qu'il lance
+(`python3 x.py`), les modules locaux que ces scripts importent **à toute profondeur** — importer un
+module local exécute sa tête, où que l'instruction se trouve —, puis la fermeture de **tête** de ces
+modules. Tout paquet tiers importé **en tête** dans cette fermeture doit être nommé par le
+workflow, directement ou par `-r requirements.txt`.
+
+**Alerte — ce qui est latent.** Un module local importé **tardivement** par un autre module dont la
+tête tire un tiers : rien ne s'exécute aujourd'hui, mais le jour où une fonction appelle cette
+branche, c'est la panne suivante. Trois chaînes existent, nommées dans
+`CHAINES_TARDIVES_CONNUES` ; une quatrième crie :
+
+- `collecte/extracteur_boc_eng.py` → `collecte/extracteur_boc.py` (pdfplumber)
+- `outils/reextraction_bbgc_depuis_archive.py` → `collecte/extracteur_boc.py` (pdfplumber)
+- `moteur/tester_donnees.py` → `collecte/avis_brvm.py` (requests, désormais déclaré)
+
+**Un import tiers tardif n'est jamais compté** : il est délibérément paresseux. `extraire_boc_eng()`
+porte `import pdfplumber` dans son corps précisément pour que le module reste importable sans lui.
+Compter ces imports-là était d'ailleurs la première version de la règle, et elle rendait des faux
+positifs sur ce fichier même.
+
+### Les dents de la section 39, prouvées deux fois
+
+Une règle qu'on n'a pas vue crier ne prouve rien. Deux falsifications :
+
+1. **Sur l'histoire.** La fonction, telle qu'elle est écrite aujourd'hui, a été lancée avec `RACINE`
+   pointé sur l'arbre du commit **`14ad77f`** (clôture du cycle 21, avant le correctif `ee79c1b`).
+   Elle rend **18 cas**, dont
+   `tests.yml : pdfplumber (via moteur/tester_donnees.py -> collecte/extracteur_boc.py)` — **la
+   panne réelle du 07/10**, nommée avec sa chaîne. Lancée sur l'arbre de `ea5ca5b` (après les trois
+   correctifs nominatifs), `pdfplumber` a disparu et il ne reste que les **13** cas `requests` que ce
+   cycle vient de corriger.
+2. **Sur un défaut planté.** `import pdfplumber` ajouté en tête de `moteur/scoring.py` : la section
+   rend **25 cas** dans 9 workflows, chacun avec son chemin
+   (`avis_brvm.yml : pdfplumber (via moteur/profils.py -> moteur/scoring.py)`, etc.). Le fichier a
+   été restauré ensuite — `git diff` vide.
+
+### Barrières
+
+Méthode du 07/10/2026, la seule qui vaille : environnement virtuel aux dépendances exactes de
+`tests.yml` (`pyyaml==6.0.2 openpyxl==3.1.5 pandas`, puis `-r requirements.txt`), où
+`import pdfplumber` **échoue** — vérifié. Python du bac à sable : **3.13.16** (la CI épingle 3.12 ;
+la note du 01/10 reste valable, `generer_dashboard_html.py` compile).
+
+Base reconstruite à neuf : **50 sociétés, 185 lignes d'états financiers**, cours mensuels 4 509
+lignes, `cours_quotidien_boc` **90 901 lignes / 48 tickers / 2 034 séances** (2018-01-02 →
+2026-10-08), dividendes 296 + 16 du BOC, liquidité 74 069 lignes.
+
+- `moteur/tester.py` : **tous les golden tests passent**
+- `moteur/tester_donnees.py` : **346 OK, 0 ÉCHEC**, code **2**, **4 alertes** toutes antérieures —
+  les divisions de nominal de C4 (12 dates), les exercices manquants de C5 (CFAC, NEIC), et les deux
+  alertes du relevé du jour, non ancrable faute d'indices lisibles
+- `collecte/observations_boc.py --test` : **10 contrôles OK, 0 échec**
+- `collecte/avis_brvm.py --test` : 11 avis, 10 rattachés, classification 8/8
+- `collecte/notations.py --test` : index 15/15, 14 tickers, GCR 10/10, Bloomfield 6/6, pièges 3/3
+- `dashboard/generer_dashboard.py` : **48 titres** ; `generer_dashboard_html.py` : 48 titres, 44/48
+  avec `source_url` ; `bloc_signaux.py` et `generer_poste_decision.py` passent
+
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant commit. `docs_site/index.html` et
+`poste_decision.html`, régénérés par le passage des barrières, annulés par `git checkout` : ce sont
+des sous-produits que `pages.yml` reconstruit au déploiement.
+
+### Proposé : C43
+
+**Six passes de la barrière peuvent s'éteindre sans la faire rougir** (ORANGE, priorité 3). La
+chasse a montré le mécanisme sur la section 10 ; la mesure l'a généralisé. Sur l'arbre syntaxique
+de `tester_donnees.py` : **340** appels `verifie()`, et **six** gestionnaires d'exception qui
+dégradent en alerte **puis quittent la section entière** — lignes 137 (`ImportError`, pandas), 146
+(`Exception`, table illisible), 254 (`ImportError`, streamlit), 636 (`ImportError`, collecteur
+d'avis), 1810 (`ImportError`, streamlit), 2237 (`Exception`, git). Trois ne tiennent qu'à une
+dépendance installée, et ce cycle vient de montrer que deux l'étaient par accident. Les deux
+`except Exception` sont les plus larges : une vraie régression s'y rangerait en alerte.
+
+Classé **ORANGE** parce que l'arbitrage n'est pas mécanique : rendre les six bloquants casserait les
+environnements sans streamlit. Trois voies sont posées dans le bloc du chantier (bloquer en CI
+seulement, exiger la dépendance, ou plafonner le nombre de sections éteintes).
+
+**Prochain chantier** : aucun `ORANGE` à `validation : OK` non consommé → rang 2, et **C38**
+(VERTE, priorité 3) est désormais la plus petite `VERTE` restante.
+
+---
+
 ## 2026-10-08 — cycle 24 (soir) : C37, la 48e ligne était dans l'archive, pas sur brvm.org
 
 Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit**.

@@ -5084,6 +5084,437 @@ def test_git_add_des_workflows():
                     f"manifeste"))
 
 
+# ----------------------------------------------------------------------
+# 38. LE JOURNAL DES PREDICTIONS S'ALLONGE, ET NE SE REECRIT PAS (C3)
+# ----------------------------------------------------------------------
+# POURQUOI CETTE SECTION EXISTE (chantier C3, 09/10/2026). Le journal est la
+# seule piece qui rende le profilage FALSIFIABLE : sans lui, l'outil dit ce
+# qu'il pense aujourd'hui et personne ne pourra jamais dire s'il avait raison.
+# Un journal qui se reecrit est pire qu'absent — il donne l'illusion d'une
+# archive tout en effacant les verdicts qu'on voulait confronter.
+#
+# QUATRE PROPRIETES, et chacune repond a une facon precise de perdre le journal.
+#
+#   A — LA FONCTION. `ecrire_journal()` est rejouee sur un fichier temporaire :
+#       un jour neuf ajoute exactement une ligne par titre, le MEME jour rejoue
+#       n'ajoute rien, et le prefixe deja ecrit reste identique A L'OCTET meme
+#       quand le verdict du jour precedent a change d'avis. C'est le test
+#       demande par C3 : « un test verifie qu'il s'allonge ».
+#   B — LE BRANCHEMENT. profils.py appelle reellement `ecrire_journal()` dans
+#       `calculer()`. Un journal correct que plus personne n'alimente cesse de
+#       s'allonger en silence : la fonction resterait verte, le fichier gele.
+#   C — LA PLANIFICATION. Au moins un workflow qui lance profils.py ajoute
+#       aussi `collecte/journal_profils.csv` a son « git add ». C'est la lecon
+#       de C35, vue par l'autre bout : un fichier ecrit dans un runner et jamais
+#       indexe est un fichier qui n'existe pas. pages.yml, qui lance profils.py
+#       avec `contents: read`, ne peut pas tenir ce role.
+#   D — LE FICHIER COMMITE. En-tete exact, dates ISO, aucune paire
+#       (date, ticker) en double, dates non decroissantes dans l'ordre du
+#       fichier — la signature d'un ajout en fin —, et terminaisons LF.
+#       Le LF est nomme ici a cause de la faute du cycle 24 : une
+#       reserialisation a reecrit 90 851 lignes d'un fichier CRLF.
+JOURNAL_PREDICTIONS = "collecte/journal_profils.csv"
+JOURNAL_ENTETE = ("date", "ticker", "profil", "grade", "cours",
+                  "date_cours", "per", "per_analyse")
+
+
+def test_journal_predictions():
+    print("\n=== 38. Journal des predictions : il s'allonge, il ne se reecrit "
+          "pas (C3, bloquant) ===")
+    import csv as _csv
+
+    # --- A. La fonction, rejouee sans importer profils.py ---------------
+    chemin_profils = ICI / "profils.py"
+    try:
+        # `besoins` fournit la constante que la signature porte en defaut : la
+        # fonction est donc rejouee avec LES COLONNES REELLES de profils.py, et
+        # non avec une copie locale qui pourrait deriver sans que rien ne crie.
+        ecrire = _extraire_fonction(chemin_profils, "ecrire_journal",
+                                    besoins=("JOURNAL_COLONNES",))
+    except AssertionError as e:
+        verifie(False, f"profils.py porte ecrire_journal() — {e}")
+        return
+
+    titres = {
+        "AAAA": {"profil": "VALUE", "grade": "A", "cours": 1000.0,
+                 "date_cours": "2026-10-08", "per": 7.5, "per_analyse": 7.5},
+        "BBBB": {"profil": "GARP", "grade": "B", "cours": 2500.0,
+                 "date_cours": "2026-10-08", "per": 12.0, "per_analyse": 11.4},
+        "CCCC": {"profil": "NON_ANALYSABLE", "grade": "C", "cours": None,
+                 "date_cours": None, "per": None, "per_analyse": None},
+    }
+    with tempfile.TemporaryDirectory() as d:
+        f = Path(d) / "journal.csv"
+        n1, p1 = ecrire(titres, f, "2026-10-01")
+        verifie((n1, p1) == (3, 0),
+                f"premier passage : {n1} ligne(s) ajoutee(s) pour 3 titres, "
+                f"{p1} deja presente(s)")
+        apres_j1 = f.read_bytes()
+        verifie(apres_j1.splitlines()[0].decode() == ",".join(JOURNAL_ENTETE),
+                "l'en-tete est ecrit une fois, sur la premiere ligne")
+
+        n2, p2 = ecrire(titres, f, "2026-10-01")
+        verifie((n2, p2) == (0, 3),
+                f"meme jour rejoue : {n2} ligne(s) ajoutee(s), {p2} reconnue(s) "
+                f"— profils.py tourne plusieurs fois par jour")
+        verifie(f.read_bytes() == apres_j1,
+                "le fichier est IDENTIQUE A L'OCTET apres le passage rejoue")
+
+        # Le moteur change d'avis sur AAAA : le lendemain inscrit le nouveau
+        # verdict et laisse l'ancien intact. C'est tout l'interet du journal.
+        titres_j2 = dict(titres)
+        titres_j2["AAAA"] = dict(titres["AAAA"], profil="VIGILANCE_CONTRACTION",
+                                 grade="C", cours=820.0)
+        n3, p3 = ecrire(titres_j2, f, "2026-10-02")
+        verifie((n3, p3) == (3, 0),
+                f"jour neuf : {n3} ligne(s) ajoutee(s) — le journal s'allonge")
+        octets = f.read_bytes()
+        verifie(octets.startswith(apres_j1),
+                "le journal du 01/10 est un PREFIXE EXACT de celui du 02/10 — "
+                "aucune ligne passee n'a ete reecrite")
+        lignes = list(_csv.DictReader(octets.decode("utf-8").splitlines()))
+        verdicts = {(l["date"], l["ticker"]): l["profil"] for l in lignes}
+        verifie(verdicts.get(("2026-10-01", "AAAA")) == "VALUE"
+                and verdicts.get(("2026-10-02", "AAAA")) == "VIGILANCE_CONTRACTION",
+                "un verdict qui change laisse les DEUX lignes lisibles "
+                "(01/10 VALUE, 02/10 VIGILANCE_CONTRACTION)")
+        vide = [l for l in lignes if l["ticker"] == "CCCC"][0]
+        verifie(vide["cours"] == "" and vide["per"] == "",
+                "une valeur absente reste une CASE VIDE, jamais un zero ni un "
+                "« None » (regle : une case vide vaut mieux qu'une valeur "
+                "approchee)")
+        verifie(b"\r" not in octets,
+                "les lignes ecrites sont terminees en LF, jamais en CRLF")
+
+    # --- B. Le branchement dans calculer() ------------------------------
+    src = chemin_profils.read_text(encoding="utf-8")
+    corps = src[src.find("\ndef calculer("):]
+    verifie("ecrire_journal(" in corps,
+            "calculer() appelle ecrire_journal() — sans quoi le journal cesse "
+            "de s'allonger en silence")
+
+    # --- C. Un workflow qui lance profils.py l'indexe -------------------
+    dossier = RACINE / ".github" / "workflows"
+    if verifie(dossier.is_dir(), f"{WORKFLOWS} existe"):
+        lance = {c.name for c in sorted(dossier.glob("*.yml"))
+                 if "profils.py" in c.read_text(encoding="utf-8")}
+        indexent = {f for f, _l, chemins, _g in _ajouts_git_des_workflows(dossier)
+                    if JOURNAL_PREDICTIONS in chemins or "-A" in chemins}
+        porteurs = sorted(lance & indexent)
+        verifie(bool(porteurs),
+                f"au moins un des {len(lance)} workflow(s) lancant profils.py "
+                f"indexe {JOURNAL_PREDICTIONS}"
+                + (f" : {', '.join(porteurs)}" if porteurs
+                   else " — AUCUN : le journal s'ecrirait dans le runner et "
+                        "serait jete a chaque passage (lecon de C35)"))
+
+    # --- D. Le fichier commite ------------------------------------------
+    chemin = RACINE / JOURNAL_PREDICTIONS
+    if not chemin.exists():
+        verifie(False, f"{JOURNAL_PREDICTIONS} absent — le premier passage de "
+                       f"profils.py le cree", bloquant=False)
+        return
+    octets = chemin.read_bytes()
+    verifie(b"\r" not in octets,
+            f"{JOURNAL_PREDICTIONS} est en LF pur (aucun \\r)")
+    texte = octets.decode("utf-8")
+    lecteur = _csv.reader(texte.splitlines())
+    rangs = [r for r in lecteur if r]
+    verifie(tuple(rangs[0]) == JOURNAL_ENTETE,
+            f"l'en-tete est exactement {','.join(JOURNAL_ENTETE)}"
+            + ("" if tuple(rangs[0]) == JOURNAL_ENTETE
+               else f" — TROUVE : {','.join(rangs[0])}"))
+    corps_rangs = rangs[1:]
+    mauvaise_largeur = [i + 2 for i, r in enumerate(corps_rangs)
+                        if len(r) != len(JOURNAL_ENTETE)]
+    verifie(not mauvaise_largeur,
+            f"les {len(corps_rangs)} ligne(s) portent {len(JOURNAL_ENTETE)} "
+            f"colonnes"
+            + ("" if not mauvaise_largeur
+               else " — LARGEUR FAUSSE ligne(s) : "
+                    + ", ".join(map(str, mauvaise_largeur[:8]))))
+    vus, doublons = set(), []
+    for r in corps_rangs:
+        if len(r) < 2:
+            continue
+        if (r[0], r[1]) in vus:
+            doublons.append(f"{r[0]}/{r[1]}")
+        vus.add((r[0], r[1]))
+    verifie(not doublons,
+            f"aucune paire (date, ticker) en double sur {len(vus)} paire(s)"
+            + ("" if not doublons
+               else " — EN DOUBLE : " + ", ".join(doublons[:8])
+                    + " — le journal a ete reecrit, ou la garde "
+                      "d'idempotence a saute"))
+    non_iso = [r[0] for r in corps_rangs if len(r) > 1 and not _re_iso(r[0])]
+    verifie(not non_iso,
+            "toutes les dates de passage sont ISO (AAAA-MM-JJ)"
+            + ("" if not non_iso else " — NON ISO : " + ", ".join(non_iso[:8])))
+    dates = [r[0] for r in corps_rangs if len(r) > 1 and _re_iso(r[0])]
+    recul = [f"ligne {i + 2} : {dates[i]} apres {dates[i - 1]}"
+             for i in range(1, len(dates)) if dates[i] < dates[i - 1]]
+    verifie(not recul,
+            f"les dates ne reculent jamais dans l'ordre du fichier "
+            f"({len(set(dates))} jour(s) journalise(s)) — signature d'un ajout "
+            f"en fin"
+            + ("" if not recul else " — RECUL : " + " ; ".join(recul[:5])))
+
+
+def _re_iso(valeur):
+    """Vrai si `valeur` est une date ISO complete et reelle."""
+    try:
+        return datetime.strptime(str(valeur), "%Y-%m-%d").date().isoformat() == valeur
+    except Exception:
+        return False
+
+
+# ----------------------------------------------------------------------
+# 39. CHAQUE WORKFLOW INSTALLE CE QUE SON PROPRE CODE IMPORTE (chasse c.25)
+# ----------------------------------------------------------------------
+# D'OU VIENT CETTE SECTION : de pannes, pas d'une idee. Le 07/10/2026, TROIS
+# fois dans la meme journee, P4 est tombee sur le meme defaut — un test de
+# donnees important un module dont la tete porte `import pdfplumber`, absent de
+# requirements.txt. Chaque fois, le correctif a ete NOMINATIF : ne pas importer
+# CE module-la. Trois gardes, trois noms, et la famille entiere restait libre.
+#
+# LA FAMILLE, MESUREE LE 09/10/2026. Chaque workflow ecrit sa propre ligne
+# `pip install`, et RIEN ne verifiait qu'elle couvre ce que les scripts du meme
+# workflow importent. Sur les 27 workflows, CINQ executaient du code dont la
+# tete de module importe `requests` sans jamais le nommer : tests.yml,
+# branchement_agregateur.yml, lot2_referentiels_et_interimaires.yml,
+# migration_csv.yml, releve_capitaux_propres.yml. Ils marchaient par ACCIDENT :
+# streamlit exige `requests<3,>=2.27`, donc `pip install -r requirements.txt`
+# l'amenait sans que personne ne l'ait demande. Corrige le 09/10/2026 en
+# declarant `requests` dans requirements.txt (meme borne que streamlit ;
+# `pip freeze` identique avant/apres, 39 paquets, 0 difference).
+#
+# ET POURQUOI CELLE-LA ETAIT PIRE QUE pdfplumber : pdfplumber tombait en ROUGE.
+# requests, lui, serait tombe en SILENCE. La section 10 fait
+# `try: import avis_brvm / except ImportError: ... bloquant=False` : sans
+# requests, elle ne casse pas, elle DISPARAIT. Un test qui s'efface sans bruit
+# est le pire etat d'une barriere.
+#
+# LA REGLE QUE CETTE SECTION FIGE, et ses deux severites.
+#
+#   BLOQUANT — ce qui s'execute A COUP SUR. Pour chaque workflow : les scripts
+#     qu'il lance (`python3 x.py`), les modules locaux que ces scripts importent
+#     A TOUTE PROFONDEUR (importer un module local execute sa tete, ou que
+#     l'instruction se trouve), puis la fermeture de TETE de ces modules. Tout
+#     paquet tiers importe EN TETE dans cette fermeture doit etre nomme par le
+#     workflow — directement, ou par `-r requirements.txt`.
+#   ALERTE — ce qui est LATENT. Un module local importe TARDIVEMENT par un autre
+#     module dont la tete tire un tiers : rien ne s'execute aujourd'hui, mais le
+#     jour ou une fonction appelle cette branche, c'est la panne suivante. Les
+#     trois chaines connues sont nommees ci-dessous ; une quatrieme crie.
+#
+# Un import TIERS tardif (dans un corps de fonction) n'est jamais compte : il
+# est deliberement paresseux — `extraire_boc_eng()` porte `import pdfplumber`
+# dans son corps precisement pour que le module reste importable sans lui.
+CHAINES_TARDIVES_CONNUES = {
+    # fichier qui importe tardivement -> module local dont la tete tire un tiers
+    ("collecte/extracteur_boc_eng.py", "collecte/extracteur_boc.py"),
+    ("outils/reextraction_bbgc_depuis_archive.py", "collecte/extracteur_boc.py"),
+    ("moteur/tester_donnees.py", "collecte/avis_brvm.py"),
+}
+# Nom de distribution -> nom de module importable, quand les deux diffe-rent.
+# `None` = la distribution ne fournit aucun module importe par le depot.
+DISTRIBUTION_VERS_MODULE = {
+    "pyyaml": "yaml", "beautifulsoup4": "bs4", "camelot-py": "camelot",
+    "git-filter-repo": None, "pip": None,
+}
+DOSSIERS_PYTHON = ("moteur", "collecte", "dashboard", "outils", "pipeline", ".")
+
+
+def _index_modules_locaux():
+    index = {}
+    for d in DOSSIERS_PYTHON:
+        dossier = RACINE / d
+        if dossier.is_dir():
+            for f in sorted(dossier.glob("*.py")):
+                index.setdefault(f.stem, []).append(f)
+    return index
+
+
+def _noms_importes(noeud):
+    import ast as _ast
+    if isinstance(noeud, _ast.Import):
+        return [a.name.split(".")[0] for a in noeud.names]
+    if isinstance(noeud, _ast.ImportFrom) and not noeud.level:
+        return [(noeud.module or "").split(".")[0]]
+    return []
+
+
+def _imports_du_fichier(f, index, locaux_profonds=False):
+    """(tiers de TETE, modules locaux). `locaux_profonds` etend la recherche des
+    modules locaux a tout le fichier, et non a sa seule tete."""
+    import ast as _ast
+    arbre = _ast.parse(f.read_text(encoding="utf-8"))
+    tiers, locaux = set(), set()
+    for n in arbre.body:
+        for m in _noms_importes(n):
+            if m and m not in index and m not in sys.stdlib_module_names:
+                tiers.add(m)
+    for n in (_ast.walk(arbre) if locaux_profonds else arbre.body):
+        for m in _noms_importes(n):
+            if m in index:
+                locaux.add(m)
+    return tiers, locaux
+
+
+def _module_de_distribution(jeton):
+    import re as _re
+    nom = _re.split(r"[<>=!\[]", jeton.strip())[0].strip().lower()
+    if not nom:
+        return None
+    return DISTRIBUTION_VERS_MODULE.get(nom, nom)
+
+
+def _paquets_de_requirements():
+    f = RACINE / "requirements.txt"
+    out = set()
+    if f.exists():
+        for ligne in f.read_text(encoding="utf-8").splitlines():
+            ligne = ligne.split("#")[0].strip()
+            if ligne and not ligne.startswith("-"):
+                out.add(_module_de_distribution(ligne))
+    return out - {None}
+
+
+def _paquets_declares(src, requis):
+    import re as _re
+    out = set()
+    for m in _re.finditer(r"pip install([^\n|&;]*)", src):
+        for jeton in m.group(1).replace('"', " ").replace("'", " ").split():
+            if jeton.startswith("-"):
+                continue
+            if jeton.endswith("requirements.txt"):
+                out |= requis
+                continue
+            out.add(_module_de_distribution(jeton))
+    return out - {None}
+
+
+def _entrees_du_workflow(src, index):
+    """Les scripts que le workflow lance, resolus en chemins du depot."""
+    import re as _re
+    out = []
+    for m in _re.finditer(r"python3?\s+(?:\./)?(?:\.\./)?([A-Za-z0-9_./-]+\.py)", src):
+        rel = m.group(1)
+        chemin = RACINE / rel
+        if not chemin.exists():
+            # Les workflows font `cd moteur` avant `python3 peupler.py`.
+            for g in index.get(Path(rel).stem, []):
+                chemin = g
+                rel = str(g.relative_to(RACINE))
+                break
+        if chemin.exists():
+            out.append((rel, chemin))
+    return out
+
+
+def _fermeture_tierce(chemin, rel, index, declares):
+    """Les tiers de TETE atteints a coup sur depuis ce script, et par ou."""
+    tiers, locaux = _imports_du_fichier(chemin, index, locaux_profonds=True)
+    manquants = {t: rel for t in tiers if t not in declares}
+    vus, pile = {chemin}, [(l, [rel]) for l in locaux]
+    while pile:
+        nom, trace = pile.pop()
+        for g in index.get(nom, []):
+            if g in vus:
+                continue
+            vus.add(g)
+            gt, gl = _imports_du_fichier(g, index)
+            suite = trace + [str(g.relative_to(RACINE))]
+            for t in gt:
+                if t not in declares:
+                    manquants.setdefault(t, " -> ".join(suite))
+            pile += [(l, suite) for l in gl]
+    return manquants
+
+
+def _chaines_tardives(index):
+    """Les couples (fichier, module local importe tardivement a tete tierce)."""
+    import ast as _ast
+    tetes = {}
+    for fs in index.values():
+        for f in fs:
+            t, _ = _imports_du_fichier(f, index)
+            tetes[str(f.relative_to(RACINE))] = t
+    trouvees = set()
+    for fs in index.values():
+        for f in fs:
+            arbre = _ast.parse(f.read_text(encoding="utf-8"))
+            sommet = {id(n) for n in arbre.body}
+            for n in _ast.walk(arbre):
+                if id(n) in sommet:
+                    continue
+                for m in _noms_importes(n):
+                    for g in index.get(m, []):
+                        rel = str(g.relative_to(RACINE))
+                        if tetes.get(rel):
+                            trouvees.add((str(f.relative_to(RACINE)), rel))
+    return trouvees
+
+
+def test_dependances_des_workflows():
+    print("\n=== 39. Chaque workflow installe ce que son code importe "
+          "(chasse du cycle 25, bloquant) ===")
+    dossier = RACINE / ".github" / "workflows"
+    if not verifie(dossier.is_dir(), f"{WORKFLOWS} existe"):
+        return
+    index = _index_modules_locaux()
+    requis = _paquets_de_requirements()
+    verifie(bool(requis),
+            f"requirements.txt est lu : {len(requis)} paquet(s) declare(s) "
+            f"({', '.join(sorted(requis))})")
+
+    fichiers = sorted(dossier.glob("*.yml"))
+    fautifs, examines = [], 0
+    for wf in fichiers:
+        src = wf.read_text(encoding="utf-8")
+        if "pip install" not in src:
+            continue
+        declares = _paquets_declares(src, requis)
+        entrees = _entrees_du_workflow(src, index)
+        if not entrees:
+            continue
+        examines += 1
+        for rel, chemin in entrees:
+            for t, ou in sorted(_fermeture_tierce(chemin, rel, index, declares).items()):
+                fautifs.append(f"{wf.name} : {t} (via {ou})")
+
+    verifie(examines >= 10,
+            f"la mesure porte sur une population reelle : {examines} workflow(s) "
+            f"installant des paquets et lancant du Python, sur {len(fichiers)}")
+    verifie(not fautifs,
+            "aucun workflow n'execute du code important un paquet tiers qu'il "
+            "n'installe pas"
+            + ("" if not fautifs
+               else f" — {len(set(fautifs))} CAS, et la panne est silencieuse "
+                    "quand l'import est garde par un except : "
+                    + " ; ".join(sorted(set(fautifs))[:10])))
+
+    # --- Les chaines LATENTES, nommees une fois ------------------------
+    trouvees = _chaines_tardives(index)
+    nouvelles = sorted(trouvees - CHAINES_TARDIVES_CONNUES)
+    verifie(not nouvelles,
+            f"aucune chaine d'import tardive NOUVELLE vers un module a tete "
+            f"tierce ({len(CHAINES_TARDIVES_CONNUES)} connue(s), toutes "
+            f"couvertes aujourd'hui)"
+            + ("" if not nouvelles
+               else " — NOUVELLE(S), latente(s) aujourd'hui et panne le jour ou "
+                    "une fonction les appelle : "
+                    + " ; ".join(f"{a} -> {b}" for a, b in nouvelles[:6])),
+            bloquant=False)
+    disparues = sorted(CHAINES_TARDIVES_CONNUES - trouvees)
+    verifie(not disparues,
+            "le registre des chaines tardives ne nomme aucune chaine disparue"
+            + ("" if not disparues
+               else " — A RETIRER : "
+                    + " ; ".join(f"{a} -> {b}" for a, b in disparues)),
+            bloquant=False)
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -5125,6 +5556,8 @@ def main():
     test_edition_anglaise_boc()
     test_observations_perimees_boc()
     test_git_add_des_workflows()
+    test_journal_predictions()
+    test_dependances_des_workflows()
     if not sans_app:
         test_application()
 

@@ -626,8 +626,13 @@ def diagnostic_distribution(cur, ticker, date_cours, sp, cours=None, dy=None):
 def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50,
                 sp_age_max_cp=3, arb=None):
     table, col = source_cours(cur)
+    # C3 (09/10/2026) : `cours` est lu SUR LA MEME LIGNE que le PER, donc a la
+    # seance `date_cours` que profils.json publie deja. C'est le prix auquel le
+    # verdict est rendu. Le `cours_row` plus bas, lui, exige un rendement non
+    # nul : il sert au diagnostic de distribution, pas au journal — BBGC, sans
+    # rendement BOC, y rendrait une case vide avec un PER renseigne.
     per_row = cur.execute(
-        f"SELECT per, {col} FROM {table} WHERE ticker=? AND per IS NOT NULL "
+        f"SELECT per, {col}, cours FROM {table} WHERE ticker=? AND per IS NOT NULL "
         f"ORDER BY {col} DESC LIMIT 1", (ticker,)).fetchone()
     dy_row = cur.execute(
         f"SELECT rendement FROM {table} WHERE ticker=? AND rendement IS NOT NULL "
@@ -820,6 +825,11 @@ def ingredients(cur, ticker, seuils, sp, sp_part_min=0.50,
                 distribution_non_recurrente=non_rec, distribution_detail=detail_dist,
                 payout=payout,
                 payout_source=payout_source, part_operationnelle=part_operationnelle,
+                # C3 (09/10/2026) : le cours de la seance `date_cours`, celle du
+                # PER retenu. Un profil sans son prix n'est pas verifiable apres
+                # coup. Cle INTERNE : profils.json n'en porte pas, sa forme
+                # etant figee par la section 20 des tests de donnees.
+                cours=per_row[2] if per_row else None,
                 date_cours=date_cours, table_cours=table,
                 roe_exercice=roe_exercice, roe_perime=roe_perime,
                 roe=roe, g=100.0 * g if g is not None else None, source_croissance=source_g,
@@ -1343,6 +1353,70 @@ def grade_confiance(profil, ing, faits_titre):
 
 
 # ----------------------------------------------------------------------
+# Journal des predictions (chantier C3, 09/10/2026)
+# ----------------------------------------------------------------------
+# POURQUOI IL EXISTE. Sans lui, l'outil est un INSTANTANE : il dit ce qu'il
+# pense aujourd'hui, et personne ne pourra jamais dire s'il avait raison. Le
+# journal fige, a chaque passage de profils.py, ce que le moteur a conclu et le
+# prix auquel il l'a conclu. C'est la seule piece qui rende le profilage
+# falsifiable.
+#
+# CE QUI N'Y EST PAS, ET POURQUOI. Aucun jugement, aucun score agrege, aucune
+# recommandation : six faits par titre, tous relus de profils.py ou de la base.
+# Un journal qui interprete devient une opinion de plus a verifier.
+JOURNAL = RACINE / "collecte" / "journal_profils.csv"
+JOURNAL_COLONNES = ("date", "ticker", "profil", "grade", "cours",
+                    "date_cours", "per", "per_analyse")
+
+
+def ecrire_journal(lignes, chemin, jour, colonnes=JOURNAL_COLONNES):
+    """Ajoute une ligne par titre au journal, et n'en reecrit jamais aucune.
+
+    TROIS PROPRIETES, et la section 38 de tester_donnees.py verifie les trois
+    en rejouant cette fonction, sans importer ce module.
+
+      1. AJOUT SEUL. Le fichier s'ouvre en "a" ; l'en-tete ne s'ecrit que s'il
+         est absent. Aucune ligne passee ne peut changer, meme si le moteur
+         change d'avis sur un titre d'hier — c'est precisement le desaccord
+         qu'on veut pouvoir lire plus tard.
+      2. IDEMPOTENT PAR JOUR. profils.py tourne plusieurs fois par jour (P13,
+         P12, P5b, P4, branchement). Une paire (date, ticker) deja presente
+         n'est pas reecrite : relancer le meme jour n'ajoute rien.
+      3. IL S'ALLONGE. Un jour neuf ajoute exactement une ligne par titre.
+
+    `jour` est la date du PASSAGE, distincte de `date_cours`, qui est la seance
+    du prix. Les deux sont inscrites : un verdict rendu le lundi sur le cours du
+    vendredi n'est pas un verdict rendu le vendredi.
+
+    Rend (ajoutees, deja_presentes).
+    """
+    import csv
+    jour = str(jour)[:10]
+    deja = set()
+    non_vide = chemin.exists() and chemin.stat().st_size > 0
+    if non_vide:
+        with chemin.open("r", encoding="utf-8", newline="") as f:
+            for ligne in csv.reader(f):
+                if len(ligne) >= 2 and ligne[0] != colonnes[0]:
+                    deja.add((ligne[0], ligne[1]))
+    chemin.parent.mkdir(parents=True, exist_ok=True)
+    ajoutees = 0
+    with chemin.open("a", encoding="utf-8", newline="") as f:
+        ecrivain = csv.writer(f, lineterminator="\n")
+        if not non_vide:
+            ecrivain.writerow(colonnes)
+        for ticker in sorted(lignes):
+            if (jour, ticker) in deja:
+                continue
+            v = lignes[ticker]
+            ecrivain.writerow(
+                [jour, ticker]
+                + ["" if v.get(c) is None else v.get(c) for c in colonnes[2:]])
+            ajoutees += 1
+    return ajoutees, len(lignes) - ajoutees
+
+
+# ----------------------------------------------------------------------
 # Calcul principal
 # ----------------------------------------------------------------------
 
@@ -1684,6 +1758,19 @@ def calculer():
         }
 
     SORTIE.write_text(json.dumps(profils, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    # C3 : le journal des predictions. Ecrit APRES profils.json, pour qu'un
+    # echec du calcul ne laisse pas une ligne de journal sans le fichier
+    # qu'elle est censee attester.
+    ajoutees, presentes = ecrire_journal(
+        {t: {"profil": v["profil"], "grade": v["grade"],
+             "cours": brut[t].get("cours"), "date_cours": v["date_cours"],
+             "per": v["per"], "per_analyse": v["per_analyse"]}
+         for t, v in profils.items()},
+        JOURNAL, date.today())
+    print("journal_profils.csv : %d ligne(s) ajoutee(s), %d deja presente(s) pour %s"
+          % (ajoutees, presentes, date.today().isoformat()))
+
     if agregateur:
         ecrire_rapport(verdicts)
     repartition = {}

@@ -295,7 +295,11 @@ mesuré titre par titre, et un test empêche le mélange.
 ## C3 — Journal des prédictions
 
 - classe : VERTE — crée un fichier neuf, n'en touche aucun
-- statut : À FAIRE
+- statut : **FAIT le 09/10/2026 (cycle 25)** — les quatre conditions de *Terminé
+  quand* sont tenues et figées par la section 38. La passe autorisée est
+  consommée ; **aucun cycle ne reprend C3.** Ce que le journal rendra possible —
+  confronter les verdicts aux cours ultérieurs — demande de la profondeur et
+  attend dans *Veille datée, hors file*.
 - validation : —
 - autonomie : complète
 - priorité : 3
@@ -307,6 +311,52 @@ instantané dont personne ne pourra jamais dire s'il avait raison.
 **Terminé quand** : le fichier existe, s'alimente à chaque passage de
 `profils.py`, ne réécrit jamais une ligne passée, et un test vérifie qu'il
 s'allonge.
+
+### Fait le 09/10/2026 (cycle 25)
+
+**Pourquoi ce chantier est passé maintenant, et pourquoi le cycle 24 s'était
+trompé de cible.** Le cycle 24 annonçait « prochain : C38 ». La règle de l'étape 4
+dit *rang 2 = la première `VERTE`, priorité la plus haute d'abord, et à priorité
+égale le plus petit numéro*. Les `VERTE` non faites étaient C3 (priorité 3), C38
+(priorité 3), C8 (8) et C9 (9) : à priorité égale, **3 < 38**, donc C3. La file
+ORANGE étant épuisée pour la première fois, c'est le premier cycle à atteindre
+réellement le rang 2 — et le premier à payer l'erreur.
+
+**Ce qui est écrit.** `collecte/journal_profils.csv`, huit colonnes :
+`date, ticker, profil, grade, cours, date_cours, per, per_analyse`. **48 lignes au
+premier passage**, une par titre, **aucune case vide**. `date` est le jour du
+**passage**, `date_cours` la **séance du prix** : un verdict rendu le lundi sur le
+cours du vendredi n'est pas un verdict rendu le vendredi, et les deux sont
+inscrites.
+
+**Le cours manquait, et il fallait le chercher au bon endroit.** `ingredients()`
+lisait déjà un cours, mais sous condition `rendement IS NOT NULL` — utile au
+diagnostic de distribution, faux ici : **BBGC**, sans rendement BOC, aurait eu une
+case vide avec un PER renseigné. Le cours est désormais lu **sur la même ligne que
+le PER**, donc à la séance `date_cours`. Mesure avant/après : **1 case vide sur 48
+→ 0**. Clé **interne** : `profils.json` n'en porte pas, sa forme étant figée par la
+section 20 — vérifié, **0 titre à forme différente** entre commité et régénéré.
+
+**Idempotence mesurée, pas supposée.** `profils.py` tourne plusieurs fois par jour
+(P13, P12, P5b, P4, branchement). Deuxième passage le même jour : **0 ligne
+ajoutée, 48 reconnues, fichier identique à l'octet**. Jour neuf dans le rejeu de
+test : **+3 sur 3**, et le journal de la veille reste un **préfixe exact**. Un
+verdict qui change laisse **les deux lignes** lisibles — c'est tout l'intérêt.
+
+**Et il est planifié, sans quoi il n'existe pas.** `P13` (`avis_brvm.yml`, chaque
+jour ouvré) et `P12` (`notations.yml`) indexent le fichier, **dans la branche
+`PROFILS = success` seulement** : une ligne de journal sans le `profils.json`
+qu'elle atteste n'atteste rien. Garde d'existence `[ -f … ] &&`, vérifiée sous
+`bash -e` : l'absence du fichier ne tue pas l'étape. `pages.yml` ne pouvait pas
+tenir ce rôle — `contents: read`.
+
+**Procès-verbal exécutable** : section **38** de `tester_donnees.py`, 19 contrôles.
+Elle rejoue `ecrire_journal()` **sans importer** `profils.py` (`_extraire_fonction`,
+`besoins=("JOURNAL_COLONNES",)`, donc sur les colonnes réelles), vérifie le préfixe
+**identique à l'octet**, le **LF pur** (faute du cycle 24), et les quatre propriétés
+du fichier commité. Elle vérifie aussi que `calculer()` **appelle** la fonction et
+qu'un workflow l'**indexe** : un journal correct que personne n'alimente, ou que
+personne ne commite, cesse de s'allonger en silence.
 
 ## C4 — Divisions de nominal non enregistrées
 
@@ -3251,11 +3301,67 @@ maintien est motivé ; `etat_backfill_quotidien.json` ne range plus en `jours_tr
 dont la série ne porte rien ; et un contrôle de `tester_donnees.py` fige cette dernière
 propriété — un état qui dit « fait » là où le fichier dit « vide » doit crier.
 
+## C43 — Six passes de la barrière peuvent s'éteindre sans la faire rougir
+
+- classe : ORANGE — décider qu'un test absent doit **bloquer** change la sévérité de la barrière, et peut arrêter un workflow qui passe aujourd'hui ; le diagnostic est fait et l'effet est mesuré
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau**
+- priorité : 3 — latent aujourd'hui, et c'est précisément la forme de panne qu'aucune CI rouge ne révèle
+
+**D'où vient ce chantier : de la chasse du cycle 25, par son côté le plus
+dérangeant.** Cette chasse portait sur les dépendances qu'un workflow n'installe
+pas (section 39). Elle a trouvé `requests`, importé **en tête** par
+`collecte/avis_brvm.py` et `collecte/notations.py`, nommé par **aucun** des cinq
+workflows qui les exécutent. Mais le plus instructif n'est pas le manque : c'est
+**ce qui se serait passé**. La section 10 fait
+`try: import avis_brvm / except ImportError: verifie(True, "…", bloquant=False); return`.
+Sans `requests`, la barrière **ne rougit pas** : la section 10 *disparaît*, et la
+CI reste verte avec un contrôle en moins.
+
+**La famille, mesurée le 09/10/2026 sur l'arbre syntaxique de
+`tester_donnees.py`.** Sur **340** appels `verifie()`, **six** gestionnaires
+d'exception dégradent en alerte **puis quittent la section entière** :
+
+| ligne | `except` | ce qui s'éteint |
+|---|---|---|
+| 137 | `ImportError` | pandas absent → section 1 (fraîcheur) |
+| 146 | `Exception` | `cours_quotidien_boc` illisible → section 1 |
+| 254 | `ImportError` | streamlit absent → section 4 (démarrage de l'application) |
+| 636 | `ImportError` | collecteur d'avis absent → section 10 (statuts de cotation) |
+| 1810 | `ImportError` | streamlit absent → injection sur `app.py` |
+| 2237 | `Exception` | git indisponible → section 20 (forme de `profils.json`) |
+
+Trois des six ne tiennent qu'à une dépendance installée, et la chasse vient de
+montrer que deux d'entre elles l'étaient **par accident**. Les deux `except
+Exception` sont les plus larges : n'importe quelle faute, y compris une vraie
+régression, s'y range en alerte.
+
+**L'arbitrage, et pourquoi il n'est pas mécanique.** Rendre les six bloquants
+casserait les environnements qui n'installent pas streamlit. Trois voies : (a)
+bloquer en CI seulement (`GITHUB_ACTIONS`, comme la section 20 le fait déjà) ;
+(b) exiger la dépendance dans le workflow et bloquer partout ; (c) compter les
+sections éteintes et refuser qu'elles dépassent un nombre nommé. C'est une
+décision de sévérité, pas de plomberie — d'où ORANGE.
+
+**Terminé quand** : chacun des six porte une sévérité décidée et écrite ; aucun
+`except Exception` ne peut plus éteindre une section sans la nommer ; et un
+contrôle compte les sections effectivement éteintes à l'exécution, de sorte
+qu'une barrière qui rétrécit le dise elle-même.
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
   nominal doit être enregistrée dans `operations_sur_titre.csv` le jour même.
   (C4 en compte déjà treize ; ce serait le quatorzième.)
+- **09/10/2026 — confronter le journal des prédictions.** `journal_profils.csv`
+  existe depuis le cycle 25 et porte **un seul jour, 48 lignes**. Rien ne le lit
+  encore, et rien ne peut le lire utilement avant qu'il ait de la profondeur :
+  juger un verdict demande des cours postérieurs. **Quand le journal couvrira au
+  moins un trimestre**, cela devient un chantier de la file — ORANGE, parce que
+  définir ce qu'est « avoir eu raison » (horizon, référence, que faire d'un titre
+  suspendu) est un arbitrage de méthode. Avant cette profondeur, un cycle qui s'en
+  saisirait mesurerait du bruit.
 
 ---
 
@@ -3264,36 +3370,35 @@ propriété — un état qui dit « fait » là où le fichier dit « vide » do
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`. Le bloc avait dérivé à
 trois entrées et 75 lignes ; il est ramené à une, comme le protocole le demande.
 
-## 2026-10-08 — cycle 24 (soir)
+## 2026-10-09 — cycle 25 (matin)
 
-**Exécuté : C37** (rang 1 : seul `ORANGE` à `validation : OK` dont la passe n'était pas
-consommée). Anti-collision : **0 commit** depuis 3 h, cycle 23 clos.
+**Exécuté : C3**, premier cycle à atteindre vraiment le **rang 2**, la file `ORANGE` à
+`validation : OK` étant épuisée. Anti-collision : **0 commit** depuis 3 h, cycle 24 clos, CI verte.
+**Le cycle 24 s'était trompé de cible** en annonçant C38 : à priorité égale (3), le rang 2 prend le
+plus petit numéro, donc **C3 avant C38**.
 
-**Sa prémisse était fausse, et c'était tout l'enjeu.** C37 posait un retéléchargement depuis
-brvm.org, le dépôt n'archivant aucun PDF. Vrai du dépôt, **faux de l'archive** : la Release
-`boc-2026` porte 152 assets, `MANIFESTE.csv` leur `sha256`. **3 des 8 séances se rattrapent
-sans brvm.org** — 2026-09-25, 09-30, 10-01. **Preuve à deux côtés, les deux mesurées** :
-`sha256` du PDF **identique** au manifeste sur les trois, réextraction reproduisant les lignes
-préexistantes à **47/47, 0 divergence**. Ajouté `BBGC` 7 795 / PER 14,33 ; 9 000 / 16,55 ;
-8 800 / 16,18 — continu avec le 8 995 du 02/10, venu d'une autre source. **Piège** : sans
-diviser le rendement par cent (BOC en %, série en fraction depuis le 2026-07-17), la
-confrontation rend **43 fausses divergences par séance**.
+**Le journal des prédictions existe.** `collecte/journal_profils.csv`, 8 colonnes, **48 lignes, 0
+case vide** ; `date` = jour du passage, `date_cours` = séance du prix. Le cours a dû être pris **sur
+la ligne du PER**, sinon **BBGC** aurait eu une case vide sous un PER renseigné (1 vide sur 48 →
+**0**). Idempotence **mesurée** : même jour rejoué **0 ajoutée / 48 reconnues, fichier identique à
+l'octet** ; jour neuf **+3 sur 3**, la veille restant un **préfixe exact**. Indexé par **P13** et
+**P12**, branche `success` seulement. `profils.json` inchangé. Section **38**, 19 contrôles.
 
-**Procès-verbal** : `outils/reextraction_bbgc_depuis_archive.py`, idempotent, sept gardes,
-**aucune date en dur** — il reprendra les 5 séances restantes tel quel quand C41 les aura
-archivées. Refus **vérifié** : une valeur falsifiée exprès (BICB 8 910 → 8 911) fait refuser
-cette séance seule. `SEANCES_SANS_BBGC_CONNUES` **8 → 5**. Diff **3 insertions, 0 suppression**.
-**Deux fautes du cycle** : une réserialisation en `\n` d'un fichier **CRLF** (90 851 lignes
-réécrites, annulée par `git checkout`, corrigée par une garde **à l'octet**), et une annonce de
-cycle partie **après** le travail. Pas de chasse (soir).
+**Chasse : ce qu'un workflow installe contre ce que son code importe.** Les trois pannes P4 du
+07/10 avaient reçu trois gardes **nominatives**, la famille aucune. **Cinq** workflows exécutaient
+du code important `requests` **en tête** sans le nommer, et marchaient parce que **streamlit**
+l'exige. Pire que `pdfplumber`, qui rougissait : ici la section 10 **disparaîtrait** sans bruit
+(`except ImportError`, `bloquant=False`). Corrigé par `requests>=2.27,<3` — **`pip freeze`
+identique avant/après, 39 paquets, 0 différence**. Section **39**, registre des **3** chaînes
+tardives connues. **Preuve par l'histoire** : sur l'arbre du commit `14ad77f` elle nomme la panne
+réelle du 07/10 ; sur un import planté dans `scoring.py`, **25 cas** dans 9 workflows.
 
-**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue) : base complète
-**48 tickers / 90 853 lignes**, golden tests tous passent, `tester_donnees.py` **322 OK, 0
-ÉCHEC**, code 2, **4** alertes toutes antérieures (C4, C5, relevé du 08/10 ×2), `profils.json`
-**0 champ**, `observations_boc` 10/0, `avis_brvm` et `notations --test` passent, dashboard **48
-titres**. **Proposé : C42** (ORANGE, 3). **Prochain** : plus aucun `ORANGE` à `validation : OK`
-non consommé → rang 2, **C38** (VERTE, 3).
-
+**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue) : base **48 tickers
+/ 90 901 lignes**, golden tests tous passent, `tester_donnees.py` **346 OK, 0 ÉCHEC**, code 2, **4**
+alertes toutes antérieures (C4, C5, relevé du jour ×2), `observations_boc` 10/0, `avis_brvm` et
+`notations --test` passent, dashboard **48 titres**. **Proposé : C43** (ORANGE, 3) — six
+gestionnaires d'exception éteignent une section entière sans faire rougir la barrière, mesurés sur
+340 `verifie()`. **Prochain** : rang 2, **C38** (VERTE, 3).
 ---
 
 # Pourquoi ce protocole a changé

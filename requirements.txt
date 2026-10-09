@@ -3,6 +3,20 @@ pandas>=2.0
 altair>=5.0
 PyYAML>=6.0
 
+# Declaration ajoutee le 09/10/2026 (chasse du cycle 25), et elle ne change rien
+# a l'environnement resolu : `requests` etait DEJA installe partout, mais
+# uniquement comme dependance transitive de streamlit (`requests<3,>=2.27`).
+# Or collecte/avis_brvm.py et collecte/notations.py l'importent EN TETE de
+# module, et cinq workflows les executent sans jamais le nommer -- dont
+# tests.yml, via la section 10 des tests de donnees. Le jour ou streamlit cesse
+# d'en dependre, la panne est SILENCIEUSE : `import avis_brvm` y est garde par
+# `except ImportError`, donc la section 10 ne tomberait pas, elle
+# DISPARAITRAIT. C'est la meme famille que les trois pannes pdfplumber du
+# 07/10/2026, vue par son cote muet. La borne reprend celle de streamlit : rien
+# n'est contraint de plus. Verifie : `pip freeze` identique avant/apres, 39
+# paquets, 0 difference.
+requests>=2.27,<3
+
 # Verrou de compatibilite (05/08/2026) : starlette 1.4.0 a rendu obligatoire le
 # parametre thread_minimum_size de GZipResponder.__init__(). Streamlit 1.61.0
 # appelle encore ce constructeur sans ce parametre, ce qui fait repondre le

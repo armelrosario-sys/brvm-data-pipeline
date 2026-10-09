@@ -90,9 +90,18 @@ jobs:
                   collecte/arbitrage_croissance.csv || true
           if [ "$PROFILS" = "success" ]; then
             git add collecte/profils.json || true
+            # C3 (09/10/2026) : le journal des predictions. P13 est le seul
+            # passage QUOTIDIEN qui lance profils.py et committe ; sans cette
+            # ligne le journal s'ecrit dans le runner et est jete a chaque fois
+            # (lecon de C35). Il n'est ajoute que si le recalcul a reussi : une
+            # ligne de journal sans le profils.json qu'elle atteste n'atteste
+            # rien. Garde d'existence : le fichier n'existe pas au tout premier
+            # passage, et « git add » est atomique (section 37).
+            [ -f collecte/journal_profils.csv ] && git add collecte/journal_profils.csv
           else
             echo "::warning::recalcul des profils en echec : profils.json n'est pas commite"
             git checkout -- collecte/profils.json || true
+            git checkout -- collecte/journal_profils.csv || true
           fi
           git commit -m "Veille avis BRVM $(date -u +%F)" || echo "rien a committer"
           git pull --rebase --autostash origin main

@@ -97,9 +97,14 @@ jobs:
                   collecte/arbitrage_croissance.csv || true
           if [ "$PROFILS" = "success" ]; then
             git add collecte/profils.json || true
+            # C3 (09/10/2026) : meme regle que dans P13 — le journal des
+            # predictions n'est indexe que si le recalcul a reussi, et son
+            # existence est gardee (section 37 : « git add » est atomique).
+            [ -f collecte/journal_profils.csv ] && git add collecte/journal_profils.csv
           else
             echo "::warning::recalcul des profils en echec : profils.json n'est pas commite"
             git checkout -- collecte/profils.json || true
+            git checkout -- collecte/journal_profils.csv || true
           fi
           git commit -m "Notations financieres $(date -u +%F)" || echo "rien a committer"
           git push || echo "push impossible"
