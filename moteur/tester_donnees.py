@@ -1959,11 +1959,30 @@ def test_confrontation_cours():
 # ----------------------------------------------------------------------
 # 22. L'IMPLICITE DU BOC DANS LE TEMPS (bloquant + alertes)
 # ----------------------------------------------------------------------
-# Plafonds mesures le 30/09/2026 (cycle 8), sur 52 368 seances a cours mouvant
-# pour le PER et 51 781 pour le rendement. Registres ADOSSES AUX VALEURS
-# OBSERVEES : une hausse est signalee, jamais silencieuse.
-FIGEMENTS_PER_MAX = 108
-FIGEMENTS_RENDEMENT_MAX = 327
+# UNITE CORRIGEE LE 09/10/2026 (cycle 26, chantier C38). Les deux plafonds
+# etaient des COMPTES ABSOLUS poses le 30/09/2026 (cycle 8) : 108 et 327. Or la
+# collecte allonge la population de 47 seances par jour, donc le compte monte
+# tout seul et le plafond etait condamne a rougir sans regression -- c'est
+# exactement la panne du 07/10/2026 sur NON_TRANCHEES_MAX. Mesure du 09/10/2026 :
+#
+#   PER       : 106 cas sur 52 620 seances-population = 2,0144 pour mille,
+#               marge du cumul : 2 cas. Entre 4 et 18 cas neufs par an
+#               (2018: 15, 2019: 18, 2020: 5, 2021: 4, 2022: 15, 2023: 11,
+#               2024: 16, 2025: 11, 2026: 11), pour ~11 700 seances-population
+#               neuves par an : LE TAUX NE PEUT QUE BAISSER.
+#   RENDEMENT : 43 cas sur 51 955 = 0,8276 pour mille, marge du cumul : 284.
+#               Un plafond a 7,6 fois sa mesure ne surveille plus rien ; le taux
+#               ci-dessous lui rend ses dents (46 cas toleres aujourd'hui au lieu
+#               de 327) sans jamais deriver.
+#
+# Le denominateur n'est pas une invention de cette conversion : _figements() le
+# RENDAIT DEJA (`pop_per`, `pop_rend`), et un plancher de population le garde
+# plus bas, sans quoi une population vide rendrait les deux taux nuls donc verts.
+# Les comptes absolus restent PUBLIES en observation, pour que la grandeur reste
+# lisible. Registres ADOSSES AUX VALEURS OBSERVEES : une hausse est signalee,
+# jamais silencieuse.
+FIGEMENTS_PER_POUR_MILLE_MAX = 2.05      # 2,0144 observe ; 107 cas toleres sur la population du jour
+FIGEMENTS_RENDEMENT_POUR_MILLE_MAX = 0.90  # 0,8276 observe ; 46 cas toleres, contre 327 pour le cumul
 
 # Points de BPA annuel (derniere seance de l'annee, cours/per) qui reposent sur
 # un PER fige. croissance_bpa_implicite() les lit pour calculer un CAGR : celui-ci
@@ -2095,6 +2114,18 @@ def test_implicite_boc():
         tombe sur un point de BPA ANNUEL lu par croissance_bpa_implicite (BOAS,
         31/12/2024), pour 0,63 % sur une borne de son CAGR.
 
+    REMESURE DU 09/10/2026 (C38), et elle explique pourquoi le cumul devait
+    partir. PER : 106 sur 52 620. Rendement : **43** sur 51 955, contre 327 le
+    30/09. Le compte du rendement a donc ete divise par 7,6 pendant que son
+    plafond restait a 327 : il tolerait 7,6 fois sa propre mesure, c'est-a-dire
+    qu'il ne surveillait plus rien. Le mecanisme est LISIBLE DANS LE CODE, pas
+    devine : la marge de _figements() vaut `demi_pas / abs(valeur)`, donc elle
+    est RELATIVE a la valeur. C21 a divise par cent une partie de la colonne
+    `rendement` le 04/10/2026 ; a demi-pas constant, cent fois plus petite rend
+    la marge cent fois plus large, et la plupart des cas cessent d'etre
+    detectes. Un plafond en compte absolu ne pouvait pas s'en apercevoir ; un
+    taux, lui, aurait montre la chute.
+
     SEVERITES. Bloquant : un point de BPA annuel repose sur un PER fige hors du
     registre ci-dessus -- c'est un nombre que le moteur CALCULE, et le registre
     est adosse aux valeurs observees. En alerte : les plafonds de figements et la
@@ -2126,16 +2157,24 @@ def test_implicite_boc():
     figes_per, pop_per = _figements(cur, "per", 0.005)
     figes_rend, pop_rend = _figements(cur, "rendement", 0.00005)
 
-    verifie(len(figes_per) <= FIGEMENTS_PER_MAX,
-            f"{len(figes_per)} PER figes alors que le cours bougeait, sur {pop_per} seances "
-            f"(plafond {FIGEMENTS_PER_MAX})"
-            + ("" if len(figes_per) <= FIGEMENTS_PER_MAX else
+    # TAUX, et non plus comptes absolus (C38, 09/10/2026) : le compte monte avec
+    # la collecte, le taux ne monte que si le defaut s'aggrave.
+    taux_per = 1000.0 * len(figes_per) / pop_per if pop_per else 0.0
+    taux_rend = 1000.0 * len(figes_rend) / pop_rend if pop_rend else 0.0
+    verifie(taux_per <= FIGEMENTS_PER_POUR_MILLE_MAX,
+            f"{taux_per:.4f} PER fige(s) pour mille seances a cours mouvant "
+            f"(plafond {FIGEMENTS_PER_POUR_MILLE_MAX} pour mille) — {len(figes_per)} cas "
+            f"sur {pop_per} seances, soit {FIGEMENTS_PER_POUR_MILLE_MAX * pop_per / 1000:.0f} "
+            f"toleres a cette population"
+            + ("" if taux_per <= FIGEMENTS_PER_POUR_MILLE_MAX else
                " — EN HAUSSE : " + ", ".join(f"{t} {d}" for t, d, *_ in figes_per[-3:])),
             bloquant=False)
-    verifie(len(figes_rend) <= FIGEMENTS_RENDEMENT_MAX,
-            f"{len(figes_rend)} rendements figes alors que le cours bougeait, sur {pop_rend} "
-            f"seances (plafond {FIGEMENTS_RENDEMENT_MAX})"
-            + ("" if len(figes_rend) <= FIGEMENTS_RENDEMENT_MAX else
+    verifie(taux_rend <= FIGEMENTS_RENDEMENT_POUR_MILLE_MAX,
+            f"{taux_rend:.4f} rendement(s) fige(s) pour mille seances a cours mouvant "
+            f"(plafond {FIGEMENTS_RENDEMENT_POUR_MILLE_MAX} pour mille) — {len(figes_rend)} cas "
+            f"sur {pop_rend} seances, soit "
+            f"{FIGEMENTS_RENDEMENT_POUR_MILLE_MAX * pop_rend / 1000:.0f} toleres a cette population"
+            + ("" if taux_rend <= FIGEMENTS_RENDEMENT_POUR_MILLE_MAX else
                " — EN HAUSSE : " + ", ".join(f"{t} {d}" for t, d, *_ in figes_rend[-3:])),
             bloquant=False)
 
@@ -3329,9 +3368,16 @@ def test_lecture_des_bassins():
 # donc l'exemption n'a plus d'objet et elle part. Un registre d'exceptions qui
 # ne se vide jamais finit par couvrir le defaut au lieu de le signaler.
 RATTACHEMENTS_CONNUS = {}
-# Avis de dividende que le collecteur n'a pas su rattacher a un ticker. Plafond
-# qui ne peut que DESCENDRE : 19 sur 47 mesures le 02/10/2026.
-AVIS_DIVIDENDE_SANS_TICKER_MAX = 19
+# Avis de dividende que le collecteur n'a pas su rattacher a un ticker.
+# UNITE CORRIGEE LE 09/10/2026 (cycle 26, chantier C38) : c'etait un compte
+# absolu, 19, pose le 02/10/2026 sur 19 observes. Le corpus d'avis GROSSIT a
+# chaque saison d'AGO, donc le compte montait avec lui : C38 relevait 18 le
+# 07/10, la mesure du 09/10 en rend 19 sur 47 et le compte etait DEJA REVENU A
+# SA MARGE NULLE. C'est la derive annoncee, prise sur le fait en deux jours.
+# Le taux, lui, ne bouge que si la QUALITE du rattachement baisse : 19/47 =
+# 0,4043 aujourd'hui ; le plafond ci-dessous tolere les memes 19 avis a la
+# population du jour, et un avis neuf DEJA rattache le fait descendre.
+AVIS_DIVIDENDE_SANS_TICKER_TAUX_MAX = 0.41
 
 
 def test_rattachement_exercice():
@@ -3498,11 +3544,17 @@ def test_rattachement_exercice():
             bloquant=False)
 
     sans_ticker = len([r for r in divid if not (r.get("ticker") or "").strip()])
-    verifie(sans_ticker <= AVIS_DIVIDENDE_SANS_TICKER_MAX,
-            f"{sans_ticker} avis de dividende sur {len(divid)} ne sont rattaches a "
-            f"aucun ticker (plafond {AVIS_DIVIDENDE_SANS_TICKER_MAX}, il ne peut "
-            f"que descendre) — un avis sans ticker ne peut corroborer aucun "
-            f"rattachement",
+    # TAUX, et non plus compte absolu (C38, 09/10/2026) : le corpus d'avis
+    # grossit, donc seule la PART non rattachee dit quelque chose.
+    taux_sans = (sans_ticker / len(divid)) if divid else 0.0
+    verifie(bool(divid) and taux_sans <= AVIS_DIVIDENDE_SANS_TICKER_TAUX_MAX,
+            f"{taux_sans:.4f} de part d'avis de dividende sans ticker "
+            f"(plafond {AVIS_DIVIDENDE_SANS_TICKER_TAUX_MAX}) — {sans_ticker} sur "
+            f"{len(divid)}, soit "
+            f"{AVIS_DIVIDENDE_SANS_TICKER_TAUX_MAX * len(divid):.0f} toleres a cette "
+            f"population ; un avis sans ticker ne peut corroborer aucun rattachement"
+            + ("" if divid else " — CORPUS VIDE : le taux serait nul donc vert, "
+                                "et ce controle ne prouverait rien"),
             bloquant=False)
     conn.close()
 
@@ -3912,7 +3964,23 @@ MAL_ECHELONNEES_MAX = 0             # le defaut lui-meme : zero, et il y reste
 # lisible. Les deux taux, eux, ne peuvent que BAISSER.
 NON_TRANCHEES_PAR_SEANCE_MAX = 34        # serie entiere, 2 031 seances
 NON_TRANCHEES_PAR_SEANCE_2026_MAX = 15   # regime courant, 91 seances de 2026
-RUPTURES_VOISINES_MAX = 291         # frontieres de changement de dividende, alerte seule
+# UNITE CORRIGEE LE 09/10/2026 (cycle 26, chantier C38). C'etait RUPTURES_
+# VOISINES_MAX = 291, un compte absolu pose le 07/10/2026 sur 291 observes :
+# marge NULLE sur une serie que la collecte allonge de 47 lignes par seance.
+# La mesure du 09/10 dit l'unite juste : les 291 ruptures ne sont pas eparpillees,
+# elles se GROUPENT sur les seances de detachement -- 178 seances concernees,
+# maximum 11 le 2021-07-30, puis 9 le 2019-07-31, 7 le 2018-07-31 et le
+# 2025-07-31, 6 le 2022-07-29 et le 2025-05-30. Des fins de mois, c'est-a-dire
+# le moment ou le dividende de reference change. Entre 15 et 45 par an, sans
+# tendance. Un MAXIMUM PAR SEANCE ne derive donc pas d'un pouce, et il est plus
+# severe que le cumul la ou ca compte : une regression d'echelle frapperait les
+# 47 titres d'une meme seance et creverait 11 aussitot, quand le cumul attendait
+# d'avoir accumule 292 cas. Meme conversion que NON_TRANCHEES le 07/10.
+RUPTURES_VOISINES_PAR_SEANCE_MAX = 11   # frontieres de changement de dividende, alerte seule
+# Plancher de population : sans lui, un corpus vide rend un maximum nul, donc
+# vert, et le controle ci-dessus ne prouverait rien. 75 323 paires comparables
+# mesurees le 09/10/2026.
+RUPTURES_PAIRES_MINIMUM = 70000
 FTSC_RENDEMENT_REEL_MIN = 0.50      # C1 : la distribution 2025 de FTSC est exacte
 
 
@@ -4032,6 +4100,8 @@ def test_echelle_rendement_boc():
     for i, r in enumerate(lignes):
         par.setdefault(r["ticker"], []).append(i)
     ruptures = 0
+    paires_comparables = 0
+    rup_par_seance = _col.Counter()
     for ind in par.values():
         ind.sort(key=lambda i: lignes[i]["date_bulletin"])
         for a, b in zip(ind, ind[1:]):
@@ -4039,13 +4109,28 @@ def test_echelle_rendement_boc():
             ca, cb = nrb._flot(lignes[a]["cours"]), nrb._flot(lignes[b]["cours"])
             if not ra or not rb or not ca or not cb:
                 continue
+            paires_comparables += 1
             if 50 <= max(ra / rb, rb / ra) <= 200 and abs(cb / ca - 1) < 0.20:
                 ruptures += 1
-    verifie(ruptures <= RUPTURES_VOISINES_MAX,
-            f"{ruptures} rupture(s) d'echelle entre deux seances voisines, plafond "
-            f"{RUPTURES_VOISINES_MAX} — ce sont les seances ou le dividende de "
-            f"reference CHANGE, et le residu non tranche les borde ; un plafond qui "
-            f"ne peut que baisser",
+                rup_par_seance[lignes[b]["date_bulletin"]] += 1
+    # Plancher d'abord : un maximum nul sur un corpus vide serait vert pour rien.
+    verifie(paires_comparables >= RUPTURES_PAIRES_MINIMUM,
+            f"{paires_comparables} paire(s) de seances voisines comparables "
+            f"(plancher {RUPTURES_PAIRES_MINIMUM}, il ne peut que monter)"
+            + ("" if paires_comparables >= RUPTURES_PAIRES_MINIMUM else
+               " — LA MESURE S'EST VIDEE : le maximum par seance serait nul, donc vert"))
+    # MAXIMUM PAR SEANCE, et non plus compte absolu (C38, 09/10/2026).
+    pire_date, pire = (rup_par_seance.most_common(1) or [(None, 0)])[0]
+    verifie(pire <= RUPTURES_VOISINES_PAR_SEANCE_MAX,
+            f"au plus {pire} rupture(s) d'echelle sur une meme seance "
+            f"(plafond {RUPTURES_VOISINES_PAR_SEANCE_MAX}, pire seance : {pire_date}) — "
+            f"{ruptures} au total sur {paires_comparables} paires, groupees sur "
+            f"{len(rup_par_seance)} seances ; ce sont les seances ou le dividende de "
+            f"reference CHANGE, et le residu non tranche les borde"
+            + ("" if pire <= RUPTURES_VOISINES_PAR_SEANCE_MAX else
+               " — EN HAUSSE sur une seance, ce qu'un changement de dividende "
+               "n'explique pas : " + ", ".join(
+                   f"{d} ({n})" for d, n in rup_par_seance.most_common(3))),
             bloquant=False)
 
 # ---------------------------------------------------------------------------
@@ -4608,10 +4693,32 @@ def test_univers_bulletin_sans_silence():
 #
 # LA REGLE QUE CETTE SECTION FIGE : un plafond BLOQUANT doit etre un taux, un
 # retard, ou un compte de cas nommes — jamais un cumul sur une serie qui croit.
-# Un plafond non bloquant peut rester un cumul : il informe, il n'arrete rien.
 # Et tout plafond nouveau doit etre CLASSE ici, sans quoi cette section tombe :
 # c'est la seule facon qu'un plafond ne naisse plus sans que son unite ait ete
 # pensee.
+#
+# ELARGIE LE 09/10/2026 (cycle 26, chantier C38) : PLUS AUCUN plafond ne peut
+# etre un cumul, bloquant ou non. La regle du 07/10 tolerait le cumul en alerte
+# — « il informe, il n'arrete rien » — et les deux jours suivants ont montre ce
+# que cette tolerance coute, des deux cotes a la fois :
+#
+#   - AVIS_DIVIDENDE_SANS_TICKER_MAX etait a 18 observes sur 19 le 07/10 ; le
+#     09/10 il etait DEJA a 19 sur 19, marge nulle, sans qu'aucun defaut ne se
+#     soit aggrave. Une alerte qui se declenche sans motif est une alerte qu'on
+#     apprend a ignorer, et c'est ainsi qu'on rate la vraie.
+#   - FIGEMENTS_RENDEMENT_MAX valait 327, exact le 30/09 ; le 09/10 la mesure
+#     rend 43. Le plafond tolerait 7,6 fois sa mesure : silencieux, et aveugle.
+#     Un cumul ne derive pas seulement vers le haut, il peut aussi devenir
+#     ENORME par rapport a ce qu'il surveille, et alors il ne surveille rien.
+#
+# Les cinq derniers cumuls sont donc convertis : FIGEMENTS_PER et
+# FIGEMENTS_RENDEMENT en taux pour mille sur leur population (section 22),
+# AVIS_DIVIDENDE_SANS_TICKER en part du corpus (section 14),
+# RUPTURES_VOISINES en maximum par seance (section 29), et
+# OBSERVATIONS_NON_RELEVEES — descendu a 0 par C35 le 08/10 — reclasse
+# `ponctuel`, puisqu'un zero ne cumule pas. Chaque conversion a recu, le meme
+# jour, un PLANCHER DE POPULATION ou en avait deja un : un taux sur un corpus
+# vide est nul, donc vert, et c'est le faux vert que la section 19 a connu.
 #
 #   cumul    — compte absolu sur une serie que la collecte allonge : DERIVE
 #   taux     — par seance, par titre, par ligne : ne derive pas
@@ -4619,12 +4726,12 @@ def test_univers_bulletin_sans_silence():
 #   ponctuel — un ensemble ferme de cas nommes, ou un zero : ne derive pas
 UNITE_PLAFONDS = {
     "PAIRES_CONFRONTABLES_MINIMUM": "ponctuel",   # plancher, pas un plafond
-    "FIGEMENTS_PER_MAX": "cumul",
-    "FIGEMENTS_RENDEMENT_MAX": "cumul",
+    "FIGEMENTS_PER_POUR_MILLE_MAX": "taux",        # C38, 09/10/2026
+    "FIGEMENTS_RENDEMENT_POUR_MILLE_MAX": "taux",  # C38, 09/10/2026
     "DATES_ISO_MIN": "ponctuel",
     "TITRES_PER_GLISSANT_MIN": "ponctuel",
     "REFERENCES_IDENTIFIEES_MIN": "ponctuel",
-    "AVIS_DIVIDENDE_SANS_TICKER_MAX": "cumul",
+    "AVIS_DIVIDENDE_SANS_TICKER_TAUX_MAX": "taux",  # C38, 09/10/2026
     "TITRES_RELEVES_MINIMUM": "ponctuel",
     "PER_RELEVES_MINIMUM": "ponctuel",
     "DIVERGENCES_SEANCE_VOISINE_MINIMUM": "ponctuel",
@@ -4632,9 +4739,12 @@ UNITE_PLAFONDS = {
     "MAL_ECHELONNEES_MAX": "ponctuel",            # zero, et il y reste
     "NON_TRANCHEES_PAR_SEANCE_MAX": "taux",       # corrige le 07/10/2026
     "NON_TRANCHEES_PAR_SEANCE_2026_MAX": "taux",  # regime courant
-    "RUPTURES_VOISINES_MAX": "cumul",             # alerte seule
+    "RUPTURES_VOISINES_PAR_SEANCE_MAX": "taux",   # C38, 09/10/2026 : par seance
+    "RUPTURES_PAIRES_MINIMUM": "ponctuel",        # plancher, pas un plafond
     "FTSC_RENDEMENT_REEL_MIN": "ponctuel",
-    "OBSERVATIONS_NON_RELEVEES_MAX": "cumul",     # alerte seule
+    # Descendu de 17 a 0 par C35 le 08/10/2026 : un zero ne cumule pas, et toute
+    # observation non relevee est desormais un signal immediat. Reclasse C38.
+    "OBSERVATIONS_NON_RELEVEES_MAX": "ponctuel",  # un zero, et il y reste
 }
 # Les registres en forme de dictionnaire ou d'ensemble nomme ne figurent pas
 # ci-dessus et n'ont pas a y figurer : etre indexe par titre, par fichier ou par
@@ -4653,6 +4763,10 @@ def test_unite_des_plafonds():
     B — tout plafond du fichier est classe dans UNITE_PLAFONDS. Sans ce
         controle, la regle A ne couvrirait que les plafonds d'aujourd'hui, et le
         prochain plafond ecrit a la main echapperait a la question.
+    C — aucun plafond n'est un cumul, BLOQUANT OU NON (C38, 09/10/2026). A ne
+        visait que les bloquants ; en deux jours, deux cumuls en alerte ont
+        montre les deux facons de mentir : l'un etait revenu a marge nulle sans
+        qu'aucun defaut ne s'aggrave, l'autre tolerait 7,6 fois sa mesure.
 
     Le caractere bloquant est lu dans le code lui-meme : l'appel verifie() qui
     nomme la constante porte `bloquant=False` ou ne le porte pas. On ne demande
@@ -4695,6 +4809,29 @@ def test_unite_des_plafonds():
             + ("" if not fautifs
                else " — BLOQUANT ET CUMULATIF, donc condamne a rougir sans "
                     "regression : " + ", ".join(sorted(set(fautifs)))))
+
+    # C — LA FAMILLE EST ETEINTE (C38, 09/10/2026). La regle A ne couvrait que
+    # les plafonds bloquants ; les deux jours qui ont suivi sa pose ont montre
+    # qu'un cumul en ALERTE derive pareillement (AVIS_DIVIDENDE_SANS_TICKER,
+    # 18/19 le 07/10 puis 19/19 le 09/10) ou devient aveugle (FIGEMENTS_
+    # RENDEMENT, plafond 327 pour 43 mesures). Les cinq derniers sont convertis ;
+    # ce controle est ce qui empeche le sixieme de naitre. Il est BLOQUANT et il
+    # peut l'etre : la propriete est entierement locale au fichier, elle ne
+    # depend d'aucune donnee, donc un rouge ici est toujours une decision
+    # d'ecriture et jamais un retard de collecte.
+    cumuls = sorted(n for n, u in UNITE_PLAFONDS.items() if u == "cumul")
+    verifie(not cumuls,
+            f"aucun des {len(UNITE_PLAFONDS)} plafonds classes n'est un `cumul`, "
+            f"bloquant ou non — la famille est eteinte depuis le 09/10/2026"
+            + ("" if not cumuls
+               else " — CUMUL(S) REAPPARU(S), a convertir en taux, retard ou "
+                    "registre de cas nommes : " + ", ".join(cumuls)))
+
+    # Et l'inventaire des unites, publie pour que la repartition reste lisible
+    # sans relire le dictionnaire.
+    print("  [obs]  unites : " + ", ".join(
+        f"{u} {sum(1 for v in UNITE_PLAFONDS.values() if v == u)}"
+        for u in sorted(set(UNITE_PLAFONDS.values()))))
 
 
 # ----------------------------------------------------------------------

@@ -3069,7 +3069,10 @@ suppression.**
 ## C38 — Cinq plafonds de la barrière sont encore des cumuls, dont trois à marge nulle
 
 - classe : VERTE — ne touche que des seuils de test et leur unité ; aucune donnée, aucune valeur certifiée
-- statut : PROPOSÉ
+- statut : **FAIT le 09/10/2026 (cycle 26)** — les cinq sont convertis, `UNITE_PLAFONDS`
+  ne porte plus aucun `cumul`, et un contrôle bloquant interdit le sixième. La passe
+  autorisée est consommée ; **aucun cycle ne reprend C38.** Voir *Fait le 09/10/2026*
+  au bas de ce bloc.
 - validation : OK
 - autonomie : complète, **sans réseau**
 - priorité : 3
@@ -3107,6 +3110,65 @@ nouveau soit classé dans `UNITE_PLAFONDS`.
 **Terminé quand** : aucun des 5 ne reste un cumul — chacun est un taux, un retard ou un
 registre de cas nommés —, chaque conversion est justifiée par sa mesure, et `UNITE_PLAFONDS`
 ne porte plus la valeur `cumul`.
+
+### Fait le 09/10/2026 (cycle 26)
+
+**Deux lignes du tableau ci-dessus étaient déjà fausses en deux jours, et c'est le meilleur
+argument du chantier.** Mesuré ce cycle, base du 09/10 (48 tickers, 90 901 lignes) :
+
+| plafond | tableau du 07/10 | mesuré le 09/10 | unité posée |
+|---|---|---|---|
+| `RUPTURES_VOISINES_MAX` | 291 / 291 | 291 / 291, **marge 0** | max **par séance** : 11 |
+| `OBSERVATIONS_NON_RELEVEES_MAX` | 17 / 17 | **0 / 0** — C35 l'a soldé le 08/10 | reclassé `ponctuel` |
+| `AVIS_DIVIDENDE_SANS_TICKER_MAX` | 18 / 19, marge 1 | **19 / 19, marge 0** | **taux** : 0,41 du corpus |
+| `FIGEMENTS_PER_MAX` | 106 / 108 | 106 / 108 | **taux** : 2,05 ‰ |
+| `FIGEMENTS_RENDEMENT_MAX` | 43 / 327 | 43 / 327 | **taux** : 0,90 ‰ |
+
+Les deux façons de mentir d'un cumul, prises sur le fait : `AVIS_DIVIDENDE_SANS_TICKER`
+est **revenu seul à la marge nulle en deux jours** sans qu'aucun défaut ne s'aggrave — le
+corpus d'avis grossit, le compte le suit ; et `FIGEMENTS_RENDEMENT` tolérait **7,6 fois sa
+mesure** (327 pour 43), donc il ne surveillait plus rien. Le second a une cause **lisible
+dans le code, non devinée** : la marge de `_figements()` vaut `demi_pas / abs(valeur)`,
+donc relative à la valeur ; C21 a divisé par cent une partie de la colonne `rendement` le
+04/10, ce qui élargit la tolérance d'autant. 327 était exact le 30/09 et aveugle le 09/10.
+Un cumul ne dérive donc pas seulement vers le haut — il peut aussi devenir énorme devant
+ce qu'il surveille. **La règle de la section 34 est élargie en conséquence** : plus aucun
+plafond ne peut être un cumul, bloquant **ou non**, là où le 07/10 tolérait l'alerte.
+
+**Ce qui justifie chaque unité, par la mesure.** Figements PER : 106 cas sur 52 620
+séances-population = 2,0144 ‰, et entre 4 et 18 cas neufs par an (2018 : 15, 2019 : 18,
+2020 : 5, 2021 : 4, 2022 : 15, 2023 : 11, 2024 : 16, 2025 : 11, 2026 : 11) pour ~11 700
+séances-population neuves par an — **le taux ne peut que baisser**. Plafond 2,05 ‰ : il
+tolère **exactement 108** cas à la population du jour, soit la sévérité du cumul qu'il
+remplace, sans en avoir la dérive. Figements rendement : 43 sur 51 955 = 0,8276 ‰, plafond
+0,90 ‰ → **47 tolérés contre 327**, sept fois plus sévère. Ruptures voisines : les 291 ne
+sont pas éparpillées, elles se **groupent sur 178 séances** de fin de mois — 11 le
+2021-07-30, 9 le 2019-07-31, 7 le 2018-07-31 et le 2025-07-31, 6 le 2022-07-29 et le
+2025-05-30 —, c'est-à-dire aux changements de dividende de référence ; un maximum par
+séance ne dérive pas d'un pouce et crève à 11 si une régression d'échelle frappe les 47
+titres d'une même séance, là où le cumul attendait d'avoir accumulé 292 cas. Avis sans
+ticker : 19 / 47 = 0,4043, plafond 0,41 → les mêmes 19 tolérés aujourd'hui, et un avis
+neuf **déjà rattaché** fait descendre le taux.
+
+**Les planchers de population, parce qu'un taux nul est vert.** Les deux figements en
+avaient déjà un (`pop_per`/`pop_rend` > 40 000). Les ruptures n'en avaient aucun :
+`RUPTURES_PAIRES_MINIMUM = 70000` est posé (75 323 paires comparables mesurées), et le
+contrôle des avis refuse désormais un corpus vide. C'est le faux vert de la section 19
+d'avant C15, et il ne revient pas par la porte des taux.
+
+**Dents prouvées par injection, 7 cas sur 7**, chacun faisant rougir le contrôle visé et
+lui seul (témoins : les quatre fonctions touchées rendent 0 bloquant, 0 alerte sans
+injection) : un `cumul` remis dans `UNITE_PLAFONDS` → **bloquant** ; un plafond neuf non
+classé → **bloquant** ; `RUPTURES_PAIRES_MINIMUM` porté à 80 000 → **bloquant** ; les
+quatre plafonds resserrés d'un cran → **une alerte chacun**, nommant ses pires cas (pour
+le rendement : `UNXC 2019-07-09, UNXC 2021-07-23, UNXC 2022-07-27`). Le fichier est
+restauré à l'identique après chaque injection, vérifié.
+
+**Section 34, deux contrôles de plus** : (C) aucun des 18 plafonds classés n'est un
+`cumul`, bloquant ou non — bloquant, et il peut l'être, la propriété étant entièrement
+locale au fichier, donc un rouge y est toujours une décision d'écriture et jamais un
+retard de collecte ; plus une observation qui publie la répartition des unités
+(**`ponctuel` 12, `taux` 6**, `cumul` 0).
 
 ## C39 — Cinq jours ouvrés manquent au quotidien, et leur cause n'est pas établie
 
@@ -3349,6 +3411,59 @@ décision de sévérité, pas de plomberie — d'où ORANGE.
 contrôle compte les sections effectivement éteintes à l'exécution, de sorte
 qu'une barrière qui rétrécit le dise elle-même.
 
+## C44 — Ce fichier a repris sa croissance, et les deux tiers sont de l'archive
+
+- classe : ORANGE — décide ce que la boucle **voit encore** au démarrage : c'est sa mémoire, pas un fichier de données ; le diagnostic est fait et l'effet est mesuré
+- statut : PROPOSÉ
+- validation : —
+- autonomie : complète, **sans réseau**
+- priorité : 2 — il taxe **chaque** cycle, deux fois par jour, et la taxe monte seule
+
+**D'où vient ce chantier : du protocole lui-même, qui a déjà tranché cette question
+une fois.** La section *Pourquoi ce protocole a changé* dit, motif 2, pourquoi
+`docs/JOURNAL.md` existe : ce fichier « pesait 23 000 tokens, dont 13 000 de journal,
+relus quatre fois par jour, et il grossissait d'environ 1 500 tokens par cycle ». Le
+journal est bien sorti. Mais les **blocs de mesure des chantiers clos** sont restés, et
+ils ont repris exactement le rôle que le journal tenait.
+
+**Mesuré le 09/10/2026.** `CHANTIERS.md` : **220 023 octets, 3 427 lignes**. Décomposé
+par bloc de chantier, sur la ligne `- statut :` de chacun :
+
+| part du fichier | octets | % |
+|---|---|---|
+| **21 chantiers CLOS** (`FAIT`, `MESURÉ`, `PREMIÈRE PASSE FAITE`) | **146 402** | **66,5** |
+| 22 chantiers ouverts (`PROPOSÉ`, `À FAIRE`) | 61 977 | 28,2 |
+| en-tête, protocole, barrières, moyens | 11 644 | 5,3 |
+
+Les six plus gros blocs clos pèsent à eux seuls 54 660 octets : C19 (9 699), C22 (9 250),
+C26 (9 129), C17 (9 073), C21 (8 803), C23 (8 706). **Chacun porte « la passe autorisée
+est consommée ; aucun cycle ne reprend ce chantier »** — c'est-à-dire que la boucle les
+relit deux fois par jour précisément pour constater qu'elle n'a rien à y faire.
+
+**La croissance, sur les commits de clôture et non sur une impression** (`git cat-file -s`
+à chaque révision du fichier) : 176 216 octets le 06/10 → **220 023 le 09/10**, soit
+**+43 807 octets en six passages**, ~7 300 par cycle. L'historique du dépôt cloné ici ne
+remonte pas au 30/09, donc la comparaison avec la taille d'alors n'est pas faite : ce qui
+est mesuré, c'est la pente actuelle, et elle est positive et régulière.
+
+**L'arbitrage, et pourquoi il n'est pas mécanique.** Déplacer ces 146 402 octets vers
+`docs/JOURNAL.md` est la solution que le protocole a déjà retenue une fois — mais ce
+fichier **est la mémoire de la boucle**, et une session neuve ne sait que ce qu'il dit. Au
+moins trois questions ne se tranchent pas sans Claudia : (a) que garde-t-on d'un chantier
+clos dans la file — le titre, la classe, le statut d'une ligne, et rien d'autre ? ou aussi
+son critère de terminaison, qu'un cycle futur pourrait vouloir relire ? (b) les chantiers
+clos **partiellement** (C18, C26, C32, C37, dont le reste part explicitement dans un autre
+chantier) se traitent-ils comme les clos complets ? (c) le renvoi vers le journal doit-il
+être nommé (ancre, date, cycle) pour rester utilisable, et qui garantit qu'il ne se casse
+pas ? Un cycle qui tranche seul effacerait de la mémoire vive ce qu'un autre cycle
+croyait disponible. **Dans le doute : ORANGE.**
+
+**Terminé quand** : la part des chantiers clos dans `CHANTIERS.md` est descendue sous un
+seuil nommé et écrit ; rien de ce qui est retiré n'est perdu — chaque bloc déplacé est
+dans `docs/JOURNAL.md`, retrouvable par un renvoi vérifié ; et un contrôle de la barrière
+mesure cette part, de sorte que la dérive se signale elle-même au lieu d'être rechassée
+dans six cycles.
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
@@ -3367,38 +3482,34 @@ qu'une barrière qui rétrécit le dise elle-même.
 
 # Dernier cycle
 
-Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`. Le bloc avait dérivé à
-trois entrées et 75 lignes ; il est ramené à une, comme le protocole le demande.
+Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-10-09 — cycle 25 (matin)
+## 2026-10-09 — cycle 26 (soir)
+**Exécuté : C38.** Anti-collision : **0 commit** depuis 3 h, cycle 25 clos, CI verte. Rang 1
+revérifié **vide** (les sept ORANGE à `validation : OK` ont leur passe consommée) ; rang 2,
+première VERTE par priorité. Pas de chasse : cycle du soir.
+**Les cinq derniers cumuls sont convertis, et deux lignes du tableau de C38 étaient déjà fausses
+en deux jours.** `AVIS_DIVIDENDE_SANS_TICKER` : 18/19 le 07/10, **19/19 le 09/10** — revenu seul à
+la marge nulle, aucun défaut aggravé, le corpus grossit et le compte le suit.
+`OBSERVATIONS_NON_RELEVEES` : 17/17 annoncé, **0/0 mesuré**, soldé par C35 → reclassé `ponctuel`.
+L'autre façon de mentir : `FIGEMENTS_RENDEMENT` tolérait **7,6 fois sa mesure** (327 pour **43**),
+exact le 30/09 et aveugle le 09/10 ; cause **lisible dans le code** — la marge de `_figements()`
+vaut `demi_pas / abs(valeur)`, donc C21, divisant par cent une partie de la colonne le 04/10, a
+élargi la tolérance d'autant. **Section 34 élargie** : aucun plafond ne peut plus être un cumul,
+bloquant **ou non**.
+**Unités, chacune par sa mesure** : PER **2,05 ‰** (2,0144 observé ; 108 tolérés aujourd'hui, la
+sévérité du cumul sans sa dérive) ; rendement **0,90 ‰** (0,8276 ; **47 tolérés contre 327**) ;
+avis **0,41** (19/47) ; ruptures **11 par séance** (291 groupées sur **178 séances** de fin de
+mois — des changements de dividende). Planchers de population ajoutés où il en manquait
+(`RUPTURES_PAIRES_MINIMUM = 70000`, 75 323 mesurées ; corpus vide refusé) : un taux nul est vert.
+**Injection : 7 / 7**, chacune touchant le contrôle visé et lui seul.
+**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) :
+base **48 tickers / 90 901 lignes**, golden tests passent, `tester_donnees.py` **348 OK, 0 ÉCHEC**,
+code 2, **4** alertes toutes antérieures (C4, C5, relevé du jour ×2) ; `profils.json` et
+`journal_profils.csv` **inchangés à l'octet**. **Proposé : C44** (ORANGE, 2) — **66,5 %** des
+220 023 octets de ce fichier sont les 21 chantiers clos, +43 807 en six passages. **Prochain** :
+rang 2, **C8** (VERTE, 8), seule VERTE restante avant C9.
 
-**Exécuté : C3**, premier cycle à atteindre vraiment le **rang 2**, la file `ORANGE` à
-`validation : OK` étant épuisée. Anti-collision : **0 commit** depuis 3 h, cycle 24 clos, CI verte.
-**Le cycle 24 s'était trompé de cible** en annonçant C38 : à priorité égale (3), le rang 2 prend le
-plus petit numéro, donc **C3 avant C38**.
-
-**Le journal des prédictions existe.** `collecte/journal_profils.csv`, 8 colonnes, **48 lignes, 0
-case vide** ; `date` = jour du passage, `date_cours` = séance du prix. Le cours a dû être pris **sur
-la ligne du PER**, sinon **BBGC** aurait eu une case vide sous un PER renseigné (1 vide sur 48 →
-**0**). Idempotence **mesurée** : même jour rejoué **0 ajoutée / 48 reconnues, fichier identique à
-l'octet** ; jour neuf **+3 sur 3**, la veille restant un **préfixe exact**. Indexé par **P13** et
-**P12**, branche `success` seulement. `profils.json` inchangé. Section **38**, 19 contrôles.
-
-**Chasse : ce qu'un workflow installe contre ce que son code importe.** Les trois pannes P4 du
-07/10 avaient reçu trois gardes **nominatives**, la famille aucune. **Cinq** workflows exécutaient
-du code important `requests` **en tête** sans le nommer, et marchaient parce que **streamlit**
-l'exige. Pire que `pdfplumber`, qui rougissait : ici la section 10 **disparaîtrait** sans bruit
-(`except ImportError`, `bloquant=False`). Corrigé par `requests>=2.27,<3` — **`pip freeze`
-identique avant/après, 39 paquets, 0 différence**. Section **39**, registre des **3** chaînes
-tardives connues. **Preuve par l'histoire** : sur l'arbre du commit `14ad77f` elle nomme la panne
-réelle du 07/10 ; sur un import planté dans `scoring.py`, **25 cas** dans 9 workflows.
-
-**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue) : base **48 tickers
-/ 90 901 lignes**, golden tests tous passent, `tester_donnees.py` **346 OK, 0 ÉCHEC**, code 2, **4**
-alertes toutes antérieures (C4, C5, relevé du jour ×2), `observations_boc` 10/0, `avis_brvm` et
-`notations --test` passent, dashboard **48 titres**. **Proposé : C43** (ORANGE, 3) — six
-gestionnaires d'exception éteignent une section entière sans faire rougir la barrière, mesurés sur
-340 `verifie()`. **Prochain** : rang 2, **C38** (VERTE, 3).
 ---
 
 # Pourquoi ce protocole a changé
