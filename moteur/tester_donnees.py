@@ -5652,6 +5652,192 @@ def test_dependances_des_workflows():
             bloquant=False)
 
 
+# SECTION 40 — les sept registres d'echec que la barriere ne nommait pas
+# (chasse du cycle 27, 10/10/2026)
+#
+# LA FAMILLE. Le depot commite sept registres de defauts. Mesure du 10/10/2026 :
+# le nom de base d'AUCUN des sept n'apparaissait une seule fois dans ce fichier.
+# Trois sont ecrits en AJOUT SEUL (`open("a")`) par un collecteur :
+# notations_echecs.jsonl (notations.py), avis_echecs.jsonl (avis_brvm.py),
+# fondamentaux_echecs.jsonl (backfill_fondamentaux.py). Quatre sont des
+# instantanes reecrits a chaque passage. Dans les deux cas, personne ne les
+# comptait : ils grossissent, et un defaut permanent y ecrit une ligne de plus a
+# chaque passage sans que rien ne rougisse jamais.
+#
+# CE QUE LE SILENCE A COUTE, chiffre le jour de la chasse :
+#   - avis_echecs.jsonl porte 19 lignes pour UN SEUL echec distinct, redit du
+#     18/09/2026 au 09/10/2026 : un `404` sur la rubrique OPERATION de
+#     brvm.org. C'est la rubrique des fractionnements et des DPS. Elle n'a donc
+#     jamais rien rendu : sur les 140 avis du corpus, la repartition est
+#     ASSEMBLEE 60, AVIS 40, DIVIDENDE 40, OPERATION **0**. Or C4 prescrit
+#     explicitement de « fouiller d'abord le corpus d'avis deja collecte »
+#     AVANT de chercher un avis de fractionnement sur le reseau — une premiere
+#     passe qui aurait donc fouille un corpus structurellement incapable d'en
+#     contenir un. Et la veille datee du 08/10/2026 (AGE Sonatel) attend un
+#     fractionnement par cette meme voie.
+#   - notations_echecs.jsonl porte 15 lignes pour 4 echecs distincts, le plus
+#     ancien redit depuis le 04/08/2026 — soit 67 jours. Ce sont les 4 `ECHEC`
+#     du fonds de notations, et C8 les designe depuis le 28/09/2026 sans que
+#     rien ne les compte.
+#
+# L'UNITE. Un compte de lignes serait un cumul : un echec permanent en ajoute
+# une a chaque passage (la regle de la section 34). Ce qui est plafonne ici est
+# donc le nombre d'echecs DISTINCTS — il ne monte que quand un defaut NOUVEAU
+# apparait, et il descend quand un defaut est repare. Pour le seul registre dont
+# la population croit avec l'archive (fondamentaux), c'est une PART des
+# tentatives. Les registres etant nommes un par un, ils n'ont pas a figurer dans
+# UNITE_PLAFONDS, comme BASCULES_PAR_TICKER et SEANCES_SANS_BBGC_CONNUES.
+#
+# cle : les champs qui identifient un echec, horodatage exclu — sans quoi la
+# redite d'un meme defaut compterait pour un defaut de plus.
+REGISTRES_ECHECS = {
+    "collecte/notations_echecs.jsonl": dict(
+        ajout_seul=True, cle=("url",), distincts_max=4),
+    "collecte/avis_echecs.jsonl": dict(
+        ajout_seul=True, cle=("rubrique", "page", "erreur"), distincts_max=1),
+    "collecte/fondamentaux_echecs.jsonl": dict(
+        ajout_seul=True, cle=("sha256", "raison"), part_max=0.72,
+        population="collecte/fondamentaux_extraits.csv"),
+    "collecte/continuite_suspecte.jsonl": dict(
+        ajout_seul=False, cle=("ticker", "date"), distincts_max=75),
+    "collecte/extractions_brutes.jsonl": dict(
+        ajout_seul=False, cle=("ticker", "exercice", "champ"), distincts_max=55),
+    "collecte/anomalies_integrite.json": dict(ajout_seul=False, distincts_max=0),
+    "collecte/rapports_non_identifies.csv": dict(
+        ajout_seul=False, cle=("sha256",), distincts_max=59),
+}
+
+
+def _echecs_distincts(chemin, cle):
+    """Les echecs distincts d'un registre, redite retiree."""
+    import csv
+    import io
+    p = RACINE / chemin
+    if not p.exists():
+        return None
+    texte = p.read_text(encoding="utf-8")
+    if chemin.endswith(".jsonl"):
+        objs = [json.loads(l) for l in texte.splitlines() if l.strip()]
+        return len(objs), len({tuple(str(o.get(k)) for k in cle) for o in objs})
+    if chemin.endswith(".csv"):
+        lignes = list(csv.DictReader(io.StringIO(texte)))
+        return len(lignes), len({tuple(str(l.get(k)) for k in cle) for l in lignes})
+    charge = json.loads(texte or "[]")
+    n = len(charge) if isinstance(charge, (list, dict)) else 1
+    return n, n
+
+
+def test_registres_echecs():
+    """Quatre controles. Le quatrieme est celui que les registres criaient.
+
+    A — l'inventaire est exhaustif : aucun registre commite n'echappe au
+        plafonnement. Sans lui, la regle ne couvrirait que les sept d'aujourd'hui.
+    B — par registre, un plafond d'echecs DISTINCTS (ou une part, quand la
+        population croit).
+    C — tout echec distinct des deux petits registres en ajout seul est NOMME
+        dans CHANTIERS.md. Un registre que la memoire de la boucle ne nomme pas
+        est un registre que personne ne reprendra : c'est exactement ce qui est
+        arrive pendant 67 jours a l'echec TTLS.
+    D — aucune rubrique muette : chaque rubrique que le collecteur d'avis
+        parcourt doit avoir rendu au moins une ligne, ou etre nommee comme
+        connue en panne. C'est le defaut que les 19 lignes d'avis_echecs
+        signalaient sans etre lues."""
+    print("\n=== 40. Les registres d'echec que rien ne comptait (chasse cycle 27) ===")
+    import csv
+    import io
+    import re
+
+    # A — l'inventaire. Tout .jsonl de collecte/, plus les deux registres
+    # commites sous une autre extension, doit etre declare.
+    import glob as _glob
+    vus = {("collecte/" + os.path.basename(f))
+           for f in _glob.glob(str(RACINE / "collecte" / "*.jsonl"))}
+    for autre in ("collecte/anomalies_integrite.json",
+                  "collecte/rapports_non_identifies.csv"):
+        if (RACINE / autre).exists():
+            vus.add(autre)
+    non_declares = sorted(vus - set(REGISTRES_ECHECS))
+    verifie(not non_declares,
+            f"les {len(vus)} registres commites de collecte/ sont tous declares "
+            f"dans REGISTRES_ECHECS"
+            + ("" if not non_declares
+               else " — NON DECLARE(S), donc ni compte ni plafonne : "
+                    + ", ".join(non_declares)))
+    disparus = sorted(set(REGISTRES_ECHECS) - vus)
+    verifie(not disparus,
+            "REGISTRES_ECHECS ne declare aucun registre disparu"
+            + ("" if not disparus else " — A RETIRER : " + ", ".join(disparus)))
+
+    # B — les plafonds, en echecs distincts ou en part.
+    mesures = {}
+    for chemin, regle in sorted(REGISTRES_ECHECS.items()):
+        compte = _echecs_distincts(chemin, regle.get("cle", ()))
+        if compte is None:
+            continue
+        lignes, distincts = compte
+        mesures[chemin] = (lignes, distincts)
+        nom = os.path.basename(chemin)
+        if "part_max" in regle:
+            pop = RACINE / regle["population"]
+            reussites = max(0, len(pop.read_text(encoding="utf-8").splitlines()) - 1)
+            total = distincts + reussites
+            verifie(total >= 200,
+                    f"{nom} : plancher de population tenu ({total} tentatives, "
+                    f"200 exigees) — une part sur un corpus vide est nulle, donc "
+                    f"faussement verte")
+            part = distincts / total if total else 0.0
+            verifie(part <= regle["part_max"],
+                    f"{nom} : {distincts} echecs distincts sur {total} tentatives, "
+                    f"soit {part:.1%} (plafond {regle['part_max']:.0%})")
+        else:
+            verifie(distincts <= regle["distincts_max"],
+                    f"{nom} : {distincts} echecs distincts (plafond "
+                    f"{regle['distincts_max']}) pour {lignes} lignes ecrites")
+        if regle.get("ajout_seul") and lignes > distincts:
+            print(f"  [note] {nom} : {lignes - distincts} redites — un defaut "
+                  f"permanent y ecrit une ligne de plus a chaque passage")
+
+    # C — tout echec du fonds de notations est nomme dans la memoire de la boucle.
+    chantiers = (RACINE / "CHANTIERS.md").read_text(encoding="utf-8")
+    fonds = RACINE / "collecte" / "notations_financieres.csv"
+    if fonds.exists():
+        lignes = list(csv.DictReader(io.StringIO(fonds.read_text(encoding="utf-8"))))
+        en_echec = sorted({l["ticker"] for l in lignes
+                           if l.get("statut_extraction") == "ECHEC"})
+        muets = [t for t in en_echec if t not in chantiers]
+        verifie(not muets,
+                f"les {len(en_echec)} tickers en ECHEC du fonds de notations "
+                f"({', '.join(en_echec) or 'aucun'}) sont tous nommes dans "
+                f"CHANTIERS.md"
+                + ("" if not muets
+                   else " — NON NOMME(S), donc perdu(s) de vue : "
+                        + ", ".join(muets)))
+
+    # D — la rubrique muette. Le collecteur parcourt RUBRIQUES ; une rubrique
+    # qui n'a jamais rien rendu est une source absente, pas une source vide.
+    src_avis = (RACINE / "collecte" / "avis_brvm.py").read_text(encoding="utf-8")
+    bloc = re.search(r"^RUBRIQUES\s*=\s*\{(.*?)^\}", src_avis, re.M | re.S)
+    rubriques = set(re.findall(r'"([A-Z_]+)"\s*:', bloc.group(1))) if bloc else set()
+    corpus = RACINE / "collecte" / "avis_brvm.csv"
+    rendues = set()
+    if corpus.exists():
+        rendues = {l["rubrique"] for l in
+                   csv.DictReader(io.StringIO(corpus.read_text(encoding="utf-8")))}
+    # Les backticks sont retires avant la recherche : « la rubrique `OPERATION` »
+    # doit compter comme un nommage, sinon le controle dependrait de la mise en
+    # forme de la prose et non de son contenu.
+    memoire = chantiers.replace("`", "")
+    muettes = sorted(r for r in rubriques - rendues
+                     if f"rubrique {r}" not in memoire)
+    verifie(rubriques and not muettes,
+            f"les {len(rubriques)} rubriques parcourues par avis_brvm.py ont "
+            f"toutes rendu au moins un avis, ou sont nommees en panne dans "
+            f"CHANTIERS.md ({len(rendues)} rendues sur {len(rubriques)})"
+            + ("" if rubriques and not muettes
+               else " — RUBRIQUE(S) MUETTE(S), le collecteur les parcourt et "
+                    "n'en rapporte rien : " + ", ".join(muettes)))
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -5695,6 +5881,7 @@ def main():
     test_git_add_des_workflows()
     test_journal_predictions()
     test_dependances_des_workflows()
+    test_registres_echecs()
     if not sans_app:
         test_application()
 

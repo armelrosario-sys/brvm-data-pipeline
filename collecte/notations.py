@@ -143,13 +143,31 @@ RE_ACTION = re.compile(
     r"affirm[ée]e?s?|confirm[ée]e?s?|maintenue?s?|attribu[ée]e?s?|retir[ée]e?s?)"
     r"(?:\s+(?:la|les|ses)?\s*notes?)?", re.I)
 RE_ACTION_CONTEXTE = re.compile(r"note", re.I)
+# Tout motif dont la capture part dans _nombre() doit etre un NOMBRE ENTIER DE
+# BOUT EN BOUT. Corrige le 10/10/2026 (cycle 27) : `([\d,\.]+)` et
+# `(\d[\d\s.,]{1,9})` acceptaient une capture SANS AUCUN CHIFFRE, ou a
+# ponctuation terminale. Un tableau PDF rendu "Score de risque-pays | . |"
+# capturait donc "." et `float('.')` levait ValueError -- qui n'etait pas
+# rattrapee : elle remontait jusqu'a extraire_pdf et faisait perdre le document
+# ENTIER, note de long terme comprise, pour un champ accessoire illisible.
+# C'est l'echec TTLS 2025-12-30 du fonds, « could not convert string to float:
+# '.' », repete a chaque passage depuis le 04/08/2026. La forme canonique
+# ci-dessous est verrouillee par la section 39 de tester_donnees.py.
+RE_NOMBRE_SUR = r"\d+(?:[.,]\d+)?"
 RE_CA = re.compile(
-    r"(\d[\d\s.,]{1,9})\s*milliards?\s*(?:de\s*)?(?:FCFA|F\s?CFA|XOF)", re.I)
+    # Le `[.,]?` est HORS du groupe : une ponctuation terminale avant
+    # « milliards » ne doit plus ni entrer dans le nombre (float('142.') passe,
+    # float('1..') non) ni faire perdre la capture entiere.
+    r"(\d[\d\s]{0,8}(?:[.,]\d{1,3})?)[.,]?\s*milliards?\s*(?:de\s*)?(?:FCFA|F\s?CFA|XOF)",
+    re.I)
 RE_MARGE_NETTE = re.compile(r"marge\s+nette[^.\d]{0,30}(\d{1,2})\s*%", re.I)
 RE_MARGE_BRUTE = re.compile(r"marge\s+brute[^.\d]{0,30}(\d{1,2})\s*%", re.I)
-RE_SCORE_PAYS = re.compile(r"score\s+de\s+risque[- ]pays\s*\|?\s*([\d,\.]+)", re.I)
-RE_SCORE_SECT = re.compile(r"score\s+de\s+risque\s+sectoriel\s*\|?\s*([\d,\.]+)", re.I)
-RE_SCORE_TOTAL = re.compile(r"score\s+total\s*\|?\s*([\d,\.]+)", re.I)
+RE_SCORE_PAYS = re.compile(
+    r"score\s+de\s+risque[- ]pays\s*\|?\s*(" + RE_NOMBRE_SUR + r")", re.I)
+RE_SCORE_SECT = re.compile(
+    r"score\s+de\s+risque\s+sectoriel\s*\|?\s*(" + RE_NOMBRE_SUR + r")", re.I)
+RE_SCORE_TOTAL = re.compile(
+    r"score\s+total\s*\|?\s*(" + RE_NOMBRE_SUR + r")", re.I)
 RE_AGENCE = re.compile(
     r"\b(GCR Ratings|GCR|WARA|Bloomfield Investment Corporation|Bloomfield|"
     r"Moody'?s|Fitch|S&P)\b")
@@ -411,8 +429,18 @@ def _analyser_texte(txt):
             note_ct_bloom = ct[0] if ct else None
         if note_lt is None:
             # tournure redactionnelle : "la note de long terme A (note d'investissement)"
+            # RE_NOTE_NUE n'a AUCUN groupe capturant (tout y est en (?:...)) :
+            # concatene tel quel, `m_txt.group(1)` levait IndexError('no such
+            # group'). Corrige le 10/10/2026 (cycle 27). Ce n'etait pas du code
+            # mort : la voie n'est atteinte que si RE_BLOOM_LT ne trouve pas de
+            # note dans sa fenetre de 120 caracteres SANS SAUT DE LIGNE, alors
+            # que `plat` l'y trouve -- exactement le cas d'un PDF qui coupe
+            # « note de long terme » en fin de ligne et met « A+ » sur la
+            # suivante. C'est l'echec ONATEL/ONTBF du fonds (2018-07-09 et
+            # 2014-05-02), « no such group », repete a chaque passage.
             m_txt = re.search(r"(?:note\s+(?:de\s+)?long\s*terme|long\s*terme[,:]?)\s*"
-                              r"(?:de\s+|demeure\s+|est\s+)?" + RE_NOTE_NUE.pattern,
+                              r"(?:de\s+|demeure\s+|est\s+)?"
+                              r"(" + RE_NOTE_NUE.pattern + r")",
                               plat, re.I)
             if m_txt:
                 note_lt = m_txt.group(1)

@@ -471,7 +471,10 @@ comparatif TTLS 2025 se tranche alors sans second accès à brvm.org.
 ## C8 — Extracteur GCR
 
 - classe : VERTE — code d'extraction ; toute écriture dans le fonds de notations repasse en ORANGE
-- statut : À FAIRE (maintenu en file sur décision du 27/09/2026)
+- statut : **FAIT le 10/10/2026 (cycle 27) pour le code ; le reversement part en C46.**
+  Les 4 `ECHEC` sont rediagnostiqués, **3 sont deux défauts de code, corrigés et
+  reproduits hors ligne**, le 4ᵉ est hors de portée. La passe autorisée est
+  consommée ; **aucun cycle ne reprend C8.** Voir *Fait le 10/10/2026* au bas du bloc.
 - validation : —
 - autonomie : complète
 - priorité : 8
@@ -492,6 +495,60 @@ avant toute proposition.
 
 **Terminé quand** : l'extracteur passe les 10 PDF GCR d'échantillon, ou le
 motif d'abandon est chiffré sur des données fraîches.
+
+### Fait le 10/10/2026 (cycle 27)
+
+**Le titre de ce chantier ne visait plus la bonne agence, et c'est la première
+mesure du cycle.** Le fonds compte aujourd'hui **386 lignes : 295 `OK`, 87
+`SANS_NOTE`, 4 `ECHEC`**. Par agence : **Bloomfield 249, WARA 82, GCR 44**, 11
+sans agence. GCR ne porte donc **aucun** échec — ses 44 extractions passent — et
+l'autotest rend bien « PDF GCR 10/10 » (relancé ce cycle). Les 4 échecs sont
+**1 TTLS** et **3 ONTBF**, et deux d'entre eux sont des documents **WARA**. Un
+extracteur GCR n'aurait rien rapporté.
+
+**Les 4 échecs sont trois messages d'erreur, et deux d'entre eux sont des défauts
+de code reproduits hors ligne, sans réseau et sans PDF.**
+
+| échec | message du registre | redit | cause |
+|---|---|---|---|
+| TTLS 2025-12-30 | `could not convert string to float: '.'` | 6 fois depuis le **04/08/2026** | `([\d,\.]+)` des trois motifs de score capture une chaîne **sans aucun chiffre** |
+| ONTBF 2018-07-09 | `no such group` | 3 fois | `RE_NOTE_NUE` n'a **aucun groupe capturant**, et le site d'appel fait `.group(1)` |
+| ONTBF 2014-05-02 | `no such group` | 3 fois | la même |
+| ONTBF 2015-08-06 | `Unexpected EOF` | 3 fois | PDF tronqué côté brvm.org — **hors de portée** |
+
+**Le premier défaut faisait perdre le document entier pour un champ accessoire.**
+`float('.')` — et `float(',')`, qui donne le même message, `_nombre` remplaçant la
+virgule par un point — levait `ValueError` dans `_analyser_texte`, exception
+remontée jusqu'à `extraire_pdf` : le document était **jeté en entier**, note de
+long terme comprise, parce qu'un tableau PDF rendait « Score de risque-pays | . | ».
+Reproduit : `RE_SCORE_PAYS.search("Score de risque-pays | . |")` capture `'.'`.
+Quatre motifs sur les six qui alimentent `_nombre` acceptaient une capture non
+convertible (les trois scores, et `RE_CA` sur `"1 .. milliards FCFA"` → `'1..'`).
+Tous quatre portent désormais la forme canonique `\d+(?:[.,]\d+)?`.
+
+**Le second n'était pas du code mort.** La voie `m_txt` n'est atteinte que si
+`RE_BLOOM_LT` ne trouve pas de note dans sa fenêtre de 120 caractères **sans saut
+de ligne**, alors que le texte aplati l'y trouve — exactement un PDF qui coupe
+« note de long terme » en fin de ligne et met « A+ » sur la suivante. Reproduit sur
+deux formes : note en début de ligne suivante, et « Long Terme » en sommaire.
+
+**Effet mesuré, les quatre reproductions avant/après :**
+
+| texte reproduisant l'échec | avant | après |
+|---|---|---|
+| score illisible `.` | `ValueError` | `note_lt='A+(WU)'`, score **vide** |
+| score illisible `,` | `ValueError` | `note_lt='A(WU)'`, score **vide** |
+| note en ligne suivante | `IndexError` | `note_lt='A+'` |
+| « Long Terme » en sommaire | `IndexError` | `note_lt='A+'` |
+
+Neuf captures légitimes vérifiées inchangées (`3,2` ; `2.75` ; `45` ; `7,25` ;
+`142` / `1 234` / `1,5` / `139` milliards ; `12 %`), et `notations.py --test`
+repasse : **index 15/15, 14 tickers, PDF GCR 10/10, Bloomfield 6/6, pièges 3/3**.
+
+**Rien n'a été écrit dans le fonds.** La classe le dit : une écriture y repasse en
+ORANGE, et les trois PDF sont hors de portée du bac à sable. Le reversement — un
+passage de `notations.yml`, qui doit faire tomber les `ECHEC` de **4 à 1** — est
+inscrit en **C46**. C'est la vérification de ce cycle, et elle attend un mot.
 
 ## C9 — Extinction de P5b et retrait du code mort
 
@@ -3464,6 +3521,88 @@ dans `docs/JOURNAL.md`, retrouvable par un renvoi vérifié ; et un contrôle de
 mesure cette part, de sorte que la dérive se signale elle-même au lieu d'être rechassée
 dans six cycles.
 
+## C45 — La rubrique OPERATION de la collecte d'avis répond 404 depuis 22 jours, et c'est celle des fractionnements
+
+- classe : ORANGE — rétablir une source d'avis ouvre l'entrée d'un corpus certifié, et retrouver la bonne adresse demande un passage réseau ; **seule la mesure est pré-autorisée**
+- statut : PROPOSÉ — diagnostic fait et chiffré le 10/10/2026 (cycle 27)
+- validation : —
+- autonomie : partielle — le constat est **sans réseau** ; l'adresse de remplacement ne se trouve que sur brvm.org, donc par workflow
+- priorité : **2** — il vide la première passe de C4 de son contenu, et la veille datée du 08/10 l'attend
+
+**Le constat, trouvé par la chasse du cycle 27 dans un registre que rien ne
+lisait.** `collecte/avis_echecs.jsonl` porte **19 lignes pour UN SEUL échec
+distinct**, redit à chaque passage du **18/09/2026 au 09/10/2026** :
+
+```
+404 Client Error: Not Found for url:
+https://www.brvm.org/fr/emetteurs/type-annonces/operations-sur-titres
+```
+
+C'est la rubrique `OPERATION` de `RUBRIQUES`, dans `collecte/avis_brvm.py`, et
+son propre en-tête la décrit ligne 37 : « fractionnements, DPS ».
+
+**Ce que ce 404 coûte, mesuré.** Sur les **140 avis** du corpus
+`collecte/avis_brvm.csv`, la répartition par rubrique est **ASSEMBLEE 60,
+AVIS 40, DIVIDENDE 40, OPERATION 0**. La rubrique n'a donc **jamais rien
+rendu** : ce n'est pas une source vide, c'est une source absente. Deux
+conséquences précises, et toutes deux déjà inscrites ailleurs dans ce fichier :
+
+1. **C4 prescrit une première passe « sans réseau »** qui « fouille d'abord le
+   corpus d'avis déjà collecté » avant de chercher un avis de fractionnement
+   pour ses dix dates. Ce corpus ne peut structurellement en contenir aucun. La
+   passe aurait rendu « rien trouvé » et ce rien n'aurait rien prouvé.
+2. **La veille datée du 08/10/2026 (AGE Sonatel, fractionnement)** attend un
+   fractionnement à enregistrer « le jour même ». Il arriverait par cette
+   rubrique, c'est-à-dire par personne.
+
+**Le défaut de forme, et c'est lui qu'il faut fermer.** `avis_brvm.py` parcourt
+`RUBRIQUES` et journalise l'échec d'une rubrique **sans jamais faire échouer le
+passage** : trois rubriques sur quatre suffisent à rendre un relevé qui a l'air
+complet. C'est la famille du *faux vert* que la section 19 a connue. Le
+contrôle D de la **section 40**, écrit ce cycle, l'interdit désormais : toute
+rubrique parcourue doit avoir rendu au moins un avis, ou être nommée en panne
+dans ce fichier — c'est pourquoi la ligne `rubrique OPERATION` ci-dessus doit y
+rester tant que le défaut vit.
+
+**Ce qu'il faut faire, et l'ordre compte.** D'abord **mesurer sans rien
+réécrire** : lancer `avis_brvm.yml` et relever le code HTTP des quatre adresses,
+pour distinguer une adresse déplacée (301/404 sur un chemin renommé par la
+BRVM) d'une rubrique réellement supprimée du site. Ensuite seulement trancher :
+corriger le chemin, ou retirer la rubrique de `RUBRIQUES` **en disant par quelle
+autre voie un fractionnement sera vu** — jamais la laisser muette.
+
+**Terminé quand** : la rubrique rend des avis et le corpus en porte, ou son
+retrait est motivé et la voie de remplacement des fractionnements est nommée ;
+dans les deux cas `avis_echecs.jsonl` cesse de réécrire la même ligne, et le
+contrôle D de la section 40 passe sans exception nommée.
+
+## C46 — Reverser au fonds de notations les trois échecs que C8 a réparés
+
+- classe : ORANGE — écrit dans le fonds de notations, donc dans des valeurs certifiées, et demande un passage réseau
+- statut : PROPOSÉ — le correctif est livré et éprouvé hors ligne par C8 (cycle 27)
+- validation : —
+- autonomie : partielle — `notations.yml` par l'API ; les trois PDF sont hors de portée du bac à sable
+- priorité : 3
+
+Le code qui jetait ces trois documents est corrigé et reproduit (voir *Fait le
+10/10/2026* sous **C8**), mais le fonds porte toujours leurs `ECHEC` : le
+correctif ne vaut que ce qu'un passage réel en fera. Un passage de
+`notations.yml` doit faire tomber `statut_extraction = ECHEC` de **4 à 1** —
+seul `20150806_-_nf_wara_-_onatel_bf_-_aout_2015.pdf` doit rester, son PDF étant
+tronqué à la source.
+
+**Deux choses à vérifier au retour, et pas seulement le compte.** D'abord que
+ONTBF reçoit une `note_lt` **plausible** : la voie corrigée lit la note dans le
+texte aplati, et C8 n'a pu l'éprouver que sur des textes reconstruits à la main,
+pas sur les PDF réels. Ensuite que TTLS porte bien sa note avec son
+`score_risque_pays` **vide** — une case vide, pas un zéro.
+
+**Terminé quand** : le fonds porte 1 `ECHEC` au lieu de 4, les trois lignes
+récupérées sont relues titre par titre, le plafond `distincts_max` de
+`notations_echecs.jsonl` dans la section 40 est descendu à la mesure nouvelle, et
+le motif du dernier échec est daté ; ou le passage montre que le correctif ne
+suffit pas, et le dit avec le message d'erreur nouveau.
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
@@ -3483,6 +3622,36 @@ dans six cycles.
 # Dernier cycle
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
+
+## 2026-10-10 — cycle 27 (matin)
+**Exécuté : C8.** Anti-collision : **0 commit de cycle** depuis 3 h, cycle 26 clos. Rang 1 revérifié
+**vide** (les **16** ORANGE à `validation : OK` portent tous la mention de passe consommée) ; rang 2.
+**Le chantier ne visait plus la bonne agence.** Fonds : **386 lignes, 295 OK / 87 SANS_NOTE / 4 ECHEC**
+— Bloomfield **249**, WARA **82**, GCR **44**, 11 sans. GCR ne porte **aucun** échec ; les 4 sont
+**1 TTLS + 3 ONTBF**, dont deux documents WARA. Un extracteur GCR n'aurait rien rapporté.
+**Trois des quatre sont deux défauts de code, reproduits hors ligne et corrigés.** (1) `([\d,\.]+)` des
+trois motifs de score capturait une chaîne **sans aucun chiffre** : `float('.')` levait `ValueError`,
+remontée jusqu'à `extraire_pdf`, qui faisait **jeter le document entier** pour un champ accessoire —
+échec TTLS redit **6 fois depuis le 04/08**, **67 jours**. 4 motifs sur 6 alimentant `_nombre` étaient
+dans ce cas ; tous portent désormais `\d+(?:[.,]\d+)?`. (2) `RE_NOTE_NUE` n'a **aucun groupe capturant**
+et le site d'appel faisait `.group(1)` → `IndexError('no such group')`, atteint quand un PDF coupe
+« note de long terme » en fin de ligne — ONTBF ×2. Le 4ᵉ (`Unexpected EOF`) est un PDF tronqué à la
+source, **hors de portée**. **4 reproductions : ValueError/IndexError → notes lues, score vide** ;
+9 captures légitimes inchangées ; `notations.py --test` index 15/15, GCR 10/10, pièges 3/3. **Rien
+écrit dans le fonds** (la classe le dit) : le reversement part en **C46**.
+**Chasse — 7 registres d'échec commités, et la barrière n'en nommait AUCUN.** Le plus parlant :
+`avis_echecs.jsonl`, **19 lignes pour 1 seul échec distinct**, redit du 18/09 au 09/10 — un **404** sur
+la rubrique `OPERATION`, celle des **fractionnements**. Elle n'a jamais rien rendu : **0 avis sur 140**
+(ASSEMBLEE 60, AVIS 40, DIVIDENDE 40). C4 prescrit d'y fouiller avant tout réseau et la veille datée du
+08/10 (AGE Sonatel) l'attend. **Section 40, 14 contrôles** : plafonds en **échecs distincts** (pas en
+lignes — une redite n'est pas un défaut de plus), part pour le seul registre à population croissante
+(**568 / 828 = 68,6 %**), tout `ECHEC` du fonds nommé ici, aucune rubrique muette. **Injection 8 / 8**,
+dont la 4ᵉ — 10 redites de plus — **verte** : l'unité n'est pas un cumul.
+**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) : base
+**50 sociétés / 185 lignes d'états**, golden tests passent, `tester_donnees.py` **360 OK, 0 ÉCHEC**,
+code 2, **4** alertes antérieures (C4, C5, relevé du jour ×2, identiques au 09/10) ; `profils.json` et
+`journal_profils.csv` **inchangés à l'octet**. **Proposé : C45** (ORANGE, 2). **Prochain** : rang 2,
+**C9** (VERTE, 9), dernière VERTE de la file.
 
 ## 2026-10-09 — cycle 26 (soir)
 **Exécuté : C38.** Anti-collision : **0 commit** depuis 3 h, cycle 25 clos, CI verte. Rang 1

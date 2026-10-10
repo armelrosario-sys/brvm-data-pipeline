@@ -9,6 +9,216 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-10 — cycle 27 (matin) : C8, le chantier ne visait plus la bonne agence, et sept registres d'échec que rien ne comptait
+
+Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit de
+cycle**. Le cycle 26 est clos (`aa21ab5`, « Cloture cycle 26 »), et les trois commits du jour sont des
+relevés automatiques (BOC, Sikafinance, Volumes/Valeurs). Aucune annonce ouverte, de cycle ni hors
+cycle. État : `HEAD` à jour sur `origin/main`, arbre propre.
+
+**Choix du chantier, et il est entièrement déterminé.** Rang 1 revérifié ligne par ligne : **16**
+chantiers ORANGE portent `validation : OK`, et les 16 portent la mention « la passe autorisée est
+consommée ». Le rang 1 est donc vide, comme au cycle 26. Rang 2, première `VERTE` non faite par
+priorité : **C8** (priorité 8), avant C9 (9). C'est bien ce que le cycle 26 annonçait.
+
+### C8 — les 4 `ECHEC` du fonds de notations
+
+**Première mesure : le titre du chantier est périmé.** C8 s'appelle « Extracteur GCR » et part du
+constat du 27/09/2026 : « 8 des 10 échecs sont GCR ». Mesuré ce cycle sur
+`collecte/notations_financieres.csv` :
+
+| | lignes |
+|---|---|
+| total | **386** |
+| `OK` | **295** |
+| `SANS_NOTE` | **87** |
+| `ECHEC` | **4** |
+
+Par agence : **Bloomfield Investment Corporation 249**, **WARA 82**, **GCR 44**, 11 sans agence
+renseignée. **GCR ne porte aucun échec** : ses 44 extractions passent, et l'autotest du module rend
+« PDF GCR 10/10 » (relancé ce cycle). Les 4 échecs sont **1 TTLS** et **3 ONTBF**, et deux des trois
+ONTBF sont des documents **WARA** (`nf_wara_-_onatel_bf`). Un extracteur GCR n'aurait rapporté aucun
+des quatre. Le critère de terminaison écrit dans le chantier — « l'extracteur passe les 10 PDF GCR
+d'échantillon » — était déjà satisfait depuis le 28/09, ce que le chantier disait lui-même.
+
+**Les 4 échecs sont trois messages, lus dans `collecte/notations_echecs.jsonl`.**
+
+| échec | message | redit | depuis |
+|---|---|---|---|
+| TTLS 2025-12-30 | `could not convert string to float: '.'` | **6 fois** | **04/08/2026** (67 jours) |
+| ONTBF 2018-07-09 | `no such group` | 3 fois | 27/09/2026 |
+| ONTBF 2014-05-02 | `no such group` | 3 fois | 27/09/2026 |
+| ONTBF 2015-08-06 | `Unexpected EOF` | 3 fois | 27/09/2026 |
+
+**Défaut 1 — un champ accessoire illisible faisait perdre le document entier.** Les trois motifs de
+score de `collecte/notations.py` s'écrivaient `([\d,\.]+)` : une classe de caractères qui accepte une
+capture **sans aucun chiffre**. Un tableau PDF rendu « Score de risque-pays | . | » capture donc `'.'`,
+et `_nombre()` fait `float('.')` → `ValueError`. Cette exception n'était rattrapée nulle part : elle
+remontait de `_analyser_texte()` à `extraire_pdf()` et le document était **jeté en entier**, note de
+long terme comprise, pour un champ qui ne sert à aucun score. Reproduit hors ligne, sans réseau et
+sans PDF :
+
+```
+RE_SCORE_PAYS.search("Score de risque-pays | . |").group(1)  ->  '.'
+_nombre('.')                                                 ->  ValueError: ... '.'
+```
+
+Et `','` donne **exactement le même message**, `_nombre` remplaçant la virgule par un point avant
+`float` — c'est pourquoi le message du registre ne dit pas lequel des deux caractères était là.
+
+L'inventaire : **4 motifs sur les 6** qui alimentent `_nombre` acceptaient une capture non
+convertible. Les trois scores, et `RE_CA` sur « 1 .. milliards FCFA » → `'1..'`. Tous quatre portent
+désormais la forme canonique `\d+(?:[.,]\d+)?` ; pour `RE_CA`, une ponctuation terminale avant
+« milliards » est tolérée **hors du groupe**, de sorte qu'elle n'entre pas dans le nombre et ne fait
+pas perdre la capture.
+
+**Défaut 2 — `no such group`, et ce n'était pas du code mort.** `RE_NOTE_NUE` est écrit entièrement en
+groupes non capturants : `RE_NOTE_NUE.groups == 0`. Concaténé tel quel dans la voie rédactionnelle de
+`_analyser_texte()`, l'appel `m_txt.group(1)` lève `IndexError('no such group')`. Cette voie n'est
+atteinte que si `RE_BLOOM_LT` ne trouve pas de note dans sa fenêtre de 120 caractères **sans saut de
+ligne**, alors que le texte aplati l'y trouve. Deux formes reproduites :
+
+- `"WARA attribue la note de long terme\nA+ a ONATEL BF."` — la note est sur la ligne suivante ;
+- `"Sommaire\nLong Terme ........ page 4\nL'agence confirme la note de long terme A+ ..."` — la
+  première occurrence de « Long Terme » est un sommaire, sans note dans sa fenêtre.
+
+Correctif : le motif est enveloppé dans un groupe capturant au site d'appel.
+
+**Défaut 3 — hors de portée.** `Unexpected EOF` vient de pdfminer sur
+`20150806_-_nf_wara_-_onatel_bf_-_aout_2015.pdf` : le PDF est tronqué côté brvm.org. Le bac à sable ne
+l'atteint pas, et le réécrire serait deviner. Constaté et daté.
+
+**Effet mesuré, les quatre reproductions avant/après :**
+
+| texte | avant | après |
+|---|---|---|
+| score illisible `.` | `ValueError` | `note_lt='A+(WU)'`, `score_risque_pays` **vide** |
+| score illisible `,` | `ValueError` | `note_lt='A(WU)'`, score **vide** |
+| note en ligne suivante | `IndexError` | `note_lt='A+'` |
+| « Long Terme » en sommaire | `IndexError` | `note_lt='A+'` |
+
+C'est la règle du dépôt appliquée au bon endroit : **une case vide vaut mieux qu'une valeur
+approchée** — mais une case vide vaut aussi mieux qu'un document perdu.
+
+**Non-régression.** Neuf captures légitimes vérifiées inchangées : `3,2`, `2.75`, `45`, `7,25`,
+`142` / `1 234` / `1,5` / `139` milliards, `12 %`. Et `collecte/notations.py --test` repasse : **index
+15/15, 14 tickers, PDF GCR 10/10, Bloomfield 6/6, pièges 3/3**.
+
+**Rien n'a été écrit dans le fonds**, et la classe du chantier le dit : « toute écriture dans le fonds
+de notations repasse en ORANGE ». Les trois PDF sont hors de portée du bac à sable, et seul un passage
+de `notations.yml` peut faire tomber les `ECHEC` de **4 à 1**. C'est **C46**, et il attend un mot.
+
+### La chasse — sept registres d'échec commités, et la barrière n'en nommait aucun
+
+**La famille.** Le dépôt commite sept registres de défauts. Mesure du jour : le nom de base
+d'**aucun des sept** n'apparaissait une seule fois dans `moteur/tester_donnees.py`. Trois sont écrits
+en **ajout seul** (`open("a")`) par un collecteur ; quatre sont des instantanés réécrits.
+
+| registre | octets | lignes | distincts | redites |
+|---|---|---|---|---|
+| `fondamentaux_echecs.jsonl` | 138 813 | 568 | 568 | 0 |
+| `extractions_brutes.jsonl` | 16 700 | 62 | 55 | 7 |
+| `rapports_non_identifies.csv` | 14 023 | 59 | 59 | 0 |
+| `continuite_suspecte.jsonl` | 10 399 | 75 | 75 | 0 |
+| `avis_echecs.jsonl` | 3 515 | **19** | **1** | **18** |
+| `notations_echecs.jsonl` | 2 766 | **15** | **4** | **11** |
+| `anomalies_integrite.json` | 3 | 0 | 0 | 0 |
+
+**Ce que le silence a coûté, et c'est le résultat le plus lourd du cycle.** `avis_echecs.jsonl` porte
+**19 lignes pour un seul échec distinct**, redit à chaque passage du **18/09/2026 au 09/10/2026** :
+
+```
+404 Client Error: Not Found for url:
+https://www.brvm.org/fr/emetteurs/type-annonces/operations-sur-titres
+```
+
+C'est la rubrique `OPERATION` de `RUBRIQUES`, dans `collecte/avis_brvm.py`, dont l'en-tête du module
+dit lui-même, ligne 37 : « fractionnements, DPS ». Répartition du corpus `collecte/avis_brvm.csv`,
+**140 avis** : **ASSEMBLEE 60, AVIS 40, DIVIDENDE 40, OPERATION 0**. La rubrique n'a **jamais** rien
+rendu. Ce n'est pas une source vide, c'est une source absente — et le collecteur parcourt `RUBRIQUES`
+en journalisant l'échec d'une rubrique **sans faire échouer le passage** : trois sur quatre suffisent
+à rendre un relevé qui a l'air complet. C'est la famille du faux vert de la section 19.
+
+Deux conséquences déjà écrites ailleurs dans `CHANTIERS.md`, et que personne ne pouvait relier faute
+de lire ce registre :
+
+1. **C4** prescrit une première passe « sans réseau » qui « fouille d'abord le corpus d'avis déjà
+   collecté » avant de chercher un avis de fractionnement pour ses dix dates. Ce corpus ne peut
+   structurellement en contenir aucun : la passe aurait rendu « rien trouvé », et ce rien n'aurait
+   rien prouvé.
+2. La **veille datée du 08/10/2026** (AGE Sonatel, fractionnement) attend un fractionnement à
+   enregistrer « le jour même ». Il arriverait par cette rubrique, c'est-à-dire par personne.
+
+À noter que le reconnaisseur, lui, fonctionne : `avis_brvm.py --test` rend « levée Sucrivoire et
+**fractionnement SNTS** détectés ». Le défaut est entièrement dans l'accès à la source.
+
+**Section 40 de `moteur/tester_donnees.py`, 14 contrôles.** Quatre familles :
+
+- **A — l'inventaire est exhaustif.** Tout `collecte/*.jsonl` commité, plus `anomalies_integrite.json`
+  et `rapports_non_identifies.csv`, doit être déclaré dans `REGISTRES_ECHECS`, et aucun registre
+  disparu ne doit y rester. Sans ce contrôle, la règle ne couvrirait que les sept d'aujourd'hui.
+- **B — un plafond par registre, et l'unité est le point.** Un compte de **lignes** serait un cumul,
+  interdit par la section 34 : un échec permanent en ajoute une à chaque passage. Ce qui est plafonné
+  est donc le nombre d'échecs **distincts** (redite retirée par une clé nommée, horodatage exclu) — il
+  ne monte que quand un défaut **nouveau** apparaît et descend quand un défaut est réparé. Pour le
+  seul registre dont la population croît avec l'archive, c'est une **part des tentatives** :
+  **568 échecs distincts sur 828 tentatives, soit 68,6 %** (plafond 72 %), avec un plancher de
+  population de 200 — une part sur un corpus vide est nulle, donc faussement verte.
+- **C — tout `ECHEC` du fonds de notations est nommé dans `CHANTIERS.md`.** Un registre que la mémoire
+  de la boucle ne nomme pas est un registre que personne ne reprendra : c'est exactement ce qui est
+  arrivé pendant 67 jours à l'échec TTLS.
+- **D — aucune rubrique muette.** Chaque rubrique que `avis_brvm.py` parcourt doit avoir rendu au
+  moins un avis, ou être nommée en panne dans `CHANTIERS.md`. Posé ce cycle, ce contrôle est rouge sur
+  `OPERATION` tant que le défaut vit, et il n'est vert aujourd'hui que parce que **C45** le nomme.
+
+**Injection : 8 / 8**, chacune touchant le contrôle visé et lui seul (le rouge `OPERATION` préexistant
+exclu) : un registre nouveau non déclaré, un registre déclaré disparu, un échec distinct de plus dans
+`notations_echecs`, la part des fondamentaux au-delà de son plafond, une population vide des deux
+côtés (plancher), un ticker en `ECHEC` masqué dans `CHANTIERS.md`, une rubrique neuve muette. Et la
+**quatrième injection est la preuve du choix d'unité** : dix redites de plus du même échec ONATEL —
+**aucun rouge**. Un cumul aurait crié ; un compte de distincts ne bronche pas.
+
+### Barrières
+
+Environnement virtuel aux dépendances exactes de `tests.yml`, `import pdfplumber` **échoue** bien
+(méthode du 07/10/2026), **Python 3.13.16** — le bac à sable ne retombe pas en 3.11, et
+`dashboard/generer_dashboard_html.py` compile.
+
+- `fusionner_fondamentaux.py`, `peupler.py` : **50 sociétés, 185 lignes d'états financiers**.
+- Les cinq chargeurs : code 0 chacun.
+- `tester.py` : **tous les golden tests passent**.
+- `profils.py` : A=6, B=28, C=14 ; `CROISSANCE_CORROBOREE=34`, `ECART_AGREGATEUR=3`,
+  `FONDAMENTAL_EN_RETARD=2`.
+- `tester_donnees.py` : **360 OK, 0 ÉCHEC**, code **2**, **4 alertes** toutes antérieures — C4
+  (12 divisions de nominal), C5 (CFAC, NEIC) et deux sur le relevé du jour (indices illisibles, séance
+  non ancrable), **identiques en forme à celles du 09/10** : le relevé du jour n'est pas ancrable deux
+  jours de suite, ce qui relève de la section 31 et non de ce cycle.
+- `avis_brvm.py --test` et `notations.py --test` : OK.
+- `generer_dashboard.py` : 48 titres.
+- `collecte/profils.json` **inchangé à l'octet**. `collecte/journal_profils.csv` : les 48 lignes du
+  jour écrites par le `profils.py` de la barrière ont été **annulées par `git checkout`** — la
+  barrière ne commite rien, et c'est à `P13`/`P12` d'indexer le journal avec le `profils.json` qu'il
+  atteste.
+
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés avant le commit.
+
+### Proposé
+
+**C45 — la rubrique OPERATION répond 404 depuis 22 jours** (ORANGE, priorité 2). Diagnostic fait et
+chiffré ci-dessus. ORANGE parce que retrouver l'adresse de remplacement demande un passage réseau et
+que rétablir la source ouvre l'entrée d'un corpus certifié ; seule la mesure — relever le code HTTP
+des quatre adresses par `avis_brvm.yml` — est pré-autorisée. Priorité 2 : il vide la première passe de
+C4 de son contenu et la veille datée du 08/10 l'attend.
+
+**C46 — reverser au fonds les trois échecs réparés** (ORANGE, priorité 3), avec sa vérification
+écrite : 4 `ECHEC` → 1, une `note_lt` plausible pour ONTBF, et TTLS avec son `score_risque_pays` vide
+plutôt qu'à zéro.
+
+**Prochain chantier**, par la règle de l'étape 4 : rang 1 vide, rang 2, **C9** (VERTE, priorité 9) —
+la dernière `VERTE` de la file.
+
+---
+
 ## 2026-10-09 — cycle 26 (soir) : C38, les cinq derniers plafonds-cumuls, et deux lignes du chantier déjà fausses
 
 Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit**. Le
