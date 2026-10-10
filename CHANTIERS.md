@@ -553,7 +553,13 @@ inscrit en **C46**. C'est la vérification de ce cycle, et elle attend un mot.
 ## C9 — Extinction de P5b et retrait du code mort
 
 - classe : VERTE — retrait de code mort, réversible, couvert par `pages.yml` et le test de fumée
-- statut : À FAIRE
+- statut : **CLOS le 10/10/2026 (cycle 28) — sa prémisse était fausse, et rien ne
+  pouvait la contredire.** Aucun des trois fichiers n'est mort : les trois sont
+  portants, mesure ci-dessous. Rien n'a été retiré, et il ne faut rien retirer.
+  Ce que ce chantier cherchait vraiment — savoir ce que personne ne lance — est
+  désormais **mesuré et borné** par la section 41 de `tester_donnees.py`. La passe
+  autorisée est consommée ; **aucun cycle ne reprend C9.** Ce que la mesure a
+  rendu visible part en **C47**.
 - validation : —
 - autonomie : complète
 - priorité : 9 — **en dernier**
@@ -565,6 +571,73 @@ se démontent ensemble ou pas du tout.
 
 **Terminé quand** : le code est retiré, aucune barrière ne s'appuie plus
 dessus, et la publication GitHub Pages fonctionne toujours.
+
+### Clos le 10/10/2026 (cycle 28), et ce que la mesure a corrigé
+
+**Les trois fichiers sont portants. Aucune des 1 382 lignes n'est morte.**
+
+| fichier | ce que dit C9 | ce que la mesure dit |
+|---|---|---|
+| `moteur/scoring.py` (735 l) | mort | importé par **7 modules**, dont `profils.py` et `generer_dashboard_html.py` — le tableau de bord **publié** ; sur ses **37** symboles de tête, 13 n'ont aucun consommateur extérieur et les 13 sont appelés **à l'intérieur** du module : aucun n'est mort |
+| `moteur/signaux.py` (439 l) | mort | **exécuté par `pages.yml`**, et sa table `signaux` est lue par `generer_dashboard_html.py`, `bloc_signaux.py` et `generer_poste_decision.py` |
+| `dashboard/generer_dashboard.py` (208 l) | mort | **test de fumée de 5 workflows** : `tests.yml`, `migration_csv.yml`, `releve_capitaux_propres.yml`, `lot2_referentiels_et_interimaires.yml`, `branchement_agregateur.yml` |
+
+Retirer les trois aurait éteint la publication GitHub Pages — que le critère
+*Terminé quand* du **même chantier** exige de garder vivante. Une seule des deux
+phrases pouvait être vraie.
+
+**Et l'avertissement du chantier désignait le mauvais fichier.** `tester_donnees.py`
+ne lance **pas** `generer_dashboard.py` : il ne le nomme nulle part. C'est
+`tests.yml` qui le lance, en dernière étape.
+
+**Pourquoi l'erreur a tenu douze jours : « code mort » était une opinion.** Rien
+dans le dépôt ne répondait à « qui lance ce fichier, et qui l'importe ». Un
+chantier **VERTE** — donc pré-autorisé, donc exécutable sans que Claudia revoie
+quoi que ce soit — prescrivait la suppression de 1 382 lignes dont aucune n'est
+morte. C'est la famille de la section 34 : un jugement écrit à la main une fois,
+jamais revérifié, qui finit par dire l'inverse du vrai.
+
+**Ce qui est livré à la place : la section 41, 10 contrôles.** Un module est
+*atteint* s'il est lancé par un workflow, par un `.sh` du dépôt, ou s'il est
+l'application ; ou s'il est atteint depuis une racine par **import local à toute
+profondeur** ou par **lancement depuis un module déjà atteint** (`app.py` lance
+les chargeurs, `tester_donnees.py` lance `app.py`). Les trois fonctions d'index,
+d'import et de résolution sont **celles de la section 39**, pour qu'il n'existe
+qu'une définition de « ce fichier importe ce module ».
+
+**La mesure, sur le dépôt du jour : 71 modules, 46 racines d'exécution,
+59 atteints, 12 orphelins — 3 576 lignes.** Et aucun des 12 n'est du code mort
+non plus :
+
+- **8 sous `outils/`, 3 201 lignes : les procès-verbaux exécutables.** C'est la
+  méthode du dépôt, écrite noir sur blanc. Chacun nomme son chantier dans sa
+  propre tête — C10, C15, C18, C22, C26, C27, C34, C37 — et la section vérifie
+  que ce chantier **existe dans ce fichier**. La légitimité se lit donc dans le
+  fichier, pas dans une liste à tenir à la main.
+- **4 ailleurs, 375 lignes : des outils que Claudia lance elle-même**, chacun
+  avec son `Usage : python3` en tête — `backtest_leger.py` (80),
+  `backtest_rendement_total.py` (82), `backtest_bootstrap_blocs.py` (110) et
+  `collecte/detecter_nouveaux_documents.py` (103). Ils sont nommés avec leur
+  motif dans `MODULES_A_LA_MAIN`. Les retirer serait un **arbitrage**, pas un
+  nettoyage : ce fichier ne le décide pas.
+
+**Vérifiée par injection, 6 fois, chacune touchant le contrôle visé :**
+
+| injection | contrôle qui tombe |
+|---|---|
+| un module orphelin neuf dans `collecte/` | orphelin non nommé dans `MODULES_A_LA_MAIN` |
+| un procès-verbal de `outils/` qui ne nomme plus son chantier | orphelin de `outils/` sans procès-verbal |
+| un procès-verbal nommant `C999`, absent de la file | le même, avec « C999 absent de la file » |
+| `backtest_leger.py` lancé par un workflow | entrée du registre redevenue atteignable |
+| une entrée du registre supprimée du dépôt | entrée du registre qui n'existe plus |
+| la résolution des racines cassée (0 racine) | **3 contrôles crient**, dont la colonne vertébrale |
+
+La dernière est celle qui compte le plus, et c'est la famille **C43** : si la
+résolution cassait, l'ensemble des modules pourrait se vider et la section
+passerait en **silence**. Le contrôle de colonne vertébrale — `app`, `peupler`,
+`profils`, `scoring`, `signaux`, les deux générateurs de tableau de bord,
+`tester`, `tester_donnees` — l'interdit : il exige que le parcours **retrouve**
+ces neuf-là.
 
 ## C10 — `dividendes.date_paiement` n'est pas une colonne de dates
 
@@ -3603,6 +3676,64 @@ récupérées sont relues titre par titre, le plafond `distincts_max` de
 le motif du dernier échec est daté ; ou le passage montre que le correctif ne
 suffit pas, et le dit avec le message d'erreur nouveau.
 
+## C47 — Quatre workflows écrivent des données et fument le tableau de bord que personne ne lit, jamais celui qui est publié
+
+- classe : ORANGE — décider qu'un test de fumée doit **changer de cible** change ce que la barrière couvre, et peut arrêter quatre workflows qui passent aujourd'hui ; le diagnostic est fait et l'effet est mesuré
+- statut : PROPOSÉ — mesuré le 10/10/2026 (cycle 28) en exécutant C9
+- validation : —
+- autonomie : complète, **sans réseau** — tout est dans le dépôt
+- priorité : 3 — latent : rien ne casse aujourd'hui, et c'est de la donnée commitée que rien ne repasse par le générateur publié
+
+**Le constat, mesuré le 10/10/2026 (cycle 28).** `dashboard/generer_dashboard.py`
+produit `dashboard_brvm.xlsx`. Ce fichier **n'a jamais été commité** — aucune
+branche, aucun commit de l'historique ne le porte — et **cinq** workflows sur
+cinq le suppriment (`rm -f dashboard_brvm.xlsx`) ou le laissent mourir avec le
+runner. Personne ne le lit. Sa seule valeur est d'être un **test de fumée**, et
+c'est à ce titre qu'il doit vivre : C9 a voulu le retirer pour cela même.
+
+**Mais quatre de ces cinq workflows écrivent dans le dépôt.**
+`migration_csv.yml`, `releve_capitaux_propres.yml`,
+`lot2_referentiels_et_interimaires.yml` et `branchement_agregateur.yml` font tous
+`git commit` puis `git push`. Chacun passe la barrière complète — `tester.py` et
+`tester_donnees.py` — puis fume **le tableau de bord que personne ne lit**, et
+**jamais** `generer_dashboard_html.py`, celui qui est publié sur GitHub Pages.
+
+**Et leur poussée ne rattrape pas l'omission, pour une raison que `pages.yml`
+documente lui-même.** Son propre commentaire du 15/07/2026 dit qu'une poussée
+faite par un autre workflow avec `GITHUB_TOKEN` **ne déclenche jamais** un
+workflow par `push` — protection anti-boucle de GitHub. Sa parade est la liste
+`workflow_run`, et elle nomme cinq workflows : *P9 - Collecte quotidienne des
+cours*, *P11 - Collecte quotidienne du BOC*, *BOC quotidien*, *Sikafinance*,
+*Capitaux propres (notations)*. **Aucun des quatre ci-dessus n'y figure.** Ni P4
+ni P5b ne repassent donc sur ce qu'ils commitent : la donnée est écrite, et le
+générateur du tableau de bord publié ne la voit qu'au prochain passage déclenché
+par autre chose.
+
+**L'effet est mesuré, et l'option la moins chère fonctionne.** Dans le bac à
+sable, sur la base reconstruite à neuf et **sans** passage préalable de
+`signaux.py`, `python3 dashboard/generer_dashboard_html.py` rend **code 0** :
+« 48 titres, 44/48 avec source_url renseignée, 48 avec liquidité du jour, 47 avec
+liquidité générale, 47 avec tendance calculée ». Une ligne ajoutée à chacun des
+quatre workflows suffirait donc techniquement — reste à décider si c'est la
+bonne.
+
+**Les trois options, et pourquoi c'est un arbitrage.**
+
+- **(a)** Ajouter `generer_dashboard_html.py` au test de fumée des quatre. Le
+  plus direct ; alourdit quatre workflows et peut les faire rougir sur un défaut
+  d'affichage et non de donnée.
+- **(b)** Ajouter les quatre noms à la liste `workflow_run` de `pages.yml`. La
+  publication repasse alors réellement sur la donnée commitée — mais republie le
+  site à chaque migration manuelle.
+- **(c)** Déclarer le test de fumée xlsx suffisant et **l'écrire dans la tête de
+  `generer_dashboard.py`**, pour qu'aucun cycle futur ne le reprenne pour du code
+  mort. Le moins cher, et le plus honnête si l'on juge que les deux générateurs
+  tombent sur les mêmes défauts de donnée.
+
+**Terminé quand** : l'option est tranchée, appliquée, et un test fige la règle —
+soit « tout workflow qui commite de la donnée fume le générateur publié », soit
+« la tête de `generer_dashboard.py` dit pourquoi il reste ».
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
@@ -3622,6 +3753,34 @@ suffit pas, et le dit avec le message d'erreur nouveau.
 # Dernier cycle
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
+
+## 2026-10-10 — cycle 28 (soir)
+**Exécuté : C9, et sa prémisse était fausse.** Anti-collision : **0 commit** depuis 3 h, cycle 27 clos,
+P4 et P5b vertes à 07h10. Rang 1 revérifié **vide** (les 16 ORANGE à `validation : OK` portent tous la
+mention de passe consommée) ; rang 2 : C9 était la **dernière VERTE**. Soir : pas de chasse.
+**Aucune des 1 382 lignes que C9 voulait retirer n'est morte.** `moteur/scoring.py` est importé par
+**7 modules**, dont `profils.py` et `generer_dashboard_html.py` — le tableau de bord **publié** ; sur ses
+37 symboles de tête, les 13 sans consommateur extérieur sont tous appelés **dans** le module.
+`moteur/signaux.py` est **exécuté par `pages.yml`**, sa table lue par trois consommateurs.
+`dashboard/generer_dashboard.py` est le **test de fumée de 5 workflows**. Les retirer éteignait la
+publication GitHub Pages, que le *Terminé quand* du **même chantier** exige de garder vivante. Son
+avertissement visait aussi le mauvais fichier : `tester_donnees.py` ne nomme nulle part
+`generer_dashboard.py` — c'est `tests.yml` qui le lance. **Rien n'a été retiré.**
+**L'erreur a tenu 12 jours parce que « code mort » était une opinion** : rien ne répondait à « qui lance
+ce fichier, et qui l'importe », et un chantier **VERTE**, donc pré-autorisé, prescrivait la suppression
+de 1 382 lignes saines. **Section 41, 10 contrôles**, bâtie sur les fonctions d'index et d'import de la
+section 39 — une seule définition d'« importe » dans le dépôt. **71 modules, 46 racines, 59 atteints,
+12 orphelins (3 576 l)**, aucun mort : **8 sous `outils/` (3 201 l) sont les procès-verbaux
+exécutables**, chacun nommant en tête son chantier (C10, C15, C18, C22, C26, C27, C34, C37), vérifié
+présent dans la file ; **4 ailleurs (375 l) sont lancés à la main**, nommés avec leur motif dans
+`MODULES_A_LA_MAIN`. **Injection 6/6**, dont la 6ᵉ — résolution cassée — fait **crier 3 contrôles** au
+lieu de passer en silence (famille C43, colonne vertébrale de 9 modules).
+**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) : base
+**50 sociétés / 185 lignes d'états**, 48 tickers, golden tests et autotests passent (GCR 10/10),
+`tester_donnees.py` **369 OK, 0 ÉCHEC**, code 2, **4** alertes antérieures (C4, C5, relevé du jour ×2),
+`profils.json` et `journal_profils.csv` **inchangés à l'octet**. **Proposé : C47** (ORANGE, 3).
+**Prochain** : plus **aucune VERTE** dans la file, donc rang 3 — mesure seule de **C2** (priorité 2) et
+de son **axe d'exercice de rattachement**, resté entier. Tout écrit attend désormais un mot.
 
 ## 2026-10-10 — cycle 27 (matin)
 **Exécuté : C8.** Anti-collision : **0 commit de cycle** depuis 3 h, cycle 26 clos. Rang 1 revérifié
@@ -3652,32 +3811,6 @@ dont la 4ᵉ — 10 redites de plus — **verte** : l'unité n'est pas un cumul.
 code 2, **4** alertes antérieures (C4, C5, relevé du jour ×2, identiques au 09/10) ; `profils.json` et
 `journal_profils.csv` **inchangés à l'octet**. **Proposé : C45** (ORANGE, 2). **Prochain** : rang 2,
 **C9** (VERTE, 9), dernière VERTE de la file.
-
-## 2026-10-09 — cycle 26 (soir)
-**Exécuté : C38.** Anti-collision : **0 commit** depuis 3 h, cycle 25 clos, CI verte. Rang 1
-revérifié **vide** (les sept ORANGE à `validation : OK` ont leur passe consommée) ; rang 2,
-première VERTE par priorité. Pas de chasse : cycle du soir.
-**Les cinq derniers cumuls sont convertis, et deux lignes du tableau de C38 étaient déjà fausses
-en deux jours.** `AVIS_DIVIDENDE_SANS_TICKER` : 18/19 le 07/10, **19/19 le 09/10** — revenu seul à
-la marge nulle, aucun défaut aggravé, le corpus grossit et le compte le suit.
-`OBSERVATIONS_NON_RELEVEES` : 17/17 annoncé, **0/0 mesuré**, soldé par C35 → reclassé `ponctuel`.
-L'autre façon de mentir : `FIGEMENTS_RENDEMENT` tolérait **7,6 fois sa mesure** (327 pour **43**),
-exact le 30/09 et aveugle le 09/10 ; cause **lisible dans le code** — la marge de `_figements()`
-vaut `demi_pas / abs(valeur)`, donc C21, divisant par cent une partie de la colonne le 04/10, a
-élargi la tolérance d'autant. **Section 34 élargie** : aucun plafond ne peut plus être un cumul,
-bloquant **ou non**.
-**Unités, chacune par sa mesure** : PER **2,05 ‰** (2,0144 observé ; 108 tolérés aujourd'hui, la
-sévérité du cumul sans sa dérive) ; rendement **0,90 ‰** (0,8276 ; **47 tolérés contre 327**) ;
-avis **0,41** (19/47) ; ruptures **11 par séance** (291 groupées sur **178 séances** de fin de
-mois — des changements de dividende). Planchers de population ajoutés où il en manquait
-(`RUPTURES_PAIRES_MINIMUM = 70000`, 75 323 mesurées ; corpus vide refusé) : un taux nul est vert.
-**Injection : 7 / 7**, chacune touchant le contrôle visé et lui seul.
-**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) :
-base **48 tickers / 90 901 lignes**, golden tests passent, `tester_donnees.py` **348 OK, 0 ÉCHEC**,
-code 2, **4** alertes toutes antérieures (C4, C5, relevé du jour ×2) ; `profils.json` et
-`journal_profils.csv` **inchangés à l'octet**. **Proposé : C44** (ORANGE, 2) — **66,5 %** des
-220 023 octets de ce fichier sont les 21 chantiers clos, +43 807 en six passages. **Prochain** :
-rang 2, **C8** (VERTE, 8), seule VERTE restante avant C9.
 
 ---
 

@@ -5838,6 +5838,199 @@ def test_registres_echecs():
                     "n'en rapporte rien : " + ", ".join(muettes)))
 
 
+# ----------------------------------------------------------------------
+# 41. AUCUN MODULE N'EST ORPHELIN SANS ETRE NOMME (chantier C9)
+# ----------------------------------------------------------------------
+# D'OU VIENT CETTE SECTION : d'un chantier dont la premisse etait fausse, et
+# que RIEN ne pouvait contredire. Le chantier C9 demandait depuis le 28/09/2026
+# le retrait de trois fichiers « morts » : dashboard/generer_dashboard.py (208
+# lignes), moteur/scoring.py (735) et moteur/signaux.py (439). Mesure du
+# 10/10/2026 (cycle 28) : les trois sont PORTANTS. scoring.py est importe par
+# sept modules, dont profils.py et generer_dashboard_html.py — le tableau de
+# bord publie ; signaux.py est execute par pages.yml et sa table `signaux` est
+# lue par trois consommateurs ; generer_dashboard.py est le test de fumee de
+# cinq workflows. Le retrait aurait eteint la publication GitHub Pages, que le
+# critere de terminaison du meme chantier exige de garder vivante.
+#
+# POURQUOI L'ERREUR A TENU DOUZE JOURS : parce que « code mort » etait une
+# OPINION. Rien dans le depot ne repondait a la question « qui lance ce
+# fichier, et qui l'importe ? ». Un chantier VERTE — donc pre-autorise, donc
+# executable sans que Claudia revoie quoi que ce soit — prescrivait la
+# suppression de 1 382 lignes dont la premiere mesure montre qu'aucune n'est
+# morte. C'est la meme famille que les plafonds de la section 34 : un seuil ecrit
+# a la main une fois, jamais reverifie, qui finit par dire l'inverse du vrai.
+#
+# CE QUE CETTE SECTION MESURE, et la seule definition qu'elle accepte. Un
+# module est ATTEINT s'il est la racine d'une execution reelle — un script
+# lance par un workflow (`python3 x.py`), par un `.sh` du depot, ou
+# l'application elle-meme — ou s'il est atteint depuis une racine par import
+# local a TOUTE PROFONDEUR, ou par lancement depuis un module deja atteint
+# (app.py::preparer_base lance les chargeurs ; tester_donnees.py lance app.py).
+# Tout le reste est ORPHELIN. La reutilisation est voulue : les trois fonctions
+# d'index, d'import et de resolution sont celles de la section 39, pour qu'il
+# n'existe qu'UNE definition de « ce fichier importe ce module » dans le depot.
+#
+# LA REGLE QUE CETTE SECTION FIGE, et ses deux voies de legitimite.
+#
+#   PROCES-VERBAL — un orphelin de `outils/` est legitime s'il nomme son
+#     chantier dans sa propre tete (« Chantier C<n> ») et que ce chantier existe
+#     dans CHANTIERS.md. C'est la methode du depot, ecrite noir sur blanc :
+#     « Committe le script avec la modification — c'est le proces-verbal
+#     executable. » Un tel script n'est pas du code mort, c'est une PREUVE : il
+#     se relance sans effet et redit ce qui a ete fait. La verification est
+#     lue dans le fichier, pas dans une liste a tenir a la main.
+#   A LA MAIN — tout autre orphelin doit etre nomme ci-dessous avec son motif.
+#     Quatre le sont aujourd'hui, et aucun n'est du code mort non plus : ce sont
+#     des outils que Claudia lance elle-meme, chacun avec un « Usage : python3 »
+#     dans sa tete. Les retirer serait un ARBITRAGE, pas un nettoyage — d'ou le
+#     chantier ORANGE qui le porte, et non ce fichier.
+#
+# Et le controle qui empeche cette section de s'eteindre seule (famille C43) :
+# le parcours doit retrouver la colonne vertebrale du depot. Si une erreur de
+# resolution vidait l'ensemble des atteints, TOUT deviendrait orphelin et la
+# section crierait ; si elle vidait l'ensemble des modules, plus rien ne
+# serait orphelin et la section passerait en SILENCE. C'est ce second cas que
+# le controle A interdit.
+MODULES_A_LA_MAIN = {
+    "backtest_leger.py":
+        "backtest PER decote vs mediane sectorielle, lance a la main (13/07/2026)",
+    "backtest_rendement_total.py":
+        "backtest prix + dividende, lance a la main (13/07/2026)",
+    "backtest_bootstrap_blocs.py":
+        "significativite par bootstrap par titre du precedent (29/07/2026)",
+    "collecte/detecter_nouveaux_documents.py":
+        "compare MANIFESTE.csv a la base et dit ce qui est neuf, sans rien "
+        "extraire ; accelere le demarrage d'une session (11/07/2026)",
+}
+# Les modules dont l'absence du parcours prouverait une panne de resolution, et
+# non une mort. Ils couvrent les trois voies : racine de workflow (peupler,
+# tester), import profond (scoring), lancement depuis un module atteint (app).
+COLONNE_VERTEBRALE = ("app", "peupler", "profils", "scoring", "signaux",
+                      "generer_dashboard", "generer_dashboard_html",
+                      "tester", "tester_donnees")
+
+
+def _racines_executees(index):
+    """Les scripts que quelque chose lance vraiment : workflows, shells, app."""
+    sources = sorted((RACINE / ".github" / "workflows").glob("*.yml"))
+    sources += sorted(p for p in RACINE.rglob("*.sh") if ".git/" not in str(p))
+    racines = set()
+    for f in sources:
+        for _rel, chemin in _entrees_du_workflow(
+                f.read_text(encoding="utf-8"), index):
+            racines.add(chemin)
+    racines |= set(index.get("app", []))
+    return racines
+
+
+def _modules_atteints(index):
+    """(racines, atteints, illisibles). Fermeture par import local profond ET
+    par lancement depuis un module deja atteint."""
+    racines = _racines_executees(index)
+    vus, illisibles, pile = set(), [], list(racines)
+    while pile:
+        f = pile.pop()
+        if f in vus:
+            continue
+        vus.add(f)
+        src = f.read_text(encoding="utf-8")
+        try:
+            _tiers, locaux = _imports_du_fichier(f, index, locaux_profonds=True)
+        except SyntaxError:
+            illisibles.append(str(f.relative_to(RACINE)))
+            continue
+        for nom in locaux:
+            pile += [g for g in index.get(nom, []) if g not in vus]
+        for _rel, chemin in _entrees_du_workflow(src, index):
+            if chemin not in vus:
+                pile.append(chemin)
+    return racines, vus, illisibles
+
+
+def test_code_atteignable():
+    print("\n=== 41. Aucun module n'est orphelin sans etre nomme (C9) ===")
+    import re as _re
+    index = _index_modules_locaux()
+    tous = {f for fs in index.values() for f in fs}
+    racines, atteints, illisibles = _modules_atteints(index)
+
+    # A — le parcours tient debout. Sans ce controle, la section passerait en
+    # silence le jour ou la resolution casse.
+    verifie(not illisibles,
+            "tout module du depot est analysable"
+            + ("" if not illisibles
+               else " — ILLISIBLE(S), le parcours est incomplet : "
+                    + ", ".join(sorted(illisibles))))
+    verifie(len(racines) >= 30,
+            f"{len(racines)} racines d'execution trouvees (workflows, shells, "
+            f"application) sur {len(tous)} modules du depot")
+    absents = [n for n in COLONNE_VERTEBRALE
+               if not index.get(n) or not all(g in atteints
+                                              for g in index[n])]
+    verifie(not absents,
+            f"la colonne vertebrale ({len(COLONNE_VERTEBRALE)} modules) est "
+            f"atteinte par le parcours"
+            + ("" if not absents
+               else " — NON ATTEINTE, donc le parcours ne mesure rien : "
+                    + ", ".join(absents)))
+
+    orphelins = sorted(str(f.relative_to(RACINE)) for f in tous - atteints)
+    lignes = {o: len((RACINE / o).read_text(encoding="utf-8").splitlines())
+              for o in orphelins}
+    verifie(True,
+            f"{len(atteints)} modules atteints, {len(orphelins)} orphelins "
+            f"({sum(lignes.values())} lignes)")
+
+    # B — un orphelin de outils/ est un proces-verbal, et il le prouve lui-meme.
+    chantiers = (RACINE / "CHANTIERS.md").read_text(encoding="utf-8")
+    sans_pv = []
+    pv = []
+    for o in orphelins:
+        if not o.startswith("outils/"):
+            continue
+        tete = (RACINE / o).read_text(encoding="utf-8")[:2000]
+        m = _re.search(r"Chantier\s+(C\d+)", tete)
+        if m and _re.search(r"^##\s+%s\s+—" % m.group(1), chantiers, _re.M):
+            pv.append(f"{o} ({m.group(1)})")
+        else:
+            sans_pv.append(o + (f" — {m.group(1)} absent de la file" if m
+                                else " — aucun chantier nomme en tete"))
+    verifie(not sans_pv,
+            f"les {len(pv)} orphelins de outils/ nomment chacun un chantier de "
+            f"la file : {', '.join(pv) or 'aucun'}"
+            + ("" if not sans_pv
+               else " — SANS PROCES-VERBAL : " + " ; ".join(sans_pv)))
+
+    # C — tout autre orphelin est nomme avec son motif. C'est ce controle qui
+    # aurait rendu C9 impossible a ecrire tel qu'il l'etait.
+    muets = [f"{o} ({lignes[o]}l)" for o in orphelins
+             if not o.startswith("outils/") and o not in MODULES_A_LA_MAIN]
+    verifie(not muets,
+            f"les {len(MODULES_A_LA_MAIN)} orphelins hors outils/ sont tous "
+            f"nommes dans MODULES_A_LA_MAIN"
+            + ("" if not muets
+               else " — ORPHELIN(S) NON NOMME(S), personne ne les lance et rien "
+                    "ne le dit : " + ", ".join(muets)))
+
+    # D — le registre ne pourrit pas : chaque entree existe encore ET est encore
+    # orpheline. Un module redevenu atteint doit sortir du registre, sinon le
+    # registre finit par decrire un depot qui n'existe plus — la panne meme de C9.
+    disparus = [o for o in MODULES_A_LA_MAIN if not (RACINE / o).exists()]
+    verifie(not disparus,
+            "chaque entree de MODULES_A_LA_MAIN existe encore"
+            + ("" if not disparus
+               else " — A RETIRER DU REGISTRE : " + ", ".join(sorted(disparus))))
+    revenus = [o for o in MODULES_A_LA_MAIN
+               if (RACINE / o).exists() and o not in orphelins]
+    verifie(not revenus,
+            "aucune entree de MODULES_A_LA_MAIN n'est redevenue atteignable"
+            + ("" if not revenus
+               else " — ATTEINTE(S) DESORMAIS, donc a retirer du registre : "
+                    + ", ".join(sorted(revenus))))
+    verifie(all(bool(m.strip()) for m in MODULES_A_LA_MAIN.values()),
+            f"les {len(MODULES_A_LA_MAIN)} entrees du registre portent un motif")
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -5882,6 +6075,7 @@ def main():
     test_journal_predictions()
     test_dependances_des_workflows()
     test_registres_echecs()
+    test_code_atteignable()
     if not sans_app:
         test_application()
 

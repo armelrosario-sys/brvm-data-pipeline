@@ -9,6 +9,188 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-10 — cycle 28 (soir) : C9, un chantier VERTE qui prescrivait la suppression de 1 382 lignes vivantes
+
+Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit**. Le
+cycle 27 est clos (`00720ae`, « Cloture cycle 27 »). Aucune annonce ouverte, de cycle ni hors cycle.
+État : `HEAD` à jour sur `origin/main`, arbre propre, **P4 et P5b vertes** à 07h10 UTC (dernier
+passage : *Rattrapage des relevés de collecte (C35)*, succès à 11h03).
+
+**Choix du chantier, entièrement déterminé.** Rang 1 revérifié : **16** chantiers ORANGE portent
+`validation : OK`, et les 16 portent la mention de passe consommée (C16, C17, C18, C19, C20, C21, C22,
+C23, C25, C26, C27, C32, C34, C35, C36, C37) — rang 1 **vide**. Rang 2 : les VERTE sont C1, C3, C8,
+C9, C10, C13, C15, C38, et **seule C9 n'est pas faite**. C'est la dernière VERTE de la file. Cycle du
+soir : pas de chasse (étape 5, une fois par jour, au matin).
+
+---
+
+### Ce que C9 demandait, et pourquoi il ne fallait pas le faire
+
+C9 — *« Extinction de P5b et retrait du code mort »*, inscrit le 28/09/2026 — nommait trois fichiers :
+`dashboard/generer_dashboard.py` (208 lignes), `moteur/scoring.py` (735) et `moteur/signaux.py` (439).
+Classe **VERTE**, donc pré-autorisée : un cycle pouvait les supprimer sans que Claudia revoie quoi que
+ce soit.
+
+**Première mesure du cycle : les trois sont portants.**
+
+| fichier | ce que dit C9 | ce que la mesure dit |
+|---|---|---|
+| `moteur/scoring.py` (735 l) | mort | importé par **7 modules** : `moteur/profils.py`, `moteur/tester.py`, `moteur/signaux.py`, `dashboard/generer_dashboard_html.py`, `dashboard/generer_dashboard.py`, `dashboard/generer_poste_decision.py`, `collecte/detecter_nouveaux_documents.py` |
+| `moteur/signaux.py` (439 l) | mort | **lancé par `pages.yml`** (`python3 signaux.py`), et sa table `signaux` est lue par `generer_dashboard_html.py`, `bloc_signaux.py` et `generer_poste_decision.py` |
+| `dashboard/generer_dashboard.py` (208 l) | mort | **test de fumée de 5 workflows** : `tests.yml`, `migration_csv.yml`, `releve_capitaux_propres.yml`, `lot2_referentiels_et_interimaires.yml`, `branchement_agregateur.yml` |
+
+Et au niveau du symbole, pas seulement du fichier : `scoring.py` déclare **37** noms de tête (fonctions,
+classes, constantes majuscules). **13** n'ont aucun consommateur hors du module — et les 13 sont
+appelés **à l'intérieur** de `scoring.py` : `mediane_liquidite_historique` (ligne 527),
+`rendement_secteur_reproductible` (473), `dernier_et_precedent_exercice` (150 et 624), `per_periode`
+(494), `rendement_le_plus_recent` (470), `evaluer_univers` (727), `get_conn` (614, 696, 705), et les
+constantes de chemin. **Aucun n'est mort.**
+
+`generer_dashboard_html.py` — le générateur du tableau de bord **publié** sur GitHub Pages — importe
+`evaluer_titre`, `rapport_fraicheur`, `charger_seuils`, `charger_marche`, `charger_liquidite_jour`,
+`charger_liquidite_generale`, `charger_tendance_liquidite` et `DB` de `scoring.py`. Retirer `scoring.py`
+et `signaux.py` éteignait donc la publication — que le critère *Terminé quand* **du même chantier**
+exige de garder vivante. Une seule des deux phrases pouvait être vraie, et rien dans le dépôt ne disait
+laquelle.
+
+**L'avertissement du chantier désignait aussi le mauvais fichier.** C9 écrit : « `tester_donnees.py`
+lance `generer_dashboard.py` comme test de fumée ». Vérifié : `tester_donnees.py` ne nomme
+`generer_dashboard.py` **nulle part** — il ne cite que `generer_dashboard_html.py`, et seulement dans
+un registre de tables. C'est `tests.yml` qui le lance, en dernière étape.
+
+**Rien n'a été retiré. C9 est clos sur ce constat, et sa prémisse est inscrite comme fausse dans son
+propre bloc**, pour qu'aucun cycle futur ne la reprenne.
+
+### Pourquoi l'erreur a tenu douze jours
+
+Parce que « code mort » était une **opinion**. Rien dans le dépôt ne répondait à la question « qui
+lance ce fichier, et qui l'importe ». C'est exactement la famille de la section 34 (plafonds écrits à
+la main, jamais revérifiés, qui finissent par dire l'inverse du vrai) — vue cette fois non sur un
+seuil chiffré mais sur un **jugement d'architecture**. Et le coût potentiel était plus élevé : un
+plafond faux fait rougir une barrière ; un chantier VERTE faux fait **supprimer du code vivant** sans
+relecture humaine.
+
+### Ce qui est livré : section 41 de `tester_donnees.py`, 10 contrôles
+
+**La définition, et elle est unique.** Un module est **atteint** s'il est :
+
+1. **une racine d'exécution** — lancé par un workflow (`python3 x.py`), par un `.sh` du dépôt, ou
+   l'application elle-même (`app.py`, que Streamlit démarre) ;
+2. atteint depuis une racine par **import local à toute profondeur** ;
+3. ou **lancé depuis un module déjà atteint** — `app.py::preparer_base()` lance les chargeurs,
+   `tester_donnees.py` lance `app.py` et des outils.
+
+Tout le reste est **orphelin**. Les trois fonctions d'index, d'import et de résolution de chemin
+réutilisées sont **celles de la section 39** (`_index_modules_locaux`, `_imports_du_fichier`,
+`_entrees_du_workflow`), délibérément : la règle du 28/09 dit que deux contrôles sur la même identité
+se désynchronisent et ne surveillent plus rien. Il n'existe donc qu'**une** définition de « ce fichier
+importe ce module » dans le dépôt.
+
+**La mesure sur le dépôt du jour : 71 modules, 46 racines d'exécution, 59 atteints, 12 orphelins —
+3 576 lignes.** Et aucun des 12 n'est du code mort :
+
+- **8 sous `outils/`, 3 201 lignes : les procès-verbaux exécutables.** C'est la méthode du dépôt,
+  écrite dans la consigne de la boucle : « Committe le script avec la modification — c'est le
+  procès-verbal exécutable. » Un tel script se relance sans effet et redit ce qui a été fait. Chacun
+  nomme **son** chantier dans sa propre tête, et la section vérifie que ce chantier existe dans
+  `CHANTIERS.md` : `migration_dates_dividendes_iso.py` (C10, 356 l),
+  `versement_mensuel_vers_quotidien.py` (C15, 309), `correction_collisions_echelle.py` (C18, 424),
+  `arbitrage_refus_pont_boc.py` (C22, 439), `versement_intermediaires.py` (C26, 439),
+  `migration_ticker_bbgci_vers_bbgc.py` (C27, 408), `arbitrage_observations_perimees_boc.py` (C34,
+  416), `reextraction_bbgc_depuis_archive.py` (C37, 410). **La légitimité se lit dans le fichier, pas
+  dans une liste à tenir à la main** — un procès-verbal neuf est accepté sans qu'on touche au test.
+- **4 ailleurs, 375 lignes : des outils lancés à la main**, chacun portant un `Usage : python3` dans
+  sa tête — `backtest_leger.py` (80 l), `backtest_rendement_total.py` (82),
+  `backtest_bootstrap_blocs.py` (110) et `collecte/detecter_nouveaux_documents.py` (103, qui compare
+  `MANIFESTE.csv` à la base et dit ce qui est neuf **sans rien extraire**). Ils sont nommés avec leur
+  motif dans `MODULES_A_LA_MAIN`. Les retirer serait un **arbitrage**, pas un nettoyage : la section
+  ne le décide pas, et C9 non plus n'aurait pas dû.
+
+**Les 10 contrôles.** A — tout module est analysable ; les racines sont en nombre réel (46, plancher
+30) ; **la colonne vertébrale est atteinte**. B — tout orphelin de `outils/` nomme un chantier
+existant. C — tout autre orphelin est nommé dans `MODULES_A_LA_MAIN`. D — le registre ne pourrit pas :
+chaque entrée **existe encore**, **est encore orpheline**, et **porte un motif**. Plus la mesure
+elle-même, imprimée.
+
+**Et le contrôle qui empêche la section de s'éteindre seule.** C'est la famille **C43** : si la
+résolution des racines cassait, l'ensemble des atteints se viderait — et alors, selon le côté par
+lequel la panne arrive, la section pourrait **passer en silence**. Le contrôle de **colonne
+vertébrale** l'interdit : le parcours doit retrouver `app`, `peupler`, `profils`, `scoring`, `signaux`,
+`generer_dashboard`, `generer_dashboard_html`, `tester`, `tester_donnees`. Ces neuf couvrent les trois
+voies d'accès (racine de workflow, import profond, lancement depuis un module atteint), donc une panne
+sur n'importe laquelle des trois fait tomber ce contrôle.
+
+**Vérifiée par injection, 6 fois, chacune touchant le contrôle visé :**
+
+| injection | ce qui tombe |
+|---|---|
+| `collecte/sonde_injection.py`, module neuf que personne ne lance | « ORPHELIN(S) NON NOMME(S), personne ne les lance et rien ne le dit : collecte/sonde_injection.py (3l) » |
+| `versement_intermediaires.py` privé de son `Chantier C26` | « SANS PROCES-VERBAL : … — aucun chantier nomme en tete » |
+| le même, renommé `Chantier C999` (absent de la file) | « SANS PROCES-VERBAL : … — C999 absent de la file » |
+| `backtest_leger.py` ajouté au `run:` de `sentinelle.yml` | « ATTEINTE(S) DESORMAIS, donc a retirer du registre : backtest_leger.py » |
+| `collecte/detecter_nouveaux_documents.py` retiré du dépôt | « A RETIRER DU REGISTRE : collecte/detecter_nouveaux_documents.py » |
+| `_racines_executees()` forcée à rendre `set()` | **3 contrôles crient** : « 0 racines d'execution trouvees », colonne vertébrale non atteinte (les 9 nommés), et tout le dépôt déclaré orphelin non nommé |
+
+La dernière est celle qui compte : la section **crie** au lieu de se taire.
+
+### Barrières
+
+Environnement : `python3 -m venv /tmp/venv_ci`, `pip install pyyaml==6.0.2 openpyxl==3.1.5 pandas`
+puis `pip install -r requirements.txt` — **Python 3.13.16**, et `import pdfplumber` **échoue**, comme
+en CI. C'est la seule méthode qui vaut (section *Vérifier une barrière sans la dépendance*).
+
+- `moteur/fusionner_fondamentaux.py` : rien à fusionner.
+- `peupler.py` : **50 sociétés, 185 lignes d'états financiers**.
+- Les cinq chargeurs : `cours_mensuels` 4 509 lignes (47 tickers, 101 mois) ; `cours_quotidien_boc`
+  90 949 lignes (**48 tickers**, 2 035 jours, 2018-01-02 → 2026-10-09) ; dividendes par exercice
+  296 ajoutés, 32 écartés (C34) ; dividendes BOC 16 ajoutés, 3 refusés ; `liquidite_quotidienne`
+  74 069 lignes.
+- `tester.py` : **tous les golden tests passent**.
+- `profils.py` : 48 titres profilés, grades A=6 / B=28 / C=14.
+- `tester_donnees.py` : **369 OK, 0 ÉCHEC**, **code 2**, et les **4** alertes sont toutes antérieures —
+  C4 (12 chutes de cours à documenter), C5 (CFAC, NEIC), et deux sur le relevé du jour, identiques à
+  celles du 09/10.
+- `avis_brvm.py --test` : 11 avis, classification 8/8. `notations.py --test` : index 15/15, 14 tickers,
+  **PDF GCR 10/10**, Bloomfield 6/6, pièges 3/3.
+- `generer_dashboard.py` : 48 titres.
+- `collecte/profils.json` : **inchangé à l'octet** (sha256 vérifié avant/après).
+  `collecte/journal_profils.csv` : `profils.py` y a ajouté les 48 lignes du 2026-10-10 — le 10/10 est
+  un **samedi**, donc aucun workflow ouvré ne les a commitées ; le fichier est **restauré** et
+  **inchangé à l'octet**. Base et classeur supprimés avant le commit.
+
+### Le chantier proposé : C47
+
+**Trouvé en mesurant C9.** `dashboard_brvm.xlsx` **n'a jamais été commité** — `git log --all` sur ce
+chemin rend zéro, et `git ls-files` n'en porte aucun — et **cinq** workflows sur cinq le suppriment ou
+le laissent mourir avec le runner. Personne ne le lit : sa seule valeur est d'être un test de fumée.
+
+Mais **quatre** de ces cinq workflows **écrivent dans le dépôt** (`git commit` puis `git push`) :
+`migration_csv.yml`, `releve_capitaux_propres.yml`, `lot2_referentiels_et_interimaires.yml`,
+`branchement_agregateur.yml`. Chacun passe la barrière complète, puis fume le classeur que personne ne
+lit — et **jamais** `generer_dashboard_html.py`, celui qui est publié.
+
+Et leur poussée ne rattrape pas l'omission, pour une raison que `pages.yml` **documente lui-même**
+(commentaire du 15/07/2026) : une poussée faite par un autre workflow avec `GITHUB_TOKEN` ne déclenche
+**jamais** un workflow par `push`. La parade de `pages.yml` est sa liste `workflow_run`, qui nomme
+cinq workflows — *P9*, *P11*, *BOC quotidien*, *Sikafinance*, *Capitaux propres (notations)*. **Aucun
+des quatre n'y figure.** Ni P4 ni P5b ne repassent donc sur ce qu'ils commitent.
+
+**Effet mesuré, et l'option la moins chère fonctionne** : dans le bac à sable, sur la base reconstruite
+à neuf et **sans** passage préalable de `signaux.py`, `python3 dashboard/generer_dashboard_html.py`
+rend **code 0** — « 48 titres, 44/48 avec source_url renseignée, 48 avec liquidité du jour, 47 avec
+liquidité générale, 47 avec tendance calculée ». Trois options sont posées dans le bloc C47 ; c'est un
+arbitrage parce que changer la cible d'un test de fumée change ce que la barrière couvre, et peut
+arrêter quatre workflows qui passent aujourd'hui.
+
+### Et ce que ce cycle change pour le suivant
+
+**La file n'a plus aucune VERTE.** Rang 1 est vide, rang 2 est épuisé pour de bon. Le cycle 29 part
+donc au **rang 3** : la mesure seule du premier ORANGE non mesuré, sans rien écrire. Par la règle
+— priorité la plus haute, puis le plus petit numéro — c'est **C2** (priorité 2) et son **axe
+d'exercice de rattachement**, que C17 a explicitement laissé entier le 01/10. À partir de maintenant,
+**tout ce que la boucle écrit attend un mot de Claudia** : un `validation : OK` sur un ORANGE, ou un
+`classe : VERTE` sur un chantier qu'elle juge réversible.
+
 ## 2026-10-10 — cycle 27 (matin) : C8, le chantier ne visait plus la bonne agence, et sept registres d'échec que rien ne comptait
 
 Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit de
