@@ -242,7 +242,12 @@ l'expliquant ; un test de la section 13 fige la règle.
 ## C2 — Convention brut/net du rendement
 
 - classe : ORANGE — tranche une convention et modifie des valeurs certifiées
-- statut : À FAIRE
+- statut : **MESURÉ le 11/10/2026 (cycle 29) sur les DEUX axes — la passe de
+  mesure est consommée, aucun cycle ne la refait.** Verdict : l'axe de
+  rattachement **ne se tranche pas** sur les données du dépôt, et la mesure dit
+  pourquoi (voir *La mesure du 11/10/2026* en bas de ce bloc). **Rien n'a été
+  écrit.** Toute écriture attend un mot de Claudia sur l'axe brut/net, qui
+  commande l'autre.
 - validation : —
 - autonomie : complète
 - priorité : 2
@@ -291,6 +296,49 @@ des montants.
 **Terminé quand** : la convention est tranchée sur les DEUX axes (brut/net ET
 exercice de rattachement), écrite dans `config/`, appliquée partout, l'effet est
 mesuré titre par titre, et un test empêche le mélange.
+
+### La mesure du 11/10/2026 (cycle 29) — le détail est au journal
+
+Procès-verbal relançable, qui n'écrit rien :
+`python3 outils/mesure_rattachement_payout.py`. **28 valeurs de `payout_ratio` sur
+14 titres.** Tableaux complets dans `docs/JOURNAL.md`, entrée du 11/10/2026.
+
+**L'axe de rattachement ne se tranche pas sur les données du dépôt.** Deux mesures
+indépendantes refusent de converger, et se scindent **par titre** : l'identité des
+capitaux propres sur 11 paires rend **A 5 / B 6** (BBGC ferme sous A sur ses
+4 paires, 0,6 à 14,1 % ; CABC sous B sur ses 6, dont 1,2 % et 1,7 %) ; le nombre
+d'actions implicite, qui ne passe par aucune de ces hypothèses, rend **A 7 / B 9**
+sur 16 paires.
+
+**Et la troisième mesure dit pourquoi : c'est l'axe brut/net qui commande.** Le
+rapport `payout certifié / (DPA ÷ BPA du BOC)` vaut **1,1360 en médiane** et
+**7 titres sur 11 tiennent dans [1,12 ; 1,15]** (BOABF, BOAC, CIEC, NTLC, SHEC,
+SLBC, TTLC). Un facteur commun à sept sociétés sans lien n'est pas une politique de
+distribution. Son inverse : **0,8803** (min 0,8757, max 0,8847). Deux côtés le
+corroborent : le **dividende est identique des deux côtés** — `rendement du BOC ×
+cours` contre `montant_net`, **12 titres sur 12 à moins de 0,5 %** —, donc le
+facteur vit dans le **BPA** et non dans le montant ; et le brut déduit à 0,880
+tombe **rond** sur **6 des 21** versements adossés à un payout certifié
+(NTLC 369,60 → 420,00 ; CIEC 205,92 → 234,00 ; SLBC 1 871,76 → 2 127,00 ;
+BOAC → 679,01 ; NTLC 721,60 → 820,00 ; STBC → 1 940,00), contre **un seul** à 0,95.
+
+**Trois conséquences pour ce chantier.** (1) **L'ordre des deux axes est l'inverse
+de celui que ce bloc supposait** : brut/net d'abord, rattachement ensuite — les deux
+mesures du rattachement passent par le facteur et sont donc contaminées par lui.
+(2) Le constat d'ouverture est vrai mais incomplet : BICB à 0,95 et ces sept-là à
+0,880 ne sont pas deux conventions mais **au moins trois**, CBIBF étant à 1,0006,
+donc sans retenue. (3) **Réserve** : 0,880 est un facteur **mesuré**, pas une
+retenue identifiée — aucune source fiscale n'a été consultée, et un même taux
+traversant la Côte d'Ivoire, le Burkina et le Togo surprendrait. Le facteur et sa
+constance sont établis ; son **nom** ne l'est pas.
+
+**L'effet sur ce qui est publié, mesuré.** **31 titres sur 48** n'ont aucun payout
+certifié et tournent sur le repli `IMPLICITE(rendement × PER)`, du côté 0,880 —
+donc sous-estimé d'environ 12 % si la convention certifiée est le brut. Après
+division par 0,880, **un seul titre sur 48** franchit le veto `payout_max = 1,00` :
+**NEIC**, 0,880244 → 1,000277, qui perdrait **GARP** (`payout_ok` ferme GARP, VALUE
+et RENDEMENT) ; le suivant, SOGC, reste à 0,986. **Le risque de cet axe est donc
+borné à un titre aujourd'hui**, et NEIC est exactement au bord.
 
 ## C3 — Journal des prédictions
 
@@ -3734,14 +3782,89 @@ bonne.
 soit « tout workflow qui commite de la donnée fume le générateur publié », soit
 « la tête de `generer_dashboard.py` dit pourquoi il reste ».
 
+## C48 — Onze seuils du registre que le code n'atteint pas, deux seuils appliqués que le registre ne porte pas
+
+- classe : ORANGE — rebrancher un seuil **change des valeurs publiées** (le PER, le ROE, les profils) ; décider qu'un seuil documenté ne sera jamais appliqué le retire du registre. Les deux sont des arbitrages de méthode ; le diagnostic est fait et l'effet est mesuré
+- statut : PROPOSÉ — mesuré le 11/10/2026 (cycle 29) par la chasse ; figé par la section 42
+- validation : —
+- autonomie : complète, **sans réseau** — tout est dans le dépôt
+- priorité : 2 — la doctrine du dépôt dit que les seuils sont versionnés, et sur **13 d'entre eux c'est faux**
+
+**Le constat, mesuré sur les 86 feuilles de `config/seuils.yaml`.** `scoring.py`
+écrit en tête : « tout provient de seuils.yaml (registre versionné) », et les
+seuils de `signaux.py` y ont été rapatriés le 14/07/2026 pour « violation de la
+doctrine de versionnement ». Personne ne vérifiait que les deux côtés se
+parlaient encore. **Seize feuilles ne sont nommées par aucun module** ; quatre
+le disent elles-mêmes (`PREVU_NON_IMPLEMENTE`), **onze ne le disent pas**. Et
+**deux seuils appliqués par le moteur ne figurent nulle part au registre**.
+
+**Le cas qui nomme la famille : `profils.inflexion_recente_max`.** Le registre
+lui donne −0,10, vingt mots de jurisprudence (STBC : « CAGR +46,9 %/an mais
+dernier exercice à −18,5 % ») et le présente comme une garde v3.2 **appliquée**.
+Or `profils.py` fusionne le bloc `profils:` par
+`sp.update({k: v for k, v in ... if k in par_defaut})` : **une clé absente de
+`par_defaut` est écartée en silence**, et celle-ci n'y est pas. Pendant ce
+temps, `profils.py:467` teste un **`-0.10` écrit en dur**. La garde fonctionne
+donc — mais le seuil que Claudia éditerait dans le registre n'aurait **aucun
+effet**, et rien ne le dirait.
+
+**Les dix autres promesses vides.** `score.croissance_lookback_annees` (3) :
+`score_rentabilite` ne compare que `rn` à `rn_n1`, soit **un** exercice.
+**Les quatre clés `calendrier:`** d'intervalle et de tolérance :
+`moteur/calendrier.py` **ne lit pas le registre du tout**.
+`collecte.requetes_par_seconde_max` (2) : aucun collecteur ne l'honore,
+`avis_brvm.py:328` dort **0,6 s écrit en dur**. `macro.prime_exigee_min`, seuil
+de lecture d'un rendement face au taux sans risque, appliqué nulle part.
+`collecte.cibles`, liste descriptive jamais relue. Et deux lignes de référence
+(`taux_oat_3ans`, `taux_oat_5ans`) qui, elles, sont **légitimement**
+informatives — seul `taux_reference` est lu, et c'est voulu.
+
+**Les deux seuils non versionnés, dans l'autre sens.**
+`age_max_capitaux_propres` = 3 (péremption du ROE, posée le 18/09/2026 sur le
+cas SGBC — elle **masque** aujourd'hui des ROE au lieu de les publier) et
+`ecart_intermediaire_max` = 0,08. Tous deux appliqués, aucun au registre : les
+changer demande de modifier du code, ce que la doctrine refuse précisément.
+
+**Ce que la chasse a déjà fermé, et ce qu'elle n'a pas tranché.** La
+**section 42** (10 contrôles, injection **8/8**) interdit désormais toute
+**nouvelle** dérive dans les deux sens, vérifie que chaque défaut connu est
+nommé avec son motif, exige qu'une entrée **disparaisse** du registre dès que sa
+cause est réparée (règle de la section 34), et compare les valeurs par défaut
+aux valeurs du registre — y compris les **12 lectures `.get(clé, défaut)`** du
+dépôt, toutes en accord aujourd'hui. Elle **ne répare rien** : ce qui est mesuré
+n'est pas tranché.
+
+**Les trois décisions, une par famille.** (a) Pour `inflexion_recente_max` :
+l'ajouter à `par_defaut` et lire le seuil — mais alors la garde devient
+réglable, et **un seuil autre que −0,10 déplacerait des profils publiés**.
+(b) Pour les sept seuils jamais appliqués : les brancher, ou les **retirer du
+registre** en disant pourquoi — un registre qui promet ce qu'il n'applique pas
+est pire qu'un registre court. (c) Pour les deux seuils en dur : les porter au
+registre, ce qui les rend éditables, `age_max_capitaux_propres` en tête.
+
+**Terminé quand** : chaque feuille du registre est soit atteinte par le code,
+soit déclarée non appliquée **dans le registre lui-même** ; aucun seuil appliqué
+par le moteur ne manque au registre ; `SEUILS_MUETS_CONNUS` et
+`SEUILS_NON_VERSIONNES_CONNUS` de la section 42 sont **vides** ; et l'effet de
+chaque rebranchement sur les profils publiés est mesuré titre par titre avant
+d'être appliqué.
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
   nominal doit être enregistrée dans `operations_sur_titre.csv` le jour même.
   (C4 en compte déjà treize ; ce serait le quatorzième.)
 - **09/10/2026 — confronter le journal des prédictions.** `journal_profils.csv`
-  existe depuis le cycle 25 et porte **un seul jour, 48 lignes**. Rien ne le lit
-  encore, et rien ne peut le lire utilement avant qu'il ait de la profondeur :
+  existe depuis le cycle 25 et porte **un seul jour, 48 lignes**. *Revérifié le
+  11/10/2026 (cycle 29) : toujours **un seul jour, le 2026-10-09**, deux jours
+  plus tard.* La ligne du jour est bien écrite à chaque exécution de
+  `profils.py`, mais seuls `avis_brvm.yml` et `notations.yml` la commitent, et
+  aucun des deux n'a poussé depuis le 09/10 ; les cycles, eux, annulent le
+  fichier pour garder leur commit propre. **À ce rythme, le trimestre que cette
+  veille attend n'arrivera jamais** : avant d'espérer de la profondeur, il faut
+  trancher qui commite ce journal — c'est la même question que **C47**. Rien ne
+  le lit encore, et rien ne peut le lire utilement avant qu'il ait de la
+  profondeur :
   juger un verdict demande des cours postérieurs. **Quand le journal couvrira au
   moins un trimestre**, cela devient un chantier de la file — ORANGE, parce que
   définir ce qu'est « avoir eu raison » (horizon, référence, que faire d'un titre
@@ -3753,6 +3876,38 @@ soit « tout workflow qui commite de la donnée fume le générateur publié »,
 # Dernier cycle
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
+
+## 2026-10-11 — cycle 29 (matin)
+**Exécuté : la mesure de C2, et c'est l'autre axe qu'elle a tranché.** Anti-collision : **0 commit**
+depuis 3 h, cycle 28 clos à 19h13. Rang 1 revérifié **vide** ligne par ligne (16 ORANGE à
+`validation : OK`, tous à passe consommée), rang 2 **vide** (8 VERTE faites ou closes) : rang 3,
+**C2**, priorité 2, plus petit numéro. **Rien n'a été écrit.**
+**Le rattachement ne se tranche pas sur les données du dépôt.** Deux mesures indépendantes refusent de
+converger et se scindent **par titre** : identité des capitaux propres, 11 paires, **A 5 / B 6** (BBGC
+sous A sur 4, CABC sous B sur 6) ; nombre d'actions implicite contre `RN × PER / cours`, 16 paires,
+**A 7 / B 9**. **La troisième mesure explique les deux** : `payout certifié / (DPA ÷ BPA du BOC)` vaut
+**1,1360** en médiane et **7 titres sur 11 tiennent dans [1,12 ; 1,15]** — un facteur commun à sept
+sociétés sans lien n'est pas une politique de distribution ; son inverse vaut **0,8803**. Corroboré
+des deux côtés : le **dividende est identique des deux côtés** (`rendement × cours` contre
+`montant_net`, **12/12 à moins de 0,5 %**), donc le facteur vit dans le **BPA** ; et le brut déduit à
+0,880 tombe **rond** sur **6 des 21** versements (NTLC 369,60 → **420,00** ; CIEC → **234,00** ;
+SLBC → **2 127,00**) contre **un seul** à 0,95. **L'ordre des deux axes de C2 est l'inverse de ce
+qu'il croyait** : brut/net commande. **Effet** : **31 titres sur 48** tournent sur le payout implicite
+et, après division par 0,880, **un seul** franchit `payout_max = 1,00` — **NEIC**, 0,880244 →
+1,000277, qui perdrait **GARP**. 0,880 est un facteur mesuré, **pas** une retenue identifiée.
+**Chasse — le registre des seuils et le code ont dérivé dans les deux sens.** Sur **86 feuilles** de
+`config/seuils.yaml`, **16 ne sont nommées par aucun module** (4 se déclarent non implémentées,
+**11 non**) et **2 seuils appliqués ne figurent pas au registre**. Le plus net :
+`profils.inflexion_recente_max`, −0,10 et vingt mots de jurisprudence STBC, **écarté en silence** par
+`if k in par_defaut` pendant que `profils.py:467` teste un `-0.10` **en dur** — l'éditer n'a aucun
+effet. **Section 42, 10 contrôles, injection 8/8**, légitimité **lue dans le registre** et non dans une
+liste tenue à la main ; ses deux **planchers** ont fait **rougir la barrière** (section 34) avant
+classement. Tout le détail est dans **C48**, proposé (ORANGE, 2).
+**Barrières** (venv `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) : **50 sociétés / 185
+lignes d'états**, 48 titres profilés, golden tests et autotests verts (GCR 10/10, avis 8/8),
+`tester_donnees.py` **379 OK, 0 ÉCHEC**, code 2, **4** alertes antérieures (C4, C5, relevé du jour ×2),
+`profils.json` **inchangé à l'octet**. **Prochain** : rang 3, **C45** — mesure pré-autorisée, un
+`avis_brvm.yml` par l'API pour relever les quatre codes HTTP. C2 attend un mot.
 
 ## 2026-10-10 — cycle 28 (soir)
 **Exécuté : C9, et sa prémisse était fausse.** Anti-collision : **0 commit** depuis 3 h, cycle 27 clos,
@@ -3781,36 +3936,6 @@ lieu de passer en silence (famille C43, colonne vertébrale de 9 modules).
 `profils.json` et `journal_profils.csv` **inchangés à l'octet**. **Proposé : C47** (ORANGE, 3).
 **Prochain** : plus **aucune VERTE** dans la file, donc rang 3 — mesure seule de **C2** (priorité 2) et
 de son **axe d'exercice de rattachement**, resté entier. Tout écrit attend désormais un mot.
-
-## 2026-10-10 — cycle 27 (matin)
-**Exécuté : C8.** Anti-collision : **0 commit de cycle** depuis 3 h, cycle 26 clos. Rang 1 revérifié
-**vide** (les **16** ORANGE à `validation : OK` portent tous la mention de passe consommée) ; rang 2.
-**Le chantier ne visait plus la bonne agence.** Fonds : **386 lignes, 295 OK / 87 SANS_NOTE / 4 ECHEC**
-— Bloomfield **249**, WARA **82**, GCR **44**, 11 sans. GCR ne porte **aucun** échec ; les 4 sont
-**1 TTLS + 3 ONTBF**, dont deux documents WARA. Un extracteur GCR n'aurait rien rapporté.
-**Trois des quatre sont deux défauts de code, reproduits hors ligne et corrigés.** (1) `([\d,\.]+)` des
-trois motifs de score capturait une chaîne **sans aucun chiffre** : `float('.')` levait `ValueError`,
-remontée jusqu'à `extraire_pdf`, qui faisait **jeter le document entier** pour un champ accessoire —
-échec TTLS redit **6 fois depuis le 04/08**, **67 jours**. 4 motifs sur 6 alimentant `_nombre` étaient
-dans ce cas ; tous portent désormais `\d+(?:[.,]\d+)?`. (2) `RE_NOTE_NUE` n'a **aucun groupe capturant**
-et le site d'appel faisait `.group(1)` → `IndexError('no such group')`, atteint quand un PDF coupe
-« note de long terme » en fin de ligne — ONTBF ×2. Le 4ᵉ (`Unexpected EOF`) est un PDF tronqué à la
-source, **hors de portée**. **4 reproductions : ValueError/IndexError → notes lues, score vide** ;
-9 captures légitimes inchangées ; `notations.py --test` index 15/15, GCR 10/10, pièges 3/3. **Rien
-écrit dans le fonds** (la classe le dit) : le reversement part en **C46**.
-**Chasse — 7 registres d'échec commités, et la barrière n'en nommait AUCUN.** Le plus parlant :
-`avis_echecs.jsonl`, **19 lignes pour 1 seul échec distinct**, redit du 18/09 au 09/10 — un **404** sur
-la rubrique `OPERATION`, celle des **fractionnements**. Elle n'a jamais rien rendu : **0 avis sur 140**
-(ASSEMBLEE 60, AVIS 40, DIVIDENDE 40). C4 prescrit d'y fouiller avant tout réseau et la veille datée du
-08/10 (AGE Sonatel) l'attend. **Section 40, 14 contrôles** : plafonds en **échecs distincts** (pas en
-lignes — une redite n'est pas un défaut de plus), part pour le seul registre à population croissante
-(**568 / 828 = 68,6 %**), tout `ECHEC` du fonds nommé ici, aucune rubrique muette. **Injection 8 / 8**,
-dont la 4ᵉ — 10 redites de plus — **verte** : l'unité n'est pas un cumul.
-**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) : base
-**50 sociétés / 185 lignes d'états**, golden tests passent, `tester_donnees.py` **360 OK, 0 ÉCHEC**,
-code 2, **4** alertes antérieures (C4, C5, relevé du jour ×2, identiques au 09/10) ; `profils.json` et
-`journal_profils.csv` **inchangés à l'octet**. **Proposé : C45** (ORANGE, 2). **Prochain** : rang 2,
-**C9** (VERTE, 9), dernière VERTE de la file.
 
 ---
 

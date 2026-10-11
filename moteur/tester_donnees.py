@@ -4745,6 +4745,14 @@ UNITE_PLAFONDS = {
     # Descendu de 17 a 0 par C35 le 08/10/2026 : un zero ne cumule pas, et toute
     # observation non relevee est desormais un signal immediat. Reclasse C38.
     "OBSERVATIONS_NON_RELEVEES_MAX": "ponctuel",  # un zero, et il y reste
+    # Section 42 (cycle 29, 11/10/2026) : deux PLANCHERS d'anti-extinction, et
+    # non des plafonds. Ils ne disent pas « pas plus de », ils disent « si le
+    # parcours en trouve moins, c'est la LECTURE qui est cassee ». Ils ne
+    # peuvent donc pas deriver vers le haut comme un cumul : 80 contre 86
+    # feuilles mesurees, 25 contre 30 cles, et un registre qui grossit ne fait
+    # qu'eloigner la marge au lieu de la ronger.
+    "FEUILLES_REGISTRE_MIN": "ponctuel",          # plancher, pas un plafond
+    "PAR_DEFAUT_CLES_MIN": "ponctuel",            # plancher, pas un plafond
 }
 # Les registres en forme de dictionnaire ou d'ensemble nomme ne figurent pas
 # ci-dessus et n'ont pas a y figurer : etre indexe par titre, par fichier ou par
@@ -6031,6 +6039,313 @@ def test_code_atteignable():
             f"les {len(MODULES_A_LA_MAIN)} entrees du registre portent un motif")
 
 
+# ----------------------------------------------------------------------
+# SECTION 42 — le registre des seuils et le code ont derive dans les deux sens
+# (chasse du cycle 29, 11/10/2026)
+#
+# LA FAMILLE. `config/seuils.yaml` est, par doctrine ecrite du depot, la source
+# unique des seuils : « tout provient de seuils.yaml (registre versionne) »
+# (moteur/scoring.py, en tete), et les seuils de signaux.py y ont ete rapatries
+# le 14/07/2026 pour « violation de la doctrine de versionnement ». Personne ne
+# verifiait que le registre et le code se parlaient encore. Mesure du
+# 11/10/2026, sur 86 feuilles : SEIZE ne sont nommees par aucun module, et DEUX
+# seuils appliques par le moteur ne figurent pas au registre.
+#
+# CE QUE LE SILENCE A COUTE, chiffre le jour de la chasse. Le cas le plus net
+# est `profils.inflexion_recente_max`. Le registre lui donne -0,10, vingt mots
+# de jurisprudence (cas STBC : « CAGR +46,9 %/an mais dernier exercice a
+# -18,5 % ») et le presente comme une garde v3.2 APPLIQUEE. Or profils.py
+# fusionne le bloc `profils:` par `sp.update({k: v for k, v in ... if k in
+# par_defaut})` : une cle absente de `par_defaut` est ECARTEE EN SILENCE.
+# `inflexion_recente_max` n'y est pas. Pendant ce temps, profils.py:467 teste un
+# `-0.10` ECRIT EN DUR. La garde fonctionne donc, mais le seuil que Claudia
+# editerait dans le registre n'aurait AUCUN effet, et rien ne le dirait.
+# Symetriquement, `age_max_capitaux_propres` (3 ans, peremption du ROE, qui
+# masque aujourd'hui des ROE publies) et `ecart_intermediaire_max` (0,08) sont
+# APPLIQUES sans figurer nulle part au registre.
+#
+# LES DEUX SENS, et pourquoi un seul controle ne suffit pas. Une cle du registre
+# que le code n'atteint pas est une PROMESSE VIDE. Un seuil du code que le
+# registre ne porte pas est un SEUIL NON VERSIONNE. Les deux sont muets, et
+# aucun ne casse rien : le code tourne, les chiffres s'affichent.
+#
+# L'UNITE, et la lecon de la section 34. Un compte global de feuilles muettes
+# serait un cumul : il monterait a chaque seuil ajoute et descendrait a chaque
+# seuil retire, sans dire lequel. Ce qui est plafonne ici est donc une LISTE
+# NOMMEE, cle par cle, avec son motif — comme MODULES_A_LA_MAIN de la section
+# 41. Une cle NOUVELLE fait crier ; une cle du registre qui redevient atteinte
+# fait crier aussi, pour que la liste ne survive pas a sa cause (section 34).
+#
+# LA LEGITIMITE LUE DANS LE FICHIER, jamais tenue a la main. Une feuille muette
+# est legitime sans figurer dans la liste si sa propre documentation, dans
+# seuils.yaml, la declare non appliquee (`PREVU_NON_IMPLEMENTE`, « non encore
+# implemente »). Le registre porte deja quatre telles declarations. On lit la
+# justification la ou elle vit.
+SEUILS_MUETS_CONNUS = {
+    "profils.inflexion_recente_max":
+        "ecartee par le filtre 'if k in par_defaut' de profils.py ; la garde "
+        "existe mais sur un -0.10 ecrit en dur (profils.py:467) — chantier C48",
+    "score.croissance_lookback_annees":
+        "scoring.py::score_rentabilite ne compare que rn a rn_n1, soit UN "
+        "exercice : le recul de 3 ans n'est pas applique — chantier C48",
+    "calendrier.intervalle_min_jours":
+        "moteur/calendrier.py ne lit pas le registre du tout — chantier C48",
+    "calendrier.intervalle_max_jours":
+        "moteur/calendrier.py ne lit pas le registre du tout — chantier C48",
+    "calendrier.tolerance_courte_jours":
+        "moteur/calendrier.py ne lit pas le registre du tout — chantier C48",
+    "calendrier.tolerance_longue_jours":
+        "moteur/calendrier.py ne lit pas le registre du tout — chantier C48",
+    "collecte.requetes_par_seconde_max":
+        "aucun collecteur ne l'honore ; avis_brvm.py:328 dort 0,6 s ecrit en "
+        "dur, soit 1,67 req/s pour un plafond affiche a 2 — chantier C48",
+    "collecte.cibles":
+        "liste descriptive des cibles de collecte, jamais relue par un "
+        "collecteur (chacun porte ses propres URL) — chantier C48",
+    "macro.prime_exigee_min":
+        "seuil de lecture d'un rendement face au taux sans risque, documente "
+        "mais applique nulle part — chantier C48",
+    "macro.taux_oat_3ans":
+        "donnee de reference affichee dans le registre pour situer le 5 ans ; "
+        "seul macro.taux_reference est lu, et c'est voulu",
+    "macro.taux_oat_5ans":
+        "idem : reference du releve UMOA-Titres, c'est taux_reference qui est lu",
+}
+# Les seuils appliques par le moteur que le registre ne porte pas. Meme regle :
+# nommes avec leur motif, et tout NOUVEAU fait crier.
+SEUILS_NON_VERSIONNES_CONNUS = {
+    "age_max_capitaux_propres":
+        "peremption du ROE a 3 ans (18/09/2026, cas SGBC) — profils.py:1471, "
+        "jamais porte au registre ; chantier C48",
+    "ecart_intermediaire_max":
+        "ecart admis entre un intermediaire et l'exercice clos (0,08) — "
+        "profils.py:1583, jamais porte au registre ; chantier C48",
+}
+MARQUEURS_NON_APPLIQUE = ("prevu_non_implemente", "non encore implemente",
+                          "non implemente", "non fait")
+# Les blocs dont l'absence prouverait une panne de lecture, et non un retrait.
+BLOCS_REGISTRE = ("filtres_exclusion", "score", "signaux", "profils",
+                  "calendrier", "macro", "extraction", "collecte")
+FEUILLES_REGISTRE_MIN = 80
+PAR_DEFAUT_CLES_MIN = 25
+
+
+def _feuilles_registre(d, prefixe=()):
+    """Les feuilles du registre, chemin pointe -> valeur."""
+    for k, v in d.items():
+        if isinstance(v, dict):
+            yield from _feuilles_registre(v, prefixe + (k,))
+        else:
+            yield ".".join(prefixe + (k,)), v
+
+
+def _doc_de_la_cle(lignes, chemin):
+    """La documentation d'une feuille : sa ligne, les commentaires qui la
+    precedent immediatement, ceux qui la suivent en retrait, et la meme chose
+    pour sa cle PARENTE (un seuil en mapping inline — { a: 1, b: 2 } — n'a pas
+    de ligne propre, et c'est le parent qui porte le marqueur)."""
+    import re as _re
+    morceaux = []
+    for cle in (chemin.split(".")[-1], chemin.split(".")[-2] if "." in chemin else ""):
+        if not cle:
+            continue
+        for i, l in enumerate(lignes):
+            if not _re.match(r"\s*%s\s*:" % _re.escape(cle), l):
+                continue
+            morceaux.append(l)
+            j = i - 1
+            while j >= 0 and lignes[j].strip().startswith("#"):
+                morceaux.append(lignes[j])
+                j -= 1
+            k = i + 1
+            while k < len(lignes) and _re.match(r"\s+#", lignes[k]):
+                morceaux.append(lignes[k])
+                k += 1
+    return "\n".join(morceaux).lower()
+
+
+def _modules_du_depot():
+    """Les modules du depot, ce fichier exclu : lui nommer une cle ne prouve
+    pas qu'elle est APPLIQUEE — il ne fait que la verifier."""
+    return {p: p.read_text(encoding="utf-8")
+            for p in sorted(RACINE.rglob("*.py"))
+            if ".git" not in str(p) and "venv" not in str(p)
+            and p.name != "tester_donnees.py"}
+
+
+def _par_defaut_de_profils():
+    """Le dict `par_defaut` de profils.py, lu sans importer le module."""
+    import ast as _ast
+    arbre = _ast.parse((RACINE / "moteur" / "profils.py").read_text(
+        encoding="utf-8"))
+    for n in _ast.walk(arbre):
+        if (isinstance(n, _ast.Assign)
+                and any(getattr(t, "id", None) == "par_defaut" for t in n.targets)
+                and isinstance(n.value, _ast.Call)):
+            return {kw.arg: _ast.literal_eval(kw.value) for kw in n.value.keywords}
+    return {}
+
+
+def _defauts_muets(modules, feuilles):
+    """Les `.get("cle", defaut)` portant sur une cle du registre. On ne retient
+    que les cles NUMERIQUES ou LISTE dont le nom est UNIQUE dans le registre :
+    un nom partage (decalage_annee, present quatre fois) ou un libelle
+    d'affichage (version, date, source, replies par "?") ne se compare pas."""
+    import re as _re
+    import ast as _ast
+    noms = {}
+    for chemin, val in feuilles.items():
+        noms.setdefault(chemin.split(".")[-1], []).append((chemin, val))
+    uniques = {n: v[0] for n, v in noms.items()
+               if len(v) == 1 and isinstance(v[0][1], (int, float, list))
+               and not isinstance(v[0][1], bool)}
+    trouves = []
+    for p, t in modules.items():
+        for m in _re.finditer(r"\.get\(\s*[\"'](\w+)[\"']\s*,\s*([^)]+?)\)", t):
+            cle = m.group(1)
+            if cle not in uniques:
+                continue
+            try:
+                defaut = _ast.literal_eval(m.group(2).strip())
+            except Exception:
+                continue
+            chemin, attendu = uniques[cle]
+            if isinstance(attendu, list):
+                accord = isinstance(defaut, (list, tuple, set)) and \
+                    sorted(map(str, defaut)) == sorted(map(str, attendu))
+            else:
+                accord = defaut == attendu
+            trouves.append((str(p.relative_to(RACINE)), chemin, defaut,
+                            attendu, accord))
+    return trouves
+
+
+def test_registre_des_seuils():
+    print("\n=== 42. Registre des seuils : promesses vides et seuils non "
+          "versionnes (chasse du cycle 29) ===")
+    import yaml as _yaml
+    src = (RACINE / "config" / "seuils.yaml").read_text(encoding="utf-8")
+    cfg = _yaml.safe_load(src) or {}
+    lignes = src.splitlines()
+    feuilles = dict(_feuilles_registre(cfg))
+    modules = _modules_du_depot()
+    par_defaut = _par_defaut_de_profils()
+
+    # A — anti-extinction (famille C43). Sans ce controle, une lecture cassee
+    # viderait les feuilles, tout serait « atteint », et la section passerait
+    # en SILENCE au lieu de crier.
+    assez = (len(feuilles) >= FEUILLES_REGISTRE_MIN
+             and len(par_defaut) >= PAR_DEFAUT_CLES_MIN
+             and len(modules) >= 20)
+    manquants = [b for b in BLOCS_REGISTRE if b not in cfg]
+    verifie(assez and not manquants,
+            f"le parcours retrouve le registre : {len(feuilles)} feuilles "
+            f"(min {FEUILLES_REGISTRE_MIN}), par_defaut {len(par_defaut)} cles "
+            f"(min {PAR_DEFAUT_CLES_MIN}), {len(modules)} modules, "
+            f"{len(BLOCS_REGISTRE)} blocs connus presents"
+            + ("" if not manquants else " — BLOC(S) ABSENT(S) : "
+               + ", ".join(manquants)))
+    if not assez:
+        return
+
+    # B — toute feuille muette est declaree non appliquee par le registre
+    #     lui-meme, ou nommee avec son motif.
+    muettes, surprises = [], []
+    for chemin in feuilles:
+        cle = chemin.split(".")[-1]
+        if any(f'"{cle}"' in t or f"'{cle}'" in t for t in modules.values()):
+            continue
+        muettes.append(chemin)
+        if chemin in SEUILS_MUETS_CONNUS:
+            continue
+        doc = _doc_de_la_cle(lignes, chemin)
+        if not any(m in doc for m in MARQUEURS_NON_APPLIQUE):
+            surprises.append(chemin)
+    verifie(not surprises,
+            f"les {len(muettes)} feuilles muettes du registre sont toutes "
+            f"declarees non appliquees ou nommees avec leur motif"
+            + ("" if not surprises else " — PROMESSE(S) VIDE(S) NOUVELLE(S) : "
+               + ", ".join(sorted(surprises))))
+
+    # C — le registre des cas connus ne survit pas a sa cause (section 34).
+    revenues = sorted(c for c in SEUILS_MUETS_CONNUS if c not in muettes)
+    verifie(not revenues,
+            f"aucune des {len(SEUILS_MUETS_CONNUS)} entrees de "
+            f"SEUILS_MUETS_CONNUS n'est redevenue atteinte"
+            + ("" if not revenues else " — ATTEINTE(S), donc a retirer : "
+               + ", ".join(revenues)))
+    verifie(all(bool(m.strip()) for m in SEUILS_MUETS_CONNUS.values())
+            and all(bool(m.strip()) for m in SEUILS_NON_VERSIONNES_CONNUS.values()),
+            f"les {len(SEUILS_MUETS_CONNUS)} + "
+            f"{len(SEUILS_NON_VERSIONNES_CONNUS)} entrees nommees portent "
+            f"un motif")
+
+    # D — une cle du bloc profils: absente de par_defaut est ECARTEE EN
+    #     SILENCE par le filtre de fusion. C'est le defaut d'inflexion.
+    reg_profils = cfg.get("profils") or {}
+    ecartees = sorted(k for k in reg_profils if k not in par_defaut)
+    inconnues = [k for k in ecartees
+                 if f"profils.{k}" not in SEUILS_MUETS_CONNUS]
+    verifie(not inconnues,
+            f"les {len(ecartees)} cle(s) du bloc profils: ecartee(s) par "
+            f"'if k in par_defaut' sont nommee(s) dans SEUILS_MUETS_CONNUS"
+            + ("" if not inconnues else " — ECARTEE(S) EN SILENCE : "
+               + ", ".join(f"profils.{k}" for k in inconnues)))
+
+    # E — un seuil applique que le registre ne porte pas n'est pas versionne.
+    non_versionnes = sorted(k for k in par_defaut if k not in reg_profils)
+    nouveaux = [k for k in non_versionnes
+                if k not in SEUILS_NON_VERSIONNES_CONNUS]
+    verifie(not nouveaux,
+            f"les {len(non_versionnes)} seuil(s) de par_defaut absent(s) du "
+            f"registre sont nomme(s) dans SEUILS_NON_VERSIONNES_CONNUS"
+            + ("" if not nouveaux else " — SEUIL(S) NON VERSIONNE(S) "
+               "NOUVEAU(X) : " + ", ".join(nouveaux)))
+    perimes = sorted(k for k in SEUILS_NON_VERSIONNES_CONNUS
+                     if k in reg_profils or k not in par_defaut)
+    verifie(not perimes,
+            f"aucune des {len(SEUILS_NON_VERSIONNES_CONNUS)} entrees de "
+            f"SEUILS_NON_VERSIONNES_CONNUS n'est devenue versionnee ou morte"
+            + ("" if not perimes else " — a retirer du registre : "
+               + ", ".join(perimes)))
+
+    # F — pour toute cle portee des deux cotes, le defaut de par_defaut doit
+    #     dire la MEME chose que le registre. Sinon le defaut mentirait sur ce
+    #     qui est applique des que la cle disparait du registre.
+    desaccords = [(k, reg_profils[k], par_defaut[k])
+                  for k in sorted(set(reg_profils) & set(par_defaut))
+                  if reg_profils[k] != par_defaut[k]]
+    verifie(not desaccords,
+            f"les {len(set(reg_profils) & set(par_defaut))} seuils portes des "
+            f"deux cotes ont la meme valeur au registre et en defaut"
+            + ("" if not desaccords else " — DESACCORD(S) : "
+               + ", ".join(f"{k} registre={a!r} defaut={b!r}"
+                           for k, a, b in desaccords)))
+
+    # G — meme regle pour les `.get("cle", defaut)` du reste du depot.
+    lus = _defauts_muets(modules, feuilles)
+    faux = [(f, c, d, a) for f, c, d, a, ok in lus if not ok]
+    verifie(not faux,
+            f"les {len(lus)} lectures .get(cle, defaut) d'un seuil du registre "
+            f"portent un defaut egal au registre"
+            + ("" if not faux else " — DESACCORD(S) : "
+               + ", ".join(f"{f}:{c} defaut={d!r} registre={a!r}"
+                           for f, c, d, a in faux)))
+
+    # H — un meme seuil replie dans PLUSIEURS modules, c'est autant d'endroits
+    #     ou le defaut peut deriver. Plafonne par liste nommee, pas par compte.
+    from collections import Counter as _Counter
+    repete = {c: n for c, n in _Counter(c for _f, c, _d, _a, _ok in lus).items()
+              if n > 1}
+    attendus = {"calendrier.min_occurrences", "calendrier.categories_exclues",
+                "portefeuille.seuil_reequilibrage_pct_poche"}
+    verifie(set(repete) <= attendus,
+            f"les seuils replies dans plusieurs modules sont les "
+            f"{len(attendus)} connus"
+            + ("" if set(repete) <= attendus else " — REPLI NOUVEAU : "
+               + ", ".join(sorted(set(repete) - attendus))))
+
+
 def main():
     sans_app = "--sans-app" in sys.argv
     print("=" * 60)
@@ -6076,6 +6391,7 @@ def main():
     test_dependances_des_workflows()
     test_registres_echecs()
     test_code_atteignable()
+    test_registre_des_seuils()
     if not sans_app:
         test_application()
 
