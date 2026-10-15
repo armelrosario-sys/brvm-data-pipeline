@@ -10,12 +10,12 @@
   "SDSC": {
    "symbole": "SDSC",
    "perf": {
-    "v1s": 0.17,
-    "v1m": -0.33,
-    "ytd": 99.34,
-    "v1an": 102.68,
-    "v3a": 94.84,
-    "v5a": 32.46
+    "v1s": 1.47,
+    "v1m": 0.32,
+    "ytd": 104.62,
+    "v1an": 108.05,
+    "v3a": 100.0,
+    "v5a": 36.26
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SDSC.ci",
@@ -35,12 +35,12 @@
   "BOAB": {
    "symbole": "BOAB",
    "perf": {
-    "v1s": 0.37,
-    "v1m": -7.18,
-    "ytd": 60.26,
-    "v1an": 85.64,
-    "v3a": 192.97,
-    "v5a": 253.77
+    "v1s": -0.59,
+    "v1m": -8.77,
+    "ytd": 59.06,
+    "v1an": 80.68,
+    "v3a": 190.78,
+    "v5a": 256.86
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAB.bj",
@@ -60,12 +60,12 @@
   "BOABF": {
    "symbole": "BOABF",
    "perf": {
-    "v1s": 1.9,
-    "v1m": -10.46,
-    "ytd": 114.67,
-    "v1an": 107.47,
-    "v3a": 148.65,
-    "v5a": 190.09
+    "v1s": 1.84,
+    "v1m": -7.53,
+    "ytd": 114.53,
+    "v1an": 107.08,
+    "v3a": 148.49,
+    "v5a": 192.55
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOABF.bf",
@@ -85,12 +85,12 @@
   "BOAC": {
    "symbole": "BOAC",
    "perf": {
-    "v1s": 0.97,
-    "v1m": -8.1,
-    "ytd": 58.7,
-    "v1an": 55.88,
-    "v3a": 225.57,
-    "v5a": 365.1
+    "v1s": 0.71,
+    "v1m": -8.23,
+    "ytd": 58.5,
+    "v1an": 54.83,
+    "v3a": 225.14,
+    "v5a": 369.28
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAC.ci",
@@ -110,12 +110,12 @@
   "BOAM": {
    "symbole": "BOAM",
    "perf": {
-    "v1s": 0.08,
-    "v1m": -14.69,
-    "ytd": 52.5,
-    "v1an": 38.64,
-    "v3a": 546.64,
-    "v5a": 381.58
+    "v1s": -1.64,
+    "v1m": -15.5,
+    "ytd": 49.88,
+    "v1an": 37.97,
+    "v3a": 535.51,
+    "v5a": 424.34
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAM.ml",
@@ -135,12 +135,12 @@
   "BOAN": {
    "symbole": "BOAN",
    "perf": {
-    "v1s": -5.2,
-    "v1m": -16.98,
-    "ytd": 77.97,
-    "v1an": 78.65,
-    "v3a": 61.57,
-    "v5a": 47.9
+    "v1s": -4.1,
+    "v1m": -13.99,
+    "ytd": 83.72,
+    "v1an": 84.42,
+    "v3a": 66.78,
+    "v5a": 50.43
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAN.ne",
@@ -160,12 +160,12 @@
   "BOAS": {
    "symbole": "BOAS",
    "perf": {
-    "v1s": 0.06,
-    "v1m": -0.61,
-    "ytd": 55.53,
-    "v1an": 38.49,
-    "v3a": 307.5,
-    "v5a": 409.38
+    "v1s": -0.73,
+    "v1m": -2.57,
+    "ytd": 55.25,
+    "v1an": 39.18,
+    "v3a": 306.75,
+    "v5a": 398.06
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAS.sn",
@@ -185,10 +185,10 @@
   "BICB": {
    "symbole": "BICB",
    "perf": {
-    "v1s": -1.86,
-    "v1m": -19.23,
-    "ytd": 69.65,
-    "v1an": 62.46,
+    "v1s": -3.12,
+    "v1m": -20.19,
+    "ytd": 68.44,
+    "v1an": 64.15,
     "v3a": null,
     "v5a": null
    },
@@ -210,12 +210,12 @@
   "BNBC": {
    "symbole": "BNBC",
    "perf": {
-    "v1s": -0.79,
-    "v1m": -11.71,
-    "ytd": 33.69,
-    "v1an": -5.75,
-    "v3a": -1.31,
-    "v5a": -13.53
+    "v1s": -7.69,
+    "v1m": -21.57,
+    "ytd": 27.66,
+    "v1an": -15.49,
+    "v3a": -5.76,
+    "v5a": -14.29
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BNBC.ci",
@@ -235,12 +235,12 @@
   "BICC": {
    "symbole": "BICC",
    "perf": {
-    "v1s": -0.47,
-    "v1m": -4.73,
-    "ytd": 61.74,
-    "v1an": 72.57,
-    "v3a": 362.5,
-    "v5a": 424.17
+    "v1s": -0.06,
+    "v1m": -4.65,
+    "ytd": 61.89,
+    "v1an": 70.72,
+    "v3a": 362.94,
+    "v5a": 424.67
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BICC.ci",
@@ -260,12 +260,12 @@
   "CFAC": {
    "symbole": "CFAC",
    "perf": {
-    "v1s": -5.86,
-    "v1m": -15.25,
-    "ytd": 1.05,
-    "v1an": -20.82,
-    "v3a": 82.91,
-    "v5a": 43.78
+    "v1s": -7.49,
+    "v1m": -17.68,
+    "ytd": -0.7,
+    "v1an": -15.98,
+    "v3a": 79.75,
+    "v5a": 37.86
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_CFAC.ci",
@@ -285,12 +285,12 @@
   "CIEC": {
    "symbole": "CIEC",
    "perf": {
-    "v1s": -0.08,
-    "v1m": -12.75,
-    "ytd": 162.5,
-    "v1an": 143.9,
-    "v3a": 197.84,
-    "v5a": 209.75
+    "v1s": -7.69,
+    "v1m": -14.04,
+    "ytd": 154.24,
+    "v1an": 152.63,
+    "v3a": 188.46,
+    "v5a": 201.51
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_CIEC.ci",
@@ -310,12 +310,12 @@
   "CBIBF": {
    "symbole": "CBIBF",
    "perf": {
-    "v1s": -4.58,
-    "v1m": -12.54,
-    "ytd": 178.29,
-    "v1an": 200.45,
-    "v3a": 255.03,
-    "v5a": 226.09
+    "v1s": -3.17,
+    "v1m": -10.04,
+    "ytd": 182.93,
+    "v1an": 208.7,
+    "v3a": 260.95,
+    "v5a": 233.33
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_CBIBF.bf",
@@ -336,7 +336,7 @@
    "symbole": "SEMC",
    "perf": {
     "v1s": null,
-    "v1m": -4.17,
+    "v1m": -1.64,
     "ytd": null,
     "v1an": 113.57,
     "v3a": 149.17,
@@ -360,12 +360,12 @@
   "ECOC": {
    "symbole": "ECOC",
    "perf": {
-    "v1s": -3.28,
-    "v1m": -6.28,
-    "ytd": 1.25,
-    "v1an": 19.12,
-    "v3a": 138.59,
-    "v5a": 276.74
+    "v1s": -4.76,
+    "v1m": -6.99,
+    "ytd": -0.59,
+    "v1an": 17.81,
+    "v3a": 134.24,
+    "v5a": 263.13
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ECOC.ci",
@@ -385,12 +385,12 @@
   "SIVC": {
    "symbole": "SIVC",
    "perf": {
-    "v1s": -4.28,
-    "v1m": -20.83,
-    "ytd": 20.25,
-    "v1an": 183.58,
-    "v3a": 239.29,
-    "v5a": 194.57
+    "v1s": -6.8,
+    "v1m": -18.32,
+    "ytd": 17.09,
+    "v1an": 164.29,
+    "v3a": 230.36,
+    "v5a": 186.82
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SIVC.ci",
@@ -410,10 +410,10 @@
   "ETIT": {
    "symbole": "ETIT",
    "perf": {
-    "v1s": 1.54,
-    "v1m": -5.71,
+    "v1s": null,
+    "v1m": -7.04,
     "ytd": 186.96,
-    "v1an": 247.37,
+    "v1an": 230.0,
     "v3a": 247.37,
     "v5a": 407.69
    },
@@ -435,12 +435,12 @@
   "FTSC": {
    "symbole": "FTSC",
    "perf": {
-    "v1s": -6.08,
-    "v1m": -12.5,
-    "ytd": -16.44,
-    "v1an": -39.77,
-    "v3a": 58.55,
-    "v5a": -2.37
+    "v1s": -6.09,
+    "v1m": -12.74,
+    "ytd": -16.67,
+    "v1an": -33.93,
+    "v3a": 58.12,
+    "v5a": -0.54
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_FTSC.ci",
@@ -460,10 +460,10 @@
   "LNBB": {
    "symbole": "LNBB",
    "perf": {
-    "v1s": -0.76,
-    "v1m": -2.5,
-    "ytd": -9.2,
-    "v1an": -2.5,
+    "v1s": 4.11,
+    "v1m": 3.05,
+    "ytd": -5.7,
+    "v1an": 1.25,
     "v3a": null,
     "v5a": null
    },
@@ -485,12 +485,12 @@
   "NEIC": {
    "symbole": "NEIC",
    "perf": {
-    "v1s": -6.07,
-    "v1m": -24.0,
-    "ytd": 74.17,
-    "v1an": 211.94,
-    "v3a": 229.13,
-    "v5a": 290.65
+    "v1s": -2.05,
+    "v1m": -24.25,
+    "ytd": 79.58,
+    "v1an": 216.91,
+    "v3a": 239.37,
+    "v5a": 322.55
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_NEIC.ci",
@@ -510,12 +510,12 @@
   "NTLC": {
    "symbole": "NTLC",
    "perf": {
-    "v1s": -0.58,
-    "v1m": -8.88,
-    "ytd": 44.6,
-    "v1an": 17.56,
-    "v3a": 97.06,
-    "v5a": 293.86
+    "v1s": -1.1,
+    "v1m": -9.29,
+    "ytd": 43.94,
+    "v1an": 15.74,
+    "v3a": 96.16,
+    "v5a": 289.09
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_NTLC.ci",
@@ -535,12 +535,12 @@
   "NSBC": {
    "symbole": "NSBC",
    "perf": {
-    "v1s": null,
-    "v1m": -13.93,
-    "ytd": 83.49,
-    "v1an": 85.84,
-    "v3a": 233.33,
-    "v5a": 252.35
+    "v1s": -0.48,
+    "v1m": -13.64,
+    "ytd": 82.61,
+    "v1an": 85.78,
+    "v3a": 231.75,
+    "v5a": 253.04
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_NSBC.ci",
@@ -560,12 +560,12 @@
   "ONTBF": {
    "symbole": "ONTBF",
    "perf": {
-    "v1s": 1.87,
-    "v1m": 4.53,
-    "ytd": 20.72,
-    "v1an": 20.0,
-    "v3a": 41.51,
-    "v5a": -24.53
+    "v1s": 9.93,
+    "v1m": 6.1,
+    "ytd": 22.54,
+    "v1an": 21.56,
+    "v3a": 43.63,
+    "v5a": -23.78
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ONTBF.bf",
@@ -585,12 +585,12 @@
   "ORGT": {
    "symbole": "ORGT",
    "perf": {
-    "v1s": -4.41,
-    "v1m": -12.01,
-    "ytd": 17.5,
-    "v1an": 8.05,
-    "v3a": 5.03,
-    "v5a": -29.5
+    "v1s": -6.02,
+    "v1m": -13.54,
+    "ytd": 17.08,
+    "v1an": 8.08,
+    "v3a": 4.66,
+    "v5a": -29.75
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ORGT.tg",
@@ -610,11 +610,11 @@
   "ORAC": {
    "symbole": "ORAC",
    "perf": {
-    "v1s": 2.38,
-    "v1m": -2.45,
-    "ytd": 53.68,
-    "v1an": 50.52,
-    "v3a": 100.92,
+    "v1s": -6.8,
+    "v1m": -8.87,
+    "ytd": 43.89,
+    "v1an": 41.41,
+    "v3a": 88.12,
     "v5a": null
    },
    "sources": [
@@ -635,12 +635,12 @@
   "PALC": {
    "symbole": "PALC",
    "perf": {
-    "v1s": -6.26,
-    "v1m": -6.2,
-    "ytd": -3.89,
-    "v1an": -17.18,
-    "v3a": 3.8,
-    "v5a": 34.22
+    "v1s": -8.06,
+    "v1m": -10.47,
+    "ytd": -4.94,
+    "v1an": -20.58,
+    "v3a": 2.67,
+    "v5a": 24.19
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_PALC.ci",
@@ -660,12 +660,12 @@
   "SAFC": {
    "symbole": "SAFC",
    "perf": {
-    "v1s": -5.32,
-    "v1m": -25.83,
-    "ytd": 69.65,
-    "v1an": 126.09,
-    "v3a": 762.62,
-    "v5a": 804.35
+    "v1s": -5.24,
+    "v1m": -21.73,
+    "ytd": 72.41,
+    "v1an": 113.81,
+    "v3a": 776.62,
+    "v5a": 826.5
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SAFC.ci",
@@ -685,12 +685,12 @@
   "SPHC": {
    "symbole": "SPHC",
    "perf": {
-    "v1s": -1.25,
-    "v1m": -4.82,
-    "ytd": null,
-    "v1an": 1.94,
-    "v3a": 203.85,
-    "v5a": 51.92
+    "v1s": -5.62,
+    "v1m": -6.73,
+    "ytd": -4.37,
+    "v1an": -5.21,
+    "v3a": 190.58,
+    "v5a": 40.43
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SPHC.ci",
@@ -710,10 +710,10 @@
   "ABJC": {
    "symbole": "ABJC",
    "perf": {
-    "v1s": -2.15,
-    "v1m": -22.1,
+    "v1s": -3.19,
+    "v1m": -21.43,
     "ytd": 10.0,
-    "v1an": 62.34,
+    "v1an": 51.18,
     "v3a": 150.2,
     "v5a": 67.89
    },
@@ -735,12 +735,12 @@
   "STAC": {
    "symbole": "STAC",
    "perf": {
-    "v1s": -0.71,
-    "v1m": -19.03,
-    "ytd": 57.36,
-    "v1an": 73.75,
-    "v3a": 89.55,
-    "v5a": 220.77
+    "v1s": -3.15,
+    "v1m": -21.72,
+    "ytd": 50.94,
+    "v1an": 65.29,
+    "v3a": 81.82,
+    "v5a": 203.03
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_STAC.ci",
@@ -761,11 +761,11 @@
    "symbole": "SGBC",
    "perf": {
     "v1s": null,
-    "v1m": 1.3,
+    "v1m": null,
     "ytd": 30.46,
-    "v1an": 39.31,
+    "v1an": 39.53,
     "v3a": 136.44,
-    "v5a": 254.55
+    "v5a": 271.25
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SGBC.ci",
@@ -785,12 +785,12 @@
   "CABC": {
    "symbole": "CABC",
    "perf": {
-    "v1s": -7.27,
-    "v1m": -12.57,
+    "v1s": -5.85,
+    "v1m": -12.32,
     "ytd": 29.66,
-    "v1an": 36.0,
+    "v1an": 35.4,
     "v3a": 163.79,
-    "v5a": 155.0
+    "v5a": 148.78
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_CABC.ci",
@@ -813,9 +813,9 @@
     "v1s": null,
     "v1m": -1.12,
     "ytd": 154.55,
-    "v1an": 136.95,
+    "v1an": 150.75,
     "v3a": 49.07,
-    "v5a": 32.28
+    "v5a": 39.42
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SICC.ci",
@@ -835,12 +835,12 @@
   "STBC": {
    "symbole": "STBC",
    "perf": {
-    "v1s": -2.29,
-    "v1m": -4.05,
-    "ytd": 7.68,
-    "v1an": 7.3,
-    "v3a": 255.0,
-    "v5a": 419.51
+    "v1s": -2.89,
+    "v1m": -3.47,
+    "ytd": 6.88,
+    "v1an": 5.7,
+    "v3a": 252.33,
+    "v5a": 403.33
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_STBC.ci",
@@ -860,12 +860,12 @@
   "SMBC": {
    "symbole": "SMBC",
    "perf": {
-    "v1s": -1.63,
-    "v1m": -13.99,
-    "ytd": 65.68,
-    "v1an": 57.4,
-    "v3a": 65.68,
-    "v5a": 124.7
+    "v1s": -6.06,
+    "v1m": -15.3,
+    "ytd": 63.16,
+    "v1an": 55.0,
+    "v3a": 63.16,
+    "v5a": 116.78
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SMBC.ci",
@@ -885,12 +885,12 @@
   "SIBC": {
    "symbole": "SIBC",
    "perf": {
-    "v1s": -3.33,
-    "v1m": -6.45,
-    "ytd": 51.3,
-    "v1an": 52.63,
-    "v3a": 225.54,
-    "v5a": 346.15
+    "v1s": 0.57,
+    "v1m": -5.38,
+    "ytd": 53.04,
+    "v1an": 53.04,
+    "v3a": 229.28,
+    "v5a": 351.28
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SIBC.ci",
@@ -910,12 +910,12 @@
   "SDCC": {
    "symbole": "SDCC",
    "perf": {
-    "v1s": -0.23,
-    "v1m": -3.73,
-    "ytd": 122.41,
-    "v1an": 114.11,
-    "v3a": 169.31,
-    "v5a": 186.67
+    "v1s": -3.85,
+    "v1m": -7.44,
+    "ytd": 115.52,
+    "v1an": 107.81,
+    "v3a": 160.96,
+    "v5a": 178.09
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SDCC.ci",
@@ -935,12 +935,12 @@
   "SOGC": {
    "symbole": "SOGC",
    "perf": {
-    "v1s": -0.57,
-    "v1m": -3.09,
-    "ytd": -0.63,
-    "v1an": -10.64,
-    "v3a": 115.66,
-    "v5a": 73.48
+    "v1s": -1.46,
+    "v1m": -3.95,
+    "ytd": -1.52,
+    "v1an": -12.44,
+    "v3a": 113.74,
+    "v5a": 61.08
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SOGC.ci",
@@ -960,12 +960,12 @@
   "SLBC": {
    "symbole": "SLBC",
    "perf": {
-    "v1s": 0.53,
-    "v1m": -0.8,
-    "ytd": 30.1,
-    "v1an": 111.12,
-    "v3a": 318.24,
-    "v5a": 272.28
+    "v1s": 2.14,
+    "v1m": 0.53,
+    "ytd": 32.18,
+    "v1an": 99.17,
+    "v3a": 324.92,
+    "v5a": 278.22
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SLBC.ci",
@@ -985,12 +985,12 @@
   "SNTS": {
    "symbole": "SNTS",
    "perf": {
-    "v1s": -0.2,
-    "v1m": 14.32,
-    "ytd": 71.9,
-    "v1an": 72.69,
-    "v3a": 173.78,
-    "v5a": 218.44
+    "v1s": -0.62,
+    "v1m": 13.91,
+    "ytd": 71.13,
+    "v1an": 71.99,
+    "v3a": 172.56,
+    "v5a": 217.36
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SNTS.sn",
@@ -1010,12 +1010,12 @@
   "SCRC": {
    "symbole": "SCRC",
    "perf": {
-    "v1s": -11.83,
-    "v1m": -25.23,
-    "ytd": 132.08,
-    "v1an": 89.23,
-    "v3a": 368.57,
-    "v5a": 134.29
+    "v1s": -9.81,
+    "v1m": -25.76,
+    "ytd": 129.72,
+    "v1an": 87.31,
+    "v3a": 363.81,
+    "v5a": 133.01
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SCRC.ci",
@@ -1035,12 +1035,12 @@
   "TTLC": {
    "symbole": "TTLC",
    "perf": {
-    "v1s": 5.95,
-    "v1m": -2.29,
-    "ytd": 37.26,
-    "v1an": 28.2,
-    "v3a": 51.18,
-    "v5a": 67.8
+    "v1s": 3.68,
+    "v1m": -4.47,
+    "ytd": 32.76,
+    "v1an": 29.44,
+    "v3a": 46.23,
+    "v5a": 59.38
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_TTLC.ci",
@@ -1060,12 +1060,12 @@
   "TTLS": {
    "symbole": "TTLS",
    "perf": {
-    "v1s": -0.55,
-    "v1m": -7.46,
-    "ytd": 44.0,
-    "v1an": 45.16,
-    "v3a": 30.91,
-    "v5a": 105.71
+    "v1s": 2.91,
+    "v1m": -7.13,
+    "ytd": 48.6,
+    "v1an": 50.1,
+    "v3a": 35.09,
+    "v5a": 112.29
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_TTLS.sn",
@@ -1085,12 +1085,12 @@
   "PRSC": {
    "symbole": "PRSC",
    "perf": {
-    "v1s": 6.41,
-    "v1m": 0.34,
-    "ytd": 13.55,
-    "v1an": 29.6,
-    "v3a": 68.91,
-    "v5a": 46.67
+    "v1s": 0.12,
+    "v1m": -0.69,
+    "ytd": 12.13,
+    "v1an": 20.69,
+    "v3a": 66.79,
+    "v5a": 39.71
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_PRSC.ci",
@@ -1110,12 +1110,12 @@
   "UNLC": {
    "symbole": "UNLC",
    "perf": {
-    "v1s": 0.52,
-    "v1m": -11.11,
-    "ytd": 40.25,
-    "v1an": 159.32,
-    "v3a": 860.0,
-    "v5a": 889.69
+    "v1s": -7.48,
+    "v1m": -17.76,
+    "ytd": 29.76,
+    "v1an": 139.92,
+    "v3a": 788.2,
+    "v5a": 815.67
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_UNLC.ci",
@@ -1135,12 +1135,12 @@
   "UNXC": {
    "symbole": "UNXC",
    "perf": {
-    "v1s": -4.58,
-    "v1m": -8.75,
-    "ytd": 56.43,
-    "v1an": 40.38,
-    "v3a": 192.0,
-    "v5a": 9.5
+    "v1s": -6.52,
+    "v1m": -10.42,
+    "ytd": 53.57,
+    "v1an": 25.36,
+    "v3a": 186.67,
+    "v5a": 7.5
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_UNXC.ci",
@@ -1160,12 +1160,12 @@
   "SHEC": {
    "symbole": "SHEC",
    "perf": {
-    "v1s": -3.1,
-    "v1m": -14.12,
-    "ytd": 51.56,
-    "v1an": 68.46,
-    "v3a": 173.75,
-    "v5a": 139.34
+    "v1s": -2.22,
+    "v1m": -19.71,
+    "ytd": 52.25,
+    "v1an": 59.42,
+    "v3a": 175.0,
+    "v5a": 131.58
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SHEC.ci",
