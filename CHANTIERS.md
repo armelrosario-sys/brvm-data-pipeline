@@ -3645,7 +3645,14 @@ dans six cycles.
 ## C45 — La rubrique OPERATION de la collecte d'avis répond 404 depuis 22 jours, et c'est celle des fractionnements
 
 - classe : ORANGE — rétablir une source d'avis ouvre l'entrée d'un corpus certifié, et retrouver la bonne adresse demande un passage réseau ; **seule la mesure est pré-autorisée**
-- statut : PROPOSÉ — diagnostic fait et chiffré le 10/10/2026 (cycle 27)
+- statut : **PROPOSÉ. Mesure RETENTÉE et NON FAITE le 23/10/2026 (cycle 30) : la
+  barrière était rouge (C49) et la règle interdit tout commit — l'instrument a
+  été écrit, éprouvé hors ligne, puis annulé. La passe de mesure reste donc
+  DISPONIBLE.** Le constat sans réseau est en revanche revérifié ce cycle :
+  `avis_echecs.jsonl` porte **28 lignes pour UN SEUL échec distinct** (19 au
+  cycle 27), redit du **18/09 au 22/10/2026**, soit **35 jours** ; le corpus
+  tient toujours **140 avis, dont OPERATION 0** (ASSEMBLEE 60, AVIS 40,
+  DIVIDENDE 40).
 - validation : —
 - autonomie : partielle — le constat est **sans réseau** ; l'adresse de remplacement ne se trouve que sur brvm.org, donc par workflow
 - priorité : **2** — il vide la première passe de C4 de son contenu, et la veille datée du 08/10 l'attend
@@ -3696,6 +3703,39 @@ autre voie un fractionnement sera vu** — jamais la laisser muette.
 retrait est motivé et la voie de remplacement des fractionnements est nommée ;
 dans les deux cas `avis_echecs.jsonl` cesse de réécrire la même ligne, et le
 contrôle D de la section 40 passe sans exception nommée.
+
+### L'instrument de la mesure, écrit le 23/10/2026 puis annulé — à refaire tel quel
+
+Le cycle 30 a buté sur une chose que ce bloc ne disait pas : **lancer
+`avis_brvm.yml` ne tranche rien.** Ce workflow rejoue la collecte et réécrit la
+même ligne de 404 ; il ne distingue pas une **adresse déplacée** d'une
+**rubrique supprimée**, qui est toute la question. Ce qui tranche, c'est
+l'**inventaire que le site publie lui-même** : la page parente
+`/fr/emetteurs/type-annonces` liste ses rubriques — si elle en porte une qui
+ressemble aux opérations sur titre sous un autre chemin, l'adresse a bougé ;
+si elle n'en porte aucune, la rubrique est morte et il faut nommer une autre
+voie.
+
+Deux fichiers avaient donc été écrits, et **annulés** par la règle « jamais de
+commit si une barrière tombe » (C49) :
+
+- `outils/mesure_rubriques_avis.py` — procès-verbal qui **n'écrit rien** :
+  sonde les quatre chemins de `RUBRIQUES` (lus **par AST** dans le source de
+  `collecte/avis_brvm.py`, jamais recopiés — un procès-verbal qui recopie la
+  valeur qu'il mesure se mesure lui-même), relève code HTTP, redirection finale
+  et taille ; extrait les chemins `type-annonces/` et leurs libellés d'ancre des
+  trois pages parentes ; éprouve sept candidats ; conclut (a) ou (b).
+  `--hors-ligne` rejoue l'autotest seul — **13 contrôles, 0 échec** mesuré ce
+  cycle — et la mesure s'arrête si l'autotest tombe.
+- `.github/workflows/mesure_rubriques_avis.yml` — `workflow_dispatch` seul,
+  `permissions: contents: read` (donc aucune écriture possible), garde-fou
+  hors ligne avant la mesure, résultat dans le résumé du run. Le fichier **doit**
+  être sur `main` : GitHub n'expose `workflow_dispatch` que depuis la branche par
+  défaut, ce qui interdit de mesurer depuis une branche de côté.
+
+Le prochain cycle qui reprendra C45 n'a pas à redécouvrir cela : il réécrit ces
+deux fichiers et lance le workflow. **Mais il ne pourra pas les pousser avant que
+C49 soit soldé.**
 
 ## C46 — Reverser au fonds de notations les trois échecs que C8 a réparés
 
@@ -3849,21 +3889,101 @@ par le moteur ne manque au registre ; `SEUILS_MUETS_CONNUS` et
 chaque rebranchement sur les profils publiés est mesuré titre par titre avant
 d'être appliqué.
 
+## C49 — La barrière est rouge depuis dix jours, un plancher de 15 sur une fenêtre glissante, et aucune CI ne l'a dit
+
+- classe : ORANGE — abaisser ou changer l'unité d'un plancher **bloquant** décide de ce que la barrière arrête encore ; dans le doute, un chantier neuf naît ORANGE. **Mais rien n'avance tant qu'il tient : la barrière rouge interdit tout commit de la boucle comme de la conversation de développement.**
+- statut : **MESURÉ le 23/10/2026 (cycle 30), et c'est lui qui a fait tomber la barrière de ce cycle.** La passe de mesure est consommée ; aucun cycle ne la refait. Toute écriture attend un mot.
+- validation : —
+- autonomie : complète, **sans réseau** — tout est dans le dépôt
+- priorité : **1** — c'est la seule chose qui bloque **tous** les autres chantiers
+
+**Le constat, mesuré ce cycle.** `moteur/tester_donnees.py` rend **375 OK,
+1 INCOHÉRENCE BLOQUANTE, code 1** — là où le cycle 29 relevait 379 OK, 0 échec,
+code 2. L'incohérence est une seule ligne, section **26** (« Rattachement d'un
+dividende à son exercice », bloquant), `tester_donnees.py:3527` :
+
+```
+verifie(len(nommes) >= 15,
+        f"{len(set(nommes))} avis BRVM nomment leur exercice et portent un "
+        f"ticker — c'est le seul cote independant du rattachement")
+```
+
+**Mesure du jour** : `len(nommes) = 14`, plancher **15**. Les 14 sont CABC,
+CBIBF, CIEC, ECOC, FTSC, NSBC, ORAC, SDCC, SGBC, SHEC, SMBC, SOGC, STBC, TTLS.
+
+**Pourquoi c'est tombé, et ce n'est pas une régression de code.** Le plancher
+porte sur `collecte/avis_brvm.csv`, que P13 **régénère entièrement** à chaque
+passage sur une fenêtre de 4 pages par rubrique. Le corpus tient 140 lignes
+depuis des semaines : ce n'est pas un cumul qui monte, c'est une **fenêtre qui
+glisse**. Relevé revision par revision sur l'historique du fichier :
+
+| passage de P13 | `len(nommes)` |
+|---|---|
+| 2026-09-28 au 2026-10-09 (11 passages) | **15** à chaque fois |
+| 2026-10-13 00:58 | **14** |
+| 2026-10-14 au 2026-10-22 (8 passages) | **14** |
+
+L'avis sorti est nommé : **SMBC exercice 2024, avis du 2025-08-27**, le plus
+ancien des quinze. **Rien n'est entré à sa place** (0 entrant entre les deux
+révisions). Un plancher absolu sur une fenêtre glissante **ne peut que finir par
+tomber**, et il retombera : le prochain plus ancien est FTSC 2024, avis du
+**2025-09-16**.
+
+**Preuve à deux côtés, et le second côté est la CI elle-même.** Le run **262**
+de `tests.yml` (P4), le 19/10/2026, a échoué sur **exactement le même message** :
+« 14 avis BRVM nomment leur exercice… », `exit code 1`. Le bac à sable et la CI
+disent la même chose.
+
+**Et le pire n'est pas le rouge, c'est le silence — famille C43.** P4 ne se
+déclenche que sur un push touchant `moteur/`, `config/`, `collecte/` ou
+`dashboard/`. Or **tous** les pushes depuis le 11/10 viennent des workflows, avec
+`GITHUB_TOKEN`, qui ne redéclenche aucun workflow (anti-boucle documenté dans
+`pages.yml`). Résultat mesuré : **le dernier run de P4 sur `main` date du
+11/10/2026 07h18**, la clôture du cycle 29. Les pipelines ont poussé dans
+`collecte/` **tous les jours ouvrés depuis**, et P4 n'a jamais tourné. La barrière
+est rouge depuis le 13/10 et **le seul endroit où cela s'est vu est la CI d'une
+PR Dependabot que personne ne lit**.
+
+**Un second défaut, dans la même ligne.** Le plancher teste `len(nommes)` — la
+liste **avec doublons** — et le message imprime `len(set(nommes))`, la liste
+**dédupliquée**. Aujourd'hui les deux valent 14, donc l'écart ne se voit pas ;
+le jour où un avis sera redit, le message annoncera un nombre que le plancher
+ne teste pas. C'est la même famille que les plafonds de C38 : le contrôle ne
+mesure pas ce qu'il déclare mesurer.
+
+**Les trois options, et aucune n'est gratuite.** (a) **Unité** : remplacer le
+plancher absolu par une **part du corpus** (14/47 avis de dividende = 0,2979),
+comme C38 l'a fait pour `AVIS_DIVIDENDE_SANS_TICKER` — mais une part sur une
+fenêtre glissante peut aussi dériver, et il faut un **plancher de population**
+sous peine du faux vert de la section 19. (b) **Fenêtre** : élargir
+`--pages` de P13 pour que le corpus cesse de perdre ses anciens — cela change une
+collecte, donc une donnée. (c) **Archive** : cesser de régénérer `avis_brvm.csv`
+et l'**accumuler**, ce qui rendrait le plancher légitime — c'est le plus juste et
+le plus lourd, et c'est un arbitrage sur une source certifiée.
+
+**Terminé quand** : `tester_donnees.py` rend 0 incohérence bloquante sur le dépôt
+du jour ; le contrôle teste et affiche **la même quantité** ; son unité ne peut
+plus tomber par glissement de fenêtre, avec son plancher de population ; et
+**quelque chose fait rougir visiblement un P4 rouge sur `main`** — sans quoi le
+prochain silence durera aussi longtemps.
+
 # Veille datée, hors file
 
 - **08/10/2026 — AGE Sonatel, fractionnement.** Si elle passe, la division de
   nominal doit être enregistrée dans `operations_sur_titre.csv` le jour même.
   (C4 en compte déjà treize ; ce serait le quatorzième.)
 - **09/10/2026 — confronter le journal des prédictions.** `journal_profils.csv`
-  existe depuis le cycle 25 et porte **un seul jour, 48 lignes**. *Revérifié le
-  11/10/2026 (cycle 29) : toujours **un seul jour, le 2026-10-09**, deux jours
-  plus tard.* La ligne du jour est bien écrite à chaque exécution de
-  `profils.py`, mais seuls `avis_brvm.yml` et `notations.yml` la commitent, et
-  aucun des deux n'a poussé depuis le 09/10 ; les cycles, eux, annulent le
-  fichier pour garder leur commit propre. **À ce rythme, le trimestre que cette
-  veille attend n'arrivera jamais** : avant d'espérer de la profondeur, il faut
-  trancher qui commite ce journal — c'est la même question que **C47**. Rien ne
-  le lit encore, et rien ne peut le lire utilement avant qu'il ait de la
+  existe depuis le cycle 25. *Les deux relevés précédents sont périmés, et dans
+  le bon sens : **remesuré le 23/10/2026 (cycle 30), le fichier commité porte
+  9 jours — 2026-10-09, 10-13, 10-14, 10-15, 10-16, 10-19, 10-20, 10-21,
+  10-22 — et 432 lignes.*** Le pessimisme du cycle 29 (« à ce rythme le
+  trimestre n'arrivera jamais ») était faux : P13 a repris de pousser le 13/10 et
+  commite le journal chaque jour ouvré depuis. Il manque les 10 et 11/10 (P13
+  n'a pas poussé) et les week-ends. **Au rythme mesuré — 9 jours en 10 jours
+  ouvrés — le trimestre est atteint vers la mi-janvier 2027.** Le mécanisme
+  reste celui que décrit **C47** : seuls `avis_brvm.yml` et `notations.yml`
+  commitent ce fichier, et les cycles l'annulent pour garder leur commit propre.
+  Rien ne le lit encore, et rien ne peut le lire utilement avant qu'il ait de la
   profondeur :
   juger un verdict demande des cours postérieurs. **Quand le journal couvrira au
   moins un trimestre**, cela devient un chantier de la file — ORANGE, parce que
@@ -3877,65 +3997,33 @@ d'être appliqué.
 
 Vingt-cinq lignes au plus. L'entrée complète va dans `docs/JOURNAL.md`.
 
-## 2026-10-11 — cycle 29 (matin)
-**Exécuté : la mesure de C2, et c'est l'autre axe qu'elle a tranché.** Anti-collision : **0 commit**
-depuis 3 h, cycle 28 clos à 19h13. Rang 1 revérifié **vide** ligne par ligne (16 ORANGE à
-`validation : OK`, tous à passe consommée), rang 2 **vide** (8 VERTE faites ou closes) : rang 3,
-**C2**, priorité 2, plus petit numéro. **Rien n'a été écrit.**
-**Le rattachement ne se tranche pas sur les données du dépôt.** Deux mesures indépendantes refusent de
-converger et se scindent **par titre** : identité des capitaux propres, 11 paires, **A 5 / B 6** (BBGC
-sous A sur 4, CABC sous B sur 6) ; nombre d'actions implicite contre `RN × PER / cours`, 16 paires,
-**A 7 / B 9**. **La troisième mesure explique les deux** : `payout certifié / (DPA ÷ BPA du BOC)` vaut
-**1,1360** en médiane et **7 titres sur 11 tiennent dans [1,12 ; 1,15]** — un facteur commun à sept
-sociétés sans lien n'est pas une politique de distribution ; son inverse vaut **0,8803**. Corroboré
-des deux côtés : le **dividende est identique des deux côtés** (`rendement × cours` contre
-`montant_net`, **12/12 à moins de 0,5 %**), donc le facteur vit dans le **BPA** ; et le brut déduit à
-0,880 tombe **rond** sur **6 des 21** versements (NTLC 369,60 → **420,00** ; CIEC → **234,00** ;
-SLBC → **2 127,00**) contre **un seul** à 0,95. **L'ordre des deux axes de C2 est l'inverse de ce
-qu'il croyait** : brut/net commande. **Effet** : **31 titres sur 48** tournent sur le payout implicite
-et, après division par 0,880, **un seul** franchit `payout_max = 1,00` — **NEIC**, 0,880244 →
-1,000277, qui perdrait **GARP**. 0,880 est un facteur mesuré, **pas** une retenue identifiée.
-**Chasse — le registre des seuils et le code ont dérivé dans les deux sens.** Sur **86 feuilles** de
-`config/seuils.yaml`, **16 ne sont nommées par aucun module** (4 se déclarent non implémentées,
-**11 non**) et **2 seuils appliqués ne figurent pas au registre**. Le plus net :
-`profils.inflexion_recente_max`, −0,10 et vingt mots de jurisprudence STBC, **écarté en silence** par
-`if k in par_defaut` pendant que `profils.py:467` teste un `-0.10` **en dur** — l'éditer n'a aucun
-effet. **Section 42, 10 contrôles, injection 8/8**, légitimité **lue dans le registre** et non dans une
-liste tenue à la main ; ses deux **planchers** ont fait **rougir la barrière** (section 34) avant
-classement. Tout le détail est dans **C48**, proposé (ORANGE, 2).
-**Barrières** (venv `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) : **50 sociétés / 185
-lignes d'états**, 48 titres profilés, golden tests et autotests verts (GCR 10/10, avis 8/8),
-`tester_donnees.py` **379 OK, 0 ÉCHEC**, code 2, **4** alertes antérieures (C4, C5, relevé du jour ×2),
-`profils.json` **inchangé à l'octet**. **Prochain** : rang 3, **C45** — mesure pré-autorisée, un
-`avis_brvm.yml` par l'API pour relever les quatre codes HTTP. C2 attend un mot.
-
-## 2026-10-10 — cycle 28 (soir)
-**Exécuté : C9, et sa prémisse était fausse.** Anti-collision : **0 commit** depuis 3 h, cycle 27 clos,
-P4 et P5b vertes à 07h10. Rang 1 revérifié **vide** (les 16 ORANGE à `validation : OK` portent tous la
-mention de passe consommée) ; rang 2 : C9 était la **dernière VERTE**. Soir : pas de chasse.
-**Aucune des 1 382 lignes que C9 voulait retirer n'est morte.** `moteur/scoring.py` est importé par
-**7 modules**, dont `profils.py` et `generer_dashboard_html.py` — le tableau de bord **publié** ; sur ses
-37 symboles de tête, les 13 sans consommateur extérieur sont tous appelés **dans** le module.
-`moteur/signaux.py` est **exécuté par `pages.yml`**, sa table lue par trois consommateurs.
-`dashboard/generer_dashboard.py` est le **test de fumée de 5 workflows**. Les retirer éteignait la
-publication GitHub Pages, que le *Terminé quand* du **même chantier** exige de garder vivante. Son
-avertissement visait aussi le mauvais fichier : `tester_donnees.py` ne nomme nulle part
-`generer_dashboard.py` — c'est `tests.yml` qui le lance. **Rien n'a été retiré.**
-**L'erreur a tenu 12 jours parce que « code mort » était une opinion** : rien ne répondait à « qui lance
-ce fichier, et qui l'importe », et un chantier **VERTE**, donc pré-autorisé, prescrivait la suppression
-de 1 382 lignes saines. **Section 41, 10 contrôles**, bâtie sur les fonctions d'index et d'import de la
-section 39 — une seule définition d'« importe » dans le dépôt. **71 modules, 46 racines, 59 atteints,
-12 orphelins (3 576 l)**, aucun mort : **8 sous `outils/` (3 201 l) sont les procès-verbaux
-exécutables**, chacun nommant en tête son chantier (C10, C15, C18, C22, C26, C27, C34, C37), vérifié
-présent dans la file ; **4 ailleurs (375 l) sont lancés à la main**, nommés avec leur motif dans
-`MODULES_A_LA_MAIN`. **Injection 6/6**, dont la 6ᵉ — résolution cassée — fait **crier 3 contrôles** au
-lieu de passer en silence (famille C43, colonne vertébrale de 9 modules).
-**Barrières** (venv aux dépendances de `tests.yml`, `import pdfplumber` échoue, Python 3.13.16) : base
-**50 sociétés / 185 lignes d'états**, 48 tickers, golden tests et autotests passent (GCR 10/10),
-`tester_donnees.py` **369 OK, 0 ÉCHEC**, code 2, **4** alertes antérieures (C4, C5, relevé du jour ×2),
-`profils.json` et `journal_profils.csv` **inchangés à l'octet**. **Proposé : C47** (ORANGE, 3).
-**Prochain** : plus **aucune VERTE** dans la file, donc rang 3 — mesure seule de **C2** (priorité 2) et
-de son **axe d'exercice de rattachement**, resté entier. Tout écrit attend désormais un mot.
+## 2026-10-23 — cycle 30 (hors horaire, 13h45 UTC)
+**La barrière est tombée : le cycle ne committe que ce constat, et C45 est annulé.** Anti-collision :
+**0 commit** depuis 3 h. **La boucle n'avait pas tourné depuis le cycle 29, le 11/10 — 12 jours,
+~24 passages manqués.** Rangs 1 et 2 revérifiés **vides** ; rang 3 = **C45**, comme proposé.
+**`tester_donnees.py` : 375 OK, 1 INCOHÉRENCE BLOQUANTE, code 1** (cycle 29 : 379 OK, 0, code 2).
+Section 26, ligne 3527 : plancher `len(nommes) >= 15`, **mesuré 14**. Pas une régression de code : le
+plancher est **absolu sur une fenêtre glissante** — P13 régénère `avis_brvm.csv` sur 4 pages par
+rubrique, 140 lignes stables. Révision par révision : **15 à chacun des 11 passages du 28/09 au
+09/10, puis 14 depuis le 13/10 00h58** ; l'avis sorti est nommé — **SMBC ex.2024, avis du
+2025-08-27** — et **rien** n'est entré à sa place ; il retombera (suivant : FTSC 2024, 2025-09-16).
+**Second côté : le run 262 de P4, le 19/10, a échoué sur le MÊME message, exit 1.** (Second défaut,
+dans la même ligne, détaillé en C49 : elle teste une quantité et en imprime une autre.)
+**Le silence est pire que le rouge, famille C43.** P4 ne part que sur un push touchant `moteur/`,
+`config/`, `collecte/`, `dashboard/`, et **tous** les pushes depuis le 11/10 viennent des workflows
+avec `GITHUB_TOKEN`, qui ne redéclenche rien : **dernier run de P4 sur `main`, 11/10 07h18**. Rouge
+depuis le 13/10, visible nulle part sauf dans la CI d'une PR Dependabot.
+**Annulé par la règle.** `avis_brvm.yml` seul ne distingue pas une adresse déplacée d'une rubrique
+supprimée : il faut l'inventaire des pages parentes. L'instrument écrit pour cela
+(`outils/mesure_rubriques_avis.py`, autotest **13/13 hors ligne**, et son workflow `contents: read`) a
+été **annulé** (`git checkout -- .`) ; conception consignée dans C45. **Revérifié sans réseau** :
+`avis_echecs.jsonl` **28 lignes, 1 échec distinct sur 35 j** ; corpus **140 avis, OPERATION 0**.
+**Barrières** (venv `tests.yml`, `import pdfplumber` échoue, Python **3.13.17**) : 50 sociétés /
+185 lignes d'états, 48 titres, golden tests et autotests verts (GCR 10/10) — **`tester_donnees.py`
+ROUGE**, **7** alertes de fraîcheur contre 4. **Aussi remesuré** : `journal_profils.csv` porte
+**9 jours, 432 lignes**, pas un seul. Pas de chasse. **Proposé : C49** (ORANGE, 1). **Prochain : C49
+et rien d'autre** — tant qu'il tient, aucun commit n'est possible, ni par la boucle ni par la
+conversation de développement. Il attend un mot.
 
 ---
 

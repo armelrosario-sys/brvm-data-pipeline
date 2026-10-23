@@ -9,6 +9,235 @@ quatre fois par jour pour rien.
 
 Une entrée par cycle. La plus récente en haut.
 
+## 2026-10-23 — cycle 30 (hors horaire, 13h45 UTC) : la barrière est rouge depuis dix jours, et aucune CI ne l'avait dit
+
+**Ce cycle n'a rien exécuté de la file. Il a buté sur une barrière rouge, tout
+annulé, et ne committe que le constat — ce que la règle prescrit.**
+
+### 0. La boucle ne tournait plus
+
+Premier fait, avant tout le reste. `CHANTIERS.md` portait comme dernier cycle le
+**29, du 11/10/2026**. Nous sommes le **23/10**. À deux passages par jour, cela
+fait **12 jours et environ 24 passages manqués**. Vérifié sur l'historique :
+**aucun commit de cycle** entre `b53674c` (clôture du cycle 29, 11/10 07h18) et
+aujourd'hui. Les 50 commits de la période viennent tous des workflows —
+`pipeline-brvm` et `github-actions[bot]` — qui, eux, ont continué sans
+interruption : BOC quotidien, cours du jour, relevé Volumes / Valeurs, veille
+des avis, Sikafinance. **Les données ont avancé ; la maintenance s'est arrêtée.**
+Ce cycle part en outre **hors horaire** (13h45 UTC, ni 06h53 ni 18h53), donc sans
+chasse aux défauts : l'étape 5 est réservée au cycle du matin.
+
+Contrôle anti-collision : `git log --since="3 hours ago"` sur `main` rend **0
+commit**. Aucune annonce ouverte, aucune session concurrente.
+
+### 1. Le chantier choisi, par la règle et non par la proposition
+
+Rang 1 (ORANGE à `validation : OK` dont la passe n'est pas consommée) revérifié
+ligne par ligne : **vide** — les 16 ORANGE validés portent tous la mention de
+passe consommée sur leur ligne `statut`. Rang 2 (première `VERTE`) : **vide** —
+les 8 VERTE sont faites ou closes. Rang 3 : premier ORANGE non mesuré, priorité
+la plus haute puis plus petit numéro. À priorité 2 : C2 (passe consommée),
+C29, C31, C44 et C48 (diagnostics déjà produits et inscrits), **C45** dont la
+mesure pré-autorisée n'a jamais été faite. C'est **C45**, et cela coïncide avec
+ce que le cycle 29 annonçait.
+
+### 2. Ce que C45 demandait, et pourquoi sa recette ne marchait pas
+
+Le bloc de C45 prescrit : « lancer `avis_brvm.yml` et relever le code HTTP des
+quatre adresses ». **Cette recette ne tranche pas la question du chantier.**
+`avis_brvm.yml` rejoue la collecte et réécrit la même ligne de 404 ; il ne
+distingue pas une **adresse déplacée** d'une **rubrique supprimée**, qui est tout
+l'enjeu. Ce qui tranche, c'est l'**inventaire que le site publie lui-même** : la
+page parente `/fr/emetteurs/type-annonces` liste ses rubriques.
+
+Deux fichiers ont donc été écrits :
+
+- `outils/mesure_rubriques_avis.py`, procès-verbal qui **n'écrit rien** : il
+  sonde les quatre chemins de `RUBRIQUES` — **lus par AST dans le source de
+  `collecte/avis_brvm.py`**, jamais recopiés, parce qu'un procès-verbal qui
+  recopie la valeur qu'il mesure se mesure lui-même — et relève code HTTP,
+  redirection finale et taille ; extrait les chemins `type-annonces/` et leurs
+  libellés d'ancre des trois pages parentes ; éprouve sept candidats ; conclut
+  (a) adresse déplacée ou (b) rubrique supprimée. `--hors-ligne` rejoue
+  l'autotest seul : **13 contrôles, 0 échec**, mesuré ce cycle. La mesure
+  s'arrête si l'autotest tombe.
+- `.github/workflows/mesure_rubriques_avis.yml`, `workflow_dispatch` seul,
+  `permissions: contents: read` — donc **aucune écriture possible** —, garde-fou
+  hors ligne avant la mesure, résultat dans le résumé du run. Le fichier **doit**
+  être sur `main` : GitHub n'expose `workflow_dispatch` que depuis la branche par
+  défaut, ce qui interdit de mesurer depuis une branche de côté.
+
+**Les deux ont été annulés.** Voir la section 4.
+
+### 3. Le constat de C45, revérifié sans réseau — et il a empiré
+
+Mesuré ce cycle sur le dépôt du jour, pas repris du journal :
+
+| mesure | cycle 27 (10/10) | ce cycle (23/10) |
+|---|---|---|
+| lignes de `collecte/avis_echecs.jsonl` | 19 | **28** |
+| échecs **distincts** | 1 | **1** |
+| fenêtre de redite | 18/09 → 09/10 | **18/09 → 22/10, 35 jours** |
+| corpus `avis_brvm.csv` | 140 avis | **140 avis** |
+| dont rubrique `OPERATION` | 0 | **0** |
+
+Répartition inchangée : ASSEMBLEE 60, AVIS 40, DIVIDENDE 40, OPERATION 0. La
+rubrique des fractionnements et des DPS n'a toujours **jamais rien rendu**.
+
+### 4. La barrière est tombée — et c'est la vraie trouvaille du cycle
+
+Barrières complètes, dans un venv aux dépendances exactes de `tests.yml`
+(`import pdfplumber` **échoue** comme en CI, Python **3.13.17** — c'était 3.13.16
+au cycle 29) :
+
+- `moteur/peupler.py` : **50 sociétés, 185 lignes d'états financiers**.
+- Les cinq chargeurs, code 0 : `cours_mensuels` 4 509 lignes / 47 tickers /
+  101 mois ; `cours_quotidien_boc` **91 333 lignes / 48 tickers / 2 043 jours**,
+  jusqu'au 2026-10-21 ; dividendes exercice 296 ajoutés et 32 écartés (C34) ;
+  dividendes BOC 17 ajoutés, 3 refus inchangés (ORGT, BOABF, et un troisième) ;
+  `liquidite_quotidienne` 74 069 lignes / 1 854 jours.
+- `moteur/tester.py` : **tous les golden tests passent**.
+- `moteur/profils.py` : **48 titres profilés**, A=6 B=28 C=14, répartition
+  AUCUN_PROFIL=17 GARP=10 RETOURNEMENT=6 VALUE=5 VIGILANCE_CONTRACTION=4
+  NON_ANALYSABLE=3 MUTATION=2 GROWTH=1.
+- `collecte/avis_brvm.py --test` : passe (11 avis, classification 8/8, levée
+  Sucrivoire et fractionnement SNTS détectés).
+- `collecte/notations.py --test` : passe (index 15/15, 14 tickers, **PDF GCR
+  10/10**, Bloomfield 6/6, pièges 3/3).
+- `dashboard/generer_dashboard.py` : code 0, 48 titres.
+- **`moteur/tester_donnees.py` : 375 OK, 1 INCOHÉRENCE BLOQUANTE, code 1.**
+
+Le cycle 29 relevait **379 OK, 0 échec, code 2**. L'incohérence est une seule
+ligne, **section 26** (« Rattachement d'un dividende à son exercice », bloquant),
+`tester_donnees.py:3527` :
+
+```
+verifie(len(nommes) >= 15,
+        f"{len(set(nommes))} avis BRVM nomment leur exercice et portent un "
+        f"ticker — c'est le seul cote independant du rattachement")
+```
+
+**`len(nommes)` vaut 14. Le plancher exige 15.** Les quatorze : CABC 2025,
+CBIBF 2025, CIEC 2025, ECOC 2025, FTSC 2024, NSBC 2025, ORAC 2025, SDCC 2025,
+SGBC 2025, SHEC 2025, SMBC 2025, SOGC 2025, STBC 2025, TTLS 2025.
+
+**Ce n'est pas une régression de code, c'est un plancher absolu posé sur une
+fenêtre glissante.** `collecte/avis_brvm.csv` est **entièrement régénéré** à
+chaque passage de P13 sur une fenêtre de 4 pages par rubrique ; le corpus tient
+140 lignes depuis des semaines. Le compte ne monte pas avec le temps : il
+**glisse**. Relevé révision par révision sur l'historique du fichier (après
+`git fetch --deepen=200`, la copie de travail étant un clone superficiel) :
+
+| passage de P13 | `len(nommes)` | total du corpus |
+|---|---|---|
+| 2026-09-28 23h30 au 2026-10-09 22h54 — **11 passages** | **15** à chacun | 139–140 |
+| **2026-10-13 00h58** | **14** | 140 |
+| 2026-10-13 23h07 au 2026-10-22 21h55 — 8 passages | **14** | 140 |
+
+L'avis qui est sorti est nommé : **SMBC exercice 2024, avis du 2025-08-27**, le
+plus ancien des quinze. Et **rien n'est entré à sa place** — `set(après) −
+set(avant)` est **vide**. Il retombera : le plus ancien restant est **FTSC 2024,
+avis du 2025-09-16**.
+
+**Preuve à deux côtés, et le second côté est la CI elle-même.** Le run **262** de
+`tests.yml` (P4), le **19/10/2026 06h27**, a échoué sur **exactement le même
+message** — « 14 avis BRVM nomment leur exercice et portent un ticker » — avec
+`Incoherence bloquante detectee — ne pas deployer` et `exit code 1`. Le bac à
+sable et la CI disent la même chose, sur deux arbres différents.
+
+**Second défaut, dans la même ligne.** Le plancher **teste** `len(nommes)` — la
+liste avec doublons — et le message **imprime** `len(set(nommes))`, la liste
+dédupliquée. Aujourd'hui les deux valent 14, donc l'écart ne se voit pas ; le
+jour où un avis sera redit, le message annoncera un nombre que le plancher ne
+teste pas. Même famille que les plafonds de C38 : le contrôle ne mesure pas ce
+qu'il déclare mesurer.
+
+**Et le silence est pire que le rouge — famille C43.** `tests.yml` ne se
+déclenche que sur un push touchant `moteur/`, `config/`, `collecte/` ou
+`dashboard/`. Or **tous** les pushes depuis le 11/10 viennent des workflows, avec
+`GITHUB_TOKEN`, qui ne redéclenche aucun workflow — anti-boucle documenté dans
+`pages.yml`. Mesure : **le dernier run de P4 sur `main` date du 11/10/2026
+07h18**, la clôture du cycle 29. Les pipelines ont écrit dans `collecte/` tous
+les jours ouvrés depuis, et P4 n'a jamais tourné. **La barrière est rouge depuis
+le 13/10 et le seul endroit où cela s'est vu est la CI d'une PR Dependabot que
+personne ne lit.**
+
+**Conséquence, appliquée.** Règle de `CHANTIERS.md` : « Jamais de commit si une
+barrière tombe. Tout annuler, ne committer que le constat d'échec. » Les deux
+fichiers de la section 2 ont été **supprimés**, `git checkout -- .` passé,
+`dashboard_brvm.xlsx` et `moteur/brvm.db` supprimés. L'arbre était propre avant
+rédaction. **La mesure de C45 n'a donc pas eu lieu, et sa passe pré-autorisée
+reste disponible** — la conception de l'instrument est consignée dans son bloc
+pour que le prochain cycle ne la redécouvre pas.
+
+Un mot sur la tentation écartée : mon code n'était pas la cause du rouge, et son
+propre autotest passait. Mais une boucle qui raisonne « la règle ne s'applique
+pas à moi cette fois » est exactement la façon dont ces règles s'érodent — et il
+y avait un coût concret : pousser dans `outils/` aurait déclenché un P4 rouge sur
+`main` au-dessus d'un rouge non résolu.
+
+### 5. Les alertes de fraîcheur sont passées de 4 à 7
+
+Non bloquantes, mais trois sont nouvelles depuis le cycle 29 et toutes disent la
+même chose — des relevés qui ont cessé d'avancer :
+
+- `collecte/dividendes_historique.csv` : dernière date **2026-10-01**, **14
+  séances de retard** sur le 2026-10-21, plafond 10 (observé 4 le 08/10) —
+  « **EN HAUSSE** ». `dividendes_par_exercice.csv` en est **généré**, donc ce
+  retard se propagerait à toute régénération.
+- `collecte/liquidite_quotidienne_historique.csv` : même date, **14 séances de
+  retard**, même plafond — « EN HAUSSE ». C'est la table de C14.
+- **1 observation** de `collecte/dividendes_boc.csv` absente du relevé
+  (plafond 0) : **PRSC 183,92 le 2026-10-23** — une régénération la perdrait.
+- Les quatre antérieures sont inchangées en forme : C4 (12 divisions de nominal
+  à documenter), C5 (CFAC et NEIC), relevé du jour non ancrable ×2 (3 indices
+  lisibles mais 0 lus).
+
+Ces trois-là sont **exactement la famille de C35**, soldée le 08/10 : « deux
+relevés de collecte se sont arrêtés le même jour ». Ils se sont arrêtés à
+nouveau, le 01/10, et rien d'autre que cette alerte ne le dit. Non inscrit en
+chantier ce cycle : **un chantier par cycle**, et C49 passe devant puisqu'il
+bloque tout. À reprendre dès que C49 est soldé.
+
+### 6. Aussi remesuré, sans s'en saisir : le journal des prédictions
+
+La veille datée du 09/10 disait « un seul jour, 48 lignes », revérifiée au cycle
+29 comme toujours un seul jour, avec le pronostic « à ce rythme le trimestre
+n'arrivera jamais ». **Ce pronostic était faux, et dans le bon sens.** Mesuré sur
+le fichier commité : `collecte/journal_profils.csv` porte **9 jours — 2026-10-09,
+10-13, 10-14, 10-15, 10-16, 10-19, 10-20, 10-21, 10-22 — et 432 lignes**. P13 a
+repris de pousser le 13/10 et commite le journal chaque jour ouvré depuis. Il
+manque les 10 et 11/10, où P13 n'a pas poussé, et les week-ends. **Au rythme
+mesuré — 9 jours en 10 jours ouvrés — le trimestre est atteint vers la mi-janvier
+2027.** La veille est corrigée en conséquence.
+
+### 7. Proposé : C49
+
+**ORANGE, priorité 1** — la seule chose qui bloque tous les autres chantiers.
+Trois options y sont écrites, aucune gratuite : (a) changer l'**unité** du
+plancher pour une part du corpus (14/47 = 0,2979), comme C38 l'a fait pour
+`AVIS_DIVIDENDE_SANS_TICKER`, avec son plancher de population sous peine du faux
+vert de la section 19 ; (b) élargir la **fenêtre** `--pages` de P13, ce qui change
+une collecte ; (c) cesser de régénérer `avis_brvm.csv` et l'**accumuler**, ce qui
+rendrait le plancher légitime — le plus juste et le plus lourd.
+
+ORANGE parce qu'abaisser un plancher **bloquant** décide de ce que la barrière
+arrête encore, et que la règle le dit : dans le doute, un chantier neuf naît
+ORANGE. **Mon avis, qui n'engage rien** : l'option (a) est la plus proche de la
+jurisprudence du dépôt, et le travail serait couvert par la classe VERTE telle
+qu'elle est définie (seuils de test, aucune donnée certifiée touchée) si Claudia
+édite la ligne `classe`. Le quatrième critère de *Terminé quand* ne l'est pas,
+lui : faire en sorte qu'un P4 rouge sur `main` se voie demande un arbitrage
+propre.
+
+### 8. Ce que ce cycle committe
+
+`CHANTIERS.md` et `docs/JOURNAL.md` seulement — donc **aucune barrière requise**
+pour ce commit, par la règle « Aucune si le commit ne touche que `CHANTIERS.md`
+ou `docs/` ». Aucun fichier de code, aucune donnée, aucun workflow.
+
+---
+
 ## 2026-10-11 — cycle 29 (matin) : la mesure de C2, et c'est l'autre axe qu'elle a tranché
 
 Contrôle anti-collision d'abord : `git log --since="3 hours ago"` sur `main` rend **0 commit**. Le
