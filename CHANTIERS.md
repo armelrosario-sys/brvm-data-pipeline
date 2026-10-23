@@ -3893,7 +3893,7 @@ d'être appliqué.
 
 - classe : ORANGE — abaisser ou changer l'unité d'un plancher **bloquant** décide de ce que la barrière arrête encore ; dans le doute, un chantier neuf naît ORANGE. **Mais rien n'avance tant qu'il tient : la barrière rouge interdit tout commit de la boucle comme de la conversation de développement.**
 - statut : **MESURÉ le 23/10/2026 (cycle 30), et c'est lui qui a fait tomber la barrière de ce cycle.** La passe de mesure est consommée ; aucun cycle ne la refait. Toute écriture attend un mot.
-- validation : —
+- validation : OK option (c)
 - autonomie : complète, **sans réseau** — tout est dans le dépôt
 - priorité : **1** — c'est la seule chose qui bloque **tous** les autres chantiers
 
