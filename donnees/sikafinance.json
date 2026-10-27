@@ -1,6 +1,6 @@
 {
- "releve_le": "2026-10-23",
- "releve_perf": "2026-10-23",
+ "releve_le": "2026-10-27",
+ "releve_perf": "2026-10-27",
  "releve_fondamentaux": "2026-10-03",
  "dernier_volet": "perf",
  "exercice": "2025",
@@ -10,12 +10,12 @@
   "SDSC": {
    "symbole": "SDSC",
    "perf": {
-    "v1s": 4.53,
-    "v1m": 7.14,
+    "v1s": 4.71,
+    "v1m": 3.45,
     "ytd": 98.02,
-    "v1an": 106.9,
-    "v3a": 102.7,
-    "v5a": 24.22
+    "v1an": 103.39,
+    "v3a": 115.05,
+    "v5a": 33.63
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SDSC.ci",
@@ -29,18 +29,18 @@
     "croissance_rn": -96.27,
     "bnpa": 14.42
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BOAB": {
    "symbole": "BOAB",
    "perf": {
-    "v1s": null,
-    "v1m": 2.39,
-    "ytd": 53.85,
-    "v1an": 78.57,
-    "v3a": 183.46,
-    "v5a": 244.5
+    "v1s": -1.41,
+    "v1m": 1.34,
+    "ytd": 55.04,
+    "v1an": 81.4,
+    "v3a": 185.67,
+    "v5a": 247.18
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAB.bj",
@@ -54,18 +54,18 @@
     "croissance_rn": 2.34,
     "bnpa": 495.73
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BOABF": {
    "symbole": "BOABF",
    "perf": {
-    "v1s": -4.24,
-    "v1m": 3.65,
-    "ytd": 104.53,
-    "v1an": 104.53,
-    "v3a": 147.42,
-    "v5a": 189.98
+    "v1s": -3.59,
+    "v1m": -5.43,
+    "ytd": 104.27,
+    "v1an": 102.65,
+    "v3a": 132.12,
+    "v5a": 194.62
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOABF.bf",
@@ -79,18 +79,18 @@
     "croissance_rn": -14.13,
     "bnpa": 437.55
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BOAC": {
    "symbole": "BOAC",
    "perf": {
-    "v1s": -1.71,
-    "v1m": 3.7,
-    "ytd": 55.99,
-    "v1an": 53.64,
-    "v3a": 229.41,
-    "v5a": 366.67
+    "v1s": -0.8,
+    "v1m": -3.23,
+    "ytd": 56.27,
+    "v1an": 55.83,
+    "v3a": 230.0,
+    "v5a": 385.71
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAC.ci",
@@ -104,18 +104,18 @@
     "croissance_rn": 10.91,
     "bnpa": 888.5
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BOAM": {
    "symbole": "BOAM",
    "perf": {
-    "v1s": -3.51,
-    "v1m": 0.55,
-    "ytd": 37.5,
-    "v1an": 27.91,
-    "v3a": 453.69,
-    "v5a": 415.63
+    "v1s": 1.75,
+    "v1m": -7.79,
+    "ytd": 45.0,
+    "v1an": 32.88,
+    "v3a": 481.94,
+    "v5a": 416.32
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAM.ml",
@@ -129,18 +129,18 @@
     "croissance_rn": 21.46,
     "bnpa": 403.69
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BOAN": {
    "symbole": "BOAN",
    "perf": {
-    "v1s": 3.19,
-    "v1m": 6.59,
-    "ytd": 85.82,
-    "v1an": 86.54,
-    "v3a": 91.37,
-    "v5a": 58.37
+    "v1s": 12.22,
+    "v1m": -1.56,
+    "ytd": 93.49,
+    "v1an": 94.61,
+    "v3a": 87.25,
+    "v5a": 70.11
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAN.ne",
@@ -154,18 +154,18 @@
     "croissance_rn": -91.82,
     "bnpa": 19.68
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BOAS": {
    "symbole": "BOAS",
    "perf": {
-    "v1s": null,
-    "v1m": 6.54,
-    "ytd": 55.53,
-    "v1an": 49.13,
-    "v3a": 294.99,
-    "v5a": 398.98
+    "v1s": 0.68,
+    "v1m": 0.68,
+    "ytd": 55.63,
+    "v1an": 52.0,
+    "v3a": 294.6,
+    "v5a": 389.3
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BOAS.sn",
@@ -179,16 +179,16 @@
     "croissance_rn": 9.61,
     "bnpa": 608.47
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BICB": {
    "symbole": "BICB",
    "perf": {
-    "v1s": 2.26,
-    "v1m": 0.35,
-    "ytd": 72.66,
-    "v1an": 65.19,
+    "v1s": 0.71,
+    "v1m": 0.12,
+    "ytd": 71.26,
+    "v1an": 60.75,
     "v3a": null,
     "v5a": null
    },
@@ -204,18 +204,18 @@
     "croissance_rn": -20.3,
     "bnpa": 418.66
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BNBC": {
    "symbole": "BNBC",
    "perf": {
-    "v1s": -3.05,
-    "v1m": -7.41,
-    "ytd": 24.11,
-    "v1an": -4.11,
-    "v3a": -11.39,
-    "v5a": -12.5
+    "v1s": -6.76,
+    "v1m": -14.18,
+    "ytd": 22.34,
+    "v1an": -6.76,
+    "v3a": -12.44,
+    "v5a": -19.77
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BNBC.ci",
@@ -229,18 +229,18 @@
     "croissance_rn": 205.18,
     "bnpa": 3.37
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "BICC": {
    "symbole": "BICC",
    "perf": {
-    "v1s": -4.01,
-    "v1m": 4.56,
-    "ytd": 59.94,
-    "v1an": 59.57,
-    "v3a": 364.18,
-    "v5a": 385.94
+    "v1s": -0.64,
+    "v1m": -2.5,
+    "ytd": 60.45,
+    "v1an": 60.41,
+    "v3a": 358.82,
+    "v5a": 420.0
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_BICC.ci",
@@ -254,18 +254,18 @@
     "croissance_rn": 39.25,
     "bnpa": 2191.0
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "CFAC": {
    "symbole": "CFAC",
    "perf": {
-    "v1s": -1.03,
-    "v1m": -3.04,
-    "ytd": 0.35,
-    "v1an": -20.28,
-    "v3a": 75.0,
-    "v5a": 36.67
+    "v1s": -5.59,
+    "v1m": -13.18,
+    "ytd": -5.59,
+    "v1an": -28.95,
+    "v3a": 68.75,
+    "v5a": 31.07
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_CFAC.ci",
@@ -279,17 +279,17 @@
     "croissance_rn": 79.32,
     "bnpa": 46.4
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "CIEC": {
    "symbole": "CIEC",
    "perf": {
-    "v1s": -15.78,
-    "v1m": -21.27,
+    "v1s": -11.98,
+    "v1m": -24.15,
     "ytd": 106.99,
-    "v1an": 96.18,
-    "v3a": 138.29,
+    "v1an": 95.4,
+    "v3a": 143.03,
     "v5a": 144.86
    },
    "sources": [
@@ -304,18 +304,18 @@
     "croissance_rn": 29.96,
     "bnpa": 234.41
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "CBIBF": {
    "symbole": "CBIBF",
    "perf": {
-    "v1s": -1.9,
-    "v1m": 7.76,
+    "v1s": 1.29,
+    "v1m": -1.9,
     "ytd": 186.64,
-    "v1an": 209.77,
-    "v3a": 257.23,
-    "v5a": 235.87
+    "v1an": 209.62,
+    "v3a": 255.17,
+    "v5a": 232.26
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_CBIBF.bf",
@@ -329,7 +329,7 @@
     "croissance_rn": 36.63,
     "bnpa": 2046.73
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SEMC": {
@@ -354,18 +354,18 @@
     "croissance_rn": -95.56,
     "bnpa": 1.79
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "ECOC": {
    "symbole": "ECOC",
    "perf": {
-    "v1s": 3.02,
-    "v1m": -2.5,
-    "ytd": 2.38,
-    "v1an": 15.56,
-    "v3a": 146.32,
-    "v5a": 276.55
+    "v1s": 0.31,
+    "v1m": -3.3,
+    "ytd": 1.56,
+    "v1an": 14.44,
+    "v3a": 137.23,
+    "v5a": 269.32
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ECOC.ci",
@@ -379,18 +379,18 @@
     "croissance_rn": 10.45,
     "bnpa": 1153.16
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SIVC": {
    "symbole": "SIVC",
    "perf": {
-    "v1s": -5.03,
+    "v1s": -4.49,
     "v1m": -15.0,
     "ytd": 7.59,
     "v1an": 139.44,
-    "v3a": 176.42,
-    "v5a": 183.33
+    "v3a": 183.33,
+    "v5a": 176.42
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SIVC.ci",
@@ -404,18 +404,18 @@
     "croissance_rn": -52.44,
     "bnpa": 20.53
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "ETIT": {
    "symbole": "ETIT",
    "perf": {
-    "v1s": -1.54,
-    "v1m": null,
-    "ytd": 178.26,
-    "v1an": 204.76,
-    "v3a": 255.56,
-    "v5a": 392.31
+    "v1s": -3.08,
+    "v1m": -8.7,
+    "ytd": 173.91,
+    "v1an": 186.36,
+    "v3a": 231.58,
+    "v5a": 384.62
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ETIT.tg",
@@ -429,18 +429,18 @@
     "croissance_rn": 15.29,
     "bnpa": 10.0
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "FTSC": {
    "symbole": "FTSC",
    "perf": {
-    "v1s": -0.28,
+    "v1s": -0.55,
     "v1m": -10.25,
     "ytd": -19.14,
-    "v1an": -37.78,
-    "v3a": 61.71,
-    "v5a": 11.49
+    "v1an": -38.32,
+    "v3a": 66.98,
+    "v5a": 8.79
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_FTSC.ci",
@@ -454,16 +454,16 @@
     "croissance_rn": -97.49,
     "bnpa": 33.04
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "LNBB": {
    "symbole": "LNBB",
    "perf": {
-    "v1s": null,
-    "v1m": 8.11,
-    "ytd": -6.87,
-    "v1an": 2.56,
+    "v1s": -0.13,
+    "v1m": 0.38,
+    "ytd": -6.98,
+    "v1an": -0.13,
     "v3a": null,
     "v5a": null
    },
@@ -479,18 +479,18 @@
     "croissance_rn": -35.59,
     "bnpa": 231.11
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "NEIC": {
    "symbole": "NEIC",
    "perf": {
-    "v1s": 1.43,
-    "v1m": -11.23,
-    "ytd": 77.92,
-    "v1an": 211.68,
-    "v3a": 244.35,
-    "v5a": 335.71
+    "v1s": 0.96,
+    "v1m": -11.72,
+    "ytd": 75.83,
+    "v1an": 208.03,
+    "v3a": 240.32,
+    "v5a": 330.61
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_NEIC.ci",
@@ -504,18 +504,18 @@
     "croissance_rn": null,
     "bnpa": 159.54
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "NTLC": {
    "symbole": "NTLC",
    "perf": {
-    "v1s": -5.44,
-    "v1m": -4.14,
+    "v1s": -4.79,
+    "v1m": -9.15,
     "ytd": 30.52,
-    "v1an": 3.35,
-    "v3a": 73.75,
-    "v5a": 172.55
+    "v1an": 3.73,
+    "v3a": 74.08,
+    "v5a": 148.66
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_NTLC.ci",
@@ -529,18 +529,18 @@
     "croissance_rn": 1.53,
     "bnpa": 834.91
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "NSBC": {
    "symbole": "NSBC",
    "perf": {
-    "v1s": 0.93,
-    "v1m": -0.55,
-    "ytd": 80.87,
-    "v1an": 84.99,
-    "v3a": 230.41,
-    "v5a": 249.37
+    "v1s": -7.93,
+    "v1m": -14.89,
+    "ytd": 67.32,
+    "v1an": 70.98,
+    "v3a": 218.9,
+    "v5a": 219.17
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_NSBC.ci",
@@ -554,18 +554,18 @@
     "croissance_rn": 6.82,
     "bnpa": 1646.0
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "ONTBF": {
    "symbole": "ONTBF",
    "perf": {
-    "v1s": 2.67,
-    "v1m": 9.82,
-    "ytd": 23.74,
-    "v1an": 23.25,
-    "v3a": 53.75,
-    "v5a": -22.54
+    "v1s": 5.52,
+    "v1m": 3.38,
+    "ytd": 23.14,
+    "v1an": 22.4,
+    "v3a": 48.18,
+    "v5a": -22.92
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ONTBF.bf",
@@ -579,18 +579,18 @@
     "croissance_rn": -26.01,
     "bnpa": 233.63
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "ORGT": {
    "symbole": "ORGT",
    "perf": {
-    "v1s": -0.36,
-    "v1m": -1.07,
-    "ytd": 15.42,
-    "v1an": 5.12,
-    "v3a": 11.47,
-    "v5a": -30.66
+    "v1s": -0.9,
+    "v1m": -9.34,
+    "ytd": 15.21,
+    "v1an": 2.41,
+    "v3a": 3.17,
+    "v5a": -32.56
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ORGT.tg",
@@ -604,17 +604,17 @@
     "croissance_rn": null,
     "bnpa": 311.79
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "ORAC": {
    "symbole": "ORAC",
    "perf": {
-    "v1s": -1.94,
-    "v1m": -0.98,
-    "ytd": 41.75,
-    "v1an": 39.02,
-    "v3a": 90.48,
+    "v1s": -2.31,
+    "v1m": -4.81,
+    "ytd": 42.25,
+    "v1an": 36.96,
+    "v3a": 89.62,
     "v5a": null
    },
    "sources": [
@@ -629,18 +629,18 @@
     "croissance_rn": 6.07,
     "bnpa": 1114.0
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "PALC": {
    "symbole": "PALC",
    "perf": {
-    "v1s": -5.26,
-    "v1m": -11.11,
-    "ytd": -11.11,
-    "v1an": -18.18,
-    "v3a": -1.57,
-    "v5a": 5.88
+    "v1s": -2.66,
+    "v1m": -7.41,
+    "ytd": -7.41,
+    "v1an": -15.73,
+    "v3a": 7.07,
+    "v5a": 7.91
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_PALC.ci",
@@ -654,18 +654,18 @@
     "croissance_rn": -2.23,
     "bnpa": 1003.0
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SAFC": {
    "symbole": "SAFC",
    "perf": {
-    "v1s": -0.64,
-    "v1m": -2.64,
-    "ytd": 64.15,
-    "v1an": 83.28,
-    "v3a": 506.15,
-    "v5a": 843.48
+    "v1s": 0.26,
+    "v1m": -11.4,
+    "ytd": 61.39,
+    "v1an": 67.74,
+    "v3a": 520.23,
+    "v5a": 789.0
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SAFC.ci",
@@ -679,17 +679,17 @@
     "croissance_rn": null,
     "bnpa": 59.06
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SPHC": {
    "symbole": "SPHC",
    "perf": {
-    "v1s": 5.26,
-    "v1m": 6.67,
+    "v1s": 6.45,
+    "v1m": 1.27,
     "ytd": 1.27,
-    "v1an": -2.44,
-    "v3a": 208.88,
+    "v1an": -2.32,
+    "v3a": 213.73,
     "v5a": 48.56
    },
    "sources": [
@@ -704,18 +704,18 @@
     "croissance_rn": 32.9,
     "bnpa": 977.07
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "ABJC": {
    "symbole": "ABJC",
    "perf": {
-    "v1s": 3.33,
-    "v1m": -21.12,
-    "ytd": 6.9,
-    "v1an": 32.48,
-    "v3a": 157.26,
-    "v5a": 63.59
+    "v1s": 6.64,
+    "v1m": -18.32,
+    "ytd": 10.69,
+    "v1an": 35.44,
+    "v3a": 167.5,
+    "v5a": 77.84
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_ABJC.ci",
@@ -729,18 +729,18 @@
     "croissance_rn": -11.08,
     "bnpa": 123.78
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "STAC": {
    "symbole": "STAC",
    "perf": {
-    "v1s": -6.4,
-    "v1m": -9.52,
-    "ytd": 43.4,
-    "v1an": 61.7,
-    "v3a": 76.74,
-    "v5a": 163.89
+    "v1s": -6.44,
+    "v1m": -9.35,
+    "ytd": 42.64,
+    "v1an": 57.5,
+    "v3a": 94.85,
+    "v5a": 170.0
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_STAC.ci",
@@ -754,18 +754,18 @@
     "croissance_rn": null,
     "bnpa": null
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SGBC": {
    "symbole": "SGBC",
    "perf": {
-    "v1s": -0.14,
-    "v1m": 2.54,
-    "ytd": 30.29,
-    "v1an": 39.11,
-    "v3a": 140.43,
-    "v5a": 267.45
+    "v1s": -0.03,
+    "v1m": 0.12,
+    "ytd": 30.27,
+    "v1an": 40.6,
+    "v3a": 143.41,
+    "v5a": 270.9
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SGBC.ci",
@@ -779,18 +779,18 @@
     "croissance_rn": 0.12,
     "bnpa": 3257.73
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "CABC": {
    "symbole": "CABC",
    "perf": {
-    "v1s": -0.17,
-    "v1m": -6.11,
-    "ytd": 26.91,
-    "v1an": 74.64,
-    "v3a": 146.5,
-    "v5a": 153.81
+    "v1s": -0.5,
+    "v1m": -12.21,
+    "ytd": 26.48,
+    "v1an": 75.59,
+    "v3a": 148.75,
+    "v5a": 157.33
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_CABC.ci",
@@ -804,7 +804,7 @@
     "croissance_rn": 39.16,
     "bnpa": 287.91
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SICC": {
@@ -829,18 +829,18 @@
     "croissance_rn": null,
     "bnpa": null
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "STBC": {
    "symbole": "STBC",
    "perf": {
-    "v1s": -0.7,
-    "v1m": 1.46,
+    "v1s": -0.93,
+    "v1m": -0.93,
     "ytd": 7.18,
-    "v1an": 8.72,
-    "v3a": 247.83,
-    "v5a": 403.56
+    "v1an": 9.28,
+    "v3a": 253.33,
+    "v5a": 394.17
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_STBC.ci",
@@ -854,18 +854,18 @@
     "croissance_rn": -17.45,
     "bnpa": 2030.83
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SMBC": {
    "symbole": "SMBC",
    "perf": {
-    "v1s": -3.8,
-    "v1m": 0.68,
-    "ytd": 55.89,
-    "v1an": 51.2,
-    "v3a": 48.84,
-    "v5a": 111.27
+    "v1s": -2.6,
+    "v1m": -6.39,
+    "ytd": 55.79,
+    "v1an": 53.37,
+    "v3a": 59.57,
+    "v5a": 108.45
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SMBC.ci",
@@ -879,18 +879,18 @@
     "croissance_rn": 50.32,
     "bnpa": 1677.31
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SIBC": {
    "symbole": "SIBC",
    "perf": {
-    "v1s": 0.8,
-    "v1m": 3.35,
-    "ytd": 52.96,
-    "v1an": 57.05,
-    "v3a": 230.33,
-    "v5a": 356.88
+    "v1s": -0.29,
+    "v1m": -3.33,
+    "ytd": 51.3,
+    "v1an": 52.63,
+    "v3a": 225.84,
+    "v5a": 357.89
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SIBC.ci",
@@ -904,18 +904,18 @@
     "croissance_rn": 10.73,
     "bnpa": 556.23
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SDCC": {
    "symbole": "SDCC",
    "perf": {
-    "v1s": -4.65,
-    "v1m": 10.17,
-    "ytd": 112.07,
-    "v1an": 97.91,
-    "v3a": 156.52,
-    "v5a": 195.32
+    "v1s": -8.38,
+    "v1m": -0.8,
+    "ytd": 103.53,
+    "v1an": 96.1,
+    "v3a": 162.33,
+    "v5a": 183.43
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SDCC.ci",
@@ -929,18 +929,18 @@
     "croissance_rn": 30.96,
     "bnpa": 518.08
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SOGC": {
    "symbole": "SOGC",
    "perf": {
-    "v1s": 2.49,
-    "v1m": 4.11,
+    "v1s": 1.2,
+    "v1m": -3.8,
     "ytd": -3.8,
-    "v1an": -12.64,
-    "v3a": 102.67,
-    "v5a": 47.57
+    "v1an": -12.59,
+    "v3a": 122.22,
+    "v5a": 38.18
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SOGC.ci",
@@ -954,18 +954,18 @@
     "croissance_rn": -4.71,
     "bnpa": 578.31
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SLBC": {
    "symbole": "SLBC",
    "perf": {
-    "v1s": 0.27,
-    "v1m": 1.9,
+    "v1s": 0.29,
+    "v1m": 1.59,
     "ytd": 33.58,
-    "v1an": 103.18,
-    "v3a": 333.76,
-    "v5a": 252.07
+    "v1an": 116.88,
+    "v3a": 354.18,
+    "v5a": 221.11
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SLBC.ci",
@@ -979,18 +979,18 @@
     "croissance_rn": 113.21,
     "bnpa": 2781.0
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SNTS": {
    "symbole": "SNTS",
    "perf": {
-    "v1s": 0.8,
-    "v1m": 6.95,
-    "ytd": 67.88,
-    "v1an": 64.26,
-    "v3a": 169.02,
-    "v5a": 213.21
+    "v1s": 9.81,
+    "v1m": 10.59,
+    "ytd": 79.94,
+    "v1an": 76.69,
+    "v3a": 179.76,
+    "v5a": 235.71
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SNTS.sn",
@@ -1004,18 +1004,18 @@
     "croissance_rn": 5.06,
     "bnpa": 4136.0
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SCRC": {
    "symbole": "SCRC",
    "perf": {
-    "v1s": 4.63,
-    "v1m": -11.71,
-    "ytd": 124.06,
-    "v1an": 87.01,
-    "v3a": 361.17,
-    "v5a": 97.92
+    "v1s": 11.63,
+    "v1m": -22.58,
+    "ytd": 126.42,
+    "v1an": 82.51,
+    "v3a": 348.6,
+    "v5a": 98.35
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SCRC.ci",
@@ -1029,18 +1029,18 @@
     "croissance_rn": null,
     "bnpa": null
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "TTLC": {
    "symbole": "TTLC",
    "perf": {
-    "v1s": -6.61,
-    "v1m": -3.02,
-    "ytd": 23.98,
-    "v1an": 23.19,
-    "v3a": 48.46,
-    "v5a": 52.37
+    "v1s": 1.04,
+    "v1m": -4.75,
+    "ytd": 24.41,
+    "v1an": 21.55,
+    "v3a": 45.25,
+    "v5a": 57.03
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_TTLC.ci",
@@ -1054,18 +1054,18 @@
     "croissance_rn": -3.06,
     "bnpa": 144.33
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "TTLS": {
    "symbole": "TTLS",
    "perf": {
-    "v1s": -2.74,
-    "v1m": -6.58,
-    "ytd": 42.0,
-    "v1an": 39.22,
-    "v3a": 33.96,
-    "v5a": 96.68
+    "v1s": -1.37,
+    "v1m": -5.14,
+    "ytd": 44.0,
+    "v1an": 42.57,
+    "v3a": 43.43,
+    "v5a": 89.97
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_TTLS.sn",
@@ -1079,17 +1079,17 @@
     "croissance_rn": -13.31,
     "bnpa": 188.69
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "PRSC": {
    "symbole": "PRSC",
    "perf": {
-    "v1s": -11.42,
-    "v1m": -9.52,
+    "v1s": -9.52,
+    "v1m": -9.42,
     "ytd": -1.94,
-    "v1an": -5.0,
-    "v3a": 40.74,
+    "v1an": -4.64,
+    "v3a": 48.73,
     "v5a": 16.03
    },
    "sources": [
@@ -1104,18 +1104,18 @@
     "croissance_rn": 0.86,
     "bnpa": 231.19
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "UNLC": {
    "symbole": "UNLC",
    "perf": {
-    "v1s": 7.47,
-    "v1m": -1.31,
-    "ytd": 41.3,
-    "v1an": 141.8,
-    "v3a": 867.2,
-    "v5a": 962.86
+    "v1s": 0.33,
+    "v1m": -11.37,
+    "ytd": 32.07,
+    "v1an": 126.0,
+    "v3a": 804.0,
+    "v5a": 893.41
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_UNLC.ci",
@@ -1129,18 +1129,18 @@
     "croissance_rn": null,
     "bnpa": 69.73
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "UNXC": {
    "symbole": "UNXC",
    "perf": {
-    "v1s": -2.1,
-    "v1m": -4.55,
+    "v1s": -0.24,
+    "v1m": -10.64,
     "ytd": 50.0,
-    "v1an": 6.6,
+    "v1an": 12.3,
     "v3a": 200.0,
-    "v5a": 8.25
+    "v5a": 5.26
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_UNXC.ci",
@@ -1154,18 +1154,18 @@
     "croissance_rn": null,
     "bnpa": null
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   },
   "SHEC": {
    "symbole": "SHEC",
    "perf": {
-    "v1s": -0.46,
-    "v1m": -11.92,
-    "ytd": 50.87,
-    "v1an": 77.24,
-    "v3a": 162.65,
-    "v5a": 106.64
+    "v1s": null,
+    "v1m": -10.12,
+    "ytd": 50.52,
+    "v1an": 82.77,
+    "v3a": 165.24,
+    "v5a": 117.5
    },
    "sources": [
     "https://www.sikafinance.com/marches/cotation_SHEC.ci",
@@ -1179,7 +1179,7 @@
     "croissance_rn": 12.59,
     "bnpa": 95.68
    },
-   "perf_releve": "2026-10-23",
+   "perf_releve": "2026-10-27",
    "chiffres_releve": "2026-10-03"
   }
  }
