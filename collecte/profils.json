@@ -4656,12 +4656,6 @@
    {
     "date": "2026-05-19",
     "type": "AGO",
-    "titre": "formulaire de vote par correspondance assemblee generale ordinaire solibra ci",
-    "url": "https://www.brvm.org/sites/default/files/20260519_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
-   },
-   {
-    "date": "2026-05-19",
-    "type": "AGO",
     "titre": "avis de convocation assemblee generale ordinaire solibra ci",
     "url": "https://www.brvm.org/sites/default/files/20260519_-_avis_de_convocation_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
    },
@@ -4670,6 +4664,12 @@
     "type": "AGO",
     "titre": "pouvoir assemblee generale ordinaire solibra ci",
     "url": "https://www.brvm.org/sites/default/files/20260519_-_pouvoir_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
+   },
+   {
+    "date": "2026-05-19",
+    "type": "AGO",
+    "titre": "formulaire de vote par correspondance assemblee generale ordinaire solibra ci",
+    "url": "https://www.brvm.org/sites/default/files/20260519_-_formulaire_de_vote_par_correspondance_-_assemblee_generale_ordinaire_-_solibra_ci.pdf"
    }
   ]
  },
