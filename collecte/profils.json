@@ -557,11 +557,11 @@
    "note": "A+",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-08-22",
-   "validite": "Juillet 2025 a Juin 2026",
+   "date": "2026-10-23",
+   "validite": "juillet 2026 a juin 2027",
    "marge_nette": "",
    "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20250822_-_notation_financiere_-_bernabe_ci.pdf"
+   "url": "https://www.brvm.org/sites/default/files/20261022_-_notation_financiere_-_bernabe_ci.pdf"
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
@@ -1162,11 +1162,11 @@
    "note": "A-",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-11-18",
+   "date": "2026-10-15",
    "validite": "",
    "marge_nette": "",
    "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20251117_-_notation_financiere_-_boa_ng.pdf"
+   "url": "https://www.brvm.org/sites/default/files/20261014_-_notation_financiere_-_boa_ng.pdf"
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
@@ -1284,11 +1284,11 @@
    "note": "A",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-10-23",
+   "date": "2026-10-07",
    "validite": "",
    "marge_nette": "",
    "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20251022_-_notation_financiere_-_boa_sn.pdf"
+   "url": "https://www.brvm.org/sites/default/files/20261006_-_notation_financiere_-_boa_sn.pdf"
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
@@ -1934,11 +1934,11 @@
    "note": "AA",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-10-28",
+   "date": "2026-10-23",
    "validite": "",
    "marge_nette": "",
    "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20251028_-_notation_financiere_-_ecobank_ci.pdf"
+   "url": "https://www.brvm.org/sites/default/files/20261022_-_notation_financiere_-_ecobank_ci.pdf"
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
@@ -2300,11 +2300,11 @@
    "note": "A+",
    "note_precedente": "",
    "perspective": "stable",
-   "date": "2025-08-28",
+   "date": "2026-10-23",
    "validite": "",
    "marge_nette": "",
    "ca_mds": "",
-   "url": "https://www.brvm.org/sites/default/files/20250828_-_notation_financiere_-_lnb_bn.pdf"
+   "url": "https://www.brvm.org/sites/default/files/20261022_-_notation_financiere_-_lnb_bn.pdf"
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
@@ -5664,14 +5664,14 @@
   "source_fait": null,
   "notation": {
    "agence": "GCR",
-   "note": "A(WU)",
-   "note_precedente": "",
+   "note": "AA-(WU)",
+   "note_precedente": "A(WU)",
    "perspective": "stable",
-   "date": "2023-12-26",
+   "date": "2025-12-30",
    "validite": "",
    "marge_nette": "",
-   "ca_mds": "477.0",
-   "url": "https://www.brvm.org/sites/default/files/20231226_-_notation_financiere_-_total_sn.pdf"
+   "ca_mds": "484.9;7.1",
+   "url": "https://www.brvm.org/sites/default/files/20251230_-_notation_financiere_-_totalenergies_marketing_sn.pdf"
   },
   "contradiction_notation": false,
   "statut_cotation": "NEGOCIABLE",
